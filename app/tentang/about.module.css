@@ -1,0 +1,52 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.lead {
+  font-size: 17px;
+  line-height: 1.7;
+  background: #ffffff;
+  border: 1px solid #e0e0e6;
+  border-left: 4px solid #c8102e;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 28px;
+}
+
+.section {
+  margin-bottom: 28px;
+}
+
+.section h2 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.section p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #1a1a2e;
+}
+
+.list {
+  padding-left: 20px;
+}
+
+.list li {
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 6px;
+}
+
+.list a {
+  color: #c8102e;
+}

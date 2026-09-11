@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import styles from "./page.module.css";
+import { Header, Footer } from "@/components/site";
 
 // ===== Data contoh (mock) — nanti diganti dari admin panel/database =====
 type Article = {
@@ -91,22 +92,7 @@ function formatDate(date: string) {
 export default function Home() {
   return (
     <main>
-      {/* ===== Header ===== */}
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <div className={styles.logo}>
-            <span className={styles.logoIcon}>🔔</span>
-            <span className={styles.logoText}>Genta<strong>Nusa</strong></span>
-          </div>
-          <nav className={styles.nav}>
-            <a href="/" className={styles.navLinkActive}>Beranda</a>
-            <a href="/kategori/politik" className={styles.navLink}>Politik</a>
-            <a href="/kategori/ekonomi" className={styles.navLink}>Ekonomi</a>
-            <a href="/kategori/nasional" className={styles.navLink}>Nasional</a>
-            <a href="/tentang" className={styles.navLink}>Tentang</a>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       {/* ===== Hero / Headline ===== */}
       <section className={styles.hero}>
@@ -185,36 +171,7 @@ export default function Home() {
         </section>
       ))}
 
-      {/* ===== Footer ===== */}
-      <footer className={styles.footer}>
-        <div className={styles.container}>
-          <div className={styles.footerGrid}>
-            <div>
-              <div className={styles.logo}>
-                <span className={styles.logoIcon}>🔔</span>
-                <span className={styles.logoText}>Genta<strong>Nusa</strong></span>
-              </div>
-              <p className={styles.footerText}>
-                Berita Nusantara terkini, akurat, dan terpercaya.
-              </p>
-            </div>
-            <div className={styles.footerCol}>
-              <h4>Kategori</h4>
-              <a href="/kategori/politik">Politik</a>
-              <a href="/kategori/ekonomi">Ekonomi</a>
-              <a href="/kategori/nasional">Nasional</a>
-            </div>
-            <div className={styles.footerCol}>
-              <h4>Kontak</h4>
-              <span>redaksi@gentanusa.id</span>
-              <span>Jakarta, Indonesia</span>
-            </div>
-          </div>
-          <div className={styles.footerBottom}>
-            © 2026 GentaNusa. Seluruh hak cipta dilindungi.
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }
