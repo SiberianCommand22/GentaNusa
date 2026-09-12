@@ -15,7 +15,7 @@ export default function AboutPage() {
       <main className={styles.container}>
         <h1 className={styles.title}>Tentang GentaNusa</h1>
         <p className={styles.lead}>
-          <strong>GentaNusa</strong> — "Lonceng Nusantara" — hadir sebagai
+          <strong>GentaNusa</strong> — &quot;Lonceng Nusantara&quot; — hadir sebagai
           penanda kabar penting bagi bangsa. Lonceng membunyikan peringatan,
           panggilan, dan tanda. Seperti itulah GentaNusa: menyuarakan kabar
           yang perlu diketahui seluruh negeri.

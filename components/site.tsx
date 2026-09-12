@@ -1,22 +1,25 @@
+import Link from "next/link";
+import { MobileNav } from "./mobile-nav";
 import styles from "./site.module.css";
 
 export function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.headerInner}>
-        <a href="/" className={styles.logo}>
+        <Link href="/" className={styles.logo}>
           <span className={styles.logoIcon}>🔔</span>
           <span className={styles.logoText}>
             Genta<strong>Nusa</strong>
           </span>
-        </a>
+        </Link>
         <nav className={styles.nav}>
-          <a href="/" className={styles.navLink}>Beranda</a>
-          <a href="/kategori/politik" className={styles.navLink}>Politik</a>
-          <a href="/kategori/ekonomi" className={styles.navLink}>Ekonomi</a>
-          <a href="/kategori/nasional" className={styles.navLink}>Nasional</a>
-          <a href="/tentang" className={styles.navLink}>Tentang</a>
+          <Link href="/" className={styles.navLink}>Beranda</Link>
+          <Link href="/kategori/politik" className={styles.navLink}>Politik</Link>
+          <Link href="/kategori/ekonomi" className={styles.navLink}>Ekonomi</Link>
+          <Link href="/kategori/nasional" className={styles.navLink}>Nasional</Link>
+          <Link href="/tentang" className={styles.navLink}>Tentang</Link>
         </nav>
+        <MobileNav />
       </div>
     </header>
   );
@@ -40,15 +43,16 @@ export function Footer() {
           </div>
           <div className={styles.footerCol}>
             <h4>Kategori</h4>
-            <a href="/kategori/politik">Politik</a>
-            <a href="/kategori/ekonomi">Ekonomi</a>
-            <a href="/kategori/nasional">Nasional</a>
+            <Link href="/kategori/politik">Politik</Link>
+            <Link href="/kategori/ekonomi">Ekonomi</Link>
+            <Link href="/kategori/nasional">Nasional</Link>
           </div>
           <div className={styles.footerCol}>
-            <h4>Kontak</h4>
-            <span>redaksi@gentanusa.id</span>
-            <span>Jakarta, Indonesia</span>
-          </div>
+                      <h4>Kontak</h4>
+                      <span>redaksi@gentanusa.id</span>
+                      <span>Jakarta, Indonesia</span>
+                      <Link href="/feed.xml">RSS Feed</Link>
+                    </div>
         </div>
         <div className={styles.footerBottom}>
           © 2026 GentaNusa. Seluruh hak cipta dilindungi.

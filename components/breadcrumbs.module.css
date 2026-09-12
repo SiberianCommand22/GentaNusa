@@ -1,0 +1,33 @@
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.link {
+  color: #1a5c8a;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.current {
+  color: #8a8a9a;
+  font-weight: 600;
+}
+
+.sep {
+  color: #c9c9d6;
+  font-size: 16px;
+  line-height: 1;
+}

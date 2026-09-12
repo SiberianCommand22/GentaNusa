@@ -1,4 +1,6 @@
-// ===== Data mock — nanti diganti database =====
+import fs from "fs";
+import path from "path";
+
 export type Article = {
   id: number;
   title: string;
@@ -6,124 +8,40 @@ export type Article = {
   excerpt: string;
   date: string;
   author: string;
+  image?: string;
   content: string[];
   tags: string[];
 };
 
-export const articles: Article[] = [
-  {
-    id: 100,
-    title:
-      "APBN 2026: Fokus Belanja Prioritas, Defisit Ditekan di Tengah Ketidakpastian Global",
-    category: "Ekonomi",
-    excerpt:
-      "Pemerintah menegaskan komitmen menjaga defisit fiskal dalam batas aman, dengan belanja diarahkan pada program prioritas nasional.",
-    date: "11 September 2026",
-    author: "Redaksi GentaNusa",
-    content: [
-      "JAKARTA — Pemerintah resmi mengajukan Rancangan Anggaran Pendapatan dan Belanja Negara (RAPBN) 2026 dengan penekanan pada belanja prioritas dan pengendalian defisit di tengah ketidakpastian ekonomi global.",
-      "Menteri Keuangan menyatakan postur APBN 2026 dirancang konsolidatif namun tetap ekspansif pada sektor-sektor produktif. Defisit ditargetkan turun bertahap menuju batas aman tiga persen dari Produk Domestik Bruto (PDB).",
-      "Belanja negara tahun depan diarahkan pada empat prioritas utama: pembangunan sumber daya manusia, infrastruktur pendukung hilirisasi, penguatan jaring pengaman sosial, serta transformasi ekonomi digital.",
-      "Kepala Badan Kebijakan Fiskal menambahkan, pemerintah juga menyiapkan ruang fiskal untuk menghadapi gejolak eksternal. Cadangan fiskal dijaga pada level yang memadai, termasuk melalui penguatan penerimaan negara.",
-      "Ekonom dari sejumlah lembaga riset menilai postur APBN 2026 cukup realistis. Mereka menyoroti pentingnya menjaga konsistensi antara target penerimaan dan realisasi belanja agar kredibilitas fiskal tetap terjaga.",
-      "Pembahasan RAPBN 2026 akan berlanjut di DPR RI. Masyarakat dipersilakan menyampaikan masukan melalui kanal partisipasi publik yang disediakan DPR maupun Kementerian Keuangan.",
-    ],
-    tags: ["APBN", "Fiskal", "Ekonomi Makro", "Anggaran"],
-  },
-  {
-    id: 1,
-    title: "DPR Sahkan Revisi UU Minerba, Ini Poin Pentingnya",
-    category: "Politik",
-    excerpt: "Revisi mengubah skema izin dan menambah kewenangan pemerintah pusat.",
-    date: "11 September 2026",
-    author: "Redaksi",
-    content: [
-      "JAKARTA — Dewan Perwakilan Rakyat (DPR) resmi mengesahkan revisi Undang-Undang Mineral dan Batubara (Minerba) dalam rapat paripurna.",
-      "Sejumlah poin penting diubah, antara lain skema perizinan usaha pertambangan yang kini melibatkan persetujuan pemerintah pusat secara lebih ketat.",
-      "Ketua Komisi VII DPR menyatakan revisi ini bertujuan meningkatkan nilai tambah sumber daya alam dalam negeri sekaligus memperkuat pengawasan terhadap aktivitas pertambangan.",
-      "Pemerintah menyambut pengesahan ini dan menyatakan akan menyiapkan aturan turunan dalam enam bulan ke depan.",
-    ],
-    tags: ["Minerba", "DPR", "UU", "Sumber Daya Alam"],
-  },
-  {
-    id: 2,
-    title: "Rupiah Menguat, IHSG Catat Rekor Tertinggi Sepanjang Tahun",
-    category: "Ekonomi",
-    excerpt: "Sentimen positif dari data inflasi domestik dan masuknya arus modal asing.",
-    date: "11 September 2026",
-    author: "Redaksi",
-    content: [
-      "JAKARTA — Nilai tukar rupiah menguat terhadap dolar Amerika Serikat pada perdagangan Kamis, didorong data inflasi domestik yang lebih rendah dari perkiraan.",
-      "Indeks Harga Saham Gabungan (IHSG) menguat dan mencatat rekor tertinggi sepanjang tahun ini. Arus modal asing masuk tercatat di pasar obligasi dan saham.",
-      "Analis menilai penguatan ini dipengaruhi keyakinan pasar terhadap stabilitas ekonomi nasional dan prospek pertumbuhan yang terjaga.",
-    ],
-    tags: ["Rupiah", "IHSG", "Pasar Modal", "Inflasi"],
-  },
-  {
-    id: 3,
-    title: "Pemerintah Percepat Pembangunan Infrastruktur Digital di Daerah 3T",
-    category: "Nasional",
-    excerpt: "Target 2027: seluruh kecamatan di daerah tertinggal terhubung internet.",
-    date: "10 September 2026",
-    author: "Redaksi",
-    content: [
-      "JAKARTA — Pemerintah mempercepat pembangunan infrastruktur digital di daerah tertinggal, terdepan, dan terluar (3T) dengan target seluruh kecamatan terhubung internet pada 2027.",
-      "Kementerian Komunikasi dan Digital menyebut program ini mencakup pembangunan menara telekomunikasi, perluasan serat optik, dan pemanfaatan satelit untuk wilayah yang sulit dijangkau.",
-      "Menteri menegaskan konektivitas digital merupakan prasyarat untuk pemerataan layanan pendidikan, kesehatan, dan ekonomi di daerah terpencil.",
-    ],
-    tags: ["Digital", "3T", "Infrastruktur", "Internet"],
-  },
-  {
-    id: 4,
-    title: "KPU Tetapkan Jadwal Tahapan Pemilu, Kampanye Mulai Tahun Depan",
-    category: "Politik",
-    excerpt: "Tahapan persiapan dimulai bulan ini, pemungutan suara tetap sesuai jadwal.",
-    date: "10 September 2026",
-    author: "Redaksi",
-    content: [
-      "JAKARTA — Komisi Pemilihan Umum (KPU) menetapkan jadwal tahapan pemilihan umum melalui rapat pleno tertutup yang dihadiri perwakilan partai politik.",
-      "Tahapan persiapan dimulai bulan ini, sementara masa kampanye dijadwalkan berlangsung tahun depan sebelum hari pemungutan suara.",
-      "KPU mengimbau seluruh partai politik mematuhi aturan kampanye dan menjaga suasana demokrasi yang damai.",
-    ],
-    tags: ["KPU", "Pemilu", "Demokrasi"],
-  },
-  {
-    id: 5,
-    title: "Inflasi Terkendali, BI Pertahankan Suku Bunga Acuan",
-    category: "Ekonomi",
-    excerpt: "Bank Indonesia menilai inflasi inti masih dalam sasaran 2,5 persen ± 1 persen.",
-    date: "9 September 2026",
-    author: "Redaksi",
-    content: [
-      "JAKARTA — Bank Indonesia (BI) memutuskan mempertahankan suku bunga acuan pada level saat ini setelah menilai inflasi inti masih berada dalam sasaran 2,5 persen ± 1 persen.",
-      "Gubernur BI menyatakan keputusan ini sejalan dengan upaya menjaga stabilitas nilai tukar dan mendukung pertumbuhan ekonomi nasional.",
-      "Ke depan, BI akan terus memantau dinamika global dan domestik dalam menentukan arah kebijakan moneter.",
-    ],
-    tags: ["BI", "Suku Bunga", "Inflasi", "Moneter"],
-  },
-  {
-    id: 6,
-    title: "Program Makan Bergizi Masuki Tahap Kedua, Jangkauan Diperluas",
-    category: "Nasional",
-    excerpt: "Pemerintah menambah 200 titik layanan baru di berbagai wilayah.",
-    date: "9 September 2026",
-    author: "Redaksi",
-    content: [
-      "JAKARTA — Program makan bergizi memasuki tahap kedua dengan penambahan 200 titik layanan baru di berbagai wilayah Indonesia.",
-      "Kepala Badan Gizi Nasional menyatakan perluasan ini menyasar daerah-daerah dengan angka kekurangan gizi tertinggi, terutama di Indonesia timur.",
-      "Program ini juga melibatkan usaha mikro dan koperasi lokal sebagai pemasok bahan pangan, sehingga berdampak pada perekonomian masyarakat sekitar.",
-    ],
-    tags: ["Gizi", "Program Pemerintah", "Pangan"],
-  },
-];
+export type Category = {
+  slug: string;
+  name: string;
+  color: string;
+};
+
+const dataDir = path.join(process.cwd(), "lib", "data");
+
+export function getArticles(): Article[] {
+  const raw = fs.readFileSync(path.join(dataDir, "articles.json"), "utf-8");
+  return JSON.parse(raw) as Article[];
+}
+
+export function getCategories(): Category[] {
+  const raw = fs.readFileSync(path.join(dataDir, "categories.json"), "utf-8");
+  return JSON.parse(raw) as Category[];
+}
+
+export function getCategoryBySlug(slug: string): Category | undefined {
+  return getCategories().find((c) => c.slug === slug);
+}
 
 export function getArticle(id: number): Article | undefined {
-  return articles.find((a) => a.id === id);
+  return getArticles().find((a) => a.id === id);
 }
 
 export function getRelated(article: Article, count = 3): Article[] {
-  return articles
+  return getArticles()
     .filter((a) => a.id !== article.id && a.category === article.category)
-    .concat(articles.filter((a) => a.id !== article.id && a.category !== article.category))
+    .concat(getArticles().filter((a) => a.id !== article.id && a.category !== article.category))
     .slice(0, count);
 }

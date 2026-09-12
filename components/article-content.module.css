@@ -1,0 +1,39 @@
+.articleContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.paragraph {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.paragraph strong {
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.paragraph em {
+  font-style: italic;
+}
+
+.paragraph code {
+  background: #f0f0f0;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 0.9em;
+  color: #c8102e;
+}
+
+.paragraph a {
+  color: #1a5c8a;
+  text-decoration: underline;
+}
+
+.paragraph a:hover {
+  color: #c8102e;
+}

@@ -1,95 +1,17 @@
 import type { Metadata } from "next";
 import styles from "./page.module.css";
 import { Header, Footer } from "@/components/site";
-
-// ===== Data contoh (mock) — nanti diganti dari admin panel/database =====
-type Article = {
-  id: number;
-  title: string;
-  category: string;
-  excerpt: string;
-  date: string;
-  author: string;
-  image?: string;
-};
-
-const featured: Article = {
-  id: 100,
-  title:
-    "APBN 2026: Fokus Belanja Prioritas, Defisit Ditekan di Tengah Ketidakpastian Global",
-  category: "Ekonomi",
-  excerpt:
-    "Pemerintah menegaskan komitmen menjaga defisit fiskal dalam batas aman, dengan belanja diarahkan pada program prioritas nasional.",
-  date: "11 September 2026",
-  author: "Redaksi GentaNusa",
-};
-
-const latest: Article[] = [
-  {
-    id: 1,
-    title: "DPR Sahkan Revisi UU Minerba, Ini Poin Pentingnya",
-    category: "Politik",
-    excerpt: "Revisi mengubah skema izin dan menambah kewenangan pemerintah pusat.",
-    date: "11 September 2026",
-    author: "Redaksi",
-  },
-  {
-    id: 2,
-    title: "Rupiah Menguat, IHSG Catat Rekor Tertinggi Sepanjang Tahun",
-    category: "Ekonomi",
-    excerpt: "Sentimen positif dari data inflasi domestik dan masuknya arus modal asing.",
-    date: "11 September 2026",
-    author: "Redaksi",
-  },
-  {
-    id: 3,
-    title: "Pemerintah Percepat Pembangunan Infrastruktur Digital di Daerah 3T",
-    category: "Nasional",
-    excerpt: "Target 2027: seluruh kecamatan di daerah tertinggal terhubung internet.",
-    date: "10 September 2026",
-    author: "Redaksi",
-  },
-  {
-    id: 4,
-    title: "KPU Tetapkan Jadwal Tahapan Pemilu, Kampanye Mulai Tahun Depan",
-    category: "Politik",
-    excerpt: "Tahapan persiapan dimulai bulan ini, pemungutan suara tetap sesuai jadwal.",
-    date: "10 September 2026",
-    author: "Redaksi",
-  },
-  {
-    id: 5,
-    title: "Inflasi Terkendali, BI Pertahankan Suku Bunga Acuan",
-    category: "Ekonomi",
-    excerpt: "Bank Indonesia menilai inflasi inti masih dalam sasaran 2,5 persen ± 1 persen.",
-    date: "9 September 2026",
-    author: "Redaksi",
-  },
-  {
-    id: 6,
-    title: "Program Makan Bergizi Masuki Tahap Kedua, Jangkauan Diperluas",
-    category: "Nasional",
-    excerpt: "Pemerintah menambah 200 titik layanan baru di berbagai wilayah.",
-    date: "9 September 2026",
-    author: "Redaksi",
-  },
-];
-
-const categories = [
-  { name: "Politik", color: "#c8102e" },
-  { name: "Ekonomi", color: "#1a5c8a" },
-  { name: "Nasional", color: "#2e7d32" },
-];
+import { getArticles, getCategories } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Beranda",
 };
 
-function formatDate(date: string) {
-  return date;
-}
-
 export default function Home() {
+  const latest = getArticles();
+  const categories = getCategories();
+  const featured = latest[0];
+
   return (
     <main>
       <Header />
@@ -112,7 +34,7 @@ export default function Home() {
             </article>
             <aside className={styles.heroSide}>
               <h3 className={styles.sideHeading}>Terpopuler</h3>
-              {latest.slice(0, 4).map((a) => (
+              {latest.slice(1, 5).map((a) => (
                 <a key={a.id} href={`/artikel/${a.id}`} className={styles.sideItem}>
                   <span className={styles.sideCat}>{a.category}</span>
                   <p className={styles.sideTitle}>{a.title}</p>
@@ -146,7 +68,7 @@ export default function Home() {
 
       {/* ===== Per Kategori ===== */}
       {categories.map((cat) => (
-        <section key={cat.name} className={styles.section}>
+        <section key={cat.slug} className={styles.section}>
           <div className={styles.container}>
             <h2 className={styles.sectionTitle}>
               <span style={{ color: cat.color }}>{cat.name}</span>

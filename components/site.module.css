@@ -66,6 +66,66 @@
   color: #1a1a2e;
 }
 
+/* ===== Mobile Nav ===== */
+.mobileNav {
+  display: none;
+  position: relative;
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.hamburger span {
+  width: 24px;
+  height: 2.5px;
+  background: #1a1a2e;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+.mobileMenu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  background: #fff;
+  border: 1px solid #e0e0e6;
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  padding: 8px 0;
+  min-width: 180px;
+  z-index: 200;
+}
+
+.mobileLink {
+  display: block;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #4a4a5a;
+}
+
+.mobileLink:hover {
+  background: #f5f5f7;
+  color: #1a1a2e;
+}
+
+@media (max-width: 768px) {
+  .nav {
+    display: none;
+  }
+
+  .mobileNav {
+    display: block;
+  }
+}
+
 /* ===== Footer ===== */
 .footer {
   background: #1a1a2e;

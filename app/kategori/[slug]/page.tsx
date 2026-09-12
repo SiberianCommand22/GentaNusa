@@ -1,24 +1,22 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/site";
-import { articles } from "@/lib/data";
+import { getArticles, getCategories, getCategoryBySlug } from "@/lib/data";
 import styles from "./category.module.css";
 
 type Params = { params: Promise<{ slug: string }> };
 
-const categories: Record<string, { name: string; color: string }> = {
-  politik: { name: "Politik", color: "#c8102e" },
-  ekonomi: { name: "Ekonomi", color: "#1a5c8a" },
-  nasional: { name: "Nasional", color: "#2e7d32" },
-};
+async function loadCategory(slug: string) {
+  return getCategoryBySlug(slug);
+}
 
 export async function generateStaticParams() {
-  return Object.keys(categories).map((slug) => ({ slug }));
+  return getCategories().map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const cat = categories[slug];
+  const cat = await loadCategory(slug);
   if (!cat) return { title: "Kategori tidak ditemukan" };
   return {
     title: `${cat.name} — Berita`,
@@ -28,10 +26,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function CategoryPage({ params }: Params) {
   const { slug } = await params;
-  const cat = categories[slug];
+  const cat = await loadCategory(slug);
   if (!cat) notFound();
 
-  const list = articles.filter((a) => a.category === cat.name);
+  const list = getArticles().filter((a) => a.category === cat.name);
 
   return (
     <>
