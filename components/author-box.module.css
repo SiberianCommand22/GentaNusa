@@ -7,6 +7,12 @@
   background: #ffffff;
   border: 1px solid #e0e0e6;
   border-radius: 12px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.link:hover .authorBox {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: #c8102e;
 }
 
 .avatar {

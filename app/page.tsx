@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import styles from "./page.module.css";
 import { Header, Footer } from "@/components/site";
+import { NewsletterBox } from "@/components/newsletter";
 import { getArticles, getCategories, formatDate, sortByDate } from "@/lib/data";
 
 export const metadata: Metadata = {
@@ -93,6 +94,13 @@ export default function Home() {
               </a>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ===== Newsletter ===== */}
+      <section className={styles.section}>
+        <div className={styles.container}>
+          <NewsletterBox />
         </div>
       </section>
 

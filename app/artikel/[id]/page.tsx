@@ -6,6 +6,8 @@ import { ArticleImage } from "@/components/article-image";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ShareButtons } from "@/components/share-buttons";
 import { AuthorBox } from "@/components/author-box";
+import { NewsletterBox } from "@/components/newsletter";
+import { ListenButton } from "@/components/listen-button";
 import { getArticles, getArticle, getRelated, formatDate } from "@/lib/data";
 import styles from "./article.module.css";
 
@@ -96,12 +98,13 @@ export default async function ArticlePage({ params }: Params) {
           </span>
           <h1 className={styles.title}>{article.title}</h1>
           <div className={styles.meta}>
-                      <span>{article.author}</span>
-                      <span>•</span>
-                      <span>{formatDate(article.date)}</span>
-                      <span>•</span>
-                      <span>{readingTime} menit baca</span>
-                    </div>
+                                <span>{article.author}</span>
+                                <span>•</span>
+                                <span>{formatDate(article.date)}</span>
+                                <span>•</span>
+                                <span>{readingTime} menit baca</span>
+                              </div>
+                    <ListenButton text={article.content.join(" ")} />
 
           {article.image && (
             <div className={styles.featuredImage}>
@@ -116,7 +119,11 @@ export default async function ArticlePage({ params }: Params) {
           <p className={styles.excerpt}>{article.excerpt}</p>
 
           <ArticleContent content={article.content} />
-          <AuthorBox name={article.author} />
+                    <AuthorBox
+                      name={article.author}
+                      slug={article.authorSlug}
+                      role={article.authorRole}
+                    />
 
           <div className={styles.tags}>
             {article.tags.map((t) => (
@@ -127,7 +134,9 @@ export default async function ArticlePage({ params }: Params) {
           </div>
 
           <ShareButtons title={article.title} url={`/artikel/${article.id}`} />
-        </article>
+
+                    <NewsletterBox compact />
+                  </article>
 
         <aside className={styles.related}>
                   <h2 className={styles.relatedTitle}>Berita Terkait</h2>

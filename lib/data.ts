@@ -8,9 +8,18 @@ export type Article = {
   excerpt: string;
   date: string;
   author: string;
+  authorSlug?: string;
+  authorRole?: string;
   image?: string;
   content: string[];
   tags: string[];
+};
+
+export type Author = {
+  slug: string;
+  name: string;
+  role: string;
+  bio: string;
 };
 
 export type Category = {
@@ -64,4 +73,27 @@ export function getRelated(article: Article, count = 3): Article[] {
     (a) => a.id !== article.id && a.category !== article.category
   );
   return sortByDate([...byCategory, ...rest]).slice(0, count);
+}
+
+const authors: Author[] = [
+  {
+    slug: "redaksi-generic",
+    name: "Redaksi",
+    role: "Redaktur GentaNusa",
+    bio: "Tim redaksi GentaNusa menyajikan berita politik, ekonomi, dan nasional secara akurat, cepat, dan terpercaya.",
+  },
+];
+
+export function getAuthor(slug: string): Author | undefined {
+  return authors.find((a) => a.slug === slug);
+}
+
+export function getAuthors(): Author[] {
+  return authors;
+}
+
+export function getArticlesByAuthor(slug: string): Article[] {
+  return sortByDate(
+    getArticles().filter((a) => (a.authorSlug ?? "redaksi-generic") === slug)
+  );
 }

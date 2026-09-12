@@ -113,11 +113,16 @@ export function Footer() {
             <ActiveLink href="/kategori/nasional">Nasional</ActiveLink>
           </div>
           <div className={styles.footerCol}>
-            <h4>Kontak</h4>
-            <span>redaksi@gentanusa.id</span>
-            <span>Jakarta, Indonesia</span>
-            <Link href="/feed.xml">RSS Feed</Link>
-          </div>
+                      <h4>Kontak</h4>
+                      <span>redaksi@gentanusa.id</span>
+                      <span>Jakarta, Indonesia</span>
+                      <Link href="/feed.xml">RSS Feed</Link>
+                    </div>
+                    <div className={styles.footerCol}>
+                      <h4>Legal</h4>
+                      <Link href="/privasi">Kebijakan Privasi</Link>
+                      <Link href="/syarat">Syarat &amp; Ketentuan</Link>
+                    </div>
         </div>
         <div className={styles.footerBottom}>
           © 2026 GentaNusa. Seluruh hak cipta dilindungi.

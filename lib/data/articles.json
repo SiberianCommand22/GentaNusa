@@ -20,7 +20,9 @@
       "Fiskal",
       "Ekonomi Makro",
       "Anggaran"
-    ]
+    ],
+    "authorSlug": "redaksi-generic",
+    "authorRole": "Redaktur GentaNusa"
   },
   {
     "id": 1,
@@ -41,7 +43,9 @@
       "DPR",
       "UU",
       "Sumber Daya Alam"
-    ]
+    ],
+    "authorSlug": "redaksi-generic",
+    "authorRole": "Redaktur GentaNusa"
   },
   {
     "id": 2,
@@ -61,7 +65,9 @@
       "IHSG",
       "Pasar Modal",
       "Inflasi"
-    ]
+    ],
+    "authorSlug": "redaksi-generic",
+    "authorRole": "Redaktur GentaNusa"
   },
   {
     "id": 3,
@@ -81,7 +87,9 @@
       "3T",
       "Infrastruktur",
       "Internet"
-    ]
+    ],
+    "authorSlug": "redaksi-generic",
+    "authorRole": "Redaktur GentaNusa"
   },
   {
     "id": 4,
@@ -100,7 +108,9 @@
       "KPU",
       "Pemilu",
       "Demokrasi"
-    ]
+    ],
+    "authorSlug": "redaksi-generic",
+    "authorRole": "Redaktur GentaNusa"
   },
   {
     "id": 5,
@@ -120,7 +130,9 @@
       "Suku Bunga",
       "Inflasi",
       "Moneter"
-    ]
+    ],
+    "authorSlug": "redaksi-generic",
+    "authorRole": "Redaktur GentaNusa"
   },
   {
     "id": 6,
@@ -139,6 +151,8 @@
       "Gizi",
       "Program Pemerintah",
       "Pangan"
-    ]
+    ],
+    "authorSlug": "redaksi-generic",
+    "authorRole": "Redaktur GentaNusa"
   }
 ]

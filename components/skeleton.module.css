@@ -1,0 +1,100 @@
+.wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.hero {
+  background: #fff;
+  border: 1px solid #e0e0e6;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 28px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e0e0e6;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.block {
+  background: linear-gradient(90deg, #ececef 25%, #f5f5f7 50%, #ececef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 0;
+}
+
+.badge {
+  width: 64px;
+  height: 18px;
+}
+
+.title {
+  width: 90%;
+  height: 18px;
+}
+
+.line {
+  width: 100%;
+  height: 12px;
+}
+
+.lineShort {
+  width: 65%;
+  height: 12px;
+}
+
+.heroImage {
+  width: 100%;
+  aspect-ratio: 16 / 6;
+  margin-bottom: 16px;
+}
+
+.heroTitle {
+  width: 70%;
+  height: 26px;
+  margin-bottom: 10px;
+}
+
+.heroLine {
+  width: 45%;
+  height: 14px;
+}

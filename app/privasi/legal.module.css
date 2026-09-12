@@ -1,0 +1,33 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.title {
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.updated {
+  font-size: 13px;
+  color: #8a8a9a;
+  margin-bottom: 24px;
+}
+
+.section {
+  margin-bottom: 24px;
+}
+
+.section h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.section p {
+  font-size: 15px;
+  line-height: 1.75;
+  color: #4a4a5a;
+}
