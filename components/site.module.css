@@ -66,6 +66,11 @@
   color: #1a1a2e;
 }
 
+.navLink.active {
+  background: #c8102e;
+  color: #fff;
+}
+
 /* ===== Mobile Nav ===== */
 .mobileNav {
   display: none;

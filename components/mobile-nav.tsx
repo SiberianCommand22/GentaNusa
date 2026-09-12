@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import styles from "./site.module.css";
 
 const navItems = [
@@ -15,6 +16,7 @@ const navItems = [
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <div className={styles.mobileNav}>
@@ -31,16 +33,19 @@ export function MobileNav() {
 
       {open && (
         <nav className={styles.mobileMenu}>
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={styles.mobileLink}
-              onClick={() => setOpen(false)}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const isActive = item.href === pathname;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`${styles.mobileLink}${isActive ? ` ${styles.navLinkActive}` : ""}`}
+                onClick={() => setOpen(false)}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
       )}
     </div>
