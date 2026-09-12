@@ -5,7 +5,7 @@ import { ArticleContent } from "@/components/article-content";
 import { ArticleImage } from "@/components/article-image";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ShareButtons } from "@/components/share-buttons";
-import { getArticles, getArticle, getRelated } from "@/lib/data";
+import { getArticles, getArticle, getRelated, formatDate } from "@/lib/data";
 import styles from "./article.module.css";
 
 type Params = { params: Promise<{ id: string }> };
@@ -93,7 +93,7 @@ export default async function ArticlePage({ params }: Params) {
           <div className={styles.meta}>
             <span>{article.author}</span>
             <span>•</span>
-            <span>{article.date}</span>
+            <span>{formatDate(article.date)}</span>
           </div>
 
           {article.image && (
@@ -127,7 +127,7 @@ export default async function ArticlePage({ params }: Params) {
             <a key={a.id} href={`/artikel/${a.id}`} className={styles.relatedCard}>
               <span className={styles.relatedCat}>{a.category}</span>
               <h3 className={styles.relatedHeadline}>{a.title}</h3>
-              <span className={styles.relatedDate}>{a.date}</span>
+              <span className={styles.relatedDate}>{formatDate(a.date)}</span>
             </a>
           ))}
         </aside>

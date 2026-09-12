@@ -1,4 +1,4 @@
-import { getArticles } from "@/lib/data";
+import { getArticles, sortByDate } from "@/lib/data";
 
 export const dynamic = "force-static";
 
@@ -15,25 +15,14 @@ function escapeXml(value: string) {
     .replace(/'/g, "&apos;");
 }
 
-const MONTHS: Record<string, string> = {
-  Januari: "01", Februari: "02", Maret: "03", April: "04",
-  Mei: "05", Juni: "06", Juli: "07", Agustus: "08",
-  September: "09", Oktober: "10", November: "11", Desember: "12",
-};
-
 function toUTC(dateStr: string): string {
-  // Format: "11 September 2026" -> RFC 822
-  const [day, month, year] = dateStr.split(" ");
-  const m = MONTHS[month];
-  if (!m) return new Date().toUTCString();
-  const d = `${year}-${m}-${day.padStart(2, "0")}T00:00:00+07:00`;
-  return new Date(d).toUTCString();
+  // ISO "2026-09-11" -> RFC 822
+  const d = new Date(dateStr + "T00:00:00+07:00");
+  return isNaN(d.getTime()) ? new Date().toUTCString() : d.toUTCString();
 }
 
 export async function GET() {
-  const articles = getArticles()
-    .sort((a, b) => (a.date < b.date ? 1 : -1))
-    .slice(0, 20);
+  const articles = sortByDate(getArticles()).slice(0, 20);
 
   const items = articles
     .map((a) => {

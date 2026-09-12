@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import styles from "./page.module.css";
 import { Header, Footer } from "@/components/site";
-import { getArticles, getCategories } from "@/lib/data";
+import { getArticles, getCategories, formatDate, sortByDate } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Beranda",
 };
 
 export default function Home() {
-  const latest = getArticles();
+  const latest = sortByDate(getArticles());
   const categories = getCategories();
   const featured = latest[0];
 
@@ -58,7 +58,7 @@ export default function Home() {
                 <div className={styles.meta}>
                   <span>{a.author}</span>
                   <span>•</span>
-                  <span>{a.date}</span>
+                  <span>{formatDate(a.date)}</span>
                 </div>
               </a>
             ))}
@@ -84,7 +84,7 @@ export default function Home() {
                   <div className={styles.meta}>
                     <span>{a.author}</span>
                     <span>•</span>
-                    <span>{a.date}</span>
+                    <span>{formatDate(a.date)}</span>
                   </div>
                 </a>
               ))}

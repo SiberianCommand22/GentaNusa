@@ -21,6 +21,22 @@ export type Category = {
 
 const dataDir = path.join(process.cwd(), "lib", "data");
 
+export function formatDate(dateStr: string): string {
+  const d = new Date(dateStr + "T00:00:00+07:00");
+  if (isNaN(d.getTime())) return dateStr;
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(d);
+}
+
+export function sortByDate(articles: Article[]): Article[] {
+  return [...articles].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+}
+
 export function getArticles(): Article[] {
   const raw = fs.readFileSync(path.join(dataDir, "articles.json"), "utf-8");
   return JSON.parse(raw) as Article[];
@@ -40,8 +56,12 @@ export function getArticle(id: number): Article | undefined {
 }
 
 export function getRelated(article: Article, count = 3): Article[] {
-  return getArticles()
-    .filter((a) => a.id !== article.id && a.category === article.category)
-    .concat(getArticles().filter((a) => a.id !== article.id && a.category !== article.category))
-    .slice(0, count);
+  const byCategory = getArticles().filter(
+    (a) => a.id !== article.id && a.category === article.category
+  );
+  if (byCategory.length >= count) return sortByDate(byCategory).slice(0, count);
+  const rest = getArticles().filter(
+    (a) => a.id !== article.id && a.category !== article.category
+  );
+  return sortByDate([...byCategory, ...rest]).slice(0, count);
 }

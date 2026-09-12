@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/site";
-import { getArticles, getCategories, getCategoryBySlug } from "@/lib/data";
+import { getArticles, getCategories, getCategoryBySlug, formatDate, sortByDate } from "@/lib/data";
 import styles from "./category.module.css";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -29,7 +29,7 @@ export default async function CategoryPage({ params }: Params) {
   const cat = await loadCategory(slug);
   if (!cat) notFound();
 
-  const list = getArticles().filter((a) => a.category === cat.name);
+  const list = sortByDate(getArticles().filter((a) => a.category === cat.name));
 
   return (
     <>
@@ -56,7 +56,7 @@ export default async function CategoryPage({ params }: Params) {
                 <div className={styles.meta}>
                   <span>{a.author}</span>
                   <span>•</span>
-                  <span>{a.date}</span>
+                  <span>{formatDate(a.date)}</span>
                 </div>
               </a>
             ))}
