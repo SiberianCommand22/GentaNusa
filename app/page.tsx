@@ -38,20 +38,20 @@ export default function Home() {
         <div className={styles.container}>
           <div className={styles.heroGrid}>
             <article className={styles.heroMain}>
-                          {featured.image && (
-                            <div className={styles.heroImage}>
-                              <Image
-                                src={featured.image}
-                                alt={featured.title}
-                                width={1200}
-                                height={630}
-                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                              />
-                            </div>
-                          )}
-                          <span className={styles.badge} style={{ background: "#1a5c8a" }}>
-                            {featured.category}
-                          </span>
+              {featured.image && (
+                <div className={styles.heroImage}>
+                  <Image
+                    src={featured.image}
+                    alt={featured.title}
+                    width={1200}
+                    height={630}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                </div>
+              )}
+              <span className={styles.badge} style={{ background: "#1a5c8a" }}>
+                {featured.category}
+              </span>
               <h1 className={styles.heroTitle}>{featured.title}</h1>
               <p className={styles.heroExcerpt}>{featured.excerpt}</p>
               <div className={styles.meta}>

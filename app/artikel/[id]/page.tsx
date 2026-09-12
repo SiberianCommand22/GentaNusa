@@ -98,13 +98,13 @@ export default async function ArticlePage({ params }: Params) {
           </span>
           <h1 className={styles.title}>{article.title}</h1>
           <div className={styles.meta}>
-                                <span>{article.author}</span>
-                                <span>•</span>
-                                <span>{formatDate(article.date)}</span>
-                                <span>•</span>
-                                <span>{readingTime} menit baca</span>
-                              </div>
-                    <ListenButton text={article.content.join(" ")} />
+            <span>{article.author}</span>
+            <span>•</span>
+            <span>{formatDate(article.date)}</span>
+            <span>•</span>
+            <span>{readingTime} menit baca</span>
+          </div>
+          <ListenButton text={article.content.join(" ")} />
 
           {article.image && (
             <div className={styles.featuredImage}>
@@ -119,11 +119,11 @@ export default async function ArticlePage({ params }: Params) {
           <p className={styles.excerpt}>{article.excerpt}</p>
 
           <ArticleContent content={article.content} />
-                    <AuthorBox
-                      name={article.author}
-                      slug={article.authorSlug}
-                      role={article.authorRole}
-                    />
+          <AuthorBox
+            name={article.author}
+            slug={article.authorSlug}
+            role={article.authorRole}
+          />
 
           <div className={styles.tags}>
             {article.tags.map((t) => (
@@ -135,24 +135,24 @@ export default async function ArticlePage({ params }: Params) {
 
           <ShareButtons title={article.title} url={`/artikel/${article.id}`} />
 
-                    <NewsletterBox compact />
-                  </article>
+          <NewsletterBox compact />
+        </article>
 
         <aside className={styles.related}>
-                  <h2 className={styles.relatedTitle}>Berita Terkait</h2>
-                  {related.map((a) => (
-                    <a key={a.id} href={`/artikel/${a.id}`} className={styles.relatedCard}>
-                      {a.image && (
-                        <div className={styles.relatedImage}>
-                          <ArticleImage src={a.image} alt={a.title} className={styles.relatedImg} />
-                        </div>
-                      )}
-                      <span className={styles.relatedCat}>{a.category}</span>
-                      <h3 className={styles.relatedHeadline}>{a.title}</h3>
-                      <span className={styles.relatedDate}>{formatDate(a.date)}</span>
-                    </a>
-                  ))}
-                </aside>
+          <h2 className={styles.relatedTitle}>Berita Terkait</h2>
+          {related.map((a) => (
+            <a key={a.id} href={`/artikel/${a.id}`} className={styles.relatedCard}>
+              {a.image && (
+                <div className={styles.relatedImage}>
+                  <ArticleImage src={a.image} alt={a.title} className={styles.relatedImg} />
+                </div>
+              )}
+              <span className={styles.relatedCat}>{a.category}</span>
+              <h3 className={styles.relatedHeadline}>{a.title}</h3>
+              <span className={styles.relatedDate}>{formatDate(a.date)}</span>
+            </a>
+          ))}
+        </aside>
       </main>
       <Footer />
     </>

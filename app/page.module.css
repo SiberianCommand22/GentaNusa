@@ -69,7 +69,7 @@
 
 /* ===== Hero ===== */
 .hero {
-  background: #1a1a2e;
+  background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4a 55%, #3a1a2e 100%);
   color: #ffffff;
   padding: 32px 0;
 }
@@ -118,6 +118,7 @@
   line-height: 1.25;
   font-weight: 800;
   margin-bottom: 14px;
+  font-family: var(--font-serif);
 }
 
 @media (max-width: 768px) {
@@ -143,6 +144,7 @@
 
 .heroSide {
   background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   padding: 20px;
 }
