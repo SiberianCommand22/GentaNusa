@@ -1,26 +1,42 @@
 [
   {
-    "id": "voa-indonesia",
-    "name": "VOA Indonesia",
-    "url": "https://www.voaindonesia.com/api/zippr?_okcode=zx8el6",
-    "category": "Internasional",
-    "color": "#2a5c8a",
-    "notice": "Konten ditautkan dari VOA Indonesia. Semua hak cipta milik penyedia sumber."
-  },
-  {
-    "id": "bbc-indonesia",
-    "name": "BBC Indonesia",
-    "url": "https://feeds.bbci.co.uk/indonesian/rss.xml",
-    "category": "Internasional",
-    "color": "#1a1a1a",
-    "notice": "Konten ditautkan dari BBC Indonesia. Semua hak cipta milik penyedia sumber."
-  },
-  {
-    "id": "antara-nasional",
-    "name": "Antara News",
-    "url": "https://www.antaranews.com/rss/nasional",
-    "category": "Nasional",
+    "id": "antara-ekonomi",
+    "name": "Antara Ekonomi",
+    "url": "https://www.antaranews.com/rss/ekonomi",
+    "category": "Ekonomi",
     "color": "#c8102e",
     "notice": "Konten ditautkan dari Antara News. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "antara-terkini",
+    "name": "Antara Terkini",
+    "url": "https://www.antaranews.com/rss/terkini",
+    "category": "Nasional",
+    "color": "#1a5c8a",
+    "notice": "Konten ditautkan dari Antara News. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "cnbc-indonesia",
+    "name": "CNBC Indonesia",
+    "url": "https://www.cnbcindonesia.com/rss",
+    "category": "Ekonomi",
+    "color": "#f0a500",
+    "notice": "Konten ditautkan dari CNBC Indonesia. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "cnn-indonesia",
+    "name": "CNN Indonesia",
+    "url": "https://www.cnnindonesia.com/rss",
+    "category": "Nasional",
+    "color": "#c8102e",
+    "notice": "Konten ditautkan dari CNN Indonesia. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "tribunnews",
+    "name": "Tribunnews",
+    "url": "https://www.tribunnews.com/rss",
+    "category": "Nasional",
+    "color": "#2e7d32",
+    "notice": "Konten ditautkan dari Tribunnews. Semua hak cipta milik penyedia sumber."
   }
 ]

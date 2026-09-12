@@ -1,158 +1,110 @@
 [
   {
-    "id": 100,
-    "title": "APBN 2026: Fokus Belanja Prioritas, Defisit Ditekan di Tengah Ketidakpastian Global",
+    "id": 89,
+    "title": "Harga Beras Stabil Jelang Panen Raya, Bulog Siapkan Serapan Gabah",
     "category": "Ekonomi",
-    "excerpt": "Pemerintah menegaskan komitmen menjaga defisit fiskal dalam batas aman, dengan belanja diarahkan pada program prioritas nasional.",
+    "excerpt": "Stok CBP aman, pemerintah antisipasi kenaikan harga di masa paceklik dengan serapan lebih awal.",
+    "date": "2026-09-12",
+    "author": "Aulia Rahman",
+    "authorSlug": "aulia-rahman",
+    "authorRole": "Jurnalis Ekonomi",
+    "image": "/images/articles/beras-stabil-jelang-panen-bulog.jpg",
+    "content": [
+      "JAKARTA — Stok beras pemerintah pada September 2026 tercatat stabil dengan Cadangan Beras Pemerintah (CBP) di angka aman. Harga gabah kering panen di tingkat petani mulai turun seiring masuknya masa panen raya di sejumlah daerah sentra.",
+      "Kepala Divisi Regional Bulog menyatakan pihaknya siap menyerap gabah sesuai Harga Pembelian Pemerintah (HPP) untuk menjaga harga di tingkat petani tetap menguntungkan. \"Kami buka titik serap di 12 provinsi sentra produksi,\" ujarnya.",
+      "Pemerintah juga mengingatkan agar ketersediaan stok menjelang akhir tahun tetap terjaga. Operasi pasar dilakukan secara berkala di pasar-pasar tradisional untuk meredam potensi kenaikan harga.",
+      "Pengamat pertanian menilai langkah serapan lebih awal ini tepat untuk mengamankan pasokan saat masa paceklik. Namun ia mengingatkan soal kesinambungan program agar harga gabah tidak jatuh terlalu dalam di musim panen raya."
+    ],
+    "tags": ["Pangan", "Beras", "Bulog", "Pertanian"]
+  },
+  {
+    "id": 121,
+    "title": "Harga Emas Antam Naik ke Rp1,7 Juta per Gram, Sempat Rebutan Antrean",
+    "category": "Ekonomi",
+    "excerpt": "Investor beralih ke logam mulia sebagai aset aman di tengah ketidakpastian pasar global.",
+    "date": "2026-09-12",
+    "author": "Siti Nurhaliza",
+    "authorSlug": "siti-nurhaliza",
+    "authorRole": "Jurnalis Ekonomi",
+    "image": "/images/articles/emas-antam-rp1-7-juta-per-gram.jpg",
+    "content": [
+      "JAKARTA — Harga emas batangan Antam naik menyentuh Rp1,7 juta per gram pada perdagangan akhir pekan. Antrean pembeli sempat mengular di sejumlah butik logam mulia di Jakarta dan Surabaya.",
+      "Kenaikan ini dipicu kekhawatiran pelaku pasar terhadap eskalasi ketegangan dagang global dan pelemahan dolar AS. Logam mulia kembali menjadi pilihan utama investor dalam mencari aset aman.",
+      "Analis komoditas menilai tren penguatan emas masih berlanjut hingga akhir tahun. Ia menyarankan investor tetap memperhatikan harga jual kembali (buyback) yang juga ikut naik mengikuti harga dasar.",
+      "Bagi pembeli yang ingin berinvestasi, pengamat mengingatkan pentingnya membeli melalui lembaga resmi dan menyimpan bukti transaksi untuk menjamin kemudahan penjualan kembali di kemudian hari."
+    ],
+    "tags": ["Emas", "Antam", "Investasi", "Logam Mulia"]
+  },
+  {
+    "id": 100,
+    "title": "Pemerintah Percepat Vaksinasi Booster Kedua untuk Tenaga Kesehatan",
+    "category": "Kesehatan",
+    "excerpt": "Nakes pertama yang divaksin, menyusul lansia dan kelompok rentan pada tahap berikutnya.",
+    "date": "2026-09-11",
+    "author": "dr. Bambang Permadi",
+    "authorSlug": "bambang-permadi",
+    "authorRole": "Kontributor Kesehatan",
+    "image": "/images/articles/vaksinasi-booster-kedua-nakes.jpg",
+    "content": [
+      "JAKARTA — Pemerintah memulai program vaksinasi booster kedua secara bertahap, dengan tenaga kesehatan (nakes) sebagai prioritas pertama. Langkah ini untuk menjaga kekebalan kelompok yang paling rentan terdampak.",
+      "Kementerian Kesehatan menyatakan vaksin yang digunakan telah melalui kajian keamanan dan efektivitas. Dosis akan didistribusikan ke puskesmas dan rumah sakit rujukan di seluruh provinsi.",
+      "Setelah nakes, giliran lansia dan penyandang komorbid yang akan menerima booster. Pemerintah mengimbau masyarakat tetap mematuhi protokol kesehatan meski cakupan vaksinasi sudah tinggi.",
+      "Epidemiolog menilai kebijakan ini tepat dilakukan menjelang musim hujan. Ia menekankan pentingnya memperbarui data penerima vaksin agar cakupan bisa dipantau secara akurat."
+    ],
+    "tags": ["Vaksin", "Kesehatan", "Nakes", "Booster"]
+  },
+  {
+    "id": 77,
+    "title": "Gunung Merapi Siaga, Warga Lereng Diminta Waspadai Awan Panas",
+    "category": "Nasional",
+    "excerpt": "Aktivitas vulkanik meningkat, radius aman diperpanjang hingga lima kilometer dari puncak.",
     "date": "2026-09-11",
     "author": "Redaksi GentaNusa",
-    "image": "/images/articles/100-apbn-2026.svg",
-    "content": [
-      "JAKARTA — Pemerintah resmi mengajukan Rancangan Anggaran Pendapatan dan Belanja Negara (RAPBN) 2026 dengan penekanan pada belanja prioritas dan pengendalian defisit di tengah ketidakpastian ekonomi global.",
-      "Menteri Keuangan menyatakan postur APBN 2026 dirancang konsolidatif namun tetap ekspansif pada sektor-sektor produktif. Defisit ditargetkan turun bertahap menuju batas aman tiga persen dari Produk Domestik Bruto (PDB).",
-      "Belanja negara tahun depan diarahkan pada empat prioritas utama: pembangunan sumber daya manusia, infrastruktur pendukung hilirisasi, penguatan jaring pengaman sosial, serta transformasi ekonomi digital.",
-      "Kepala Badan Kebijakan Fiskal menambahkan, pemerintah juga menyiapkan ruang fiskal untuk menghadapi gejolak eksternal. Cadangan fiskal dijaga pada level yang memadai, termasuk melalui penguatan penerimaan negara.",
-      "Ekonom dari sejumlah lembaga riset menilai postur APBN 2026 cukup realistis. Mereka menyoroti pentingnya menjaga konsistensi antara target penerimaan dan realisasi belanja agar kredibilitas fiskal tetap terjaga.",
-      "Pembahasan RAPBN 2026 akan berlanjut di DPR RI. Masyarakat dipersilakan menyampaikan masukan melalui kanal partisipasi publik yang disediakan DPR maupun Kementerian Keuangan."
-    ],
-    "tags": [
-      "APBN",
-      "Fiskal",
-      "Ekonomi Makro",
-      "Anggaran"
-    ],
     "authorSlug": "redaksi-generic",
-    "authorRole": "Redaktur GentaNusa"
+    "authorRole": "Redaktur GentaNusa",
+    "image": "/images/articles/merapi-siaga-waspada-awan-panas.jpg",
+    "content": [
+      "YOGYAKARTA — Status Gunung Merapi dinaikkan menjadi Siaga (Level III) menyusul meningkatnya aktivitas vulkanik yang terpantau dalam beberapa hari terakhir. Guguran lava pijar dan awan panas teramati mengarah ke barat daya.",
+      "Balai Penyelidikan dan Pengembangan Teknologi Kebencanaan Geologi (BPPTKG) memperpanjang radius aman hingga lima kilometer dari puncak. Warga di lereng diimbau tidak beraktivitas di dalam zona bahaya.",
+      "BPBD setempat telah menyiapkan pos pengungsian dan jalur evakuasi. Warga yang tinggal di sekitar bantaran sungai yang berhulu di Merapi diminta waspada terhadap potensi lahar saat hujan.",
+      "Masyarakat diimbau tetap tenang namun waspada, dan hanya mengikuti informasi resmi dari BPPTKG serta BPBD. Jalur pendakian ke puncak Merapi ditutup sementara."
+    ],
+    "tags": ["Merapi", "Bencana", "Vulkanologi", "Yogyakarta"]
   },
   {
-    "id": 1,
-    "title": "DPR Sahkan Revisi UU Minerba, Ini Poin Pentingnya",
-    "category": "Politik",
-    "excerpt": "Revisi mengubah skema izin dan menambah kewenangan pemerintah pusat.",
-    "date": "2026-09-11",
-    "author": "Redaksi",
-    "image": "/images/articles/1-dpr-sahkan-revisi-uu-minerba-ini-poin-pe.svg",
-    "content": [
-      "JAKARTA — Dewan Perwakilan Rakyat (DPR) resmi mengesahkan revisi Undang-Undang Mineral dan Batubara (Minerba) dalam rapat paripurna.",
-      "Sejumlah poin penting diubah, antara lain skema perizinan usaha pertambangan yang kini melibatkan persetujuan pemerintah pusat secara lebih ketat.",
-      "Ketua Komisi VII DPR menyatakan revisi ini bertujuan meningkatkan nilai tambah sumber daya alam dalam negeri sekaligus memperkuat pengawasan terhadap aktivitas pertambangan.",
-      "Pemerintah menyambut pengesahan ini dan menyatakan akan menyiapkan aturan turunan dalam enam bulan ke depan."
-    ],
-    "tags": [
-      "Minerba",
-      "DPR",
-      "UU",
-      "Sumber Daya Alam"
-    ],
-    "authorSlug": "redaksi-generic",
-    "authorRole": "Redaktur GentaNusa"
-  },
-  {
-    "id": 2,
-    "title": "Rupiah Menguat, IHSG Catat Rekor Tertinggi Sepanjang Tahun",
-    "category": "Ekonomi",
-    "excerpt": "Sentimen positif dari data inflasi domestik dan masuknya arus modal asing.",
-    "date": "2026-09-11",
-    "author": "Redaksi",
-    "image": "/images/articles/2-rupiah-menguat-ihsg-catat-rekor-tertingg.svg",
-    "content": [
-      "JAKARTA — Nilai tukar rupiah menguat terhadap dolar Amerika Serikat pada perdagangan Kamis, didorong data inflasi domestik yang lebih rendah dari perkiraan.",
-      "Indeks Harga Saham Gabungan (IHSG) menguat dan mencatat rekor tertinggi sepanjang tahun ini. Arus modal asing masuk tercatat di pasar obligasi dan saham.",
-      "Analis menilai penguatan ini dipengaruhi keyakinan pasar terhadap stabilitas ekonomi nasional dan prospek pertumbuhan yang terjaga."
-    ],
-    "tags": [
-      "Rupiah",
-      "IHSG",
-      "Pasar Modal",
-      "Inflasi"
-    ],
-    "authorSlug": "redaksi-generic",
-    "authorRole": "Redaktur GentaNusa"
-  },
-  {
-    "id": 3,
-    "title": "Pemerintah Percepat Pembangunan Infrastruktur Digital di Daerah 3T",
-    "category": "Nasional",
-    "excerpt": "Target 2027: seluruh kecamatan di daerah tertinggal terhubung internet.",
+    "id": 55,
+    "title": "PSSI Perpanjang Kerja Sama dengan Pelatih Baru hingga Piala Asia 2027",
+    "category": "Olahraga",
+    "excerpt": "Kontrak diperpanjang setelah sederet hasil positif di kualifikasi, target lolos babak utama.",
     "date": "2026-09-10",
-    "author": "Redaksi",
-    "image": "/images/articles/3-pemerintah-percepat-pembangunan-infrastr.svg",
+    "author": "Rizki Pratama",
+    "authorSlug": "rizki-pratama",
+    "authorRole": "Jurnalis Olahraga",
+    "image": "/images/articles/pssi-perpanjang-kerja-sama-pelatih.jpg",
     "content": [
-      "JAKARTA — Pemerintah mempercepat pembangunan infrastruktur digital di daerah tertinggal, terdepan, dan terluar (3T) dengan target seluruh kecamatan terhubung internet pada 2027.",
-      "Kementerian Komunikasi dan Digital menyebut program ini mencakup pembangunan menara telekomunikasi, perluasan serat optik, dan pemanfaatan satelit untuk wilayah yang sulit dijangkau.",
-      "Menteri menegaskan konektivitas digital merupakan prasyarat untuk pemerataan layanan pendidikan, kesehatan, dan ekonomi di daerah terpencil."
+      "JAKARTA — PSSI resmi memperpanjang kerja sama dengan pelatih tim nasional hingga berakhirnya Piala Asia 2027. Keputusan ini diambil setelah tim menunjukkan konsistensi permainan pada babak kualifikasi.",
+      "Sekretaris Jenderal PSSI menyatakan perpanjangan kontrak merupakan bentuk apresiasi atas perkembangan tim. \"Kami ingin membangun kesinambungan program pembinaan,\" ujarnya dalam konferensi pers.",
+      "Pelatih menyambut baik kepercayaan ini dan menyebut target utama adalah membawa tim lolos ke babak utama serta bersaing di level Asia. Ia berencana melakukan pemusatan latihan dan uji coba internasional.",
+      "Ia juga menekankan pentingnya regenerasi pemain muda dengan memperbanyak menit bermain bagi talenta lokal di kompetisi domestik."
     ],
-    "tags": [
-      "Digital",
-      "3T",
-      "Infrastruktur",
-      "Internet"
-    ],
-    "authorSlug": "redaksi-generic",
-    "authorRole": "Redaktur GentaNusa"
+    "tags": ["PSSI", "Timnas", "Piala Asia", "Sepak Bola"]
   },
   {
-    "id": 4,
-    "title": "KPU Tetapkan Jadwal Tahapan Pemilu, Kampanye Mulai Tahun Depan",
-    "category": "Politik",
-    "excerpt": "Tahapan persiapan dimulai bulan ini, pemungutan suara tetap sesuai jadwal.",
-    "date": "2026-09-10",
-    "author": "Redaksi",
-    "image": "/images/articles/4-kpu-tetapkan-jadwal-tahapan-pemilu-kampa.svg",
-    "content": [
-      "JAKARTA — Komisi Pemilihan Umum (KPU) menetapkan jadwal tahapan pemilihan umum melalui rapat pleno tertutup yang dihadiri perwakilan partai politik.",
-      "Tahapan persiapan dimulai bulan ini, sementara masa kampanye dijadwalkan berlangsung tahun depan sebelum hari pemungutan suara.",
-      "KPU mengimbau seluruh partai politik mematuhi aturan kampanye dan menjaga suasana demokrasi yang damai."
-    ],
-    "tags": [
-      "KPU",
-      "Pemilu",
-      "Demokrasi"
-    ],
-    "authorSlug": "redaksi-generic",
-    "authorRole": "Redaktur GentaNusa"
-  },
-  {
-    "id": 5,
-    "title": "Inflasi Terkendali, BI Pertahankan Suku Bunga Acuan",
-    "category": "Ekonomi",
-    "excerpt": "Bank Indonesia menilai inflasi inti masih dalam sasaran 2,5 persen ± 1 persen.",
-    "date": "2026-09-09",
-    "author": "Redaksi",
-    "image": "/images/articles/5-inflasi-terkendali-bi-pertahankan-suku-b.svg",
-    "content": [
-      "JAKARTA — Bank Indonesia (BI) memutuskan mempertahankan suku bunga acuan pada level saat ini setelah menilai inflasi inti masih berada dalam sasaran 2,5 persen ± 1 persen.",
-      "Gubernur BI menyatakan keputusan ini sejalan dengan upaya menjaga stabilitas nilai tukar dan mendukung pertumbuhan ekonomi nasional.",
-      "Ke depan, BI akan terus memantau dinamika global dan domestik dalam menentukan arah kebijakan moneter."
-    ],
-    "tags": [
-      "BI",
-      "Suku Bunga",
-      "Inflasi",
-      "Moneter"
-    ],
-    "authorSlug": "redaksi-generic",
-    "authorRole": "Redaktur GentaNusa"
-  },
-  {
-    "id": 6,
-    "title": "Program Makan Bergizi Masuki Tahap Kedua, Jangkauan Diperluas",
+    "id": 45,
+    "title": "Menteri Kehutanan Tegaskan Moratorium Izin Baru Tetap Berlaku",
     "category": "Nasional",
-    "excerpt": "Pemerintah menambah 200 titik layanan baru di berbagai wilayah.",
+    "excerpt": "Kawasan hutan lindung dan gambut dilarang untuk aktivitas baru, izin lama di audit.",
     "date": "2026-09-09",
-    "author": "Redaksi",
-    "image": "/images/articles/6-program-makan-bergizi-masuki-tahap-kedua.svg",
-    "content": [
-      "JAKARTA — Program makan bergizi memasuki tahap kedua dengan penambahan 200 titik layanan baru di berbagai wilayah Indonesia.",
-      "Kepala Badan Gizi Nasional menyatakan perluasan ini menyasar daerah-daerah dengan angka kekurangan gizi tertinggi, terutama di Indonesia timur.",
-      "Program ini juga melibatkan usaha mikro dan koperasi lokal sebagai pemasok bahan pangan, sehingga berdampak pada perekonomian masyarakat sekitar."
-    ],
-    "tags": [
-      "Gizi",
-      "Program Pemerintah",
-      "Pangan"
-    ],
+    "author": "Redaksi GentaNusa",
     "authorSlug": "redaksi-generic",
-    "authorRole": "Redaktur GentaNusa"
+    "authorRole": "Redaktur GentaNusa",
+    "image": "/images/articles/moratorium-izin-hutan-tetap-berlaku.jpg",
+    "content": [
+      "JAKARTA — Menteri Kehutanan menegaskan moratorium pemberian izin baru di kawasan hutan lindung dan lahan gambut tetap berlaku. Kebijakan ini merupakan komitmen pemerintah dalam menekan deforestasi.",
+      "Penegasan ini menyusul sejumlah usulan dari daerah agar sebagian kawasan dibuka kembali. Pemerintah memilih mengedepankan aspek keberlanjutan lingkungan jangka panjang.",
+      "Izin yang sudah terbit sebelumnya akan diaudit untuk memastikan tidak ada pelanggaran. Jika ditemukan penyimpangan, sanksi akan dijatuhkan sesuai peraturan perundang-undangan.",
+      "Direktur eksekutif lembaga lingkungan menilai sikap pemerintah ini sebagai sinyal positif. Pelaku usaha diharapkan menyelaraskan kegiatan dengan prinsip kelestarian agar tidak melanggar aturan."
+    ],
+    "tags": ["Kehutanan", "Moratorium", "Lingkungan", "Gambut"]
   }
 ]
