@@ -1,0 +1,26 @@
+[
+  {
+    "id": "voa-indonesia",
+    "name": "VOA Indonesia",
+    "url": "https://www.voaindonesia.com/api/zippr?_okcode=zx8el6",
+    "category": "Internasional",
+    "color": "#2a5c8a",
+    "notice": "Konten ditautkan dari VOA Indonesia. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "bbc-indonesia",
+    "name": "BBC Indonesia",
+    "url": "https://feeds.bbci.co.uk/indonesian/rss.xml",
+    "category": "Internasional",
+    "color": "#1a1a1a",
+    "notice": "Konten ditautkan dari BBC Indonesia. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "antara-nasional",
+    "name": "Antara News",
+    "url": "https://www.antaranews.com/rss/nasional",
+    "category": "Nasional",
+    "color": "#c8102e",
+    "notice": "Konten ditautkan dari Antara News. Semua hak cipta milik penyedia sumber."
+  }
+]
