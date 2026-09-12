@@ -67,6 +67,10 @@ export default async function ArticlePage({ params }: Params) {
   if (!article) notFound();
 
   const related = getRelated(article);
+  const readingTime = Math.max(
+    1,
+    Math.round(article.content.join(" ").split(/\s+/).length / 200)
+  );
 
   return (
     <>
@@ -91,10 +95,12 @@ export default async function ArticlePage({ params }: Params) {
           </span>
           <h1 className={styles.title}>{article.title}</h1>
           <div className={styles.meta}>
-            <span>{article.author}</span>
-            <span>•</span>
-            <span>{formatDate(article.date)}</span>
-          </div>
+                      <span>{article.author}</span>
+                      <span>•</span>
+                      <span>{formatDate(article.date)}</span>
+                      <span>•</span>
+                      <span>{readingTime} menit baca</span>
+                    </div>
 
           {article.image && (
             <div className={styles.featuredImage}>
@@ -122,15 +128,20 @@ export default async function ArticlePage({ params }: Params) {
         </article>
 
         <aside className={styles.related}>
-          <h2 className={styles.relatedTitle}>Berita Terkait</h2>
-          {related.map((a) => (
-            <a key={a.id} href={`/artikel/${a.id}`} className={styles.relatedCard}>
-              <span className={styles.relatedCat}>{a.category}</span>
-              <h3 className={styles.relatedHeadline}>{a.title}</h3>
-              <span className={styles.relatedDate}>{formatDate(a.date)}</span>
-            </a>
-          ))}
-        </aside>
+                  <h2 className={styles.relatedTitle}>Berita Terkait</h2>
+                  {related.map((a) => (
+                    <a key={a.id} href={`/artikel/${a.id}`} className={styles.relatedCard}>
+                      {a.image && (
+                        <div className={styles.relatedImage}>
+                          <ArticleImage src={a.image} alt={a.title} className={styles.relatedImg} />
+                        </div>
+                      )}
+                      <span className={styles.relatedCat}>{a.category}</span>
+                      <h3 className={styles.relatedHeadline}>{a.title}</h3>
+                      <span className={styles.relatedDate}>{formatDate(a.date)}</span>
+                    </a>
+                  ))}
+                </aside>
       </main>
       <Footer />
     </>

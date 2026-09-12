@@ -122,6 +122,18 @@
   transition: box-shadow 0.2s;
 }
 
+.relatedImage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.relatedImg {
+  object-fit: cover;
+}
+
 .relatedCard:hover {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }

@@ -10,6 +10,7 @@ const navItems = [
   { href: "/kategori/ekonomi", label: "Ekonomi" },
   { href: "/kategori/nasional", label: "Nasional" },
   { href: "/tentang", label: "Tentang" },
+  { href: "/cari", label: "Cari" },
 ];
 
 export function MobileNav() {

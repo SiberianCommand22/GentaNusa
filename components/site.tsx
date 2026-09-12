@@ -18,7 +18,8 @@ export function Header() {
           <Link href="/kategori/ekonomi" className={styles.navLink}>Ekonomi</Link>
           <Link href="/kategori/nasional" className={styles.navLink}>Nasional</Link>
           <Link href="/tentang" className={styles.navLink}>Tentang</Link>
-        </nav>
+                    <Link href="/cari" className={styles.navLink}>Cari</Link>
+                  </nav>
         <MobileNav />
       </div>
     </header>
