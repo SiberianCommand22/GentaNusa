@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { Header, Footer } from "@/components/site";
 import { getArticles, getCategories, getCategoryBySlug, formatDate, sortByDate } from "@/lib/data";
 import styles from "./category.module.css";
@@ -47,19 +48,32 @@ export default async function CategoryPage({ params }: Params) {
         ) : (
           <div className={styles.grid}>
             {list.map((a) => (
-              <a key={a.id} href={`/artikel/${a.id}`} className={styles.card}>
-                <div className={styles.cardBadge} style={{ background: cat.color }}>
-                  {a.category}
-                </div>
-                <h2 className={styles.cardTitle}>{a.title}</h2>
-                <p className={styles.cardExcerpt}>{a.excerpt}</p>
-                <div className={styles.meta}>
-                  <span>{a.author}</span>
-                  <span>•</span>
-                  <span>{formatDate(a.date)}</span>
-                </div>
-              </a>
-            ))}
+                          <a key={a.id} href={`/artikel/${a.id}`} className={styles.card}>
+                            {a.image && (
+                              <div className={styles.cardImage}>
+                                <Image
+                                  src={a.image}
+                                  alt={a.title}
+                                  width={1200}
+                                  height={630}
+                                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
+                              </div>
+                            )}
+                            <div className={styles.cardBody}>
+                              <div className={styles.cardBadge} style={{ background: cat.color }}>
+                                {a.category}
+                              </div>
+                              <h2 className={styles.cardTitle}>{a.title}</h2>
+                              <p className={styles.cardExcerpt}>{a.excerpt}</p>
+                              <div className={styles.meta}>
+                                <span>{a.author}</span>
+                                <span>•</span>
+                                <span>{formatDate(a.date)}</span>
+                              </div>
+                            </div>
+                          </a>
+                        ))}
           </div>
         )}
       </main>

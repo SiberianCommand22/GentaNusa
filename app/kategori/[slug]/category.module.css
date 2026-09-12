@@ -48,16 +48,29 @@
   background: #ffffff;
   border: 1px solid #e0e0e6;
   border-radius: 12px;
-  padding: 20px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 10px;
   transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .card:hover {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
+}
+
+.cardImage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.cardBody {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
 }
 
 .cardBadge {

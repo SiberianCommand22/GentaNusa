@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import styles from "./page.module.css";
 import { Header, Footer } from "@/components/site";
 import { getArticles, getCategories, formatDate, sortByDate } from "@/lib/data";
@@ -6,6 +7,21 @@ import { getArticles, getCategories, formatDate, sortByDate } from "@/lib/data";
 export const metadata: Metadata = {
   title: "Beranda",
 };
+
+function CardImage({ src, alt, className }: { src?: string; alt: string; className?: string }) {
+  if (!src) return null;
+  return (
+    <div className={className}>
+      <Image
+        src={src}
+        alt={alt}
+        width={1200}
+        height={630}
+        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+      />
+    </div>
+  );
+}
 
 export default function Home() {
   const latest = sortByDate(getArticles());
@@ -29,7 +45,7 @@ export default function Home() {
               <div className={styles.meta}>
                 <span>{featured.author}</span>
                 <span>•</span>
-                <span>{featured.date}</span>
+                <span>{formatDate(featured.date)}</span>
               </div>
             </article>
             <aside className={styles.heroSide}>
@@ -52,13 +68,16 @@ export default function Home() {
           <div className={styles.grid}>
             {latest.map((a) => (
               <a key={a.id} href={`/artikel/${a.id}`} className={styles.card}>
-                <div className={styles.cardBadge}>{a.category}</div>
-                <h3 className={styles.cardTitle}>{a.title}</h3>
-                <p className={styles.cardExcerpt}>{a.excerpt}</p>
-                <div className={styles.meta}>
-                  <span>{a.author}</span>
-                  <span>•</span>
-                  <span>{formatDate(a.date)}</span>
+                <CardImage src={a.image} alt={a.title} className={styles.cardImage} />
+                <div className={styles.cardBody}>
+                  <div className={styles.cardBadge}>{a.category}</div>
+                  <h3 className={styles.cardTitle}>{a.title}</h3>
+                  <p className={styles.cardExcerpt}>{a.excerpt}</p>
+                  <div className={styles.meta}>
+                    <span>{a.author}</span>
+                    <span>•</span>
+                    <span>{formatDate(a.date)}</span>
+                  </div>
                 </div>
               </a>
             ))}
@@ -76,15 +95,18 @@ export default function Home() {
             <div className={styles.grid}>
               {latest.filter((a) => a.category === cat.name).map((a) => (
                 <a key={a.id} href={`/artikel/${a.id}`} className={styles.card}>
-                  <div className={styles.cardBadge} style={{ background: cat.color }}>
-                    {a.category}
-                  </div>
-                  <h3 className={styles.cardTitle}>{a.title}</h3>
-                  <p className={styles.cardExcerpt}>{a.excerpt}</p>
-                  <div className={styles.meta}>
-                    <span>{a.author}</span>
-                    <span>•</span>
-                    <span>{formatDate(a.date)}</span>
+                  <CardImage src={a.image} alt={a.title} className={styles.cardImage} />
+                  <div className={styles.cardBody}>
+                    <div className={styles.cardBadge} style={{ background: cat.color }}>
+                      {a.category}
+                    </div>
+                    <h3 className={styles.cardTitle}>{a.title}</h3>
+                    <p className={styles.cardExcerpt}>{a.excerpt}</p>
+                    <div className={styles.meta}>
+                      <span>{a.author}</span>
+                      <span>•</span>
+                      <span>{formatDate(a.date)}</span>
+                    </div>
                   </div>
                 </a>
               ))}
