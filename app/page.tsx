@@ -52,7 +52,9 @@ export default function Home() {
               <span className={styles.badge} style={{ background: "#1a5c8a" }}>
                 {featured.category}
               </span>
-              <h1 className={styles.heroTitle}>{featured.title}</h1>
+              <h1 className={styles.heroTitle}>
+                <a href={`/artikel/${featured.id}`}>{featured.title}</a>
+              </h1>
               <p className={styles.heroExcerpt}>{featured.excerpt}</p>
               <div className={styles.meta}>
                 <span>{featured.author}</span>
@@ -63,14 +65,14 @@ export default function Home() {
             <aside className={styles.heroSide}>
               <h3 className={styles.sideHeading}>Terpopuler</h3>
               {latest.slice(1, 5).map((a, i) => (
-                              <a key={a.id} href={`/artikel/${a.id}`} className={styles.sideItem}>
-                                <span className={styles.sideNum}>{i + 1}</span>
-                                <span>
-                                  <span className={styles.sideCat}>{a.category}</span>
-                                  <p className={styles.sideTitle}>{a.title}</p>
-                                </span>
-                              </a>
-                            ))}
+                <a key={a.id} href={`/artikel/${a.id}`} className={styles.sideItem}>
+                  <span className={styles.sideNum}>{i + 1}</span>
+                  <span>
+                    <span className={styles.sideCat}>{a.category}</span>
+                    <p className={styles.sideTitle}>{a.title}</p>
+                  </span>
+                </a>
+              ))}
             </aside>
           </div>
         </div>
@@ -88,6 +90,7 @@ export default function Home() {
                   <div className={styles.cardBadge}>{a.category}</div>
                   <h3 className={styles.cardTitle}>{a.title}</h3>
                   <p className={styles.cardExcerpt}>{a.excerpt}</p>
+                  <span className={styles.readMore}>Baca selengkapnya →</span>
                   <div className={styles.meta}>
                     <span>{a.author}</span>
                     <span>•</span>
@@ -124,6 +127,7 @@ export default function Home() {
                     </div>
                     <h3 className={styles.cardTitle}>{a.title}</h3>
                     <p className={styles.cardExcerpt}>{a.excerpt}</p>
+                    <span className={styles.readMore}>Baca selengkapnya →</span>
                     <div className={styles.meta}>
                       <span>{a.author}</span>
                       <span>•</span>

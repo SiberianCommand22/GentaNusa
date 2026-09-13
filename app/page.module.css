@@ -242,14 +242,23 @@
 }
 
 .card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  border-color: #c8c8d2;
 }
 
 .cardImage {
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
+}
+
+.cardImage img {
+  transition: transform 0.4s ease;
+}
+
+.card:hover .cardImage img {
+  transform: scale(1.06);
 }
 
 .cardBody {
@@ -286,6 +295,21 @@
   line-height: 1.55;
   color: #4a4a5a;
   flex: 1;
+}
+
+.readMore {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #c8102e;
+  margin-top: 2px;
+  transition: gap 0.2s;
+}
+
+.readMore:hover {
+  gap: 8px;
 }
 
 /* ===== Footer ===== */
