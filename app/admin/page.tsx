@@ -58,8 +58,8 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    // cek status login via endpoint ringan
-    fetch("/api/articles").then((r) => {
+    // cek status login via endpoint khusus
+    fetch("/api/admin/check").then((r) => {
       if (r.ok) {
         setAuthed(true);
         load();
