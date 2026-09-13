@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GentaNusa
 
-## Getting Started
+Portal berita Indonesia — Next.js 16 (App Router), data JSON, SSG.
 
-First, run the development server:
+## Mulai
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka [http://localhost:3000](http://localhost:3000).
+Web otomatis hidup saat laptop nyala (auto-start `gentanusa_dev.bat`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Dokumentasi
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **PRD.md** → visi, fitur, roadmap, keputusan (baca dulu sebelum kerja)
+- **lib/data/** → konten (articles.json, categories.json, sources.json, syndicated.json)
+- **scripts/fetch_rss.py** → bot sindikasi RSS
 
-## Learn More
+## Struktur
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/          → halaman (beranda, artikel, kategori, penulis, sindikasi, cari, legal)
+components/   → UI dipakai ulang (header, kartu, share, TTS, dark mode, reveal)
+lib/data/     → konten JSON
+lib/data.ts   → helper baca data (getArticles, getCategories, dll)
+public/       → gambar, favicon
+scripts/      → bot fetch RSS
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Perintah
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Perintah | Fungsi |
+|---|---|
+| `npm run dev` | Dev server (jangan bila auto-start sudah jalan) |
+| `npm run build` | Build produksi |
+| `npm start` | Jalankan build produksi |
+| `npm run lint` | Cek kode |
+| `python3 scripts/fetch_rss.py` | Tarik berita sindikasi terbaru |
 
-## Deploy on Vercel
+## Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Target: Vercel (gratis). Lihat PRD.md bagian Roadmap.
