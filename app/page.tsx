@@ -62,12 +62,15 @@ export default function Home() {
             </article>
             <aside className={styles.heroSide}>
               <h3 className={styles.sideHeading}>Terpopuler</h3>
-              {latest.slice(1, 5).map((a) => (
-                <a key={a.id} href={`/artikel/${a.id}`} className={styles.sideItem}>
-                  <span className={styles.sideCat}>{a.category}</span>
-                  <p className={styles.sideTitle}>{a.title}</p>
-                </a>
-              ))}
+              {latest.slice(1, 5).map((a, i) => (
+                              <a key={a.id} href={`/artikel/${a.id}`} className={styles.sideItem}>
+                                <span className={styles.sideNum}>{i + 1}</span>
+                                <span>
+                                  <span className={styles.sideCat}>{a.category}</span>
+                                  <p className={styles.sideTitle}>{a.title}</p>
+                                </span>
+                              </a>
+                            ))}
             </aside>
           </div>
         </div>

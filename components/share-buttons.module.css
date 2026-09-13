@@ -32,8 +32,9 @@
 }
 
 .button:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.06);
   opacity: 0.9;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
 }
 
 .copy {
@@ -51,5 +52,6 @@
 }
 
 .copy:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.06);
+  background: #e8e8ee;
 }
