@@ -3,6 +3,7 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import { Header, Footer } from "@/components/site";
 import { NewsletterBox } from "@/components/newsletter";
+import { Reveal } from "@/components/reveal";
 import { getArticles, getCategories, formatDate, sortByDate } from "@/lib/data";
 
 export const metadata: Metadata = {
@@ -79,52 +80,16 @@ export default function Home() {
       </section>
 
       {/* ===== Berita Terbaru ===== */}
-      <section className={styles.section}>
-        <div className={styles.container}>
-          <h2 className={styles.sectionTitle}>Terbaru</h2>
-          <div className={styles.grid}>
-            {latest.map((a) => (
-              <a key={a.id} href={`/artikel/${a.id}`} className={styles.card}>
-                <CardImage src={a.image} alt={a.title} className={styles.cardImage} />
-                <div className={styles.cardBody}>
-                  <div className={styles.cardBadge}>{a.category}</div>
-                  <h3 className={styles.cardTitle}>{a.title}</h3>
-                  <p className={styles.cardExcerpt}>{a.excerpt}</p>
-                  <span className={styles.readMore}>Baca selengkapnya →</span>
-                  <div className={styles.meta}>
-                    <span>{a.author}</span>
-                    <span>•</span>
-                    <span>{formatDate(a.date)}</span>
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Newsletter ===== */}
-      <section className={styles.section}>
-        <div className={styles.container}>
-          <NewsletterBox />
-        </div>
-      </section>
-
-      {/* ===== Per Kategori ===== */}
-      {categories.map((cat) => (
-        <section key={cat.slug} className={styles.section}>
+      <Reveal>
+        <section className={styles.section}>
           <div className={styles.container}>
-            <h2 className={styles.sectionTitle}>
-              <span style={{ color: cat.color }}>{cat.name}</span>
-            </h2>
+            <h2 className={styles.sectionTitle}>Terbaru</h2>
             <div className={styles.grid}>
-              {latest.filter((a) => a.category === cat.name).map((a) => (
+              {latest.map((a) => (
                 <a key={a.id} href={`/artikel/${a.id}`} className={styles.card}>
                   <CardImage src={a.image} alt={a.title} className={styles.cardImage} />
                   <div className={styles.cardBody}>
-                    <div className={styles.cardBadge} style={{ background: cat.color }}>
-                      {a.category}
-                    </div>
+                    <div className={styles.cardBadge}>{a.category}</div>
                     <h3 className={styles.cardTitle}>{a.title}</h3>
                     <p className={styles.cardExcerpt}>{a.excerpt}</p>
                     <span className={styles.readMore}>Baca selengkapnya →</span>
@@ -139,6 +104,48 @@ export default function Home() {
             </div>
           </div>
         </section>
+      </Reveal>
+
+      {/* ===== Newsletter ===== */}
+      <Reveal>
+        <section className={styles.section}>
+          <div className={styles.container}>
+            <NewsletterBox />
+          </div>
+        </section>
+      </Reveal>
+
+      {/* ===== Per Kategori ===== */}
+      {categories.map((cat, ci) => (
+        <Reveal key={cat.slug} delay={ci * 100}>
+          <section className={styles.section}>
+            <div className={styles.container}>
+              <h2 className={styles.sectionTitle}>
+                <span style={{ color: cat.color }}>{cat.name}</span>
+              </h2>
+              <div className={styles.grid}>
+                {latest.filter((a) => a.category === cat.name).map((a) => (
+                  <a key={a.id} href={`/artikel/${a.id}`} className={styles.card}>
+                    <CardImage src={a.image} alt={a.title} className={styles.cardImage} />
+                    <div className={styles.cardBody}>
+                      <div className={styles.cardBadge} style={{ background: cat.color }}>
+                        {a.category}
+                      </div>
+                      <h3 className={styles.cardTitle}>{a.title}</h3>
+                      <p className={styles.cardExcerpt}>{a.excerpt}</p>
+                      <span className={styles.readMore}>Baca selengkapnya →</span>
+                      <div className={styles.meta}>
+                        <span>{a.author}</span>
+                        <span>•</span>
+                        <span>{formatDate(a.date)}</span>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+        </Reveal>
       ))}
 
       <Footer />
