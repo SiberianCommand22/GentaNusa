@@ -3,24 +3,26 @@
 import { useEffect, useState } from "react";
 import styles from "./theme-toggle.module.css";
 
-export function ThemeToggle() {
-  const [dark, setDark] = useState(false);
+function getInitialTheme(): boolean {
+  // Baca pilihan tersimpan SEKALI di awal render (tahan navigasi antar halaman)
+  if (typeof window === "undefined") return false;
+  try {
+    const saved = localStorage.getItem("genta-theme");
+    if (saved) return saved === "dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  } catch {
+    return false;
+  }
+}
 
-  // Terapkan tema: sinkronisasi eksternal (DOM + penyimpanan), bukan setState
+export function ThemeToggle() {
+  const [dark, setDark] = useState(getInitialTheme);
+
+  // Sinkronkan tema ke DOM + simpan pilihan
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
     localStorage.setItem("genta-theme", dark ? "dark" : "light");
   }, [dark]);
-
-  // Baca preferensi awal sekali (async — anti flicker script sudah
-  // men-set data-theme sebelum render, kita tinggal samakan ikonnya)
-  useEffect(() => {
-    const saved = localStorage.getItem("genta-theme");
-    const initial = saved
-      ? saved === "dark"
-      : window.matchMedia("(prefers-color-scheme: dark)").matches;
-    requestAnimationFrame(() => setDark(initial));
-  }, []);
 
   return (
     <button
@@ -28,6 +30,7 @@ export function ThemeToggle() {
       onClick={() => setDark(!dark)}
       aria-label={dark ? "Ganti ke mode terang" : "Ganti ke mode gelap"}
       title={dark ? "Mode terang" : "Mode gelap"}
+      suppressHydrationWarning
     >
       {dark ? "☀️" : "🌙"}
     </button>
