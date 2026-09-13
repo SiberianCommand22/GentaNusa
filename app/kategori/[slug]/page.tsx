@@ -7,6 +7,9 @@ import styles from "./category.module.css";
 
 type Params = { params: Promise<{ slug: string }> };
 
+// URL kategori tak dikenal = 404 beneran
+export const dynamicParams = false;
+
 async function loadCategory(slug: string) {
   return getCategoryBySlug(slug);
 }

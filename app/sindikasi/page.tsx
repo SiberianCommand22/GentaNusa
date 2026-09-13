@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Header, Footer } from "@/components/site";
-import { getSyndicated, getSources, getSourceById } from "@/lib/syndication";
+import { getSyndicated, getSources } from "@/lib/syndication";
 import { formatDate } from "@/lib/data";
 import styles from "./syndication.module.css";
 

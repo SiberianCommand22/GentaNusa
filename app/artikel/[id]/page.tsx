@@ -13,6 +13,9 @@ import styles from "./article.module.css";
 
 type Params = { params: Promise<{ id: string }> };
 
+// URL artikel tak dikenal = 404 beneran (bukan render kosong)
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   return getArticles().map((a) => ({ id: String(a.id) }));
 }

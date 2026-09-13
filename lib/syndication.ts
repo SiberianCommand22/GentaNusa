@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { getArticles } from "./data";
 
 export type Source = {
   id: string;
