@@ -1,23 +1,5 @@
 [
   {
-    "id": 89,
-    "title": "Harga Beras Stabil Jelang Panen Raya, Bulog Siapkan Serapan Gabah",
-    "category": "Ekonomi",
-    "excerpt": "Stok CBP aman, pemerintah antisipasi kenaikan harga di masa paceklik dengan serapan lebih awal.",
-    "date": "2026-09-12",
-    "author": "Aulia Rahman",
-    "authorSlug": "aulia-rahman",
-    "authorRole": "Jurnalis Ekonomi",
-    "image": "/images/articles/beras-stabil-jelang-panen-bulog.jpg",
-    "content": [
-      "JAKARTA — Stok beras pemerintah pada September 2026 tercatat stabil dengan Cadangan Beras Pemerintah (CBP) di angka aman. Harga gabah kering panen di tingkat petani mulai turun seiring masuknya masa panen raya di sejumlah daerah sentra.",
-      "Kepala Divisi Regional Bulog menyatakan pihaknya siap menyerap gabah sesuai Harga Pembelian Pemerintah (HPP) untuk menjaga harga di tingkat petani tetap menguntungkan. \"Kami buka titik serap di 12 provinsi sentra produksi,\" ujarnya.",
-      "Pemerintah juga mengingatkan agar ketersediaan stok menjelang akhir tahun tetap terjaga. Operasi pasar dilakukan secara berkala di pasar-pasar tradisional untuk meredam potensi kenaikan harga.",
-      "Pengamat pertanian menilai langkah serapan lebih awal ini tepat untuk mengamankan pasokan saat masa paceklik. Namun ia mengingatkan soal kesinambungan program agar harga gabah tidak jatuh terlalu dalam di musim panen raya."
-    ],
-    "tags": ["Pangan", "Beras", "Bulog", "Pertanian"]
-  },
-  {
     "id": 121,
     "title": "Harga Emas Antam Naik ke Rp1,7 Juta per Gram, Sempat Rebutan Antrean",
     "category": "Ekonomi",
@@ -33,7 +15,12 @@
       "Analis komoditas menilai tren penguatan emas masih berlanjut hingga akhir tahun. Ia menyarankan investor tetap memperhatikan harga jual kembali (buyback) yang juga ikut naik mengikuti harga dasar.",
       "Bagi pembeli yang ingin berinvestasi, pengamat mengingatkan pentingnya membeli melalui lembaga resmi dan menyimpan bukti transaksi untuk menjamin kemudahan penjualan kembali di kemudian hari."
     ],
-    "tags": ["Emas", "Antam", "Investasi", "Logam Mulia"]
+    "tags": [
+      "Emas",
+      "Antam",
+      "Investasi",
+      "Logam Mulia"
+    ]
   },
   {
     "id": 100,
@@ -51,7 +38,35 @@
       "Setelah nakes, giliran lansia dan penyandang komorbid yang akan menerima booster. Pemerintah mengimbau masyarakat tetap mematuhi protokol kesehatan meski cakupan vaksinasi sudah tinggi.",
       "Epidemiolog menilai kebijakan ini tepat dilakukan menjelang musim hujan. Ia menekankan pentingnya memperbarui data penerima vaksin agar cakupan bisa dipantau secara akurat."
     ],
-    "tags": ["Vaksin", "Kesehatan", "Nakes", "Booster"]
+    "tags": [
+      "Vaksin",
+      "Kesehatan",
+      "Nakes",
+      "Booster"
+    ]
+  },
+  {
+    "id": 89,
+    "title": "Harga Beras Stabil Jelang Panen Raya, Bulog Siapkan Serapan Gabah",
+    "category": "Ekonomi",
+    "excerpt": "Stok CBP aman, pemerintah antisipasi kenaikan harga di masa paceklik dengan serapan lebih awal.",
+    "date": "2026-09-12",
+    "author": "Aulia Rahman",
+    "authorSlug": "aulia-rahman",
+    "authorRole": "Jurnalis Ekonomi",
+    "image": "/images/articles/beras-stabil-jelang-panen-bulog.jpg",
+    "content": [
+      "JAKARTA — Stok beras pemerintah pada September 2026 tercatat stabil dengan Cadangan Beras Pemerintah (CBP) di angka aman. Harga gabah kering panen di tingkat petani mulai turun seiring masuknya masa panen raya di sejumlah daerah sentra.",
+      "Kepala Divisi Regional Bulog menyatakan pihaknya siap menyerap gabah sesuai Harga Pembelian Pemerintah (HPP) untuk menjaga harga di tingkat petani tetap menguntungkan. \"Kami buka titik serap di 12 provinsi sentra produksi,\" ujarnya.",
+      "Pemerintah juga mengingatkan agar ketersediaan stok menjelang akhir tahun tetap terjaga. Operasi pasar dilakukan secara berkala di pasar-pasar tradisional untuk meredam potensi kenaikan harga.",
+      "Pengamat pertanian menilai langkah serapan lebih awal ini tepat untuk mengamankan pasokan saat masa paceklik. Namun ia mengingatkan soal kesinambungan program agar harga gabah tidak jatuh terlalu dalam di musim panen raya."
+    ],
+    "tags": [
+      "Pangan",
+      "Beras",
+      "Bulog",
+      "Pertanian"
+    ]
   },
   {
     "id": 77,
@@ -69,7 +84,12 @@
       "BPBD setempat telah menyiapkan pos pengungsian dan jalur evakuasi. Warga yang tinggal di sekitar bantaran sungai yang berhulu di Merapi diminta waspada terhadap potensi lahar saat hujan.",
       "Masyarakat diimbau tetap tenang namun waspada, dan hanya mengikuti informasi resmi dari BPPTKG serta BPBD. Jalur pendakian ke puncak Merapi ditutup sementara."
     ],
-    "tags": ["Merapi", "Bencana", "Vulkanologi", "Yogyakarta"]
+    "tags": [
+      "Merapi",
+      "Bencana",
+      "Vulkanologi",
+      "Yogyakarta"
+    ]
   },
   {
     "id": 55,
@@ -87,7 +107,12 @@
       "Pelatih menyambut baik kepercayaan ini dan menyebut target utama adalah membawa tim lolos ke babak utama serta bersaing di level Asia. Ia berencana melakukan pemusatan latihan dan uji coba internasional.",
       "Ia juga menekankan pentingnya regenerasi pemain muda dengan memperbanyak menit bermain bagi talenta lokal di kompetisi domestik."
     ],
-    "tags": ["PSSI", "Timnas", "Piala Asia", "Sepak Bola"]
+    "tags": [
+      "PSSI",
+      "Timnas",
+      "Piala Asia",
+      "Sepak Bola"
+    ]
   },
   {
     "id": 45,
@@ -105,6 +130,11 @@
       "Izin yang sudah terbit sebelumnya akan diaudit untuk memastikan tidak ada pelanggaran. Jika ditemukan penyimpangan, sanksi akan dijatuhkan sesuai peraturan perundang-undangan.",
       "Direktur eksekutif lembaga lingkungan menilai sikap pemerintah ini sebagai sinyal positif. Pelaku usaha diharapkan menyelaraskan kegiatan dengan prinsip kelestarian agar tidak melanggar aturan."
     ],
-    "tags": ["Kehutanan", "Moratorium", "Lingkungan", "Gambut"]
+    "tags": [
+      "Kehutanan",
+      "Moratorium",
+      "Lingkungan",
+      "Gambut"
+    ]
   }
 ]

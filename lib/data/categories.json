@@ -1,5 +1,17 @@
 [
-  { "slug": "politik", "name": "Politik", "color": "#c8102e" },
-  { "slug": "ekonomi", "name": "Ekonomi", "color": "#1a5c8a" },
-  { "slug": "nasional", "name": "Nasional", "color": "#2e7d32" }
+  {
+    "slug": "politik",
+    "name": "Politik",
+    "color": "#c8102e"
+  },
+  {
+    "slug": "nasional",
+    "name": "Nasional",
+    "color": "#2e7d32"
+  },
+  {
+    "slug": "ekonomi",
+    "name": "Ekonomi",
+    "color": "#1a5c8a"
+  }
 ]

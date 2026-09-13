@@ -1,27 +1,11 @@
 [
   {
-    "id": "antara-ekonomi",
-    "name": "Antara Ekonomi",
-    "url": "https://www.antaranews.com/rss/ekonomi",
-    "category": "Ekonomi",
-    "color": "#c8102e",
-    "notice": "Konten ditautkan dari Antara News. Semua hak cipta milik penyedia sumber."
-  },
-  {
-    "id": "antara-terkini",
-    "name": "Antara Terkini",
-    "url": "https://www.antaranews.com/rss/terkini",
+    "id": "tribunnews",
+    "name": "Tribunnews",
+    "url": "https://www.tribunnews.com/rss",
     "category": "Nasional",
-    "color": "#1a5c8a",
-    "notice": "Konten ditautkan dari Antara News. Semua hak cipta milik penyedia sumber."
-  },
-  {
-    "id": "cnbc-indonesia",
-    "name": "CNBC Indonesia",
-    "url": "https://www.cnbcindonesia.com/rss",
-    "category": "Ekonomi",
-    "color": "#f0a500",
-    "notice": "Konten ditautkan dari CNBC Indonesia. Semua hak cipta milik penyedia sumber."
+    "color": "#2e7d32",
+    "notice": "Konten ditautkan dari Tribunnews. Semua hak cipta milik penyedia sumber."
   },
   {
     "id": "cnn-indonesia",
@@ -32,11 +16,27 @@
     "notice": "Konten ditautkan dari CNN Indonesia. Semua hak cipta milik penyedia sumber."
   },
   {
-    "id": "tribunnews",
-    "name": "Tribunnews",
-    "url": "https://www.tribunnews.com/rss",
+    "id": "cnbc-indonesia",
+    "name": "CNBC Indonesia",
+    "url": "https://www.cnbcindonesia.com/rss",
+    "category": "Ekonomi",
+    "color": "#f0a500",
+    "notice": "Konten ditautkan dari CNBC Indonesia. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "antara-terkini",
+    "name": "Antara Terkini",
+    "url": "https://www.antaranews.com/rss/terkini",
     "category": "Nasional",
-    "color": "#2e7d32",
-    "notice": "Konten ditautkan dari Tribunnews. Semua hak cipta milik penyedia sumber."
+    "color": "#1a5c8a",
+    "notice": "Konten ditautkan dari Antara News. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "antara-ekonomi",
+    "name": "Antara Ekonomi",
+    "url": "https://www.antaranews.com/rss/ekonomi",
+    "category": "Ekonomi",
+    "color": "#c8102e",
+    "notice": "Konten ditautkan dari Antara News. Semua hak cipta milik penyedia sumber."
   }
 ]
