@@ -29,7 +29,7 @@ export default async function AuthorPage({ params }: Params) {
   const author = getAuthor(slug);
   if (!author) notFound();
 
-  const articles = getArticlesByAuthor(slug);
+  const articles = await getArticlesByAuthor(slug);
 
   return (
     <>

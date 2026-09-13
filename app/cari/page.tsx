@@ -32,7 +32,7 @@ export default async function SearchPage({
   const query = q.trim().toLowerCase();
 
   const results = query
-    ? getArticles().filter(
+    ? (await getArticles()).filter(
         (a) =>
           a.title.toLowerCase().includes(query) ||
           a.excerpt.toLowerCase().includes(query) ||

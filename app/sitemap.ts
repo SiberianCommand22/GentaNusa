@@ -3,7 +3,7 @@ import { getArticles, getCategories } from "@/lib/data";
 
 const SITE_URL = "https://gentanusa.id";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const staticPages = [
@@ -11,14 +11,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/tentang`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
   ] as MetadataRoute.Sitemap;
 
-  const categoryPages = getCategories().map((c) => ({
+  const categoryPages = (await getCategories()).map((c) => ({
     url: `${SITE_URL}/kategori/${c.slug}`,
     lastModified: now,
     changeFrequency: "daily" as const,
     priority: 0.8,
   }));
 
-  const articlePages = getArticles().map((a) => ({
+  const articlePages = (await getArticles()).map((a) => ({
     url: `${SITE_URL}/artikel/${a.id}`,
     lastModified: now,
     changeFrequency: "monthly" as const,

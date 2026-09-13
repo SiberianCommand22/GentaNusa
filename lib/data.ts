@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { supabaseAnon } from "./supabase";
 
 export type Article = {
   id: number;
@@ -46,30 +47,75 @@ export function sortByDate(articles: Article[]): Article[] {
   );
 }
 
-export function getArticles(): Article[] {
-  const raw = fs.readFileSync(path.join(dataDir, "articles.json"), "utf-8");
-  return JSON.parse(raw) as Article[];
+function readJson(file: string) {
+  return JSON.parse(fs.readFileSync(path.join(dataDir, file), "utf-8"));
 }
 
-export function getCategories(): Category[] {
-  const raw = fs.readFileSync(path.join(dataDir, "categories.json"), "utf-8");
-  return JSON.parse(raw) as Category[];
+function mapRow(a: any): Article {
+  return {
+    id: a.id,
+    title: a.title,
+    category: a.category,
+    excerpt: a.excerpt,
+    date: a.date,
+    author: a.author,
+    authorSlug: a.author_slug ?? "redaksi-generic",
+    authorRole: a.author_role ?? undefined,
+    image: a.image ?? undefined,
+    content: a.content ?? [],
+    tags: a.tags ?? [],
+  };
 }
 
-export function getCategoryBySlug(slug: string): Category | undefined {
-  return getCategories().find((c) => c.slug === slug);
+// Baca artikel: dari Supabase (live) — fallback ke JSON kalau DB nggak bisa
+export async function getArticles(): Promise<Article[]> {
+  if (supabaseAnon) {
+    try {
+      const { data, error } = await supabaseAnon
+        .from("articles")
+        .select("*")
+        .order("date", { ascending: false });
+      if (error) throw error;
+      if (data && data.length > 0) return data.map(mapRow);
+    } catch (e) {
+      console.warn("Supabase read gagal, fallback JSON:", e);
+    }
+  }
+  return sortByDate(readJson("articles.json"));
 }
 
-export function getArticle(id: number): Article | undefined {
-  return getArticles().find((a) => a.id === id);
+export async function getCategories(): Promise<Category[]> {
+  if (supabaseAnon) {
+    try {
+      const { data, error } = await supabaseAnon
+        .from("categories")
+        .select("*");
+      if (error) throw error;
+      if (data && data.length > 0) {
+        return data.map((c) => ({ slug: c.slug, name: c.name, color: c.color }));
+      }
+    } catch (e) {
+      console.warn("Supabase read gagal, fallback JSON:", e);
+    }
+  }
+  return readJson("categories.json");
 }
 
-export function getRelated(article: Article, count = 3): Article[] {
-  const byCategory = getArticles().filter(
+export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
+  return (await getCategories()).find((c) => c.slug === slug);
+}
+
+export async function getArticle(id: number): Promise<Article | undefined> {
+  return (await getArticles()).find((a) => a.id === id);
+}
+
+export async function getRelated(article: Article, count = 3): Promise<Article[]> {
+  const all = await getArticles();
+  const byCategory = all.filter(
     (a) => a.id !== article.id && a.category === article.category
   );
   if (byCategory.length >= count) return sortByDate(byCategory).slice(0, count);
-  const rest = getArticles().filter(
+  const rest = all.filter(
     (a) => a.id !== article.id && a.category !== article.category
   );
   return sortByDate([...byCategory, ...rest]).slice(0, count);
@@ -92,8 +138,8 @@ export function getAuthors(): Author[] {
   return authors;
 }
 
-export function getArticlesByAuthor(slug: string): Article[] {
+export async function getArticlesByAuthor(slug: string): Promise<Article[]> {
   return sortByDate(
-    getArticles().filter((a) => (a.authorSlug ?? "redaksi-generic") === slug)
+    (await getArticles()).filter((a) => (a.authorSlug ?? "redaksi-generic") === slug)
   );
 }

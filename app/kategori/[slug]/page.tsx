@@ -15,7 +15,7 @@ async function loadCategory(slug: string) {
 }
 
 export async function generateStaticParams() {
-  return getCategories().map((c) => ({ slug: c.slug }));
+  return (await getCategories()).map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -33,7 +33,7 @@ export default async function CategoryPage({ params }: Params) {
   const cat = await loadCategory(slug);
   if (!cat) notFound();
 
-  const list = sortByDate(getArticles().filter((a) => a.category === cat.name));
+  const list = sortByDate((await getArticles()).filter((a) => a.category === cat.name));
 
   return (
     <>

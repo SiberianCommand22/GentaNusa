@@ -8,7 +8,7 @@ import { ShareButtons } from "@/components/share-buttons";
 import { AuthorBox } from "@/components/author-box";
 import { NewsletterBox } from "@/components/newsletter";
 import { ListenButton } from "@/components/listen-button";
-import { getArticles, getArticle, getRelated, formatDate } from "@/lib/data";
+import { getArticles, getArticle, getRelated, formatDate, type Article } from "@/lib/data";
 import styles from "./article.module.css";
 
 type Params = { params: Promise<{ id: string }> };
@@ -17,12 +17,12 @@ type Params = { params: Promise<{ id: string }> };
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  return getArticles().map((a) => ({ id: String(a.id) }));
+  return (await getArticles()).map((a) => ({ id: String(a.id) }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { id } = await params;
-  const article = getArticle(Number(id));
+  const article = await getArticle(Number(id));
   if (!article) return { title: "Artikel tidak ditemukan" };
   return {
     title: article.title,
@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
-function jsonLd(article: Extract<ReturnType<typeof getArticle>, NonNullable<unknown>>) {
+function jsonLd(article: Article) {
   return {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -69,10 +69,10 @@ function jsonLd(article: Extract<ReturnType<typeof getArticle>, NonNullable<unkn
 
 export default async function ArticlePage({ params }: Params) {
   const { id } = await params;
-  const article = getArticle(Number(id));
+  const article = await getArticle(Number(id));
   if (!article) notFound();
 
-  const related = getRelated(article);
+  const related = await getRelated(article);
   const readingTime = Math.max(
     1,
     Math.round(article.content.join(" ").split(/\s+/).length / 200)

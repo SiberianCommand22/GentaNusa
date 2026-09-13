@@ -22,7 +22,7 @@ function toUTC(dateStr: string): string {
 }
 
 export async function GET() {
-  const articles = sortByDate(getArticles()).slice(0, 20);
+  const articles = sortByDate(await getArticles()).slice(0, 20);
 
   const items = articles
     .map((a) => {

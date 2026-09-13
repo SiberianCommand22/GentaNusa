@@ -25,9 +25,9 @@ function CardImage({ src, alt, className }: { src?: string; alt: string; classNa
   );
 }
 
-export default function Home() {
-  const latest = sortByDate(getArticles());
-  const categories = getCategories();
+export default async function Home() {
+  const latest = sortByDate(await getArticles());
+  const categories = await getCategories();
   const featured = latest[0];
 
   return (
