@@ -12,17 +12,17 @@
 
 .subtitle {
   font-size: 15px;
-  color: #4a4a5a;
+  color: var(--text-muted);
   margin-bottom: 24px;
 }
 
 .empty {
   font-size: 15px;
-  color: #4a4a5a;
+  color: var(--text-muted);
   padding: 40px;
   text-align: center;
-  background: #ffffff;
-  border: 1px solid #e0e0e6;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
 }
 
@@ -45,8 +45,8 @@
 }
 
 .card {
-  background: #ffffff;
-  border: 1px solid #e0e0e6;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   display: flex;
@@ -96,7 +96,7 @@
 .cardExcerpt {
   font-size: 13px;
   line-height: 1.55;
-  color: #4a4a5a;
+  color: var(--text-muted);
   flex: 1;
 }
 
@@ -104,5 +104,5 @@
   display: flex;
   gap: 8px;
   font-size: 12px;
-  color: #8a8a9a;
+  color: var(--text-faint);
 }

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import styles from "./site.module.css";
 import { navItems } from "./_types";
+import { ThemeToggle } from "./theme-toggle";
 
 export function ActiveLink({
   href,
@@ -40,13 +41,14 @@ export function Header() {
           </span>
         </Link>
         <nav className={styles.nav}>
-          {navItems.map((item) => (
-            <ActiveLink key={item.href} href={item.href} className={styles.navLink}>
-              {item.label}
-            </ActiveLink>
-          ))}
-        </nav>
-        <MobileNav />
+                  {navItems.map((item) => (
+                    <ActiveLink key={item.href} href={item.href} className={styles.navLink}>
+                      {item.label}
+                    </ActiveLink>
+                  ))}
+                </nav>
+                <ThemeToggle />
+                <MobileNav />
       </div>
     </header>
   );

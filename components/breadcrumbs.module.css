@@ -22,7 +22,7 @@
 }
 
 .current {
-  color: #8a8a9a;
+  color: var(--text-faint);
   font-weight: 600;
 }
 

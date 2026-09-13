@@ -6,7 +6,7 @@
 
 .hero {
   background: #fff;
-  border: 1px solid #e0e0e6;
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 28px;
@@ -32,7 +32,7 @@
 
 .card {
   background: #fff;
-  border: 1px solid #e0e0e6;
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -45,7 +45,7 @@
 }
 
 .block {
-  background: linear-gradient(90deg, #ececef 25%, #f5f5f7 50%, #ececef 75%);
+  background: linear-gradient(90deg, #ececef 25%, var(--bg) 50%, #ececef 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
   border-radius: 6px;

@@ -9,7 +9,7 @@
   gap: 20px;
   align-items: flex-start;
   background: #fff;
-  border: 1px solid #e0e0e6;
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 28px;
   margin-bottom: 28px;
@@ -44,7 +44,7 @@
 .bio {
   font-size: 14px;
   line-height: 1.7;
-  color: #4a4a5a;
+  color: var(--text-muted);
 }
 
 .sectionTitle {
@@ -58,9 +58,9 @@
 .empty {
   text-align: center;
   padding: 40px;
-  color: #4a4a5a;
+  color: var(--text-muted);
   background: #fff;
-  border: 1px solid #e0e0e6;
+  border: 1px solid var(--border);
   border-radius: 12px;
 }
 
@@ -83,8 +83,8 @@
 }
 
 .card {
-  background: #ffffff;
-  border: 1px solid #e0e0e6;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   display: flex;
@@ -131,7 +131,7 @@
 .cardExcerpt {
   font-size: 13px;
   line-height: 1.55;
-  color: #4a4a5a;
+  color: var(--text-muted);
   flex: 1;
 }
 
@@ -139,5 +139,5 @@
   display: flex;
   gap: 8px;
   font-size: 12px;
-  color: #8a8a9a;
+  color: var(--text-faint);
 }
