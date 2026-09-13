@@ -41,14 +41,14 @@ export function Header() {
           </span>
         </Link>
         <nav className={styles.nav}>
-                  {navItems.map((item) => (
-                    <ActiveLink key={item.href} href={item.href} className={styles.navLink}>
-                      {item.label}
-                    </ActiveLink>
-                  ))}
-                </nav>
-                <ThemeToggle />
-                <MobileNav />
+          {navItems.map((item) => (
+            <ActiveLink key={item.href} href={item.href} className={styles.navLink}>
+              {item.label}
+            </ActiveLink>
+          ))}
+        </nav>
+        <ThemeToggle />
+        <MobileNav />
       </div>
     </header>
   );
@@ -115,16 +115,18 @@ export function Footer() {
             <ActiveLink href="/kategori/nasional">Nasional</ActiveLink>
           </div>
           <div className={styles.footerCol}>
-                      <h4>Kontak</h4>
-                      <span>redaksi@gentanusa.id</span>
-                      <span>Jakarta, Indonesia</span>
-                      <Link href="/feed.xml">RSS Feed</Link>
-                    </div>
-                    <div className={styles.footerCol}>
-                      <h4>Legal</h4>
-                      <Link href="/privasi">Kebijakan Privasi</Link>
-                      <Link href="/syarat">Syarat &amp; Ketentuan</Link>
-                    </div>
+            <h4>Kontak</h4>
+            <span>redaksi@gentanusa.id</span>
+            <span>Jakarta, Indonesia</span>
+            <Link href="/feed.xml">RSS Feed</Link>
+          </div>
+          <div className={styles.footerCol}>
+            <h4>Info</h4>
+            <Link href="/tentang">Tentang Kami</Link>
+            <Link href="/sindikasi">Sindikasi</Link>
+            <Link href="/privasi">Kebijakan Privasi</Link>
+            <Link href="/syarat">Syarat &amp; Ketentuan</Link>
+          </div>
         </div>
         <div className={styles.footerBottom}>
           © 2026 GentaNusa. Seluruh hak cipta dilindungi.
