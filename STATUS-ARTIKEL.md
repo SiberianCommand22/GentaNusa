@@ -1,0 +1,7 @@
+- **Status**: Ketiga artikel konten asli sudah (1) masuk DB Supabase, (2) tampil di web, (3) SVG premium sudah terhubung ke artikel masing-masing.
+- **Penulis**: "Redaksi GentaNusa" (semua artikel — bukan fiktif)
+- **Sumber**: Riset web nyata (jakartasatu.com, katadata.co.id, CNBC, Kompas) — 14 Sep 2026
+- **URL produksi**: `https://gentanusa-pesphn9l8-genta-nusa.vercel.artikel/90` (dan 91, 92) — artikel 90 = Gugatan MK/Gibran, 91 = Rupiah Reshuffle/Menkeu, 92 = Semeru Erupsi
+- **URL lama**: `https://gentanusa-pusj1ts5h-genta-nusa.vercel.app` juga masih aktif dan menampilkan artikel sama (Vercel alias kedua URL)
+- **Lokak**: `C:/Users/MyBook Pro 105/Documents/Bissillah/berita/gentanusa/`
+- **Screenshot**: Belum sempat karena Vercel deployment protection (akan diambil setelah proteksi dicabut atau jika akses terbatas)
