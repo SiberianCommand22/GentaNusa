@@ -1,10 +1,9 @@
-// Tampilkan logo sesuai mode: terang = asli, gelap = versi light (putih/emasm)
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./site.module.css";
 import { navItems } from "./_types";
 import { ThemeToggle } from "./theme-toggle";
@@ -34,8 +33,11 @@ function ActiveLink({
 
 export function Header() {
   const [dark, setDark] = useState(false);
+  const mounted = useRef(false);
 
   useEffect(() => {
+    if (mounted.current) return;
+    mounted.current = true;
     try {
       const saved = localStorage.getItem("genta-theme");
       const d = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -113,16 +115,22 @@ export function MobileNav() {
 
 export function Footer() {
   const [dark, setDark] = useState(false);
+  const mounted = useRef(false);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("genta-theme");
-      const d = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setDark(d);
-      document.documentElement.setAttribute("data-theme", d ? "dark" : "light");
-    } catch {
-      // SSR
-    }
+    if (mounted.current) return;
+    mounted.current = true;
+    const timer = setTimeout(() => {
+      try {
+        const saved = localStorage.getItem("genta-theme");
+        const d = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        setDark(d);
+        document.documentElement.setAttribute("data-theme", d ? "dark" : "light");
+      } catch {
+        // SSR
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
