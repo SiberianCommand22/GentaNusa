@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Ilustrasi harga beras stabil">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f2e1d"/>
+      <stop offset="55%" stop-color="#1a5c3a"/>
+      <stop offset="100%" stop-color="#2e7d32"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd54f"/>
+      <stop offset="100%" stop-color="#ffb300"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- Siluet gunung -->
+  <path d="M0 520 L220 320 L380 470 L520 340 L700 500 L850 400 L1050 520 L1200 430 L1200 630 L0 630 Z" fill="#0b2417" opacity="0.55"/>
+  <!-- Sawah terasering -->
+  <path d="M0 560 Q300 500 600 560 T1200 560 L1200 630 L0 630 Z" fill="#0b2417" opacity="0.7"/>
+  <!-- Matahari -->
+  <circle cx="900" cy="190" r="70" fill="url(#sun)"/>
+  <!-- Butir padi -->
+  <g fill="#f0d17a" opacity="0.95">
+    <ellipse cx="200" cy="420" rx="14" ry="34" transform="rotate(-20 200 420)"/>
+    <ellipse cx="240" cy="400" rx="14" ry="34" transform="rotate(-35 240 400)"/>
+    <ellipse cx="160" cy="400" rx="14" ry="34" transform="rotate(-5 160 400)"/>
+  </g>
+  <g fill="#e6c25a" opacity="0.8">
+    <ellipse cx="280" cy="430" rx="12" ry="30" transform="rotate(-15 280 430)"/>
+    <ellipse cx="120" cy="430" rx="12" ry="30" transform="rotate(-25 120 430)"/>
+  </g>
+</svg>

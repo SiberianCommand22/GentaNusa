@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Source_Serif_4, Inter } from "next/font/google";
 import { BackToTop } from "@/components/back-to-top";
+import { BackgroundCanvas } from "@/components/background-canvas";
 import "./globals.css";
 
 const sourceSerif = Source_Serif_4({
@@ -63,6 +64,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <BackgroundCanvas />
         {children}
         <BackToTop />
       </body>

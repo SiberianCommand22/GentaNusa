@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Ilustrasi Gunung Merapi siaga">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2b1a10"/>
+      <stop offset="60%" stop-color="#5c3620"/>
+      <stop offset="100%" stop-color="#8a5028"/>
+    </linearGradient>
+    <linearGradient id="lava" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffab40"/>
+      <stop offset="100%" stop-color="#ff3d00"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#sky)"/>
+  <path d="M0 560 L280 300 L420 420 L600 200 L780 420 L920 300 L1200 560 L1200 630 L0 630 Z" fill="#1c1008"/>
+  <path d="M600 200 L540 280 L600 260 L660 280 Z" fill="url(#lava)" opacity="0.9"/>
+  <path d="M600 200 L570 240 L600 225 L630 240 Z" fill="#ffca28"/>
+  <ellipse cx="600" cy="160" rx="90" ry="35" fill="#ff8a65" opacity="0.5"/>
+  <g fill="#d32f2f" opacity="0.85">
+    <circle cx="480" cy="150" r="7"/>
+    <circle cx="530" cy="120" r="5"/>
+    <circle cx="680" cy="130" r="6"/>
+    <circle cx="720" cy="160" r="4"/>
+  </g>
+</svg>

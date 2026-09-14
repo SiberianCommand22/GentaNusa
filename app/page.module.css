@@ -69,7 +69,7 @@
 
 /* ===== Hero ===== */
 .hero {
-  background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4a 55%, #3a1a2e 100%);
+  background: transparent;
   color: var(--surface);
   padding: 32px 0;
 }
@@ -95,6 +95,7 @@
 
 .badge {
   display: inline-block;
+  width: fit-content;
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
@@ -105,12 +106,41 @@
   margin-bottom: 14px;
 }
 
-.heroImage {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: 12px;
+/* Hero: kartu dengan gambar latar penuh + overlay gradien */
+.heroCard {
+  position: relative;
+  display: block;
+  border-radius: 16px;
   overflow: hidden;
-  margin-bottom: 14px;
+  min-height: 420px;
+}
+
+.heroImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.heroImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 28px;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.5) 45%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
 }
 
 .heroTitle {
@@ -119,6 +149,8 @@
   font-weight: 800;
   margin-bottom: 14px;
   font-family: var(--font-serif);
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 768px) {
@@ -130,7 +162,7 @@
 .heroExcerpt {
   font-size: 16px;
   line-height: 1.6;
-  color: #c9c9d6;
+  color: rgba(255, 255, 255, 0.92);
   margin-bottom: 16px;
   max-width: 600px;
 }
@@ -143,10 +175,11 @@
 }
 
 .heroSide {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 20px;
+  backdrop-filter: blur(6px);
 }
 
 .sideHeading {
@@ -154,7 +187,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #c9c9d6;
+  color: var(--text-muted);
   margin-bottom: 14px;
 }
 
@@ -163,12 +196,12 @@
   align-items: flex-start;
   gap: 10px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border);
   transition: background 0.15s;
 }
 
 .sideItem:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--hover);
 }
 
 .sideNum {
@@ -194,6 +227,7 @@
   font-size: 14px;
   line-height: 1.4;
   font-weight: 600;
+  color: var(--text);
 }
 
 .sideTitle:hover {

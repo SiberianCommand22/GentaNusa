@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Ilustrasi moratorium izin hutan">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d3d2e"/>
+      <stop offset="70%" stop-color="#1a6b4d"/>
+      <stop offset="100%" stop-color="#2e8b62"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#sky)"/>
+  <path d="M0 300 L250 120 L450 300 Z" fill="#123c2c" opacity="0.6"/>
+  <path d="M900 280 L1100 100 L1200 200 L1200 300 Z" fill="#0e3325" opacity="0.7"/>
+  <g fill="#0b2e20">
+    <path d="M180 330 L260 180 L340 330 Z"/>
+    <path d="M500 350 L580 200 L660 350 Z"/>
+    <path d="M820 340 L900 190 L980 340 Z"/>
+  </g>
+  <g fill="#123c2c">
+    <path d="M240 360 L300 240 L360 360 Z"/>
+    <path d="M560 370 L620 250 L680 370 Z"/>
+    <path d="M880 360 L940 240 L1000 360 Z"/>
+  </g>
+  <rect x="430" y="330" width="340" height="30" rx="6" fill="#ff4d4d" opacity="0.9"/>
+  <rect x="430" y="340" width="340" height="30" rx="6" fill="#d32f2f" opacity="0.9"/>
+  <text x="600" y="362" font-family="Arial,sans-serif" font-size="24" font-weight="bold" fill="#fff" text-anchor="middle">MORATORIUM</text>
+</svg>

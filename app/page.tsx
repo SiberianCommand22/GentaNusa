@@ -38,34 +38,36 @@ export default async function Home() {
       <Header />
 
       {/* ===== Hero / Headline ===== */}
-      <section className={styles.hero}>
-        <div className={styles.container}>
-          <div className={styles.heroGrid}>
-            <article className={styles.heroMain}>
-              {featured.image && (
-                <div className={styles.heroImage}>
-                  <Image
-                    src={featured.image}
-                    alt={featured.title}
-                    width={1200}
-                    height={630}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  />
-                </div>
-              )}
-              <span className={styles.badge} style={{ background: "#1a5c8a" }}>
-                {featured.category}
-              </span>
-              <h1 className={styles.heroTitle}>
-                <a href={`/artikel/${featured.id}`}>{featured.title}</a>
-              </h1>
-              <p className={styles.heroExcerpt}>{featured.excerpt}</p>
-              <div className={styles.meta}>
-                <span>{featured.author}</span>
-                <span>•</span>
-                <span>{formatDate(featured.date)}</span>
-              </div>
-            </article>
+            <section className={styles.hero}>
+              <div className={styles.container}>
+                <div className={styles.heroGrid}>
+                  <article className={styles.heroMain}>
+                    <a href={`/artikel/${featured.id}`} className={styles.heroCard}>
+                      {featured.image && (
+                        <div className={styles.heroImage}>
+                          <Image
+                            src={featured.image}
+                            alt={featured.title}
+                            width={1200}
+                            height={630}
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          />
+                        </div>
+                      )}
+                      <div className={styles.heroOverlay}>
+                        <span className={styles.badge} style={{ background: "#1a5c8a" }}>
+                          {featured.category}
+                        </span>
+                        <h1 className={styles.heroTitle}>{featured.title}</h1>
+                        <p className={styles.heroExcerpt}>{featured.excerpt}</p>
+                        <div className={styles.meta}>
+                          <span>{featured.author}</span>
+                          <span>•</span>
+                          <span>{formatDate(featured.date)}</span>
+                        </div>
+                      </div>
+                    </a>
+                  </article>
             <aside className={styles.heroSide}>
               <h3 className={styles.sideHeading}>Terpopuler</h3>
               {latest.slice(1, 5).map((a, i) => (
