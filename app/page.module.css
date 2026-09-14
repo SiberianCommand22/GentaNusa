@@ -1,22 +1,33 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.section {
+  padding: 32px 0;
+}
+
+/* ===== Hero ===== */
 .hero {
-  padding: 30px 0;
+  padding: 24px 0;
 }
 
 .heroCard {
   display: block;
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
   text-decoration: none;
   color: inherit;
   position: relative;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .heroImageWrapper {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 7;
-  min-height: 280px;
+  min-height: 240px;
 }
 
 .heroImageWrapper > img {
@@ -24,11 +35,6 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.4s ease;
-}
-
-.heroCard:hover .heroImageWrapper > img {
-  transform: scale(1.03);
 }
 
 .heroOverlay {
@@ -36,44 +42,44 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 40px 32px 28px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
+  padding: 36px 28px 24px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
   color: #fff;
 }
 
 .badge {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 4px;
+  padding: 3px 10px;
+  border-radius: 3px;
   color: #fff;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .heroTitle {
-  font-family: var(--font-serif);
-  font-size: 32px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
   font-weight: 700;
   line-height: 1.2;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   color: #fff;
 }
 
 .heroExcerpt {
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.5;
   opacity: 0.9;
-  margin-bottom: 12px;
-  max-width: 680px;
+  margin-bottom: 8px;
+  max-width: 640px;
 }
 
 .meta {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-size: 13px;
   opacity: 0.7;
 }
@@ -82,7 +88,7 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 20px;
 }
 
 @media (max-width: 1024px) {
@@ -100,16 +106,10 @@
 .card {
   display: flex;
   flex-direction: column;
-  background: var(--surface);
-  border-radius: 8px;
+  background: #fff;
+  border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
 }
 
 .cardImage {
@@ -117,66 +117,60 @@
   aspect-ratio: 16 / 9;
   object-fit: cover;
   display: block;
-  transition: transform 0.3s ease;
-}
-
-.card:hover .cardImage {
-  transform: scale(1.03);
 }
 
 .cardBody {
-  padding: 16px;
+  padding: 14px;
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
 .cardBadge {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #fff;
-  padding: 3px 10px;
-  border-radius: 3px;
-  margin-bottom: 10px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  margin-bottom: 8px;
   align-self: flex-start;
 }
 
 .cardTitle {
-  font-family: var(--font-serif);
-  font-size: 16px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
   font-weight: 700;
   line-height: 1.35;
   color: var(--text);
-  margin-bottom: 8px;
-  transition: color 0.3s ease;
+  margin-bottom: 6px;
 }
 
 .cardSummary {
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.5;
   color: var(--text-muted);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   flex: 1;
 }
 
 .cardReadMore {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #c8102e;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .cardMeta {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-faint);
 }
 
 .cardGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 20px;
 }
 
 @media (max-width: 1024px) {
@@ -189,4 +183,23 @@
   .cardGrid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ===== Notice ===== */
+.notice {
+  background: #fff8e6;
+  border: 1px solid #f0e0b8;
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 32px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #6a5a2a;
+}
+
+/* ===== Loading ===== */
+.loading {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--text-muted);
 }
