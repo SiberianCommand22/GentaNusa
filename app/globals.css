@@ -23,13 +23,13 @@
 }
 
 [data-theme="dark"] {
-  --bg: #12121a;
-  --surface: #1c1c28;
-  --border: #2e2e3e;
-  --text: #e8e8f0;
-  --text-muted: #a0a0b4;
-  --text-faint: #70708a;
-  --hover: #242434;
+  --bg: #0e0e16;
+  --surface: #16162a;
+  --border: #2a2a40;
+  --text: #ececf4;
+  --text-muted: #a0a0b8;
+  --text-faint: #707090;
+  --hover: #1e1e36;
   --notice-bg: #2a2410;
   --notice-border: #4a4020;
   --notice-text: #d8c880;
@@ -76,12 +76,11 @@ h3 {
 }
 
 /* Default (light): always visible with gentle opacity */
-.bg-canvas:not([data-parent-theme="dark"]):not([data-theme="dark"]),
 .bg-canvas {
   opacity: 0.85;
 }
 
-/* Dark mode: full opacity, richer glows */
+/* Dark mode: full opacity, kaya glow */
 [data-theme="dark"] .bg-canvas {
   opacity: 1;
 }
@@ -122,4 +121,43 @@ h3 {
   height: 40px;
   background: radial-gradient(ellipse, rgba(200, 16, 46, 0.08), transparent 70%);
   pointer-events: none;
+}
+
+/* ===== Logo filter per mode ===== */
+/* Terang: logo asli (warna asli di background terang) */
+.logoImg {
+  filter: none;
+}
+
+/* Gelap: logo perlu glow agar tidak jadi jelek */
+[data-theme="dark"] .logoImg {
+  filter: drop-shadow(0 0 10px rgba(240, 165, 0, 0.55))
+    drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5)) brightness(1.12) contrast(1.1);
+}
+
+/* Header di mode gelap: surface lebih terang biar logo kontras */
+[data-theme="dark"] .header {
+  background: var(--surface);
+  border-bottom-color: var(--genta-red);
+}
+
+/* Nav link dark mode */
+[data-theme="dark"] .navLink {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .navLink:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+[data-theme="dark"] .navLink.active {
+  background: var(--genta-red);
+  color: #fff;
+}
+
+/* Footer dark mode */
+[data-theme="dark"] .footer {
+  background: #08081a;
+  border-top: 1px solid var(--border);
 }

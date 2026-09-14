@@ -4,6 +4,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: background 0.3s ease;
 }
 
 .headerInner {
@@ -31,6 +32,14 @@
   width: 130px;
   height: auto;
   object-fit: contain;
+  filter: none;
+  transition: filter 0.3s ease;
+}
+
+/* Gelap: logo pakai filter brightness invert (putih) */
+[data-theme="dark"] .logoImg {
+  filter: drop-shadow(0 0 10px rgba(240, 165, 0, 0.55))
+    drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5)) brightness(1.12) contrast(1.1);
 }
 
 .logoImgLight {
@@ -147,6 +156,12 @@
   color: #c9c9d6;
   padding: 40px 0 20px;
   margin-top: 40px;
+  transition: background 0.3s ease;
+}
+
+[data-theme="dark"] .footer {
+  background: #08081a;
+  border-top: 1px solid var(--border);
 }
 
 .container {
