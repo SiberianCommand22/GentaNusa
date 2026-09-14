@@ -5,21 +5,28 @@ import styles from "./newsletter.module.css";
 
 export function NewsletterBox({ compact = false }: { compact?: boolean }) {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "done" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "done" | "error" | "sending">("idle");
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const value = email.trim();
     if (!value || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
       setStatus("error");
       return;
     }
+    setStatus("sending");
     try {
-      const existing = JSON.parse(localStorage.getItem("gn-newsletter") ?? "[]");
-      existing.push({ email: value, at: new Date().toISOString() });
-      localStorage.setItem("gn-newsletter", JSON.stringify(existing));
-      setStatus("done");
-      setEmail("");
+      const res = await fetch("/api/subscribers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: value }),
+      });
+      if (res.ok) {
+        setStatus("done");
+        setEmail("");
+      } else {
+        setStatus("error");
+      }
     } catch {
       setStatus("error");
     }
@@ -47,13 +54,14 @@ export function NewsletterBox({ compact = false }: { compact?: boolean }) {
           placeholder="email@contoh.com"
           className={styles.input}
           aria-label="Alamat email"
+          disabled={status === "sending"}
         />
-        <button type="submit" className={styles.button}>
-          Berlangganan
+        <button type="submit" className={styles.button} disabled={status === "sending"}>
+          {status === "sending" ? "Menyimpan…" : "Berlangganan"}
         </button>
       </form>
       {status === "error" && (
-        <p className={styles.error}>Masukkan alamat email yang valid.</p>
+        <p className={styles.error}>Terjadi kesalahan. Coba lagi nanti.</p>
       )}
     </div>
   );

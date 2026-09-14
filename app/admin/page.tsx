@@ -38,23 +38,26 @@ export default function AdminPage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
+  const [subscribers, setSubscribers] = useState<{ id: number; email: string; created_at: string }[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
-  const [tab, setTab] = useState<"artikel" | "kategori" | "sumber">("artikel");
+  const [tab, setTab] = useState<"artikel" | "kategori" | "sumber" | "subscriber">("artikel");
   const [newCat, setNewCat] = useState({ slug: "", name: "", color: "#c8102e" });
   const [newSrc, setNewSrc] = useState({ id: "", name: "", url: "", category: "", color: "#666666" });
 
   const load = useCallback(async () => {
-    const [a, c, s] = await Promise.all([
+    const [a, c, s, sub] = await Promise.all([
       fetch("/api/articles").then((r) => r.json()),
       fetch("/api/categories").then((r) => r.json()),
       fetch("/api/sources").then((r) => r.json()),
+      fetch("/api/subscribers").then((r) => r.json()).catch(() => []),
     ]);
     setArticles(Array.isArray(a) ? a : []);
     setCategories(Array.isArray(c) ? c : []);
     setSources(Array.isArray(s) ? s : []);
+    setSubscribers(Array.isArray(sub) ? sub : []);
   }, []);
 
   useEffect(() => {
@@ -218,6 +221,7 @@ export default function AdminPage() {
           <button className={styles.tab} onClick={() => setTab("artikel")} data-active={tab === "artikel"}>Artikel ({articles.length})</button>
           <button className={styles.tab} onClick={() => setTab("kategori")} data-active={tab === "kategori"}>Kategori</button>
           <button className={styles.tab} onClick={() => setTab("sumber")} data-active={tab === "sumber"}>Sumber RSS</button>
+          <button className={styles.tab} onClick={() => setTab("subscriber")} data-active={tab === "subscriber"}>Subscribers ({subscribers.length})</button>
           <button className={styles.tab} onClick={logout}>Logout</button>
         </div>
       </div>
@@ -344,6 +348,27 @@ export default function AdminPage() {
             ))}
           </div>
         </form>
+      )}
+    {tab === "subscriber" && (
+        <div className={styles.form}>
+          <h2>📧 Subscribers ({subscribers.length})</h2>
+          {subscribers.length === 0 ? (
+            <p style={{ color: "var(--muted, #4a4a5a)" }}>Belum ada yang berlangganan.</p>
+          ) : (
+            <div className={styles.list}>
+              {subscribers.map((s) => (
+                <div key={s.id} className={styles.item}>
+                  <div>
+                    <strong>{s.email}</strong>
+                    <span className={styles.itemMeta}>
+                      {new Date(s.created_at).toLocaleString("id-ID")}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
