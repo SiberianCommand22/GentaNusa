@@ -1,9 +1,11 @@
+DEPLOY NOTES — GentaNusa
+========================
+
 - **Lokal (dev)**: http://localhost:3000 ✅ (port 3000)
-- **Production URL sementara**: https://gentanusa-90guag19r-genta-nusa.vercel.app
+- **Production URL**: https://gentanusa-2cx4xc57b-genta-nusa.vercel.app
   - ⚠️ URL ini ada **Deployment Protection** (Vercel meminta login SSO untuk akses)
   - Masalah ini bukan dari kode kita — ini pengaturan akun Vercel
   - Bisa diakses via `vercel inspect` atau setelah setting password protection off
-- **Deploy state**: `.deploy-state.json` (URL terbaru)
-- **Semua 3 artikel (90, 91, 92)** sudah masuk DB ✅
-- **Build sukses** ✅ (semua route, termasuk route handler API)
-- **Semua API route** sudah `null-safe` dengan `ensureClient()` ✅
+- **Build**: sukses ✅ (Next.js 16.3.4, Turbopack)
+- **Deploy**: manual via `npx vercel --prod` (akun Vercel terotentikasi)
+- **Artikel**: 3 artikel konten asli di DB (90, 91, 92), penulis "Redaksi GentaNusa"
