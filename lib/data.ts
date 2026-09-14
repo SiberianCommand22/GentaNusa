@@ -51,7 +51,21 @@ function readJson(file: string) {
   return JSON.parse(fs.readFileSync(path.join(dataDir, file), "utf-8"));
 }
 
-function mapRow(a: any): Article {
+type DbArticle = {
+  id: number;
+  title: string;
+  category: string;
+  excerpt: string;
+  date: string;
+  author: string;
+  author_slug?: string;
+  author_role?: string;
+  image?: string;
+  content?: string[];
+  tags?: string[];
+};
+
+function mapRow(a: DbArticle): Article {
   return {
     id: a.id,
     title: a.title,
