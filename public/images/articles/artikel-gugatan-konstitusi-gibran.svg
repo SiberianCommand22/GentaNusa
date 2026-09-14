@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Gugatan konstitusi Gibran">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0f2e"/><stop offset="50%" stop-color="#1a1a3e"/><stop offset="100%" stop-color="#2d1b4e"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd54f"/><stop offset="100%" stop-color="#f57f17"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c8102e" stop-opacity="0.4"/><stop offset="100%" stop-color="#c8102e" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow2" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="blur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="8"/></filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="600" cy="280" r="350" fill="url(#glow)"/>
+  <!-- Mahkamah silhouette -->
+  <g fill="#0d1129" opacity="0.9">
+    <rect x="350" y="280" width="500" height="280"/>
+    <rect x="380" y="300" width="28" height="260"/><rect x="430" y="300" width="28" height="260"/>
+    <rect x="742" y="300" width="28" height="260"/><rect x="792" y="300" width="28" height="260"/>
+    <path d="M320 280 L600 140 L880 280 Z"/>
+    <rect x="310" y="275" width="580" height="10"/>
+  </g>
+  <!-- Gavel -->
+  <g filter="url(#glow2)" transform="translate(820, 180) rotate(35)" opacity="0.85">
+    <rect x="0" y="0" width="160" height="50" rx="6" fill="#8d6e63"/>
+    <ellipse cx="80" cy="25" rx="80" ry="25" fill="#6d4c41" opacity="0.6"/>
+    <rect x="150" y="45" width="30" height="120" rx="4" fill="#795548"/>
+  </g>
+  <!-- Scroll -->
+  <g transform="translate(200, 350)" opacity="0.6" filter="url(#blur)">
+    <rect x="0" y="0" width="200" height="180" rx="4" fill="url(#gold)"/>
+    <rect x="10" y="20" width="180" height="3" fill="#fff" opacity="0.3"/>
+    <rect x="10" y="40" width="160" height="3" fill="#fff" opacity="0.3"/>
+    <rect x="10" y="60" width="170" height="3" fill="#fff" opacity="0.3"/>
+    <rect x="10" y="80" width="140" height="3" fill="#fff" opacity="0.3"/>
+    <rect x="10" y="100" width="150" height="3" fill="#fff" opacity="0.3"/>
+  </g>
+  <text x="600" y="110" text-anchor="middle" font-family="serif" font-size="70" font-weight="800" fill="url(#gold)" opacity="0.15">MAHKAMAH</text>
+  <text x="600" y="560" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#ffd54f" opacity="0.4">Konstitusi: UUD 1945 &amp; UU No. 7/2017</text>
+  <g fill="#ffd54f" opacity="0.5" filter="url(#glow2)">
+    <circle cx="450" cy="200" r="3"/><circle cx="750" cy="150" r="2"/>
+    <circle cx="550" cy="100" r="4"/><circle cx="850" cy="250" r="2"/>
+  </g>
+</svg>

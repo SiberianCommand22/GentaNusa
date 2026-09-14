@@ -76,8 +76,8 @@ function mapRow(a: DbArticle): Article {
     authorSlug: a.author_slug ?? "redaksi-generic",
     authorRole: a.author_role ?? undefined,
     image: a.image ?? undefined,
-    content: a.content ?? [],
-    tags: a.tags ?? [],
+    content: Array.isArray(a.content) ? a.content : JSON.parse(a.content || "[]"),
+    tags: Array.isArray(a.tags) ? a.tags : JSON.parse(a.tags || "[]"),
   };
 }
 
