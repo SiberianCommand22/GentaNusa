@@ -1,12 +1,21 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { adminClient } from "@/lib/supabase";
+import { adminClient, isSupabaseReady } from "@/lib/supabase";
+
+function ensureClient() {
+  const r = isSupabaseReady();
+  if (!r.ok) return { ok: false as const, error: r.reason };
+  if (!adminClient) return { ok: false as const, error: "Service key belum di-set" };
+  return { ok: true as const, client: adminClient };
+}
 
 // GET /api/subscribers — daftar email subscriber (admin)
 export async function GET(req: NextRequest) {
   if (req.cookies.get("genta_admin")?.value !== "1") {
     return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
   }
-  const { data, error } = await adminClient
+  const c = ensureClient();
+  if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
+  const { data, error } = await c.client
     .from("subscribers")
     .select("*")
     .order("created_at", { ascending: false });
@@ -21,9 +30,10 @@ export async function POST(req: NextRequest) {
   if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return NextResponse.json({ error: "Email tidak valid" }, { status: 400 });
   }
-  const { error } = await adminClient.from("subscribers").insert([{ email }]);
+  const c = ensureClient();
+  if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
+  const { error } = await c.client.from("subscribers").insert([{ email }]);
   if (error) {
-    // Email sudah terdaftar (unique) — anggap sukses, jangan error ke user
     if (error.code === "23505") return NextResponse.json({ ok: true, duplicate: true });
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

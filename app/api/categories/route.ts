@@ -1,13 +1,22 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { adminClient } from "@/lib/supabase";
+import { adminClient, isSupabaseReady } from "@/lib/supabase";
 
 function isAdmin(req: NextRequest) {
   return req.cookies.get("genta_admin")?.value === "1";
 }
 
+function ensureClient() {
+  const r = isSupabaseReady();
+  if (!r.ok) return { ok: false as const, error: r.reason };
+  if (!adminClient) return { ok: false as const, error: "Service key belum di-set" };
+  return { ok: true as const, client: adminClient };
+}
+
 // GET — daftar kategori (public)
 export async function GET() {
-  const { data, error } = await adminClient.from("categories").select("*").order("name");
+  const c = ensureClient();
+  if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
+  const { data, error } = await c.client.from("categories").select("*").order("name");
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
 }
@@ -17,11 +26,13 @@ export async function POST(req: NextRequest) {
   if (!isAdmin(req)) {
     return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
   }
+  const c = ensureClient();
+  if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
   const body = await req.json().catch(() => null);
   if (!body?.slug || !body?.name || !body?.color) {
     return NextResponse.json({ error: "slug, name, color wajib" }, { status: 400 });
   }
-  const { data, error } = await adminClient
+  const { data, error } = await c.client
     .from("categories")
     .insert([{ slug: body.slug, name: body.name, color: body.color }])
     .select()
@@ -35,9 +46,11 @@ export async function DELETE(req: NextRequest) {
   if (!isAdmin(req)) {
     return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
   }
+  const c = ensureClient();
+  if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
   const slug = req.nextUrl.searchParams.get("slug");
   if (!slug) return NextResponse.json({ error: "slug wajib" }, { status: 400 });
-  const { error } = await adminClient.from("categories").delete().eq("slug", slug);
+  const { error } = await c.client.from("categories").delete().eq("slug", slug);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

@@ -1,19 +1,19 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const serviceKey = process.env.SUPABASE_SERVICE_KEY;
 
-if (!url) {
-  throw new Error("NEXT_PUBLIC_SUPABASE_URL belum di-set (.env.local)");
+export const supabaseAnon: SupabaseClient | null = url && anonKey
+  ? createClient(url, anonKey)
+  : null;
+
+export const adminClient: SupabaseClient | null = url && serviceKey
+  ? createClient(url, serviceKey)
+  : null;
+
+export function isSupabaseReady() {
+  if (!url) return { ok: false as const, reason: "NEXT_PUBLIC_SUPABASE_URL belum di-set (.env.local)" };
+  if (!anonKey) return { ok: false as const, reason: "NEXT_PUBLIC_SUPABASE_ANON_KEY belum di-set (.env.local)" };
+  return { ok: true as const, url };
 }
-
-// Client anon — HANYA baca (RLS: publik bisa select). Aman untuk halaman web.
-export const supabaseAnon = createClient(
-  url,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
-);
-
-// Service client — akses penuh (tulis/hapus). HANYA di route API admin.
-export const adminClient = createClient(
-  url,
-  process.env.SUPABASE_SERVICE_KEY || ""
-);

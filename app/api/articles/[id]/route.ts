@@ -1,12 +1,21 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { adminClient } from "@/lib/supabase";
+import { adminClient, isSupabaseReady } from "@/lib/supabase";
 
 function isAdmin(req: NextRequest) {
   return req.cookies.get("genta_admin")?.value === "1";
 }
 
+function ensureClient() {
+  const r = isSupabaseReady();
+  if (!r.ok) return { ok: false as const, error: r.reason };
+  if (!adminClient) return { ok: false as const, error: "Service key belum di-set" };
+  return { ok: true as const, client: adminClient };
+}
+
 async function getArticle(id: string) {
-  const { data } = await adminClient.from("articles").select("*").eq("id", id).single();
+  const c = ensureClient();
+  if (!c.ok) return null;
+  const { data } = await c.client.from("articles").select("*").eq("id", id).single();
   return data;
 }
 
@@ -29,11 +38,14 @@ export async function PUT(
   if (!isAdmin(req)) {
     return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
   }
+  const c = ensureClient();
+  if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
+
   const { id } = await params;
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Body kosong" }, { status: 400 });
 
-  const { data, error } = await adminClient
+  const { data, error } = await c.client
     .from("articles")
     .update({
       title: body.title,
@@ -62,8 +74,11 @@ export async function DELETE(
   if (!isAdmin(req)) {
     return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
   }
+  const c = ensureClient();
+  if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
+
   const { id } = await params;
-  const { error } = await adminClient.from("articles").delete().eq("id", id);
+  const { error } = await c.client.from("articles").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
 }
