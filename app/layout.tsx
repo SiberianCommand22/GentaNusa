@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Source_Serif_4, Inter } from "next/font/google";
 import { BackToTop } from "@/components/back-to-top";
 import { BackgroundCanvas } from "@/components/background-canvas";
-import { Header, Footer } from "@/components/site";
+import "./globals.css";
 
 const sourceSerif = Source_Serif_4({
   subsets: ["latin"],
@@ -17,17 +17,21 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "GentaNusa — Berita Nusantara Terkini",
+  title: {
+    default: "GentaNusa — Berita Nusantara Terkini",
+    template: "%s | GentaNusa",
+  },
   description:
     "GentaNusa menyajikan berita politik, ekonomi, dan nasional Indonesia secara akurat, cepat, dan terpercaya.",
+  metadataBase: new URL("https://gentanusa.id"),
   openGraph: {
+    type: "website",
+    locale: "id_ID",
+    url: "https://gentanusa.id",
+    siteName: "GentaNusa",
     title: "GentaNusa — Berita Nusantara Terkini",
     description:
       "GentaNusa menyajikan berita politik, ekonomi, dan nasional Indonesia secara akurat, cepat, dan terpercaya.",
-    url: "https://gentanusa.id",
-    siteName: "GentaNusa",
-    locale: "id_ID",
-    type: "website",
     images: [
       {
         url: "/images/placeholder-article.svg",
@@ -48,27 +52,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="id"
-      className={`${sourceSerif.variable} ${inter.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang="id" className={`${sourceSerif.variable} ${inter.variable}`}>
       <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("genta-theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.setAttribute("data-theme","dark");}catch(e){}})();`,
           }}
         />
       </head>
-      <body style={{ minHeight: "100vh" }}>
+      <body>
         <BackgroundCanvas />
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        {children}
         <BackToTop />
       </body>
     </html>

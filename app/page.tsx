@@ -1,89 +1,157 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import styles from "./page.module.css";
 import { Header, Footer } from "@/components/site";
-import { getArticles, formatDate } from "@/lib/data";
+import { NewsletterBox } from "@/components/newsletter";
+import { Reveal } from "@/components/reveal";
+import { getArticles, getCategories, formatDate, sortByDate } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Beranda",
 };
 
+// Auto-refresh: artikel baru muncul ≤60 detik tanpa deploy
 export const revalidate = 60;
 
-export default async function Home() {
-  const articles = (await getArticles()).sort((a: any, b: any) =>
-    new Date(b.date).getTime() - new Date(a.date).getTime()
+function CardImage({ src, alt, className }: { src?: string; alt: string; className?: string }) {
+  if (!src) return null;
+  return (
+    <div className={className}>
+      <Image
+        src={src}
+        alt={alt}
+        width={1200}
+        height={630}
+        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+      />
+    </div>
   );
-  const featured = articles[0];
+}
+
+export default async function Home() {
+  const latest = sortByDate(await getArticles());
+  const categories = await getCategories();
+  const featured = latest[0];
 
   return (
     <main>
       <Header />
 
-      {/* ===== Hero ===== */}
-      <section className="section">
-        <div className="container">
-          <a href={`/artikel/${featured.id}`} className="hero">
-            <div className="heroImageWrapper">
-              <Image
-                src={featured.image || "/images/placeholder-article.svg"}
-                alt={featured.title}
-                width={1200}
-                height={500}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                priority
-              />
-              <div className="heroOverlay">
-                <span className="badge" style={{ background: "#c8102e" }}>
-                  {featured.category}
-                </span>
-                <h1 className="heroTitle">{featured.title}</h1>
-                <p className="heroExcerpt">{featured.excerpt}</p>
-                <div className="meta">
-                  <span>{featured.author}</span>
-                  <span>•</span>
-                  <span>{formatDate(featured.date)}</span>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-      </section>
-
-      {/* ===== Terbaru ===== */}
-      <section className="section">
-        <div className="container">
-          <h2 style={{ fontFamily: "Georgia, serif", fontSize: 22, marginBottom: 20 }}>
-            Terbaru
-          </h2>
-          <div className="grid">
-            {articles.map((a: any) => (
-              <a key={a.id} href={`/artikel/${a.id}`} className="card">
-                <Image
-                  src={a.image}
-                  alt={a.title}
-                  width={600}
-                  height={340}
-                  style={{ width: "100%", height: "auto" }}
-                  className="cardImage"
-                />
-                <div className="cardBody">
-                  <span className="cardBadge" style={{ background: "#c8102e" }}>
-                    {a.category}
+      {/* ===== Hero / Headline ===== */}
+            <section className={styles.hero}>
+              <div className={styles.container}>
+                <div className={styles.heroGrid}>
+                  <article className={styles.heroMain}>
+                    <a href={`/artikel/${featured.id}`} className={styles.heroCard}>
+                      {featured.image && (
+                        <div className={styles.heroImage}>
+                          <Image
+                            src={featured.image}
+                            alt={featured.title}
+                            width={1200}
+                            height={630}
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          />
+                        </div>
+                      )}
+                      <div className={styles.heroOverlay}>
+                        <span className={styles.badge} style={{ background: "#1a5c8a" }}>
+                          {featured.category}
+                        </span>
+                        <h1 className={styles.heroTitle}>{featured.title}</h1>
+                        <p className={styles.heroExcerpt}>{featured.excerpt}</p>
+                        <div className={styles.meta}>
+                          <span>{featured.author}</span>
+                          <span>•</span>
+                          <span>{formatDate(featured.date)}</span>
+                        </div>
+                      </div>
+                    </a>
+                  </article>
+            <aside className={styles.heroSide}>
+              <h3 className={styles.sideHeading}>Terpopuler</h3>
+              {latest.slice(1, 5).map((a, i) => (
+                <a key={a.id} href={`/artikel/${a.id}`} className={styles.sideItem}>
+                  <span className={styles.sideNum}>{i + 1}</span>
+                  <span>
+                    <span className={styles.sideCat}>{a.category}</span>
+                    <p className={styles.sideTitle}>{a.title}</p>
                   </span>
-                  <h3 className="cardTitle">{a.title}</h3>
-                  <p className="cardSummary">{a.excerpt}</p>
-                  <span className="cardReadMore">Baca selengkapnya →</span>
-                  <div className="cardMeta">
-                    <span>{a.author}</span>
-                    <span>•</span>
-                    <span>{formatDate(a.date)}</span>
-                  </div>
-                </div>
-              </a>
-            ))}
+                </a>
+              ))}
+            </aside>
           </div>
         </div>
       </section>
+
+      {/* ===== Berita Terbaru ===== */}
+      <Reveal>
+        <section className={styles.section}>
+          <div className={styles.container}>
+            <h2 className={styles.sectionTitle}>Terbaru</h2>
+            <div className={styles.grid}>
+              {latest.map((a) => (
+                <a key={a.id} href={`/artikel/${a.id}`} className={styles.card}>
+                  <CardImage src={a.image} alt={a.title} className={styles.cardImage} />
+                  <div className={styles.cardBody}>
+                    <div className={styles.cardBadge}>{a.category}</div>
+                    <h3 className={styles.cardTitle}>{a.title}</h3>
+                    <p className={styles.cardExcerpt}>{a.excerpt}</p>
+                    <span className={styles.readMore}>Baca selengkapnya →</span>
+                    <div className={styles.meta}>
+                      <span>{a.author}</span>
+                      <span>•</span>
+                      <span>{formatDate(a.date)}</span>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      </Reveal>
+
+      {/* ===== Newsletter ===== */}
+      <Reveal>
+        <section className={styles.section}>
+          <div className={styles.container}>
+            <NewsletterBox />
+          </div>
+        </section>
+      </Reveal>
+
+      {/* ===== Per Kategori ===== */}
+      {categories.map((cat, ci) => (
+        <Reveal key={cat.slug} delay={ci * 100}>
+          <section className={styles.section}>
+            <div className={styles.container}>
+              <h2 className={styles.sectionTitle}>
+                <span style={{ color: cat.color }}>{cat.name}</span>
+              </h2>
+              <div className={styles.grid}>
+                {latest.filter((a) => a.category === cat.name).map((a) => (
+                  <a key={a.id} href={`/artikel/${a.id}`} className={styles.card}>
+                    <CardImage src={a.image} alt={a.title} className={styles.cardImage} />
+                    <div className={styles.cardBody}>
+                      <div className={styles.cardBadge} style={{ background: cat.color }}>
+                        {a.category}
+                      </div>
+                      <h3 className={styles.cardTitle}>{a.title}</h3>
+                      <p className={styles.cardExcerpt}>{a.excerpt}</p>
+                      <span className={styles.readMore}>Baca selengkapnya →</span>
+                      <div className={styles.meta}>
+                        <span>{a.author}</span>
+                        <span>•</span>
+                        <span>{formatDate(a.date)}</span>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+        </Reveal>
+      ))}
 
       <Footer />
     </main>
