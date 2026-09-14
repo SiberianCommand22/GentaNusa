@@ -1,14 +1,15 @@
+// Tampilkan logo sesuai mode: terang = asli, gelap = versi light (putih/emasm)
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./site.module.css";
 import { navItems } from "./_types";
 import { ThemeToggle } from "./theme-toggle";
 
-export function ActiveLink({
+function ActiveLink({
   href,
   children,
   className,
@@ -32,19 +33,32 @@ export function ActiveLink({
 }
 
 export function Header() {
+  const [dark, setDark] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("genta-theme");
+      const d = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setDark(d);
+      document.documentElement.setAttribute("data-theme", d ? "dark" : "light");
+    } catch {
+      // SSR
+    }
+  }, []);
+
   return (
     <header className={styles.header}>
       <div className={styles.headerInner}>
         <Link href="/" className={styles.logo}>
-                  <Image
-                    src="/images/logo-gentanusa.png"
-                    alt="Logo GentaNusa"
-                    width={130}
-                    height={71}
-                    className={styles.logoImg}
-                    priority
-                  />
-                </Link>
+          <Image
+            src={dark ? "/images/logo-gentanusa-dark.svg" : "/images/logo-gentanusa.png"}
+            alt="Logo GentaNusa"
+            width={130}
+            height={71}
+            className={styles.logoImg}
+            priority
+          />
+        </Link>
         <nav className={styles.nav}>
           {navItems.map((item) => (
             <ActiveLink key={item.href} href={item.href} className={styles.navLink}>
@@ -98,20 +112,33 @@ export function MobileNav() {
 }
 
 export function Footer() {
+  const [dark, setDark] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("genta-theme");
+      const d = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setDark(d);
+      document.documentElement.setAttribute("data-theme", d ? "dark" : "light");
+    } catch {
+      // SSR
+    }
+  }, []);
+
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
         <div className={styles.footerGrid}>
           <div>
             <Link href="/" className={styles.logo}>
-                          <Image
-                            src="/images/logo-gentanusa.png"
-                            alt="Logo GentaNusa"
-                            width={130}
-                            height={71}
-                            className={`${styles.logoImg} ${styles.logoImgLight}`}
-                          />
-                        </Link>
+              <Image
+                src={dark ? "/images/logo-gentanusa-dark.svg" : "/images/logo-gentanusa.png"}
+                alt="Logo GentaNusa"
+                width={130}
+                height={71}
+                className={`${styles.logoImg} ${styles.logoImgLight}`}
+              />
+            </Link>
             <p className={styles.footerText}>
               Berita Nusantara terkini, akurat, dan terpercaya.
             </p>

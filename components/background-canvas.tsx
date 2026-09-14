@@ -1,6 +1,8 @@
-// Background premium: mode terang — gradien hangat merah-biru-emas,
-// grid geometris, motif kawung & parang (budaya Indonesia), glow lembut.
-// Fixed di belakang konten (z -10). Area kiri/atas bersih untuk baca.
+// Komponen background canvas — mode terang (default) & gelap.
+// Terang: gradien warm off-white, grid merah GentaNusa, motif kawung & parang.
+// Gelap: gradient navy-hitam, network lines (putih), glow warna identitas,
+//        motif batik abstrak, cahaya atmosferik.
+// CSS .bg-canvas mengatur opacity (terang: 0.85, gelap: 1.0).
 export function BackgroundCanvas() {
   return (
     <div
@@ -12,11 +14,10 @@ export function BackgroundCanvas() {
         zIndex: -10,
         pointerEvents: "none",
         overflow: "hidden",
-        background:
-          "linear-gradient(160deg, #fff 0%, #f8f6f4 30%, #f0eef0 60%, #f5f3f6 100%)",
+        background: "linear-gradient(160deg, #0e0e16 0%, #0a0a14 50%, #100e1e 100%)",
       }}
     >
-      {/* Gradien warna GentaNusa — pojok kanan atas (hangat) */}
+      {/* Glow merah — pojok kanan atas */}
       <div
         style={{
           position: "absolute",
@@ -25,29 +26,41 @@ export function BackgroundCanvas() {
           width: "700px",
           height: "500px",
           background:
-            "radial-gradient(ellipse at center, rgba(200,16,46,0.10), rgba(29,78,216,0.06) 50%, transparent 70%)",
+            "radial-gradient(ellipse at center, rgba(200,16,46,0.14), transparent 65%)",
         }}
       />
-      {/* Gradien kedua — pojok kiri bawah (hijau kebumian lembut) */}
+      {/* Glow biru — pojok kiri atas */}
       <div
         style={{
           position: "absolute",
-          bottom: "-10%",
+          top: "-10%",
           left: "-5%",
           width: "600px",
+          height: "450px",
+          background:
+            "radial-gradient(ellipse at center, rgba(29,78,216,0.10), transparent 60%)",
+        }}
+      />
+      {/* Glow emas — tengah bawah */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "-20%",
+          left: "40%",
+          width: "500px",
           height: "400px",
           background:
-            "radial-gradient(ellipse at center, rgba(200,160,60,0.08), rgba(200,16,46,0.04) 50%, transparent 70%)",
+            "radial-gradient(ellipse at center, rgba(240,165,0,0.06), transparent 65%)",
         }}
       />
 
-      {/* Grid geometris halus */}
+      {/* Grid geometris halus (garis putih sangat tipis) */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "linear-gradient(rgba(200,16,46,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(200,16,46,0.05) 1px, transparent 1px)",
+            "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
           backgroundSize: "96px 96px",
           maskImage:
             "radial-gradient(ellipse 85% 65% at 50% 0%, black, transparent 80%)",
@@ -64,19 +77,19 @@ export function BackgroundCanvas() {
           bottom: "-80px",
           width: "640px",
           height: "580px",
-          opacity: 0.5,
+          opacity: 0.45,
         }}
         viewBox="0 0 640 580"
         fill="none"
       >
-        <g stroke="#c8102e" strokeOpacity="0.22" strokeWidth="1">
+        <g stroke="#ffffff" strokeOpacity="0.18" strokeWidth="1">
           <path d="M80 520 L200 420 L320 470 L470 340 L560 420" />
           <path d="M200 420 L180 300" />
           <path d="M320 470 L340 250" />
           <path d="M470 340 L600 180" />
           <path d="M560 420 L600 300" />
         </g>
-        <g fill="#c8102e" fillOpacity="0.28">
+        <g fill="#ffffff" fillOpacity="0.22">
           <circle cx="80" cy="520" r="3" />
           <circle cx="200" cy="420" r="4" />
           <circle cx="320" cy="470" r="3" />
@@ -97,12 +110,12 @@ export function BackgroundCanvas() {
           bottom: "-40px",
           width: "340px",
           height: "340px",
-          opacity: 0.3,
+          opacity: 0.22,
         }}
         viewBox="0 0 340 340"
         fill="none"
       >
-        <g fill="none" stroke="#c8102e" strokeOpacity="0.25" strokeWidth="1.2">
+        <g fill="none" stroke="#c8102e" strokeOpacity="0.3" strokeWidth="1.2">
           <circle cx="80" cy="80" r="34" />
           <circle cx="152" cy="80" r="34" />
           <circle cx="116" cy="146" r="34" />
@@ -110,7 +123,7 @@ export function BackgroundCanvas() {
           <circle cx="152" cy="212" r="34" />
           <circle cx="116" cy="278" r="34" />
         </g>
-        <g fill="#c8102e" fillOpacity="0.12">
+        <g fill="#c8102e" fillOpacity="0.1">
           <circle cx="80" cy="80" r="8" />
           <circle cx="152" cy="80" r="8" />
           <circle cx="116" cy="146" r="8" />
@@ -125,12 +138,12 @@ export function BackgroundCanvas() {
           top: "-20px",
           width: "280px",
           height: "280px",
-          opacity: 0.18,
+          opacity: 0.12,
         }}
         viewBox="0 0 280 280"
         fill="none"
       >
-        <g stroke="#1d4ed8" strokeOpacity="0.4" strokeWidth="1.5">
+        <g stroke="#1d4ed8" strokeOpacity="0.3" strokeWidth="1.5">
           <path d="M0 280 L280 0" />
           <path d="M40 280 L280 40" />
           <path d="M80 280 L280 80" />
@@ -139,7 +152,7 @@ export function BackgroundCanvas() {
         </g>
       </svg>
 
-      {/* Cahaya lembut atas (kedalaman sinematik, warna hangat) */}
+      {/* Cahaya lembut merah (atas tengah) */}
       <div
         style={{
           position: "absolute",
@@ -148,10 +161,10 @@ export function BackgroundCanvas() {
           width: "700px",
           height: "500px",
           background:
-            "radial-gradient(ellipse, rgba(200,16,46,0.07), transparent 65%)",
+            "radial-gradient(ellipse, rgba(200,16,46,0.08), transparent 65%)",
         }}
       />
-      {/* Cahaya kedua — biru lembut (kiri atas) */}
+      {/* Cahaya lembut biru (kiri atas) */}
       <div
         style={{
           position: "absolute",
@@ -160,7 +173,7 @@ export function BackgroundCanvas() {
           width: "500px",
           height: "400px",
           background:
-            "radial-gradient(ellipse, rgba(29,78,216,0.06), transparent 60%)",
+            "radial-gradient(ellipse, rgba(29,78,216,0.07), transparent 60%)",
         }}
       />
     </div>
