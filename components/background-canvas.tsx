@@ -1,8 +1,4 @@
-// Komponen background canvas — mode terang (default) & gelap.
-// Terang: gradien warm off-white, grid merah GentaNusa, motif kawung & parang.
-// Gelap: gradient navy-hitam, network lines (putih), glow warna identitas,
-//        motif batik abstrak, cahaya atmosferik.
-// CSS .bg-canvas mengatur opacity (terang: 0.85, gelap: 1.0).
+// Background canvas: terang (default) atau gelap (dark mode)
 export function BackgroundCanvas() {
   return (
     <div
@@ -14,166 +10,43 @@ export function BackgroundCanvas() {
         zIndex: -10,
         pointerEvents: "none",
         overflow: "hidden",
-        background: "linear-gradient(160deg, #0e0e16 0%, #0a0a14 50%, #100e1e 100%)",
+        background: "linear-gradient(180deg, #fafafa 0%, #f5f5f7 50%, #f0f0f2 100%)",
+        transition: "background 0.5s ease",
       }}
     >
-      {/* Glow merah — pojok kanan atas */}
-      <div
-        style={{
-          position: "absolute",
-          top: "-15%",
-          right: "-10%",
-          width: "700px",
-          height: "500px",
-          background:
-            "radial-gradient(ellipse at center, rgba(200,16,46,0.14), transparent 65%)",
-        }}
-      />
-      {/* Glow biru — pojok kiri atas */}
-      <div
-        style={{
-          position: "absolute",
-          top: "-10%",
-          left: "-5%",
-          width: "600px",
-          height: "450px",
-          background:
-            "radial-gradient(ellipse at center, rgba(29,78,216,0.10), transparent 60%)",
-        }}
-      />
-      {/* Glow emas — tengah bawah */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "-20%",
-          left: "40%",
-          width: "500px",
-          height: "400px",
-          background:
-            "radial-gradient(ellipse at center, rgba(240,165,0,0.06), transparent 65%)",
-        }}
-      />
-
-      {/* Grid geometris halus (garis putih sangat tipis) */}
+      {/* Grid sangat halus (hanya di terang) */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
+            "linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)",
           backgroundSize: "96px 96px",
-          maskImage:
-            "radial-gradient(ellipse 85% 65% at 50% 0%, black, transparent 80%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 85% 65% at 50% 0%, black, transparent 80%)",
+          opacity: 0.3,
         }}
       />
-
-      {/* Jaringan informasi: garis tipis + titik koneksi (kanan bawah) */}
-      <svg
-        style={{
-          position: "absolute",
-          right: "-60px",
-          bottom: "-80px",
-          width: "640px",
-          height: "580px",
-          opacity: 0.45,
-        }}
-        viewBox="0 0 640 580"
-        fill="none"
-      >
-        <g stroke="#ffffff" strokeOpacity="0.18" strokeWidth="1">
-          <path d="M80 520 L200 420 L320 470 L470 340 L560 420" />
-          <path d="M200 420 L180 300" />
-          <path d="M320 470 L340 250" />
-          <path d="M470 340 L600 180" />
-          <path d="M560 420 L600 300" />
-        </g>
-        <g fill="#ffffff" fillOpacity="0.22">
-          <circle cx="80" cy="520" r="3" />
-          <circle cx="200" cy="420" r="4" />
-          <circle cx="320" cy="470" r="3" />
-          <circle cx="470" cy="340" r="4" />
-          <circle cx="560" cy="420" r="3" />
-          <circle cx="180" cy="300" r="3" />
-          <circle cx="340" cy="250" r="3" />
-          <circle cx="600" cy="180" r="4" />
-          <circle cx="600" cy="300" r="3" />
-        </g>
-      </svg>
-
-      {/* Motif kawung (budaya Indonesia) — pojok kiri bawah, sangat halus */}
-      <svg
-        style={{
-          position: "absolute",
-          left: "-40px",
-          bottom: "-40px",
-          width: "340px",
-          height: "340px",
-          opacity: 0.22,
-        }}
-        viewBox="0 0 340 340"
-        fill="none"
-      >
-        <g fill="none" stroke="#c8102e" strokeOpacity="0.3" strokeWidth="1.2">
-          <circle cx="80" cy="80" r="34" />
-          <circle cx="152" cy="80" r="34" />
-          <circle cx="116" cy="146" r="34" />
-          <circle cx="80" cy="212" r="34" />
-          <circle cx="152" cy="212" r="34" />
-          <circle cx="116" cy="278" r="34" />
-        </g>
-        <g fill="#c8102e" fillOpacity="0.1">
-          <circle cx="80" cy="80" r="8" />
-          <circle cx="152" cy="80" r="8" />
-          <circle cx="116" cy="146" r="8" />
-        </g>
-      </svg>
-
-      {/* Motif parang halus (diagonal — budaya Yogyakarta) — pojok kanan atas */}
-      <svg
-        style={{
-          position: "absolute",
-          right: "-20px",
-          top: "-20px",
-          width: "280px",
-          height: "280px",
-          opacity: 0.12,
-        }}
-        viewBox="0 0 280 280"
-        fill="none"
-      >
-        <g stroke="#1d4ed8" strokeOpacity="0.3" strokeWidth="1.5">
-          <path d="M0 280 L280 0" />
-          <path d="M40 280 L280 40" />
-          <path d="M80 280 L280 80" />
-          <path d="M0 240 L240 0" />
-          <path d="M0 200 L200 0" />
-        </g>
-      </svg>
-
-      {/* Cahaya lembut merah (atas tengah) */}
+      {/* Glow merah lembut (kanan atas) */}
       <div
         style={{
           position: "absolute",
-          top: "-20%",
-          left: "25%",
-          width: "700px",
-          height: "500px",
-          background:
-            "radial-gradient(ellipse, rgba(200,16,46,0.08), transparent 65%)",
-        }}
-      />
-      {/* Cahaya lembut biru (kiri atas) */}
-      <div
-        style={{
-          position: "absolute",
-          top: "5%",
-          left: "-5%",
+          top: "-15%",
+          right: "-10%",
           width: "500px",
           height: "400px",
           background:
-            "radial-gradient(ellipse, rgba(29,78,216,0.07), transparent 60%)",
+            "radial-gradient(ellipse at center, rgba(200,16,46,0.06), transparent 65%)",
+        }}
+      />
+      {/* Glow hijau kebumian (kiri bawah) */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "-10%",
+          left: "-5%",
+          width: "400px",
+          height: "350px",
+          background:
+            "radial-gradient(ellipse at center, rgba(39,91,57,0.05), transparent 60%)",
         }}
       />
     </div>

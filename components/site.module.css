@@ -1,10 +1,8 @@
 .header {
-  background: var(--surface);
-  border-bottom: 3px solid #c8102e;
   position: sticky;
   top: 0;
   z-index: 100;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .headerInner {
@@ -16,6 +14,7 @@
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .logo {
@@ -28,6 +27,7 @@
   font-size: 26px;
 }
 
+/* Logo invert di dark mode agar kontras */
 .logoImg {
   width: 130px;
   height: auto;
@@ -36,10 +36,8 @@
   transition: filter 0.3s ease;
 }
 
-/* Gelap: logo pakai filter brightness invert (putih) */
 [data-theme="dark"] .logoImg {
-  filter: drop-shadow(0 0 10px rgba(240, 165, 0, 0.55))
-    drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5)) brightness(1.12) contrast(1.1);
+  filter: invert(1) brightness(0.9) drop-shadow(0 0 8px rgba(240, 165, 0, 0.3));
 }
 
 .logoImgLight {
@@ -77,11 +75,11 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--text-muted);
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .navLink:hover {
-  background: var(--bg);
+  background: var(--hover);
   color: var(--text);
 }
 
@@ -136,7 +134,7 @@
 }
 
 .mobileLink:hover {
-  background: var(--bg);
+  background: var(--hover);
   color: var(--text);
 }
 
@@ -152,16 +150,12 @@
 
 /* ===== Footer ===== */
 .footer {
-  background: #1a1a2e;
+  background: #0a0a16;
   color: #c9c9d6;
   padding: 40px 0 20px;
   margin-top: 40px;
-  transition: background 0.3s ease;
-}
-
-[data-theme="dark"] .footer {
-  background: #08081a;
   border-top: 1px solid var(--border);
+  transition: background 0.3s ease;
 }
 
 .container {
@@ -172,10 +166,10 @@
 
 .footerGrid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 32px;
   padding-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 @media (max-width: 768px) {

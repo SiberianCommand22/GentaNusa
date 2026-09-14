@@ -9,27 +9,30 @@
   --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
 
-  /* Semantic theme vars (light default) */
-  --bg: #f5f5f7;
+  /* Light mode: editorial clean */
+  --bg: #fafafa;
   --surface: #ffffff;
+  --surface-elevated: #ffffff;
   --border: #e0e0e6;
   --text: #1a1a2e;
   --text-muted: #4a4a5a;
   --text-faint: #8a8a9a;
-  --hover: #fafafc;
+  --hover: #f0f0f2;
   --notice-bg: #fff8e6;
   --notice-border: #f0e0b8;
   --notice-text: #6a5a2a;
 }
 
 [data-theme="dark"] {
-  --bg: #0e0e16;
-  --surface: #16162a;
-  --border: #2a2a40;
+  /* Dark mode: premium dark (MotionSites style) */
+  --bg: #0a0a14;
+  --surface: #12121e;
+  --surface-elevated: #1a1a28;
+  --border: #252538;
   --text: #ececf4;
   --text-muted: #a0a0b8;
   --text-faint: #707090;
-  --hover: #1e1e36;
+  --hover: #1e1e34;
   --notice-bg: #2a2410;
   --notice-border: #4a4020;
   --notice-text: #d8c880;
@@ -47,13 +50,8 @@ body {
   overflow-x: hidden;
   font-family: var(--font-sans);
   color: var(--text);
-  background: transparent;
-  transition: background 0.3s ease, color 0.3s ease;
-}
-
-/* Background canvas (fixed, z -10) jadi latar sebenarnya */
-html {
   background: var(--bg);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 a {
@@ -69,95 +67,26 @@ h3 {
   letter-spacing: -0.01em;
 }
 
-/* ===== Background canvas: terang (default) ===== */
+/* Background canvas */
 .bg-canvas {
-  opacity: 0;
-  transition: opacity 0.6s ease;
+  opacity: 1;
+  transition: opacity 0.3s ease, background 0.5s ease;
 }
 
-/* Default (light): always visible with gentle opacity */
-.bg-canvas {
-  opacity: 0.85;
-}
-
-/* Dark mode: full opacity, kaya glow */
 [data-theme="dark"] .bg-canvas {
   opacity: 1;
 }
 
-/* ===== Premium article hero untuk mode terang ===== */
-.article-hero {
-  position: relative;
-  overflow: hidden;
-  border-radius: 12px;
-  background: linear-gradient(
-    135deg,
-    #fff 0%,
-    #f8f6f4 50%,
-    #f0e8e8 100%
-  );
-  border: 1px solid var(--genta-border);
+/* Glass effect utility */
+.glass {
+  background: rgba(18, 18, 30, 0.6);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Header bar khas GentaNusa di hero */
-.article-hero::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--genta-red), #e84060, #1d4ed8);
-  border-radius: 12px 12px 0 0;
-}
-
-/* Soft glow under hero */
-.article-hero::after {
-  content: "";
-  position: absolute;
-  bottom: -20px;
-  left: 10%;
-  right: 10%;
-  height: 40px;
-  background: radial-gradient(ellipse, rgba(200, 16, 46, 0.08), transparent 70%);
-  pointer-events: none;
-}
-
-/* ===== Logo filter per mode ===== */
-/* Terang: logo asli (warna asli di background terang) */
-.logoImg {
-  filter: none;
-}
-
-/* Gelap: logo perlu glow agar tidak jadi jelek */
-[data-theme="dark"] .logoImg {
-  filter: drop-shadow(0 0 10px rgba(240, 165, 0, 0.55))
-    drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5)) brightness(1.12) contrast(1.1);
-}
-
-/* Header di mode gelap: surface lebih terang biar logo kontras */
-[data-theme="dark"] .header {
-  background: var(--surface);
-  border-bottom-color: var(--genta-red);
-}
-
-/* Nav link dark mode */
-[data-theme="dark"] .navLink {
-  color: var(--text-muted);
-}
-
-[data-theme="dark"] .navLink:hover {
-  background: var(--hover);
-  color: var(--text);
-}
-
-[data-theme="dark"] .navLink.active {
-  background: var(--genta-red);
-  color: #fff;
-}
-
-/* Footer dark mode */
-[data-theme="dark"] .footer {
-  background: #08081a;
-  border-top: 1px solid var(--border);
+/* Light mode glass */
+[data-theme="light"] .glass,
+:root [data-theme="light"] .glass {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--border);
 }

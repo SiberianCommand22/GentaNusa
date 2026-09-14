@@ -1,3 +1,4 @@
+// Tampilkan logo sesuai mode: terang = asli, gelap = versi light (putih/emasm)
 "use client";
 
 import Image from "next/image";
@@ -8,24 +9,11 @@ import styles from "./site.module.css";
 import { navItems } from "./_types";
 import { ThemeToggle } from "./theme-toggle";
 
-function ActiveLink({
-  href,
-  children,
-  className,
-}: {
-  href: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
+function ActiveLink({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) {
   const pathname = usePathname();
   const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
   return (
-    <Link
-      href={href}
-      className={[className, isActive ? styles.active : ""]
-        .filter(Boolean)
-        .join(" ")}
-    >
+    <Link href={href} className={[className, isActive ? styles.active : ""].filter(Boolean).join(" ")}>
       {children}
     </Link>
   );
@@ -38,14 +26,17 @@ export function Header() {
   useEffect(() => {
     if (mounted.current) return;
     mounted.current = true;
-    try {
-      const saved = localStorage.getItem("genta-theme");
-      const d = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setDark(d);
-      document.documentElement.setAttribute("data-theme", d ? "dark" : "light");
-    } catch {
-      // SSR
-    }
+    const timer = setTimeout(() => {
+      try {
+        const saved = localStorage.getItem("genta-theme");
+        const d = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        setDark(d);
+        document.documentElement.setAttribute("data-theme", d ? "dark" : "light");
+      } catch {
+        // SSR
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -98,9 +89,7 @@ export function MobileNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={[styles.mobileLink, isActive ? styles.active : ""]
-                  .filter(Boolean)
-                  .join(" ")}
+                className={[styles.mobileLink, isActive ? styles.active : ""].filter(Boolean).join(" ")}
                 onClick={() => setOpen(false)}
               >
                 {item.label}
@@ -147,9 +136,7 @@ export function Footer() {
                 className={`${styles.logoImg} ${styles.logoImgLight}`}
               />
             </Link>
-            <p className={styles.footerText}>
-              Berita Nusantara terkini, akurat, dan terpercaya.
-            </p>
+            <p className={styles.footerText}>Berita Nusantara terkini, akurat, dan terpercaya.</p>
           </div>
           <div className={styles.footerCol}>
             <h4>Kategori</h4>
@@ -158,22 +145,14 @@ export function Footer() {
             <ActiveLink href="/kategori/nasional">Nasional</ActiveLink>
           </div>
           <div className={styles.footerCol}>
-            <h4>Kontak</h4>
-            <span>redaksi@gentanusa.id</span>
-            <span>Jakarta, Indonesia</span>
-            <Link href="/feed.xml">RSS Feed</Link>
-          </div>
-          <div className={styles.footerCol}>
             <h4>Info</h4>
             <Link href="/tentang">Tentang Kami</Link>
             <Link href="/sindikasi">Sindikasi</Link>
             <Link href="/privasi">Kebijakan Privasi</Link>
-            <Link href="/syarat">Syarat &amp; Ketentuan</Link>
+            <Link href="/syarat">Syarat & Ketentuan</Link>
           </div>
         </div>
-        <div className={styles.footerBottom}>
-          © 2026 GentaNusa. Seluruh hak cipta dilindungi.
-        </div>
+        <div className={styles.footerBottom}>&copy; 2026 GentaNusa. Seluruh hak cipta dilindungi.</div>
       </div>
     </footer>
   );
