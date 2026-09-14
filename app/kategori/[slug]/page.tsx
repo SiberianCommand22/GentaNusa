@@ -7,8 +7,10 @@ import styles from "./category.module.css";
 
 type Params = { params: Promise<{ slug: string }> };
 
-// URL kategori tak dikenal = 404 beneran
-export const dynamicParams = false;
+// ID kategori baru (dari admin) harus bisa diakses
+export const dynamicParams = true;
+// Auto-refresh: kategori & artikel baru muncul ≤60 detik tanpa deploy
+export const revalidate = 60;
 
 async function loadCategory(slug: string) {
   return getCategoryBySlug(slug);

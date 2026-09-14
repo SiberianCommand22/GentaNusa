@@ -7,8 +7,8 @@ import styles from "./author.module.css";
 
 type Params = { params: Promise<{ slug: string }> };
 
-// URL penulis tak dikenal = 404 beneran
-export const dynamicParams = false;
+// Penulis tetap statis (daftar penulis fixed), artikel-nya auto-refresh
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   return getAuthors().map((a) => ({ slug: a.slug }));

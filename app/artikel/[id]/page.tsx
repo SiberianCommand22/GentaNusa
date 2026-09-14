@@ -13,8 +13,11 @@ import styles from "./article.module.css";
 
 type Params = { params: Promise<{ id: string }> };
 
-// URL artikel tak dikenal = 404 beneran (bukan render kosong)
-export const dynamicParams = false;
+// ID artikel baru (dari admin) harus bisa diakses — dynamicParams true
+// (notFound() tetap lindungi ID sampah)
+export const dynamicParams = true;
+// Auto-refresh: artikel baru muncul ≤60 detik tanpa deploy
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   return (await getArticles()).map((a) => ({ id: String(a.id) }));

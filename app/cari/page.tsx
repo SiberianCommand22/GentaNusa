@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   description: "Cari artikel GentaNusa berdasarkan kata kunci.",
 };
 
+// Auto-refresh: artikel baru ikut terdampak pencarian ≤60 detik
+export const revalidate = 60;
+
 function highlight(text: string, q: string) {
   if (!q) return text;
   const idx = text.toLowerCase().indexOf(q.toLowerCase());

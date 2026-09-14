@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: "Beranda",
 };
 
+// Auto-refresh: artikel baru muncul ≤60 detik tanpa deploy
+export const revalidate = 60;
+
 function CardImage({ src, alt, className }: { src?: string; alt: string; className?: string }) {
   if (!src) return null;
   return (
