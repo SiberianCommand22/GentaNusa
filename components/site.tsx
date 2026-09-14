@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -35,11 +36,15 @@ export function Header() {
     <header className={styles.header}>
       <div className={styles.headerInner}>
         <Link href="/" className={styles.logo}>
-          <span className={styles.logoIcon}>🔔</span>
-          <span className={styles.logoText}>
-            Genta<strong>Nusa</strong>
-          </span>
-        </Link>
+                  <Image
+                    src="/images/logo-gentanusa.png"
+                    alt="Logo GentaNusa"
+                    width={130}
+                    height={71}
+                    className={styles.logoImg}
+                    priority
+                  />
+                </Link>
         <nav className={styles.nav}>
           {navItems.map((item) => (
             <ActiveLink key={item.href} href={item.href} className={styles.navLink}>
@@ -99,11 +104,14 @@ export function Footer() {
         <div className={styles.footerGrid}>
           <div>
             <Link href="/" className={styles.logo}>
-              <span className={styles.logoIcon}>🔔</span>
-              <span className={`${styles.logoText} ${styles.logoTextLight}`}>
-                Genta<strong>Nusa</strong>
-              </span>
-            </Link>
+                          <Image
+                            src="/images/logo-gentanusa.png"
+                            alt="Logo GentaNusa"
+                            width={130}
+                            height={71}
+                            className={`${styles.logoImg} ${styles.logoImgLight}`}
+                          />
+                        </Link>
             <p className={styles.footerText}>
               Berita Nusantara terkini, akurat, dan terpercaya.
             </p>

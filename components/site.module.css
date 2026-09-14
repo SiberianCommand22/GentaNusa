@@ -27,6 +27,16 @@
   font-size: 26px;
 }
 
+.logoImg {
+  width: auto;
+  height: 40px;
+  object-fit: contain;
+}
+
+.logoImgLight {
+  filter: brightness(0) invert(1);
+}
+
 .logoText {
   font-size: 24px;
   font-weight: 300;
