@@ -1,0 +1,9 @@
+- **Lokal (dev)**: http://localhost:3000 ✅ (port 3000)
+- **Production URL sementara**: https://gentanusa-90guag19r-genta-nusa.vercel.app
+  - ⚠️ URL ini ada **Deployment Protection** (Vercel meminta login SSO untuk akses)
+  - Masalah ini bukan dari kode kita — ini pengaturan akun Vercel
+  - Bisa diakses via `vercel inspect` atau setelah setting password protection off
+- **Deploy state**: `.deploy-state.json` (URL terbaru)
+- **Semua 3 artikel (90, 91, 92)** sudah masuk DB ✅
+- **Build sukses** ✅ (semua route, termasuk route handler API)
+- **Semua API route** sudah `null-safe` dengan `ensureClient()` ✅
