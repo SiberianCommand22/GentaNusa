@@ -29,14 +29,16 @@
 
 .logoImg {
   width: auto;
-  height: 40px;
+  height: 72px;
   object-fit: contain;
 }
 
-.logoImgLight {
-  filter: brightness(0) invert(1);
+.logoImgDark {
+  width: auto;
+  height: 72px;
+  object-fit: contain;
+  filter: brightness(0);
 }
-
 .logoText {
   font-size: 24px;
   font-weight: 300;

@@ -69,10 +69,26 @@ h3 {
   letter-spacing: -0.01em;
 }
 
-/* ===== Background premium (dark mode) ===== */
+/* ===== Background canvas: light mode = siluet, dark = sunset city ===== */
 .bg-canvas {
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.6s ease;
+}
+
+/* Dark mode: hide light siluet, show sunset city */
+.bg-canvas .bg-dark {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+[data-theme="dark"] .bg-canvas > div:first-child {
+  opacity: 0;
+}
+
+[data-theme="dark"] .bg-canvas .bg-dark {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 [data-theme="dark"] .bg-canvas {

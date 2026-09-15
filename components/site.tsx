@@ -3,10 +3,26 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./site.module.css";
 import { navItems } from "./_types";
 import { ThemeToggle } from "./theme-toggle";
+
+function useIsDark(): boolean {
+  const [dark, setDark] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      const t = localStorage.getItem("genta-theme");
+      setDark(t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches);
+    };
+    check();
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", check);
+    return () => {
+      window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", check);
+    };
+  }, []);
+  return dark;
+}
 
 export function ActiveLink({
   href,
@@ -32,19 +48,20 @@ export function ActiveLink({
 }
 
 export function Header() {
+  const dark = useIsDark();
   return (
     <header className={styles.header}>
       <div className={styles.headerInner}>
         <Link href="/" className={styles.logo}>
-                  <Image
-                    src="/images/logo-gentanusa.png"
-                    alt="Logo GentaNusa"
-                    width={130}
-                    height={71}
-                    className={styles.logoImg}
-                    priority
-                  />
-                </Link>
+          <Image
+            src="/images/logo-gentanusa.png"
+            alt="Logo GentaNusa"
+            width={130}
+            height={71}
+            className={`${styles.logoImg} ${dark ? styles.logoImgDark : ""}`}
+            priority
+          />
+        </Link>
         <nav className={styles.nav}>
           {navItems.map((item) => (
             <ActiveLink key={item.href} href={item.href} className={styles.navLink}>
@@ -104,17 +121,15 @@ export function Footer() {
         <div className={styles.footerGrid}>
           <div>
             <Link href="/" className={styles.logo}>
-                          <Image
-                            src="/images/logo-gentanusa.png"
-                            alt="Logo GentaNusa"
-                            width={130}
-                            height={71}
-                            className={`${styles.logoImg} ${styles.logoImgLight}`}
-                          />
-                        </Link>
-            <p className={styles.footerText}>
-              Berita Nusantara terkini, akurat, dan terpercaya.
-            </p>
+              <Image
+                src="/images/logo-gentanusa-white.png"
+                alt="Logo GentaNusa"
+                width={130}
+                height={71}
+                className={`${styles.logoImg} ${styles.logoImgDark}`}
+              />
+            </Link>
+            <p className={styles.footerText}>Berita Nusantara terkini, akurat, dan terpercaya.</p>
           </div>
           <div className={styles.footerCol}>
             <h4>Kategori</h4>
@@ -133,11 +148,11 @@ export function Footer() {
             <Link href="/tentang">Tentang Kami</Link>
             <Link href="/sindikasi">Sindikasi</Link>
             <Link href="/privasi">Kebijakan Privasi</Link>
-            <Link href="/syarat">Syarat &amp; Ketentuan</Link>
+            <Link href="/syarat">Syarat & Ketentuan</Link>
           </div>
         </div>
         <div className={styles.footerBottom}>
-          © 2026 GentaNusa. Seluruh hak cipta dilindungi.
+          &copy; 2026 GentaNusa. Seluruh hak cipta dilindungi.
         </div>
       </div>
     </footer>
