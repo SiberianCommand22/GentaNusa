@@ -12,14 +12,12 @@ function useIsDark(): boolean {
   const [dark, setDark] = useState(false);
   useEffect(() => {
     const check = () => {
-      const t = localStorage.getItem("genta-theme");
-      setDark(t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches);
+      setDark(document.documentElement.getAttribute("data-theme") === "dark");
     };
     check();
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", check);
-    return () => {
-      window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", check);
-    };
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => observer.disconnect();
   }, []);
   return dark;
 }
