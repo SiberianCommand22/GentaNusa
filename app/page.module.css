@@ -74,6 +74,28 @@
   padding: 32px 0;
 }
 
+/* Font hierarki: serif untuk judul, sans untuk body */
+.heroTitle,
+.cardTitle,
+.sideTitle,
+.sectionTitle {
+  font-family: var(--font-serif);
+}
+
+.meta,
+.cardExcerpt,
+.readMore,
+.badge,
+.cardBadge,
+.sideCat,
+.sideHeading,
+.footerText,
+.footerCol,
+.footerCol a,
+.footerCol span {
+  font-family: var(--font-sans);
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -128,6 +150,12 @@
   object-fit: cover;
 }
 
+/* Fallback gradient jika gambar hero gagal muat */
+.heroImage img[src=""],
+.heroImage:empty {
+  background: linear-gradient(135deg, #1a1a2e 0%, #3d2e4a 50%, #c8102e 100%);
+}
+
 .heroOverlay {
   position: absolute;
   inset: 0;
@@ -144,8 +172,8 @@
 }
 
 .heroTitle {
-  font-size: 34px;
-  line-height: 1.25;
+  font-size: 42px;
+  line-height: 1.2;
   font-weight: 800;
   margin-bottom: 14px;
   font-family: var(--font-serif);
@@ -159,7 +187,7 @@
 
 @media (max-width: 768px) {
   .heroTitle {
-    font-size: 26px;
+    font-size: 28px;
   }
 }
 
@@ -223,8 +251,9 @@
   display: inline-block;
   font-size: 11px;
   font-weight: 700;
-  color: #f0a500;
+  color: var(--text-muted);
   text-transform: uppercase;
+  letter-spacing: 0.5px;
   margin-bottom: 4px;
 }
 
@@ -252,21 +281,54 @@
   margin-bottom: 20px;
 }
 
+/* Hero: artikel besar (2x lebar) + card kecil */
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
+.cardFeatured {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.cardFeatured .cardImage {
+  aspect-ratio: auto;
+  min-height: 280px;
+}
+
+.cardFeatured .cardBody {
+  justify-content: center;
+  padding: 28px;
+}
+
+.cardFeatured .cardTitle {
+  font-size: 20px;
+  line-height: 1.3;
+}
+
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .cardFeatured {
+    grid-column: span 2;
+    grid-template-columns: 1fr;
+  }
+  .cardFeatured .cardImage {
+    min-height: 200px;
+    aspect-ratio: 16 / 9;
   }
 }
 
 @media (max-width: 600px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+  .cardFeatured {
+    grid-column: span 1;
   }
 }
 
@@ -317,12 +379,14 @@
   text-transform: uppercase;
   color: #fff;
   background: #c8102e;
+  font-family: var(--font-sans);
 }
 
 .cardTitle {
   font-size: 16px;
   line-height: 1.4;
   font-weight: 700;
+  font-family: var(--font-serif);
 }
 
 .cardTitle:hover {
@@ -334,6 +398,7 @@
   line-height: 1.55;
   color: var(--text-muted);
   flex: 1;
+  font-family: var(--font-sans);
 }
 
 .readMore {
@@ -345,6 +410,7 @@
   color: #c8102e;
   margin-top: 2px;
   transition: gap 0.2s;
+  font-family: var(--font-sans);
 }
 
 .readMore:hover {

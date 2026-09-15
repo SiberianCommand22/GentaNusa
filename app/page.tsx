@@ -10,7 +10,6 @@ export const metadata: Metadata = {
   title: "Beranda",
 };
 
-// Auto-refresh: artikel baru muncul ≤60 detik tanpa deploy
 export const revalidate = 60;
 
 function CardImage({ src, alt, className }: { src?: string; alt: string; className?: string }) {
@@ -32,45 +31,47 @@ export default async function Home() {
   const latest = sortByDate(await getArticles());
   const categories = await getCategories();
   const featured = latest[0];
+  const sideArticles = latest.slice(1, 5);
+  const gridArticles = latest.slice(0, 6);
 
   return (
     <main>
       <Header />
 
       {/* ===== Hero / Headline ===== */}
-            <section className={styles.hero}>
-              <div className={styles.container}>
-                <div className={styles.heroGrid}>
-                  <article className={styles.heroMain}>
-                    <a href={`/artikel/${featured.id}`} className={styles.heroCard}>
-                      {featured.image && (
-                        <div className={styles.heroImage}>
-                          <Image
-                            src={featured.image}
-                            alt={featured.title}
-                            width={1200}
-                            height={630}
-                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                          />
-                        </div>
-                      )}
-                      <div className={styles.heroOverlay}>
-                        <span className={styles.badge} style={{ background: "#1a5c8a" }}>
-                          {featured.category}
-                        </span>
-                        <h1 className={styles.heroTitle}>{featured.title}</h1>
-                        <p className={styles.heroExcerpt}>{featured.excerpt}</p>
-                        <div className={styles.meta}>
-                          <span>{featured.author}</span>
-                          <span>•</span>
-                          <span>{formatDate(featured.date)}</span>
-                        </div>
-                      </div>
-                    </a>
-                  </article>
+      <section className={styles.hero}>
+        <div className={styles.container}>
+          <div className={styles.heroGrid}>
+            <article className={styles.heroMain}>
+              <a href={`/artikel/${featured.id}`} className={styles.heroCard}>
+                {featured.image && (
+                  <div className={styles.heroImage}>
+                    <Image
+                      src={featured.image}
+                      alt={featured.title}
+                      width={1200}
+                      height={630}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  </div>
+                )}
+                <div className={styles.heroOverlay}>
+                  <span className={styles.badge} style={{ background: "#1a5c8a" }}>
+                    {featured.category}
+                  </span>
+                  <h1 className={styles.heroTitle}>{featured.title}</h1>
+                  <p className={styles.heroExcerpt}>{featured.excerpt}</p>
+                  <div className={styles.meta}>
+                    <span>{featured.author}</span>
+                    <span>•</span>
+                    <span>{formatDate(featured.date)}</span>
+                  </div>
+                </div>
+              </a>
+            </article>
             <aside className={styles.heroSide}>
               <h3 className={styles.sideHeading}>Terpopuler</h3>
-              {latest.slice(1, 5).map((a, i) => (
+              {sideArticles.map((a, i) => (
                 <a key={a.id} href={`/artikel/${a.id}`} className={styles.sideItem}>
                   <span className={styles.sideNum}>{i + 1}</span>
                   <span>
@@ -90,8 +91,12 @@ export default async function Home() {
           <div className={styles.container}>
             <h2 className={styles.sectionTitle}>Terbaru</h2>
             <div className={styles.grid}>
-              {latest.map((a) => (
-                <a key={a.id} href={`/artikel/${a.id}`} className={styles.card}>
+              {gridArticles.map((a, i) => (
+                <a
+                  key={a.id}
+                  href={`/artikel/${a.id}`}
+                  className={i === 0 ? `${styles.card} ${styles.cardFeatured}` : styles.card}
+                >
                   <CardImage src={a.image} alt={a.title} className={styles.cardImage} />
                   <div className={styles.cardBody}>
                     <div className={styles.cardBadge}>{a.category}</div>
@@ -125,17 +130,13 @@ export default async function Home() {
         <Reveal key={cat.slug} delay={ci * 100}>
           <section className={styles.section}>
             <div className={styles.container}>
-              <h2 className={styles.sectionTitle}>
-                <span style={{ color: cat.color }}>{cat.name}</span>
-              </h2>
+              <h2 className={styles.sectionTitle}>{cat.name}</h2>
               <div className={styles.grid}>
                 {latest.filter((a) => a.category === cat.name).map((a) => (
                   <a key={a.id} href={`/artikel/${a.id}`} className={styles.card}>
                     <CardImage src={a.image} alt={a.title} className={styles.cardImage} />
                     <div className={styles.cardBody}>
-                      <div className={styles.cardBadge} style={{ background: cat.color }}>
-                        {a.category}
-                      </div>
+                      <div className={styles.cardBadge}>{a.category}</div>
                       <h3 className={styles.cardTitle}>{a.title}</h3>
                       <p className={styles.cardExcerpt}>{a.excerpt}</p>
                       <span className={styles.readMore}>Baca selengkapnya →</span>

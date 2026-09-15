@@ -8,13 +8,13 @@ export function BackgroundCanvas() {
         <path d="M0 220 L0 160 L80 140 L120 100 L160 120 L200 80 L250 60 L300 90 L350 50 L400 70 L450 40 L500 80 L550 60 L600 100 L650 50 L700 70 L750 90 L800 40 L850 60 L900 100 L950 70 L1000 110 L1050 80 L1100 120 L1150 90 L1200 130 L1200 220 Z" fill="#1a1a2e" />
         <path d="M0 220 L0 180 L60 170 L140 150 L220 165 L300 140 L380 155 L460 135 L540 150 L620 140 L700 155 L780 135 L860 150 L940 140 L1020 155 L1100 145 L1200 160 L1200 220 Z" fill="#1a1a2e" opacity="0.5" />
       </svg>
-      <svg style={{ position: "absolute", bottom: "30px", left: "50%", transform: "translateX(-50%)", width: "500px", height: "120px", opacity: 0.08 }} viewBox="0 0 500 120" fill="none">
+      <svg style={{ position: "absolute", bottom: "30px", left: "50%", transform: "translateX(-50%)", width: "500px", height: "120px", opacity: 0.04 }} viewBox="0 0 500 120" fill="none">
         <path d="M20 60 Q60 40 100 50 Q140 30 180 40 Q220 20 260 35 Q300 25 340 40 Q380 30 420 45 Q460 35 480 50 Q490 70 470 80 Q430 90 390 85 Q350 100 310 90 Q270 105 230 95 Q190 110 150 100 Q110 110 70 100 Q30 90 20 60 Z" fill="#1a1a2e" />
       </svg>
-      <svg style={{ position: "absolute", right: "-30px", top: "-30px", width: "300px", height: "300px", opacity: 0.08 }} viewBox="0 0 300 300" fill="none">
+      <svg style={{ position: "absolute", right: "-30px", top: "-30px", width: "300px", height: "300px", opacity: 0.04 }} viewBox="0 0 300 300" fill="none">
         <g stroke="#1a1a2e" strokeWidth="0.8"><circle cx="60" cy="60" r="28" /><circle cx="120" cy="60" r="28" /><circle cx="90" cy="110" r="28" /><circle cx="60" cy="160" r="28" /><circle cx="120" cy="160" r="28" /><circle cx="90" cy="210" r="28" /></g>
       </svg>
-      <div style={{ position: "absolute", top: "-10%", right: "-5%", width: "500px", height: "400px", background: "radial-gradient(ellipse, rgba(200,16,46,0.04), transparent 65%)" }} />
+      <div style={{ position: "absolute", top: "-10%", right: "-5%", width: "500px", height: "400px", background: "radial-gradient(ellipse, rgba(200,16,46,0.02), transparent 65%)" }} />
 
       {/* ===== MODE GELAP: sunset city (dari image referensi) ===== */}
       <div className="bg-dark">
