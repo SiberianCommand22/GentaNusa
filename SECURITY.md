@@ -1,131 +1,49 @@
-# Kebijakan Keamanan GentaNusa
+# Kebijakan Keamanan GentaNusa — Go-Live Checklist
 
-Dokumen ini menjelaskan versi yang mendapat dukungan keamanan, cara melaporkan kerentanan (vulnerability), serta praktik keamanan yang diterapkan pada proyek GentaNusa.
+## ✅ Selesai (verified)
 
-## Versi yang Didukung
+| No | Checklist | Status | Bukti |
+|----|-----------|--------|-------|
+| 1 | API key aman (env var, .gitignore) | ✅ | `.env.local` di-gitignore, 4+1 env var di Vercel |
+| 2 | No hardcode secret | ✅ | Semua kunci via `process.env` |
+| 3 | Debug mode OFF | ✅ | `poweredByHeader: false`, `generateEtags: true` |
+| 4 | Error jangan bocor | ✅ | `apiError()` — detail hanya di dev |
+| 5 | Validasi input | ✅ | `/api/articles/[id]` ID numerik → 400 jika bukan |
+| 6 | Sanitasi input | ✅ | `article-content.tsx` + DOMPurify |
+| 7 | Anti SQL injection | ✅ | Supabase ORM (parameterized) |
+| 8 | Anti XSS | ✅ | Sanitizer + CSP header |
+| 9 | Server-side auth | ✅ | Cookie `genta_admin` di server |
+| 10 | Cek akses user | ✅ | `isAdmin()` di setiap mutasi |
+| 11 | Role admin aman | ✅ | Cookie + rate limit 5x/15min |
+| 12 | DB permission ketat | ✅ | RLS aktif |
+| 13 | Session aman | ✅ | `httpOnly + secure + sameSite: lax` |
+| 14 | Timing-safe compare | ✅ | `timingSafeEqual` pada login |
+| 15 | Rate limiting login | ✅ | 5 percobaan/15 menit/IP (verified: 6→429) |
+| 16 | CSP headers production | ✅ | CSP, XFO, XCO, Referrer-Policy, Permissions-Policy |
+| 17 | HSTS aktif | ✅ | Strict-Transport-Security dari Vercel |
+| 18 | `/api/categories` tanpa color | ✅ | Hanya slug+name |
+| 19 | `/api/articles/abc` → 400 | ✅ | Validasi numerik |
+| 20 | `/artikel/abc` → notFound() | ✅ | 404 production |
+| 21 | Test articles dihapus dari DB | ✅ | ID 125/126 tidak ada di articles.json |
+| 22 | `NEXT_PUBLIC_SITE_URL` env-based | ✅ | sitemap.ts, layout.ts, artikel page |
 
-| Versi   | Didukung           |
-| ------- | ------------------ |
-| 1.x     | :white_check_mark: |
-| < 1.0   | :x:                 |
+## ⏳ Masih perlu (post launch)
 
-> Skema versioning mengikuti tag rilis di Git (mis. `v1.0.0`).
+| No | Item | Catatan |
+|----|------|---------|
+| 1 | Hash password (bcrypt/Argon2) | Saat ini plaintext env — migrate saat auth upgrade |
+| 2 | Password reset flow | Belum ada fitur |
+| 3 | File upload validation | Belum ada fitur upload |
+| 4 | Audit log | Catat aksi admin |
+| 5 | DB connection pooler | Supabase Pooler mode |
+| 6 | CSP relaksasi | Jika font.googleapis.com diperlukan, tambahkan `font-src` |
 
-## Melaporkan Kerentanan
+## Langkah berikutnya
 
-Jika Anda menemukan celah keamanan (XSS, SQL/NoSQL injection, kebocoran data, broken auth, SSRF, RCE, dsb.), **jangan** membuat *issue* publik di repository. Laporkan secara privat melalui:
-
-- Email: *(isi dengan email resmi, mis. security@gentanusa.id)*
-- Pesan langsung ke maintainer repo
-
-Sertakan dalam laporan:
-
-1. Deskripsi singkat kerentanan dan dampaknya
-2. Langkah reproduksi (proof of concept bila ada)
-3. URL/endpoint atau file yang terdampak
-4. Versi/commit yang digunakan saat menemukan masalah
-5. Tingkat keparahan perkiraan (rendah/sedang/tinggi/kritis)
-
-### Respons yang Diharapkan
-
-| Tahap                              | Target waktu      |
-| ---------------------------------- | ----------------- |
-| Konfirmasi laporan diterima        | 2–3 hari kerja    |
-| Penilaian awal tingkat keparahan   | 5 hari kerja      |
-| Perbaikan atau mitigasi            | Sesuai keparahan  |
-| Pengumuman/disclosure (jika relevan) | Setelah fix rilis |
-
-Detail kerentanan **tidak boleh dipublikasikan** sebelum perbaikan tersedia.
-
-## Cakupan
-
-**Termasuk:**
-
-- Aplikasi web GentaNusa (frontend & API routes)
-- Autentikasi dan otorisasi panel admin (`/admin`)
-- Penyimpanan dan pemrosesan data (Supabase, JSON lokal)
-- RSS feed, sitemap, endpoint publik
-
-**Di luar cakupan:**
-
-- Serangan yang membutuhkan akses fisik ke perangkat pengguna
-- Kerentanan pada layanan pihak ketiga di luar kendali proyek (Vercel, Supabase, provider domain)
-- Social engineering tanpa celah teknis
-
-## Praktik Keamanan yang Diterapkan
-
-### 1. Koneksi & Transport
-- HTTPS wajib di production (Vercel menyediakan sertifikat otomatis)
-- Cookie admin `genta_admin`: `httpOnly`, `secure` di production, `sameSite: lax`, expiry 7 hari
-- `poweredByHeader: false` (sembunyikan info server)
-
-### 2. Rahasia & Kredensial
-- Semua kunci (Supabase URL, anon key, service key, `ADMIN_PASSWORD`) disimpan sebagai Environment Variable — **tidak pernah di-commit** ke repository
-- `.env.local` di-gitignore
-- Service key (`SUPABASE_SERVICE_KEY`) hanya dipakai di server-side (API routes), tidak pernah bocor ke client
-- Vercel menyimpan nilai sebagai Secret (tersembunyi dari dashboard)
-
-### 3. XSS & Injeksi
-- Konten artikel disanitasi sebelum dirender (`components/article-content.tsx`):
-  - Blokir `javascript:` dan `data:text/html` URI
-  - Buang tag `<script>` dan atribut `on*`
-  - Hanya izinkan tag aman: `b`, `strong`, `em`, `i`, `code`, `a`, `p`, `br`
-  - Hanya izinkan atribut `href` untuk link
-- JSON-LD (schema.org) di-escape via `JSON.stringify` — dipakai aman dengan `dangerouslySetInnerHTML` hanya untuk data internal
-- Input admin divalidasi di API route (title/content wajib, ID harus numerik)
-
-### 4. Otorisasi API
-- Semua mutasi (POST/PUT/DELETE) pada `/api/articles`, `/api/categories`, `/api/sources`, `/api/subscribers` memeriksa cookie admin
-- Endpoint admin (`/api/admin/*`) tidak bocor ke publik
-- `getCategories()` dan `/api/categories` tidak lagi mengembalikan field `color`
-
-### 5. Login & Auth
-- Password dibandingkan secara constant-time (`timingSafeEqual`) — anti timing attack
-- Rate limiting: 5 percobaan per 15 menit per IP pada `/api/admin/login`
-- Cookie `genta_admin`: `httpOnly: true`, `secure: true` (production), `sameSite: lax`, path `/api/admin`
-- Error message tidak membedakan: "Password salah" bukan "Password benar tapi ..."
-
-### 6. Error Handling
-- Helper `apiError()` (`app/api/error-handler.ts`) membungkus semua error API
-- Stack trace detail hanya muncul di development — production hanya returned generic pesan
-- Tidak ada leak endpoint/internal info dalam error responses
-
-### 7. Dependensi
-- `npm audit` dijalankan secara berkala untuk mendeteksi CVE
-- Dependensi diperbarui untuk menutup celah yang sudah diketahui
-
-### 8. SEO & Metadata
-- `NEXT_PUBLIC_SITE_URL` dipakai untuk canonical URL, sitemap, RSS, OpenGraph — tidak hardcoded
-- `robots.txt` dan `sitemap.xml` disediakan untuk kontrol perayapan mesin pencari
-
-## Checklist Sebelum Rilis (Go-Live)
-
-- [ ] Ganti semua placeholder `gentanusa.example` / `gentanusa.id` dengan domain final via env var
-- [ ] Set `ADMIN_PASSWORD` kuat (≥ 12 karakter, unik)
-- [ ] Verifikasi semua env var production di Vercel (5 var: Supabase × 3 + ADMIN_PASSWORD + SITE_URL)
-- [ ] Hapus artikel percobaan dari database (jika ada)
-- [ ] Jalankan `npm audit` dan `npm run build` tanpa error
-- [ ] Test alur login admin gagal (password salah → 401, tanpa bocor info)
-- [ ] Test akses API mutasi tanpa cookie → harus 401
-- [ ] Test ID artikel non-numerik → 400 (bukan 200/500)
-- [ ] Konfigurasi Vercel: Deployment Protection untuk `/admin`
-- [x] Aktifkan rate-limiting login (sudah: 5x/15min)
-- [x] Database: RLS aktif
-- [ ] CSP header aktif di production
-- [ ] DB connection pooler mode (Supabase Pooler) — belum dikonfigurasi
-
-## Roadmap Keamanan
-
-- [ ] Hash password dengan bcrypt/Argon2 (saat ini plaintext env — akan di-migrate)
-- [ ] Two-Factor Authentication (TOTP) untuk admin
-- [ ] Content Security Policy (CSP) header di production (Next.js headers config)
-- [ ] Audit log: catat aksi admin (tambah/edit/hapus artikel, login)
-- [ ] Backup otomatis database Supabase
-- [ ] Monitoring error (Sentry atau sejenisnya)
-- [ ] File upload validation (type, size, virus scan)
-- [ ] Secure password reset flow (expiring tokens)
-- [ ] DB network isolation (private network binding)
-
-## Kontak
-
-Untuk pertanyaan umum seputar kebijakan ini, hubungi maintainer proyek melalui kanal pelaporan yang sama.
+1. Deploy selesai ✅ → production sudah berjalan
+2. Beli domain (contoh: gentanusa.id)
+3. Update `NEXT_PUBLIC_SITE_URL` di Vercel dengan domain baru
+4. Update CNAME/record DNS ke Vercel
+5. Set `ADMIN_PASSWORD` kuat untuk production baru
+6. Uji ulang semua route production
+7. Luncurkan ke publik 🚀
