@@ -77,17 +77,24 @@ Detail kerentanan **tidak boleh dipublikasikan** sebelum perbaikan tersedia.
 ### 4. Otorisasi API
 - Semua mutasi (POST/PUT/DELETE) pada `/api/articles`, `/api/categories`, `/api/sources`, `/api/subscribers` memeriksa cookie admin
 - Endpoint admin (`/api/admin/*`) tidak bocor ke publik
-- `getCategories()` dan `/api/categories` tidak lagi mengembalikan field `color` ke publik
+- `getCategories()` dan `/api/categories` tidak lagi mengembalikan field `color`
 
-### 5. Dependensi
+### 5. Login & Auth
+- Password dibandingkan secara constant-time (`timingSafeEqual`) — anti timing attack
+- Rate limiting: 5 percobaan per 15 menit per IP pada `/api/admin/login`
+- Cookie `genta_admin`: `httpOnly: true`, `secure: true` (production), `sameSite: lax`, path `/api/admin`
+- Error message tidak membedakan: "Password salah" bukan "Password benar tapi ..."
+
+### 6. Error Handling
+- Helper `apiError()` (`app/api/error-handler.ts`) membungkus semua error API
+- Stack trace detail hanya muncul di development — production hanya returned generic pesan
+- Tidak ada leak endpoint/internal info dalam error responses
+
+### 7. Dependensi
 - `npm audit` dijalankan secara berkala untuk mendeteksi CVE
 - Dependensi diperbarui untuk menutup celah yang sudah diketahui
 
-### 6. Panel Admin
-- Password dikonfigurasi via env var (`ADMIN_PASSWORD`) — bukan hardcode
-- Akan diperkuat dengan rate-limiting pada endpoint login (lihat roadmap)
-
-### 7. SEO & Metadata
+### 8. SEO & Metadata
 - `NEXT_PUBLIC_SITE_URL` dipakai untuk canonical URL, sitemap, RSS, OpenGraph — tidak hardcoded
 - `robots.txt` dan `sitemap.xml` disediakan untuk kontrol perayapan mesin pencari
 
@@ -95,22 +102,29 @@ Detail kerentanan **tidak boleh dipublikasikan** sebelum perbaikan tersedia.
 
 - [ ] Ganti semua placeholder `gentanusa.example` / `gentanusa.id` dengan domain final via env var
 - [ ] Set `ADMIN_PASSWORD` kuat (≥ 12 karakter, unik)
-- [ ] Verifikasi semua env var production di Vercel (4 var: Supabase × 3 + ADMIN_PASSWORD + SITE_URL)
+- [ ] Verifikasi semua env var production di Vercel (5 var: Supabase × 3 + ADMIN_PASSWORD + SITE_URL)
 - [ ] Hapus artikel percobaan dari database (jika ada)
 - [ ] Jalankan `npm audit` dan `npm run build` tanpa error
 - [ ] Test alur login admin gagal (password salah → 401, tanpa bocor info)
 - [ ] Test akses API mutasi tanpa cookie → harus 401
+- [ ] Test ID artikel non-numerik → 400 (bukan 200/500)
 - [ ] Konfigurasi Vercel: Deployment Protection untuk `/admin`
-- [ ] (Opsional) Aktifkan rate-limiting login di depan Vercel / middleware
+- [x] Aktifkan rate-limiting login (sudah: 5x/15min)
+- [x] Database: RLS aktif
+- [ ] CSP header aktif di production
+- [ ] DB connection pooler mode (Supabase Pooler) — belum dikonfigurasi
 
 ## Roadmap Keamanan
 
-- [ ] Rate limiting pada `/api/admin/login` (mis. 5 percobaan/menit/IP)
+- [ ] Hash password dengan bcrypt/Argon2 (saat ini plaintext env — akan di-migrate)
 - [ ] Two-Factor Authentication (TOTP) untuk admin
-- [ ] Content Security Policy (CSP) header di production
+- [ ] Content Security Policy (CSP) header di production (Next.js headers config)
 - [ ] Audit log: catat aksi admin (tambah/edit/hapus artikel, login)
 - [ ] Backup otomatis database Supabase
 - [ ] Monitoring error (Sentry atau sejenisnya)
+- [ ] File upload validation (type, size, virus scan)
+- [ ] Secure password reset flow (expiring tokens)
+- [ ] DB network isolation (private network binding)
 
 ## Kontak
 

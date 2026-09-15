@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 export async function GET() {
   const store = await cookies();
   const cookie = store.get("genta_admin");
+
   if (cookie?.value === "1") {
     return NextResponse.json({ ok: true });
   }
