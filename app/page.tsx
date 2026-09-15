@@ -4,6 +4,7 @@ import styles from "./page.module.css";
 import { Header, Footer } from "@/components/site";
 import { NewsletterBox } from "@/components/newsletter";
 import { Reveal } from "@/components/reveal";
+import { CardImage } from "@/components/card-image";
 import { getArticles, getCategories, formatDate, sortByDate } from "@/lib/data";
 
 export const metadata: Metadata = {
@@ -11,21 +12,6 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 60;
-
-function CardImage({ src, alt, className }: { src?: string; alt: string; className?: string }) {
-  if (!src) return null;
-  return (
-    <div className={className}>
-      <Image
-        src={src}
-        alt={alt}
-        width={1200}
-        height={630}
-        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-      />
-    </div>
-  );
-}
 
 export default async function Home() {
   const latest = sortByDate(await getArticles());
