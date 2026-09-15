@@ -54,11 +54,11 @@ export function Header() {
       <div className={styles.headerInner}>
         <Link href="/" className={styles.logo}>
           <Image
-            src="/images/logo-gentanusa.png"
+            src={dark ? "/images/logo-gentanusa-white.png" : "/images/logo-gentanusa.png"}
             alt="Logo GentaNusa"
             width={130}
             height={71}
-            className={`${styles.logoImg} ${dark ? styles.logoImgDark : ""}`}
+            className={styles.logoImg}
             priority
           />
         </Link>
@@ -126,7 +126,7 @@ export function Footer() {
                 alt="Logo GentaNusa"
                 width={130}
                 height={71}
-                className={`${styles.logoImg} ${styles.logoImgDark}`}
+                className={styles.logoImgFooter}
               />
             </Link>
             <p className={styles.footerText}>Berita Nusantara terkini, akurat, dan terpercaya.</p>
