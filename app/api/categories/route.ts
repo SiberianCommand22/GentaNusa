@@ -12,11 +12,14 @@ function ensureClient() {
   return { ok: true as const, client: adminClient };
 }
 
-// GET — daftar kategori (public)
+// GET — daftar kategori (public) — tanpa field color (bukan untuk publik)
 export async function GET() {
   const c = ensureClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
-  const { data, error } = await c.client.from("categories").select("*").order("name");
+  const { data, error } = await c.client
+    .from("categories")
+    .select("slug, name")
+    .order("name");
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
 }

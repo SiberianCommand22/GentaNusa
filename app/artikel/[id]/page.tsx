@@ -55,24 +55,28 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
+
 function jsonLd(article: Article) {
   return {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     headline: article.title,
     description: article.excerpt,
-    image: article.image ? `https://gentanusa.id${article.image}` : undefined,
+    image: article.image ? `${SITE_URL}${article.image}` : undefined,
     author: { "@type": "Organization", name: article.author },
-    publisher: { "@type": "Organization", name: "GentaNusa", logo: { "@type": "ImageObject", url: "https://gentanusa.id/images/placeholder-article.svg" } },
+    publisher: { "@type": "Organization", name: "GentaNusa", logo: { "@type": "ImageObject", url: `${SITE_URL}/images/placeholder-article.svg` } },
     datePublished: article.date,
-    mainEntityOfPage: `https://gentanusa.id/artikel/${article.id}`,
+    mainEntityOfPage: `${SITE_URL}/artikel/${article.id}`,
     keywords: article.tags.join(", "),
   };
 }
 
 export default async function ArticlePage({ params }: Params) {
   const { id } = await params;
-  const article = await getArticle(Number(id));
+  const articleId = Number(id);
+  if (!Number.isFinite(articleId) || articleId <= 0) notFound();
+  const article = await getArticle(articleId);
   if (!article) notFound();
 
   const related = await getRelated(article);

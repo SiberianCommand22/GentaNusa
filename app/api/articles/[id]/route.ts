@@ -25,7 +25,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const data = await getArticle(id);
+  const numId = Number(id);
+  if (!Number.isFinite(numId)) {
+    return NextResponse.json({ error: "ID tidak valid" }, { status: 400 });
+  }
+  const data = await getArticle(String(numId));
   if (!data) return NextResponse.json({ error: "Tidak ditemukan" }, { status: 404 });
   return NextResponse.json(data);
 }

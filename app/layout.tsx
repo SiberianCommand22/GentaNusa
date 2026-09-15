@@ -16,6 +16,8 @@ const inter = Inter({
   display: "swap",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
+
 export const metadata: Metadata = {
   title: {
     default: "GentaNusa — Berita Nusantara Terkini",
@@ -23,11 +25,11 @@ export const metadata: Metadata = {
   },
   description:
     "GentaNusa menyajikan berita politik, ekonomi, dan nasional Indonesia secara akurat, cepat, dan terpercaya.",
-  metadataBase: new URL("https://gentanusa.id"),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     type: "website",
     locale: "id_ID",
-    url: "https://gentanusa.id",
+    url: SITE_URL,
     siteName: "GentaNusa",
     title: "GentaNusa — Berita Nusantara Terkini",
     description:

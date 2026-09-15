@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getArticles, getCategories } from "@/lib/data";
 
-const SITE_URL = "https://gentanusa.id";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
