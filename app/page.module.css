@@ -153,6 +153,10 @@
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }
 
+[data-theme="dark"] .heroTitle {
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 0, 0, 0.4);
+}
+
 @media (max-width: 768px) {
   .heroTitle {
     font-size: 26px;
@@ -197,11 +201,12 @@
   gap: 10px;
   padding: 10px 0;
   border-bottom: 1px solid var(--border);
-  transition: background 0.15s;
+  transition: background 0.15s, padding-left 0.15s;
 }
 
 .sideItem:hover {
   background: var(--hover);
+  padding-left: 8px;
 }
 
 .sideNum {
