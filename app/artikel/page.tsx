@@ -1,9 +1,9 @@
-/* ===== Loading skeleton ===== */
+import { NextResponse } from "next/server";
 
-export default function Loading() {
+export default async function ArticleListPage() {
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 20px" }}>
-      <p>Memuat artikel…</p>
-    </div>
+    <main style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 20px" }}>
+      <h1>Artikel</h1>
+    </main>
   );
 }

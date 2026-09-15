@@ -18,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const articlePages = (await getArticles()).map((a) => ({
+  const articlePages = (await getArticles()).filter((a) => a.id <= 1000).map((a) => ({
     url: `${SITE_URL}/artikel/${a.id}`,
     lastModified: now,
     changeFrequency: "monthly" as const,

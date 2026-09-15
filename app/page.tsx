@@ -49,7 +49,7 @@ export default async function Home() {
                   <p className={styles.heroExcerpt}>{featured.excerpt}</p>
                   <div className={styles.meta}>
                     <span>{featured.author}</span>
-                    <span>•</span>
+                    <span> | </span>
                     <span>{formatDate(featured.date)}</span>
                   </div>
                 </div>
@@ -88,10 +88,10 @@ export default async function Home() {
                     <div className={styles.cardBadge}>{a.category}</div>
                     <h3 className={styles.cardTitle}>{a.title}</h3>
                     <p className={styles.cardExcerpt}>{a.excerpt}</p>
-                    <span className={styles.readMore}>Baca selengkapnya →</span>
+                    <span className={styles.readMore}>Baca selengkapnya -&gt;</span>
                     <div className={styles.meta}>
                       <span>{a.author}</span>
-                      <span>•</span>
+                      <span> | </span>
                       <span>{formatDate(a.date)}</span>
                     </div>
                   </div>
@@ -125,10 +125,10 @@ export default async function Home() {
                       <div className={styles.cardBadge}>{a.category}</div>
                       <h3 className={styles.cardTitle}>{a.title}</h3>
                       <p className={styles.cardExcerpt}>{a.excerpt}</p>
-                      <span className={styles.readMore}>Baca selengkapnya →</span>
+                      <span className={styles.readMore}>Baca selengkapnya -&gt;</span>
                       <div className={styles.meta}>
                         <span>{a.author}</span>
-                        <span>•</span>
+                        <span> | </span>
                         <span>{formatDate(a.date)}</span>
                       </div>
                     </div>
