@@ -37,7 +37,6 @@
   width: auto;
   height: 72px;
   object-fit: contain;
-  filter: brightness(0);
 }
 .logoText {
   font-size: 24px;
