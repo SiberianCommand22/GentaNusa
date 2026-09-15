@@ -28,8 +28,8 @@
 }
 
 .logoImg {
-  width: 130px;
-  height: auto;
+  width: auto;
+  height: 40px;
   object-fit: contain;
 }
 
