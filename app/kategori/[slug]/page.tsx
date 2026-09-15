@@ -42,7 +42,7 @@ export default async function CategoryPage({ params }: Params) {
       <Header />
       <main className={styles.container}>
         {/* ===== Banner Kategori ===== */}
-        <div className={styles.banner} style={{ borderColor: cat.color }}>
+        <div className={styles.banner}>
           <div className={styles.bannerInner}>
             <span className={styles.bannerLabel}>Kategori</span>
             <h1 className={styles.title}>{cat.name}</h1>
@@ -50,7 +50,7 @@ export default async function CategoryPage({ params }: Params) {
               Kumpulan berita {cat.name.toLowerCase()} terbaru dari GentaNusa.
             </p>
           </div>
-          <div className={styles.bannerAccent} style={{ background: cat.color }} />
+          <div className={styles.bannerAccent} />
         </div>
 
         {list.length === 0 ? (
@@ -71,7 +71,7 @@ export default async function CategoryPage({ params }: Params) {
                   </div>
                 )}
                 <div className={styles.cardBody}>
-                  <div className={styles.cardBadge} style={{ background: cat.color }}>
+                  <div className={styles.cardBadge}>
                     {a.category}
                   </div>
                   <h2 className={styles.cardTitle}>{a.title}</h2>

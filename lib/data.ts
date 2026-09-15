@@ -26,7 +26,6 @@ export type Author = {
 export type Category = {
   slug: string;
   name: string;
-  color: string;
 };
 
 const dataDir = path.join(process.cwd(), "lib", "data");
@@ -106,7 +105,7 @@ export async function getCategories(): Promise<Category[]> {
         .select("*");
       if (error) throw error;
       if (data && data.length > 0) {
-        return data.map((c) => ({ slug: c.slug, name: c.name, color: c.color }));
+        return data.map((c) => ({ slug: c.slug, name: c.name }));
       }
     } catch (e) {
       console.warn("Supabase read gagal, fallback JSON:", e);

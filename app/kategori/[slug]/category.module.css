@@ -9,7 +9,7 @@
   position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-left: 6px solid;
+  border-left: 6px solid #c8102e;
   border-radius: 12px;
   padding: 28px 32px;
   margin-bottom: 28px;
@@ -44,7 +44,7 @@
   color: var(--text-muted);
 }
 
-/* aksen warna lembut di pojok */
+/* aksen merah di pojok */
 .bannerAccent {
   position: absolute;
   top: -40px;
@@ -52,7 +52,8 @@
   width: 160px;
   height: 160px;
   border-radius: 50%;
-  opacity: 0.12;
+  background: radial-gradient(circle, rgba(200,16,46,0.25), transparent 70%);
+  opacity: 1;
 }
 
 /* ===== Daftar Berita ===== */
@@ -130,6 +131,7 @@
   font-weight: 700;
   text-transform: uppercase;
   color: #fff;
+  background: #c8102e;
 }
 
 .cardTitle {
