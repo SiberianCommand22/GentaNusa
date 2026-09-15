@@ -1,10 +1,10 @@
 .container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 30px 20px;
+  padding: 32px 20px;
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 40px;
+  grid-template-columns: 1fr 340px;
+  gap: 36px;
 }
 
 @media (max-width: 768px) {
@@ -64,13 +64,17 @@
 .featuredImage {
   position: relative;
   width: 100%;
-  height: 400px;
+  aspect-ratio: 16 / 8;
   margin-bottom: 24px;
   border-radius: 8px;
   overflow: hidden;
 }
 
-.image {
+.featuredImage img,
+.featuredImage picture,
+.featuredImage > img {
+  width: 100% !important;
+  height: 100% !important;
   object-fit: cover;
 }
 
