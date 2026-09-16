@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import styles from "./theme-toggle.module.css";
 
 function getInitialTheme(): boolean {
-  // Baca pilihan tersimpan SEKALI di awal render (tahan navigasi antar halaman)
   if (typeof window === "undefined") return false;
   try {
     const saved = localStorage.getItem("genta-theme");
-    if (saved) return saved === "dark";
+    if (saved !== null) return saved === "dark";
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   } catch {
     return false;
@@ -18,10 +17,11 @@ function getInitialTheme(): boolean {
 export function ThemeToggle() {
   const [dark, setDark] = useState(getInitialTheme);
 
-  // Sinkronkan tema ke DOM + simpan pilihan
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
-    localStorage.setItem("genta-theme", dark ? "dark" : "light");
+    try {
+      localStorage.setItem("genta-theme", dark ? "dark" : "light");
+    } catch {}
   }, [dark]);
 
   return (

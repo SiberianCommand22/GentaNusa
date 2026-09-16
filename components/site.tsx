@@ -1,70 +1,43 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import styles from "./site.module.css";
 import { navItems } from "./_types";
 import { ThemeToggle } from "./theme-toggle";
 
-function useIsDark(): boolean {
+export function Header() {
   const [dark, setDark] = useState(false);
+
   useEffect(() => {
     const check = () => {
       setDark(document.documentElement.getAttribute("data-theme") === "dark");
     };
     check();
     const observer = new MutationObserver(check);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
     return () => observer.disconnect();
   }, []);
-  return dark;
-}
 
-export function ActiveLink({
-  href,
-  children,
-  className,
-}: {
-  href: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  const pathname = usePathname();
-  const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
-  return (
-    <Link
-      href={href}
-      className={[className, isActive ? styles.active : ""]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      {children}
-    </Link>
-  );
-}
-
-export function Header() {
-  const dark = useIsDark();
   return (
     <header className={styles.header}>
       <div className={styles.headerInner}>
-        <Link href="/" className={styles.logo}>
-          <Image
-            src={"/images/logo-gentanusa.png"}
+        <a className={styles.logo} href="/">
+          <img
             alt="Logo GentaNusa"
             width={130}
             height={71}
             className={styles.logoImg}
-            priority
+            src={dark ? "/images/logo-gentanusa-white.png" : "/images/logo-gentanusa.png"}
           />
-        </Link>
+        </a>
         <nav className={styles.nav}>
           {navItems.map((item) => (
-            <ActiveLink key={item.href} href={item.href} className={styles.navLink}>
+            <a key={item.href} href={item.href} className={styles.navLink}>
               {item.label}
-            </ActiveLink>
+            </a>
           ))}
         </nav>
         <ThemeToggle />
@@ -74,38 +47,26 @@ export function Header() {
   );
 }
 
-export function MobileNav() {
+function MobileNav() {
   const [open, setOpen] = useState(false);
-  const pathname = usePathname();
 
   return (
     <div className={styles.mobileNav}>
       <button
         className={styles.hamburger}
         onClick={() => setOpen(!open)}
-        aria-label={open ? "Tutup menu" : "Buka menu"}
+        aria-label="Buka menu"
         aria-expanded={open}
       >
         <span /> <span /> <span />
       </button>
-
       {open && (
         <nav className={styles.mobileMenu}>
-          {navItems.map((item) => {
-            const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={[styles.mobileLink, isActive ? styles.active : ""]
-                  .filter(Boolean)
-                  .join(" ")}
-                onClick={() => setOpen(false)}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
+          {navItems.map((item) => (
+            <a key={item.href} href={item.href} className={styles.mobileLink} onClick={() => setOpen(false)}>
+              {item.label}
+            </a>
+          ))}
         </nav>
       )}
     </div>
@@ -118,40 +79,39 @@ export function Footer() {
       <div className={styles.container}>
         <div className={styles.footerGrid}>
           <div>
-            <Link href="/" className={styles.logo}>
-              <Image
-                src={"/images/logo-gentanusa-white.png"}
+            <a className={styles.logo} href="/">
+              <img
                 alt="Logo GentaNusa"
+                loading="lazy"
                 width={130}
                 height={71}
                 className={styles.logoImgFooter}
+                src="/images/logo-gentanusa-white.png"
               />
-            </Link>
+            </a>
             <p className={styles.footerText}>Berita Nusantara terkini, akurat, dan terpercaya.</p>
           </div>
           <div className={styles.footerCol}>
             <h4>Kategori</h4>
-            <ActiveLink href="/kategori/politik">Politik</ActiveLink>
-            <ActiveLink href="/kategori/ekonomi">Ekonomi</ActiveLink>
-            <ActiveLink href="/kategori/nasional">Nasional</ActiveLink>
+            <a className="" href="/kategori/politik">Politik</a>
+            <a className="" href="/kategori/ekonomi">Ekonomi</a>
+            <a className="" href="/kategori/nasional">Nasional</a>
           </div>
           <div className={styles.footerCol}>
             <h4>Kontak</h4>
             <span>redaksi@gentanusa.id</span>
             <span>Jakarta, Indonesia</span>
-            <Link href="/feed.xml">RSS Feed</Link>
+            <a href="/feed.xml">RSS Feed</a>
           </div>
           <div className={styles.footerCol}>
             <h4>Info</h4>
-            <Link href="/tentang">Tentang Kami</Link>
-            <Link href="/sindikasi">Sindikasi</Link>
-            <Link href="/privasi">Kebijakan Privasi</Link>
-            <Link href="/syarat">Syarat & Ketentuan</Link>
+            <a href="/tentang">Tentang Kami</a>
+            <a href="/sindikasi">Sindikasi</a>
+            <a href="/privasi">Kebijakan Privasi</a>
+            <a href="/syarat">Syarat & Ketentuan</a>
           </div>
         </div>
-        <div className={styles.footerBottom}>
-          &copy; 2026 GentaNusa. Seluruh hak cipta dilindungi.
-        </div>
+        <div className={styles.footerBottom}>© 2026 GentaNusa. Seluruh hak cipta dilindungi.</div>
       </div>
     </footer>
   );
