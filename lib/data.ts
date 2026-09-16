@@ -30,13 +30,9 @@ export type Category = {
 
 const dataDir = path.join(process.cwd(), "lib", "data");
 
-// In-memory cache — satu fetch Supabase per proses, reuse untuk semua request
-const cache = {
-  articles: null as Article[] | null,
-  categories: null as Category[] | null,
-  timestamp: 0,
-};
-const CACHE_TTL = 30000; // 30 detik — cukup untuk ISR revalidate=60
+// Per-type in-memory cache — fetch Supabase sekali per proses, reuse semua request
+const cache = new Map<string, { data: unknown; timestamp: number }>();
+const CACHE_TTL = 60000; // 1 menit — sesuai ISR revalidate
 
 export function formatDate(dateStr: string): string {
   const d = new Date(dateStr + "T00:00:00+07:00");
@@ -117,35 +113,25 @@ async function fetchCategoriesDb(): Promise<Category[] | null> {
   return null;
 }
 
-// Baca artikel: dari Supabase (cached) → fallback JSON
+// Baca artikel: dari Supabase (cached 1x) → fallback JSON
 export async function getArticles(): Promise<Article[]> {
-  const now = Date.now();
-  if (cache.articles && now - cache.timestamp < CACHE_TTL) return cache.articles;
+  const cached = cache.get("articles");
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data as Article[];
+
   const fromDb = await fetchArticlesDb();
-  if (fromDb) {
-    cache.articles = fromDb;
-    cache.timestamp = now;
-    return fromDb;
-  }
-  const fromJson = sortByDate(readJson("articles.json"));
-  cache.articles = fromJson;
-  cache.timestamp = now;
-  return fromJson;
+  const result = fromDb ?? sortByDate(readJson("articles.json"));
+  cache.set("articles", { data: result, timestamp: Date.now() });
+  return result;
 }
 
 export async function getCategories(): Promise<Category[]> {
-  const now = Date.now();
-  if (cache.categories && now - cache.timestamp < CACHE_TTL) return cache.categories;
+  const cached = cache.get("categories");
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data as Category[];
+
   const fromDb = await fetchCategoriesDb();
-  if (fromDb) {
-    cache.categories = fromDb;
-    cache.timestamp = now;
-    return fromDb;
-  }
-  const fromJson = readJson("categories.json");
-  cache.categories = fromJson;
-  cache.timestamp = now;
-  return fromJson;
+  const result = fromDb ?? readJson("categories.json");
+  cache.set("categories", { data: result, timestamp: Date.now() });
+  return result;
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
