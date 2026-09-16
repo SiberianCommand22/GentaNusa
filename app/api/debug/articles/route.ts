@@ -1,48 +1,61 @@
 import { NextResponse } from "next/server";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
-import { getArticles } from "@/lib/data";
+import { getArticles, getCategories } from "@/lib/data";
 
 export async function GET() {
   const localArticles = await getArticles();
-  const localIds = localArticles.map((a) => a.id).sort((a, b) => a - b);
+  const localCategories = await getCategories();
+  const localArticleIds = localArticles.map((a) => a.id).sort((a, b) => a - b);
+  const localCategorySlugs = localCategories.map((c) => c.slug);
 
-  if (!isSupabaseReady) {
-    return NextResponse.json({
-      source: "local-only",
-      message: "Supabase tidak terkoneksi — hanya data JSON lokal",
-      localArticles: localIds,
-    });
+  let dbArticleIds: number[] = [];
+  let dbCategorySlugs: string[] = [];
+  let dbError: string | null = null;
+  let dbSource = "not-connected";
+
+  if (isSupabaseReady()) {
+    dbSource = "connected";
+    const client = adminClient!;
+
+    const { data: dbArticles, error: err1 } = await client
+      .from("articles")
+      .select("id")
+      .order("id", { ascending: true });
+    if (err1) {
+      dbError = `articles: ${err1.message}`;
+    } else {
+      dbArticleIds = (dbArticles || []).map((a: any) => a.id).sort((a: number, b: number) => a - b);
+    }
+
+    const { data: dbCats, error: err2 } = await client
+      .from("categories")
+      .select("slug")
+      .order("slug", { ascending: true });
+    if (err2) {
+      dbError = dbError ? `${dbError}; categories: ${err2.message}` : `categories: ${err2.message}`;
+    } else {
+      dbCategorySlugs = (dbCats || []).map((c: any) => c.slug);
+    }
   }
-
-  const { data: dbArticles, error: dbError } = await adminClient
-    .from("articles")
-    .select("id")
-    .order("id", { ascending: true });
-
-  if (dbError) {
-    return NextResponse.json({
-      source: "supabase-error",
-      error: dbError.message,
-      localArticles: localIds,
-    });
-  }
-
-  const dbIds = (dbArticles || []).map((a: any) => a.id).sort((a: number, b: number) => a - b);
-
-  const mismatch = {
-    inLocalNotDb: localIds.filter((id) => !dbIds.includes(id)),
-    inDbNotLocal: dbIds.filter((id) => !localIds.includes(id)),
-  };
 
   const a121 = localArticles.find((a) => a.id === 121);
 
   return NextResponse.json({
-    source: "both",
-    localCount: localIds.length,
-    dbCount: dbIds.length,
-    localIds,
-    dbIds,
-    mismatch,
+    timestamp: new Date().toISOString(),
+    localArticleIds,
+    dbArticleIds,
+    articleMismatch: {
+      inLocalNotDb: localArticleIds.filter((id) => !dbArticleIds.includes(id)),
+      inDbNotLocal: dbArticleIds.filter((id) => !localArticleIds.includes(id)),
+    },
+    localCategorySlugs,
+    dbCategorySlugs,
+    categoryMismatch: {
+      inLocalNotDb: localCategorySlugs.filter((s) => !dbCategorySlugs.includes(s)),
+      inDbNotLocal: dbCategorySlugs.filter((s) => !localCategorySlugs.includes(s)),
+    },
     article121: a121 || null,
+    dbSource,
+    dbError,
   });
 }

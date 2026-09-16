@@ -1,34 +1,29 @@
 import { NextResponse } from "next/server";
-import { adminClient } from "@/lib/supabase";
+import { adminClient, isSupabaseReady } from "@/lib/supabase";
 
 export async function GET() {
-  try {
-    const { data, error } = await adminClient
+  let count = 0;
+  let dbError: string | null = null;
+  let dbSource = "not-connected";
+
+  if (isSupabaseReady()) {
+    dbSource = "connected";
+    const client = adminClient!;
+
+    const { data: dbCats, error: err } = await client
       .from("categories")
-      .select("count", { count: "exact", head: true });
-
-    if (error) {
-      return NextResponse.json({
-        table: "categories",
-        error: error.message,
-        code: error.code,
-        hint: error.hint || undefined,
-        details: error.details || undefined,
-      }, { status: 500 });
+      .select("*", { count: "exact", head: true });
+    if (err) {
+      dbError = `categories: ${err.message}`;
+    } else {
+      count = (dbCats as any[])?.length ?? 0;
     }
-
-    return NextResponse.json({
-      table: "categories",
-      rowCount: data?.count ?? 0,
-      message: data?.count === 0
-        ? "Tabel categories KOSONG — perlu seed data"
-        : `Tabel categories ada ${data.count} baris`,
-    });
-  } catch (err: any) {
-    return NextResponse.json({
-      table: "categories",
-      error: err.message,
-      stack: err.stack,
-    }, { status: 500 });
   }
+
+  return NextResponse.json({
+    table: "categories",
+    source: dbSource,
+    rowCount: count,
+    error: dbError,
+  });
 }
