@@ -30,9 +30,9 @@ export type Category = {
 
 const dataDir = path.join(process.cwd(), "lib", "data");
 
-// Per-type in-memory cache — fetch Supabase sekali per proses, reuse semua request
+// Cache per-process: fetch sekali, reuse semua request. TTL 30 detik.
 const cache = new Map<string, { data: unknown; timestamp: number }>();
-const CACHE_TTL = 60000; // 1 menit — sesuai ISR revalidate
+const CACHE_TTL = 30000;
 
 export function formatDate(dateStr: string): string {
   const d = new Date(dateStr + "T00:00:00+07:00");
@@ -113,7 +113,7 @@ async function fetchCategoriesDb(): Promise<Category[] | null> {
   return null;
 }
 
-// Baca artikel: dari Supabase (cached 1x) → fallback JSON
+// Baca artikel: dari Supabase (cached) → fallback JSON
 export async function getArticles(): Promise<Article[]> {
   const cached = cache.get("articles");
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data as Article[];

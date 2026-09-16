@@ -17,7 +17,6 @@ export default async function Home() {
   const latest = sortByDate(await getArticles());
   const categories = await getCategories();
   const featured = latest[0];
-  const sideArticles = latest.slice(1, 5);
 
   return (
     <main>
@@ -55,7 +54,7 @@ export default async function Home() {
             </article>
             <aside className={styles.heroSide}>
               <h3 className={styles.sideHeading}>Terpopuler</h3>
-              {sideArticles.map((a, i) => (
+              {latest.slice(1, 5).map((a, i) => (
                 <a key={a.id} href={`/artikel/${a.id}`} className={styles.sideItem}>
                   <span className={styles.sideNum}>{i + 1}</span>
                   <span>
