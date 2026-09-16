@@ -56,7 +56,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="id" className={`${sourceSerif.variable} ${inter.variable}`}>
+    <html lang="id" className={`${sourceSerif.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <script
