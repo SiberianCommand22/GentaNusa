@@ -7,12 +7,13 @@ export function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: n
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
+    if (delay === 0) return;
     const timer = setTimeout(() => setVisible(true), delay);
     return () => clearTimeout(timer);
   }, [delay]);
 
   return (
-    <div className={`${styles.reveal} ${visible ? styles.visible : ""}`} style={{ transitionDelay: `${delay}ms` }}>
+    <div className={`${styles.reveal} ${visible ? styles.visible : ""}`}>
       {children}
     </div>
   );

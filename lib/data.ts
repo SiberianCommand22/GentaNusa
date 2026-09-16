@@ -30,6 +30,14 @@ export type Category = {
 
 const dataDir = path.join(process.cwd(), "lib", "data");
 
+// In-memory cache — satu fetch Supabase per proses, reuse untuk semua request
+const cache = {
+  articles: null as Article[] | null,
+  categories: null as Category[] | null,
+  timestamp: 0,
+};
+const CACHE_TTL = 30000; // 30 detik — cukup untuk ISR revalidate=60
+
 export function formatDate(dateStr: string): string {
   const d = new Date(dateStr + "T00:00:00+07:00");
   if (isNaN(d.getTime())) return dateStr;
@@ -80,38 +88,64 @@ function mapRow(a: DbArticle): Article {
   };
 }
 
-// Baca artikel: dari Supabase (live) — fallback ke JSON kalau DB nggak bisa
-export async function getArticles(): Promise<Article[]> {
-  if (supabaseAnon) {
-    try {
-      const { data, error } = await supabaseAnon
-        .from("articles")
-        .select("*")
-        .order("date", { ascending: false });
-      if (error) throw error;
-      if (data && data.length > 0) return data.map(mapRow);
-    } catch (e) {
-      console.warn("Supabase read gagal, fallback JSON:", e);
-    }
+async function fetchArticlesDb(): Promise<Article[] | null> {
+  if (!supabaseAnon) return null;
+  try {
+    const { data, error } = await supabaseAnon
+      .from("articles")
+      .select("*")
+      .order("date", { ascending: false });
+    if (error) throw error;
+    if (data && data.length > 0) return data.map(mapRow);
+  } catch (e) {
+    console.warn("Supabase read gagal:", e);
   }
-  return sortByDate(readJson("articles.json"));
+  return null;
+}
+
+async function fetchCategoriesDb(): Promise<Category[] | null> {
+  if (!supabaseAnon) return null;
+  try {
+    const { data, error } = await supabaseAnon
+      .from("categories")
+      .select("slug, name");
+    if (error) throw error;
+    if (data && data.length > 0) return data;
+  } catch (e) {
+    console.warn("Supabase categories gagal:", e);
+  }
+  return null;
+}
+
+// Baca artikel: dari Supabase (cached) → fallback JSON
+export async function getArticles(): Promise<Article[]> {
+  const now = Date.now();
+  if (cache.articles && now - cache.timestamp < CACHE_TTL) return cache.articles;
+  const fromDb = await fetchArticlesDb();
+  if (fromDb) {
+    cache.articles = fromDb;
+    cache.timestamp = now;
+    return fromDb;
+  }
+  const fromJson = sortByDate(readJson("articles.json"));
+  cache.articles = fromJson;
+  cache.timestamp = now;
+  return fromJson;
 }
 
 export async function getCategories(): Promise<Category[]> {
-  if (supabaseAnon) {
-    try {
-      const { data, error } = await supabaseAnon
-        .from("categories")
-        .select("*");
-      if (error) throw error;
-      if (data && data.length > 0) {
-        return data.map((c) => ({ slug: c.slug, name: c.name }));
-      }
-    } catch (e) {
-      console.warn("Supabase read gagal, fallback JSON:", e);
-    }
+  const now = Date.now();
+  if (cache.categories && now - cache.timestamp < CACHE_TTL) return cache.categories;
+  const fromDb = await fetchCategoriesDb();
+  if (fromDb) {
+    cache.categories = fromDb;
+    cache.timestamp = now;
+    return fromDb;
   }
-  return readJson("categories.json");
+  const fromJson = readJson("categories.json");
+  cache.categories = fromJson;
+  cache.timestamp = now;
+  return fromJson;
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {

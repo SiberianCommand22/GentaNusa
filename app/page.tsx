@@ -18,13 +18,11 @@ export default async function Home() {
   const categories = await getCategories();
   const featured = latest[0];
   const sideArticles = latest.slice(1, 5);
-  const gridArticles = latest.slice(0, 6);
 
   return (
     <main>
       <Header />
 
-      {/* ===== Hero / Headline ===== */}
       <section className={styles.hero}>
         <div className={styles.container}>
           <div className={styles.heroGrid}>
@@ -71,17 +69,16 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ===== Berita Terbaru ===== */}
       <Reveal>
         <section className={styles.section}>
           <div className={styles.container}>
             <h2 className={styles.sectionTitle}>Terbaru</h2>
             <div className={styles.grid}>
-              {gridArticles.map((a, i) => (
+              {latest.slice(0, 6).map((a) => (
                 <a
                   key={a.id}
                   href={`/artikel/${a.id}`}
-                  className={i === 0 ? `${styles.card} ${styles.cardFeatured}` : styles.card}
+                  className={a.id === featured.id ? `${styles.card} ${styles.cardFeatured}` : styles.card}
                 >
                   <CardImage src={a.image} alt={a.title} className={styles.cardImage} />
                   <div className={styles.cardBody}>
@@ -102,7 +99,6 @@ export default async function Home() {
         </section>
       </Reveal>
 
-      {/* ===== Newsletter ===== */}
       <Reveal>
         <section className={styles.section}>
           <div className={styles.container}>
@@ -111,7 +107,6 @@ export default async function Home() {
         </section>
       </Reveal>
 
-      {/* ===== Per Kategori ===== */}
       {categories.map((cat, ci) => (
         <Reveal key={cat.slug} delay={ci * 100}>
           <section className={styles.section}>
