@@ -24,6 +24,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
   const { id } = await params;
   const article = await getArticle(Number(id));
   if (!article) return { title: "Artikel tidak ditemukan" };
@@ -33,12 +34,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     openGraph: {
       type: "article",
       locale: "id_ID",
-      url: `https://gentanusa.id/artikel/${article.id}`,
+      url: `${SITE_URL}/artikel/${article.id}`,
       siteName: "GentaNusa",
       title: article.title,
       description: article.excerpt,
       images: article.image
-        ? [{ url: `https://gentanusa.id${article.image}`, width: 1200, height: 630, alt: article.title }]
+        ? [{ url: `${SITE_URL}${article.image}`, width: 1200, height: 630, alt: article.title }]
         : undefined,
       publishedTime: undefined,
     },
@@ -46,11 +47,11 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       card: "summary_large_image",
       title: article.title,
       description: article.excerpt,
-      images: article.image ? [`https://gentanusa.id${article.image}`] : undefined,
+      images: article.image ? [`${SITE_URL}${article.image}`] : undefined,
     },
     alternates: {
       canonical: `/artikel/${article.id}`,
-      types: { "application/rss+xml": "https://gentanusa.id/feed.xml" },
+      types: { "application/rss+xml": `${SITE_URL}/feed.xml` },
     },
   };
 }

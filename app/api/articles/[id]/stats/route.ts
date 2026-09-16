@@ -33,3 +33,32 @@ export async function GET(
   }
   return NextResponse.json(data ?? { article_id: id, views: 0, likes: 0, shares: 0 });
 }
+
+// POST /api/articles/[id]/stats — update views/likes/shares (admin)
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!isAdmin(req)) {
+    return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
+  }
+  const c = ensureClient();
+  if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
+  const body = await req.json().catch(() => null);
+  const { id } = await params;
+  const { data, error } = await c.client
+    .from("article_stats")
+    .upsert(
+      {
+        article_id: id,
+        views: body?.views ?? 0,
+        likes: body?.likes ?? 0,
+        shares: body?.shares ?? 0,
+      },
+      { onConflict: "article_id" }
+    )
+    .select()
+    .single();
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
+}
