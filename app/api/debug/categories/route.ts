@@ -1,29 +1,36 @@
 import { NextResponse } from "next/server";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
+import { getCategories } from "@/lib/data";
 
 export async function GET() {
-  let dbCategorySlugs: string[] = [];
-  let dbError: string | null = null;
-  let dbSource = "not-connected";
+  const localCategories = await getCategories();
+  const localSlugs = localCategories.map((c) => c.slug);
+
+  const result: Record<string, any> = {
+    localCount: localSlugs.length,
+    localSlugs,
+  };
 
   if (isSupabaseReady()) {
-    dbSource = "connected";
     const client = adminClient!;
-
-    const { data: dbCats, error: err2 } = await client
+    const { data: dbCats, error: err } = await client
       .from("categories")
-      .select("slug")
-      .order("slug", { ascending: true });
-    if (err2) {
-      dbError = `categories: ${err2.message}`;
+      .select("id, slug, name, color")
+      .order("id", { ascending: true });
+
+    if (err) {
+      result.db = { error: err.message };
     } else {
-      dbCategorySlugs = (dbCats || []).map((c: any) => c.slug);
+      const dbSlugs = (dbCats || []).map((c: any) => c.slug);
+      result.db = {
+        count: (dbCats || []).length,
+        dbSlugs,
+        rows: dbCats,
+        inLocalNotDb: localSlugs.filter((s) => !dbSlugs.includes(s)),
+        inDbNotLocal: dbSlugs.filter((s) => !localSlugs.includes(s)),
+      };
     }
   }
 
-  return NextResponse.json({
-    dbSource,
-    dbCategorySlugs,
-    dbError,
-  });
+  return NextResponse.json(result, { status: 200 });
 }

@@ -1,0 +1,51 @@
+import { NextRequest, NextResponse } from "next/server";
+import { adminClient, isSupabaseReady } from "@/lib/supabase";
+import { getArticles, getCategories } from "@/lib/data";
+
+// Debug: cek koneksi DB dan data
+export async function GET() {
+  const localArticles = await getArticles();
+  const localCategories = await getCategories();
+
+  const result: Record<string, any> = {
+    localArticles: localArticles.length,
+    localCategories: localCategories.length,
+    localArticleIds: localArticles.map((a) => a.id).sort((a, b) => a - b),
+    localCategorySlugs: localCategories.map((c) => c.slug),
+  };
+
+  if (isSupabaseReady()) {
+    const client = adminClient!;
+    const { data: dbArticles, error: err1 } = await client
+      .from("articles")
+      .select("id")
+      .order("id", { ascending: true });
+
+    if (err1) {
+      result.dbArticles = { error: err1.message };
+    } else {
+      result.dbArticles = {
+        count: (dbArticles || []).length,
+        ids: (dbArticles || []).map((a: any) => a.id).sort((a: number, b: number) => a - b),
+      };
+    }
+
+    const { data: dbCats, error: err2 } = await client
+      .from("categories")
+      .select("id, slug, name, color")
+      .order("id", { ascending: true });
+
+    if (err2) {
+      result.dbCategories = { error: err2.message };
+    } else {
+      result.dbCategories = {
+        count: (dbCats || []).length,
+        rows: dbCats,
+      };
+    }
+  } else {
+    result.db = "Supabase tidak terkoneksi (dev mode atau env vars hilang)";
+  }
+
+  return NextResponse.json(result, { status: 200 });
+}

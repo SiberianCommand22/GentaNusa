@@ -1,71 +1,62 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { timingSafeEqual } from "node:crypto";
+import fs from "fs";
+import path from "path";
+import { NextRequest, NextResponse } from "next/server";
 
-// Rate limiting: 5 percobaan per 15 menit per IP (in-memory, restart reset)
-const attempts = new Map<string, { count: number; resetAt: number }>();
-const MAX_ATTEMPTS = 5;
-const WINDOW_MS = 15 * 60 * 1000;
+// Track rate per IP
+const rateMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 5; // max attempts
+const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
-function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
-  const now = Date.now();
-  const entry = attempts.get(ip);
-  if (!entry || now > entry.resetAt) {
-    attempts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return { allowed: true, remaining: MAX_ATTEMPTS - 1 };
-  }
-  entry.count++;
-  if (entry.count > MAX_ATTEMPTS) {
-    return { allowed: false, remaining: 0 };
-  }
-  return { allowed: true, remaining: MAX_ATTEMPTS - entry.count };
-}
-
-// Bandingkan password secara constant-time (anti timing attack)
-function safeEqual(a: string, b: string): boolean {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  if (bufA.length !== bufB.length) {
-    // Panjang sama tetap diproses agar timing seragam
-    timingSafeEqual(bufA, bufA);
-    return false;
-  }
-  return timingSafeEqual(bufA, bufB);
-}
-
-// Admin auth sederhana: password dari env (ADMIN_PASSWORD)
-// Cookie httpOnly + expiry 7 hari
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") ?? "unknown";
-  const limit = checkRateLimit(ip);
-  if (!limit.allowed) {
-    return NextResponse.json({ error: "Terlalu banyak percobaan. Coba lagi nanti." }, { status: 429 });
-  }
-
   try {
-    const { password } = await request.json().catch(() => ({}));
-    const expected = process.env.ADMIN_PASSWORD;
-
-    if (!expected) {
-      return NextResponse.json({ error: "ADMIN_PASSWORD belum di-set" }, { status: 500 });
+    // Rate limiting
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const now = Date.now();
+    const entry = rateMap.get(ip);
+    if (entry && now < entry.resetAt) {
+      if (entry.count >= RATE_LIMIT) {
+        return NextResponse.json(
+          { ok: false, error: "Too many attempts. Try again later." },
+          { status: 429 }
+        );
+      }
+      entry.count++;
+    } else {
+      rateMap.set(ip, { count: 1, resetAt: now + WINDOW_MS });
     }
-    if (!safeEqual(password ?? "", expected)) {
-      return NextResponse.json({ error: "Password salah" }, { status: 401 });
+
+    const body = await request.json();
+    const { email, password } = body || {};
+
+    if (!email || !password) {
+      return NextResponse.json({ ok: false, error: "Email dan password diperlukan" }, { status: 400 });
     }
 
-    const res = NextResponse.json({ ok: true });
-    res.cookies.set("genta_admin", "1", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/api/admin",
+    const isAdmin =
+      email === "admin" && password === process.env.ADMIN_PASSWORD;
+
+    if (!isAdmin) {
+      return NextResponse.json({ ok: false, error: "Email atau password salah" }, { status: 401 });
+    }
+
+    // Set cookie
+    const res = NextResponse.json({
+      ok: true,
+      admin: true,
+      message: "Berhasil masuk",
     });
+
+    res.cookies.set("admin_session", "1", {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/api/admin",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60, // 1 hour
+    });
+
     return res;
-  } catch (e) {
-    // Log detail hanya di development
-    if (process.env.NODE_ENV === "development") {
-      console.error("[Login Error]", e);
-    }
-    return NextResponse.json({ error: "Terjadi kesalahan internal" }, { status: 500 });
+  } catch (err: any) {
+    return NextResponse.json({ ok: false, error: err.message }, { status: 500 });
   }
 }

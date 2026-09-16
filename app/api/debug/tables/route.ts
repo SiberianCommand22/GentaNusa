@@ -9,7 +9,6 @@ export async function GET() {
   if (isSupabaseReady()) {
     dbSource = "connected";
     const client = adminClient!;
-
     const { data: dbCats, error: err } = await client
       .from("categories")
       .select("*", { count: "exact", head: true });
@@ -20,10 +19,5 @@ export async function GET() {
     }
   }
 
-  return NextResponse.json({
-    table: "categories",
-    source: dbSource,
-    rowCount: count,
-    error: dbError,
-  });
+  return NextResponse.json({ table: "categories", source: dbSource, rowCount: count, error: dbError });
 }

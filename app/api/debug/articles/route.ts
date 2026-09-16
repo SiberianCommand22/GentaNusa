@@ -29,8 +29,8 @@ export async function GET() {
 
     const { data: dbCats, error: err2 } = await client
       .from("categories")
-      .select("slug")
-      .order("slug", { ascending: true });
+      .select("id, slug, name, color")
+      .order("id", { ascending: true });
     if (err2) {
       dbError = dbError ? `${dbError}; categories: ${err2.message}` : `categories: ${err2.message}`;
     } else {
