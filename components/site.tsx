@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import styles from "./site.module.css";
 import { navItems } from "./_types";
 import { ThemeToggle } from "./theme-toggle";
 
-export function Header() {
+function useIsDark(): boolean {
   const [dark, setDark] = useState(false);
-
   useEffect(() => {
     const check = () => {
       setDark(document.documentElement.getAttribute("data-theme") === "dark");
@@ -20,11 +22,17 @@ export function Header() {
     });
     return () => observer.disconnect();
   }, []);
+  return dark;
+}
+
+export function Header() {
+  const dark = useIsDark();
+  const pathname = usePathname();
 
   return (
     <header className={styles.header}>
       <div className={styles.headerInner}>
-        <a className={styles.logo} href="/">
+        <Link href="/" className={styles.logo}>
           <img
             alt="Logo GentaNusa"
             width={130}
@@ -32,12 +40,16 @@ export function Header() {
             className={styles.logoImg}
             src={dark ? "/images/logo-gentanusa-white.png" : "/images/logo-gentanusa.png"}
           />
-        </a>
+        </Link>
         <nav className={styles.nav}>
           {navItems.map((item) => (
-            <a key={item.href} href={item.href} className={styles.navLink}>
+            <Link
+              key={item.href}
+              href={item.href}
+              className={pathname === "/" && item.href === "/" ? `${styles.navLink} ${styles.active}` : styles.navLink}
+            >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
         <ThemeToggle />
@@ -49,6 +61,7 @@ export function Header() {
 
 function MobileNav() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <div className={styles.mobileNav}>
@@ -62,11 +75,19 @@ function MobileNav() {
       </button>
       {open && (
         <nav className={styles.mobileMenu}>
-          {navItems.map((item) => (
-            <a key={item.href} href={item.href} className={styles.mobileLink} onClick={() => setOpen(false)}>
-              {item.label}
-            </a>
-          ))}
+          {navItems.map((item) => {
+            const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={isActive ? `${styles.mobileLink} ${styles.active}` : styles.mobileLink}
+                onClick={() => setOpen(false)}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
       )}
     </div>
@@ -79,7 +100,7 @@ export function Footer() {
       <div className={styles.container}>
         <div className={styles.footerGrid}>
           <div>
-            <a className={styles.logo} href="/">
+            <Link href="/" className={styles.logo}>
               <img
                 alt="Logo GentaNusa"
                 loading="lazy"
@@ -88,14 +109,14 @@ export function Footer() {
                 className={styles.logoImgFooter}
                 src="/images/logo-gentanusa-white.png"
               />
-            </a>
+            </Link>
             <p className={styles.footerText}>Berita Nusantara terkini, akurat, dan terpercaya.</p>
           </div>
           <div className={styles.footerCol}>
             <h4>Kategori</h4>
-            <a className="" href="/kategori/politik">Politik</a>
-            <a className="" href="/kategori/ekonomi">Ekonomi</a>
-            <a className="" href="/kategori/nasional">Nasional</a>
+            <a href="/kategori/politik">Politik</a>
+            <a href="/kategori/ekonomi">Ekonomi</a>
+            <a href="/kategori/nasional">Nasional</a>
           </div>
           <div className={styles.footerCol}>
             <h4>Kontak</h4>

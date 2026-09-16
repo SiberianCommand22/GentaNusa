@@ -1,33 +1,41 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import styles from "./theme-toggle.module.css";
 
-function getInitialTheme(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    const saved = localStorage.getItem("genta-theme");
-    if (saved !== null) return saved === "dark";
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
-  } catch {
-    return false;
-  }
-}
-
 export function ThemeToggle() {
-  const [dark, setDark] = useState(getInitialTheme);
+  const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    // Baca setelah mount (hindari SSR/localStorage mismatch)
+    let isDark = false;
     try {
-      localStorage.setItem("genta-theme", dark ? "dark" : "light");
+      const saved = localStorage.getItem("genta-theme");
+      if (saved !== null) {
+        isDark = saved === "dark";
+      } else {
+        isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      }
     } catch {}
-  }, [dark]);
+
+    setDark(isDark);
+    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+    try {
+      localStorage.setItem("genta-theme", isDark ? "dark" : "light");
+    } catch {}
+  }, []);
 
   return (
     <button
       className={styles.toggle}
-      onClick={() => setDark(!dark)}
+      onClick={() => {
+        const next = !dark;
+        setDark(next);
+        document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
+        try {
+          localStorage.setItem("genta-theme", next ? "dark" : "light");
+        } catch {}
+      }}
       aria-label={dark ? "Ganti ke mode terang" : "Ganti ke mode gelap"}
       title={dark ? "Mode terang" : "Mode gelap"}
       suppressHydrationWarning
