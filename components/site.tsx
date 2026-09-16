@@ -52,7 +52,7 @@ export function Header() {
       <div className={styles.headerInner}>
         <Link href="/" className={styles.logo}>
           <Image
-            src={dark ? "/images/logo-gentanusa-white.png" : "/images/logo-gentanusa.png"}
+            src={"/images/logo-gentanusa.png"}
             alt="Logo GentaNusa"
             width={130}
             height={71}
@@ -120,7 +120,7 @@ export function Footer() {
           <div>
             <Link href="/" className={styles.logo}>
               <Image
-                src="/images/logo-gentanusa-white.png"
+                src={"/images/logo-gentanusa-white.png"}
                 alt="Logo GentaNusa"
                 width={130}
                 height={71}

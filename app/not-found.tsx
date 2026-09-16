@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Header, Footer } from "@/components/site";
+
+export const metadata: Metadata = {
+  title: "Tidak Ditemukan",
+};
 
 export default function NotFound() {
   return (
