@@ -3,6 +3,13 @@ export const navItems = [
   { href: "/kategori/politik", label: "Politik" },
   { href: "/kategori/ekonomi", label: "Ekonomi" },
   { href: "/kategori/nasional", label: "Nasional" },
+  { href: "/kategori/kesehatan", label: "Kesehatan" },
+  { href: "/kategori/teknologi", label: "Teknologi" },
+  { href: "/kategori/pendidikan", label: "Pendidikan" },
+  { href: "/kategori/budaya", label: "Budaya" },
+  { href: "/kategori/lingkungan", label: "Lingkungan" },
+  { href: "/kategori/dunia", label: "Dunia" },
+  { href: "/kategori/olahraga", label: "Olahraga" },
   { href: "/tentang", label: "Tentang" },
   { href: "/cari", label: "Cari" },
 ];
