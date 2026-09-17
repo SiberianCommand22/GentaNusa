@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   const res = NextResponse.json({ ok: true });
-  res.cookies.set("genta_admin", "", {
+  res.cookies.set("admin_session", "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: true,
+    sameSite: "strict",
     maxAge: 0,
     path: "/api/admin",
   });

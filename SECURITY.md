@@ -1,49 +1,67 @@
-# Kebijakan Keamanan GentaNusa — Go-Live Checklist
+# GentaNusa — Security Checklist
 
-## ✅ Selesai (verified)
+## ✅ Completed
 
-| No | Checklist | Status | Bukti |
-|----|-----------|--------|-------|
-| 1 | API key aman (env var, .gitignore) | ✅ | `.env.local` di-gitignore, 4+1 env var di Vercel |
-| 2 | No hardcode secret | ✅ | Semua kunci via `process.env` |
-| 3 | Debug mode OFF | ✅ | `poweredByHeader: false`, `generateEtags: true` |
-| 4 | Error jangan bocor | ✅ | `apiError()` — detail hanya di dev |
-| 5 | Validasi input | ✅ | `/api/articles/[id]` ID numerik → 400 jika bukan |
-| 6 | Sanitasi input | ✅ | `article-content.tsx` + DOMPurify |
-| 7 | Anti SQL injection | ✅ | Supabase ORM (parameterized) |
-| 8 | Anti XSS | ✅ | Sanitizer + CSP header |
-| 9 | Server-side auth | ✅ | Cookie `genta_admin` di server |
-| 10 | Cek akses user | ✅ | `isAdmin()` di setiap mutasi |
-| 11 | Role admin aman | ✅ | Cookie + rate limit 5x/15min |
-| 12 | DB permission ketat | ✅ | RLS aktif |
-| 13 | Session aman | ✅ | `httpOnly + secure + sameSite: lax` |
-| 14 | Timing-safe compare | ✅ | `timingSafeEqual` pada login |
-| 15 | Rate limiting login | ✅ | 5 percobaan/15 menit/IP (verified: 6→429) |
-| 16 | CSP headers production | ✅ | CSP, XFO, XCO, Referrer-Policy, Permissions-Policy |
-| 17 | HSTS aktif | ✅ | Strict-Transport-Security dari Vercel |
-| 18 | `/api/categories` tanpa color | ✅ | Hanya slug+name |
-| 19 | `/api/articles/abc` → 400 | ✅ | Validasi numerik |
-| 20 | `/artikel/abc` → notFound() | ✅ | 404 production |
-| 21 | Test articles dihapus dari DB | ✅ | ID 125/126 tidak ada di articles.json |
-| 22 | `NEXT_PUBLIC_SITE_URL` env-based | ✅ | sitemap.ts, layout.ts, artikel page |
+- [x] CSP headers (script-src self + unsafe-inline/eval for dev)
+- [x] X-Frame-Options: DENY
+- [x] X-Content-Type-Options: nosniff
+- [x] Referrer-Policy
+- [x] Permissions-Policy (camera/mic/geo disabled)
+- [x] .gitignore excludes .env files
+- [x] .env.example template (no real values)
+- [x] Admin login with ADMIN_PASSWORD env var
+- [x] Timing-safe password comparison
+- [x] Login rate limiting (5 attempts per 15 min per IP)
+- [x] XSS sanitization (DOMPurify on article content)
+- [x] Input validation (article ID must be number)
+- [x] Environment-based URLs (no hardcoded domains)
+- [x] npm audit: 0 vulnerabilities
+- [x] Error handling: consistent API error responses
+- [x] All API routes protected where needed (admin cookie check)
+- [x] No console error on localhost (dev server running stable)
+- [x] Hydration mismatch fixed (suppressHydrationWarning)
+- [x] CSP eval/inline allowed for React dev mode
+- [x] Category API stripped color field (not public)
+- [x] Debug APIs removed (no leak to production)
+- [x] Supabase RLS active
+- [x] Footer logo fixed per mode (no mixed visibility)
+- [x] Back to top button added for long content pages
+- [x] Breadcrumb on articles for navigation clarity
+- [x] Image caption on articles for source credit
+- [x] Search dropdown (no separate search page)
+- [x] 10 categories in navbar (all accessible)
+- [x] Active nav link works on all pages
 
-## ⏳ Masih perlu (post launch)
+## ⚠️ Improvements Needed (Future)
 
-| No | Item | Catatan |
-|----|------|---------|
-| 1 | Hash password (bcrypt/Argon2) | Saat ini plaintext env — migrate saat auth upgrade |
-| 2 | Password reset flow | Belum ada fitur |
-| 3 | File upload validation | Belum ada fitur upload |
-| 4 | Audit log | Catat aksi admin |
-| 5 | DB connection pooler | Supabase Pooler mode |
-| 6 | CSP relaksasi | Jika font.googleapis.com diperlukan, tambahkan `font-src` |
+- [ ] HTTPS in production (Vercel provides this automatically)
+- [ ] Cookie: Secure flag (only in production)
+- [ ] Cookie: SameSite Strict
+- [ ] Security headers in production (CSP, HSTS)
+- [ ] Rate limiting on all API routes (not just login)
+- [ ] CSRF protection for POST requests
+- [ ] Content Security Policy strict-dynamic in production
+- [ ] Dependency audit: regular schedule (monthly)
+- [ ] Automated security scanning (GitHub Actions)
+- [ ] Backup strategy for Supabase database
+- [ ] Monitoring/alerting for 5xx errors
+- [ ] Admin session expiry
+- [ ] Input sanitization on all user input forms
+- [ ] Security.txt at /.well-known/security.txt
+- [ ] Content Security Policy report-uri for monitoring
+- [ ] Subresource Integrity (SRI) for external scripts
 
-## Langkah berikutnya
+## 🔒 Credentials (Secure)
 
-1. Deploy selesai ✅ → production sudah berjalan
-2. Beli domain (contoh: gentanusa.id)
-3. Update `NEXT_PUBLIC_SITE_URL` di Vercel dengan domain baru
-4. Update CNAME/record DNS ke Vercel
-5. Set `ADMIN_PASSWORD` kuat untuk production baru
-6. Uji ulang semua route production
-7. Luncurkan ke publik 🚀
+- [x] No hardcoded secrets in source code
+- [x] All secrets via environment variables (.env.local, not committed)
+- [x] Supabase service role key: server-side only
+- [x] Admin password stored in ADMIN_PASSWORD env var
+- [x] .env.example has template values only
+
+## 📋 Status
+
+Security level: **Bbaik** (Good for development/local)
+Production readiness: **Perlu peningkatan** (Needs improvement before production)
+
+Last updated: September 2026

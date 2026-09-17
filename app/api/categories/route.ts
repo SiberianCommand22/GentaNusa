@@ -1,8 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { rateLimit } from "../rate-limit";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
 
 function isAdmin(req: NextRequest) {
-  return req.cookies.get("genta_admin")?.value === "1";
+  return req.cookies.get("admin_session")?.value === "1";
 }
 
 function ensureClient() {
@@ -26,6 +27,9 @@ export async function GET() {
 
 // POST — tambah kategori (admin)
 export async function POST(req: NextRequest) {
+  const rl = rateLimit(req);
+  if (!rl.ok) return rl.response;
+
   if (!isAdmin(req)) {
     return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
   }
