@@ -69,13 +69,16 @@ h3 {
   letter-spacing: -0.01em;
 }
 
-/* ===== Background canvas: light mode = siluet, dark = sunset city ===== */
+/* ===== Background canvas ===== */
 .bg-canvas {
   opacity: 1;
   transition: opacity 0.6s ease;
 }
 
-/* Dark mode: hide light siluet, show sunset city */
+.bg-canvas > div:first-child {
+  opacity: 1;
+}
+
 .bg-canvas .bg-dark {
   opacity: 0;
   pointer-events: none;
@@ -89,8 +92,4 @@ h3 {
 [data-theme="dark"] .bg-canvas .bg-dark {
   opacity: 1;
   pointer-events: auto;
-}
-
-[data-theme="dark"] .bg-canvas {
-  opacity: 1;
 }
