@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import styles from "./site.module.css";
 import { navItems } from "./_types";
 import { ThemeToggle } from "./theme-toggle";
+import { HeaderSearch } from "./header-search";
 
 function useIsDark(): boolean {
   const [dark, setDark] = useState(false);
@@ -55,6 +56,7 @@ export function Header() {
         <div className={styles.themeToggle}>
           <ThemeToggle />
         </div>
+        <HeaderSearch />
         <MobileNav />
       </div>
     </header>
