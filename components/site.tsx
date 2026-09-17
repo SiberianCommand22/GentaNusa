@@ -52,7 +52,9 @@ export function Header() {
             </Link>
           ))}
         </nav>
-        <ThemeToggle />
+        <div className={styles.themeToggle}>
+          <ThemeToggle />
+        </div>
         <MobileNav />
       </div>
     </header>
