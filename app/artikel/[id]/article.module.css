@@ -2,18 +2,56 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px 20px;
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 36px;
 }
 
-@media (max-width: 768px) {
-  .container {
-    grid-template-columns: 1fr;
-  }
+.breadcrumb {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-/* ===== Artikel ===== */
+.breadcrumb a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbSep {
+  color: var(--text-faint);
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  line-height: 1.3;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.author {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dot {
+  color: var(--text-faint);
+}
+
 .article {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -21,148 +59,121 @@
   padding: 32px;
 }
 
-.badge {
-  display: inline-block;
-  padding: 4px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  background: #c8102e;
-  margin-bottom: 16px;
-}
-
-.badge a {
-  color: #fff;
-}
-
-.title {
-  font-size: 30px;
-  line-height: 1.3;
-  font-weight: 800;
-  margin-bottom: 14px;
-}
-
-.meta {
-  display: flex;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--text-faint);
-  margin-bottom: 18px;
-}
-
-.excerpt {
-  font-size: 17px;
-  line-height: 1.7;
-  color: var(--text-muted);
-  border-left: 4px solid #c8102e;
-  padding-left: 16px;
-  margin-bottom: 24px;
-}
-
-/* ===== Featured Image ===== */
-.featuredImage {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 8;
-  margin-bottom: 24px;
-  border-radius: 8px;
+/* ===== Image ===== */
+.heroFigure {
+  margin: -32px -32px 24px;
+  border-radius: 12px 12px 0 0;
   overflow: hidden;
 }
 
-.featuredImage img,
-.featuredImage picture,
-.featuredImage > img {
-  width: 100% !important;
-  height: 100% !important;
+.featuredImage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
 }
 
-/* ===== Artikel Content ===== */
-.articleContent :global(p) {
-  font-size: 16px;
-  line-height: 1.85;
-  color: var(--text);
-  margin-bottom: 18px;
+.caption {
+  padding: 12px 24px;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--bg);
+  border-top: 1px solid var(--border);
 }
 
+/* ===== Content ===== */
+.content {
+  font-size: 17px;
+  line-height: 1.85;
+  color: var(--text);
+}
+
+.content p {
+  margin-bottom: 1.2em;
+}
+
+/* ===== Tags ===== */
 .tags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
 }
 
 .tag {
+  display: inline-block;
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 13px;
   background: var(--bg);
   color: var(--text-muted);
+  border: 1px solid var(--border);
 }
 
-/* ===== Terkait ===== */
+/* ===== Related ===== */
 .related {
-  align-self: start;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
 }
 
 .relatedTitle {
-  font-size: 18px;
-  font-weight: 800;
-  border-left: 4px solid #c8102e;
-  padding-left: 12px;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
   margin-bottom: 16px;
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 }
 
 .relatedCard {
   display: block;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px;
-  margin-bottom: 12px;
-  transition: box-shadow 0.2s;
+  text-decoration: none;
+  color: inherit;
 }
 
 .relatedImage {
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.cardImg {
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 6px;
-  overflow: hidden;
-  margin-bottom: 10px;
-}
-
-.relatedImg {
   object-fit: cover;
+  transition: transform 0.3s;
 }
 
-.relatedCard:hover {
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+.relatedCard:hover .cardImg {
+  transform: scale(1.03);
 }
 
-.relatedCat {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #c8102e;
-  margin-bottom: 6px;
-}
-
-.relatedHeadline {
-  font-size: 15px;
+.relatedCardTitle {
+  font-size: 14px;
+  font-weight: 600;
   line-height: 1.4;
-  font-weight: 700;
-  margin-bottom: 6px;
 }
 
-.relatedHeadline:hover {
-  color: #c8102e;
+.relatedCard:hover .relatedCardTitle {
+  color: var(--accent);
 }
 
-.relatedDate {
-  font-size: 12px;
-  color: var(--text-faint);
+@media (max-width: 900px) {
+  .relatedGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .relatedGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 24px;
+  }
 }
