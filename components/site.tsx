@@ -95,7 +95,6 @@ function MobileNav() {
 }
 
 export function Footer() {
-  const dark = useIsDark();
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
@@ -108,7 +107,7 @@ export function Footer() {
                 width={130}
                 height={71}
                 className={styles.logoImgFooter}
-                src={dark ? "/images/logo-gentanusa-white.png" : "/images/logo-gentanusa.png"}
+                src="/images/logo-gentanusa-white.png"
               />
             </Link>
             <p className={styles.footerText}>Berita Nusantara terkini, akurat, dan terpercaya.</p>
