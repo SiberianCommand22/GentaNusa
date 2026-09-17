@@ -32,12 +32,12 @@ export async function POST(req: NextRequest) {
   const c = ensureClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
   const body = await req.json().catch(() => null);
-  if (!body?.slug || !body?.name || !body?.color) {
-    return NextResponse.json({ error: "slug, name, color wajib" }, { status: 400 });
+  if (!body?.slug || !body?.name) {
+    return NextResponse.json({ error: "slug, name wajib" }, { status: 400 });
   }
   const { data, error } = await c.client
     .from("categories")
-    .insert([{ slug: body.slug, name: body.name, color: body.color }])
+    .insert([{ slug: body.slug, name: body.name }])
     .select()
     .single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
