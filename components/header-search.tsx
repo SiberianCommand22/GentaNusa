@@ -13,7 +13,13 @@ interface SearchArticle {
   tags: string[];
 }
 
-export function HeaderSearch() {
+interface HeaderSearchProps {
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+}
+
+export function HeaderSearch({ isOpen, onToggle, onClose }: HeaderSearchProps) {
   const [articles, setArticles] = useState<SearchArticle[]>([]);
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);

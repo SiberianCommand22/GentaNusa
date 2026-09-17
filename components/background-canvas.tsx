@@ -10,7 +10,7 @@ export function BackgroundCanvas() {
   }, []);
 
   if (!mounted) {
-    // SSR: render dark mode by default (matches server HTML)
+    // SSR: render dark mode default (sunset city)
     return (
       <div
         aria-hidden="true"
