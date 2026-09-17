@@ -57,6 +57,9 @@ export function Header() {
           <ThemeToggle />
         </div>
         <HeaderSearch />
+        <Link href="/cari" className={styles.navLink}>
+          Cari
+        </Link>
         <MobileNav />
       </div>
     </header>

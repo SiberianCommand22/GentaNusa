@@ -11,5 +11,4 @@ export const navItems = [
   { href: "/kategori/dunia", label: "Dunia" },
   { href: "/kategori/olahraga", label: "Olahraga" },
   { href: "/tentang", label: "Tentang" },
-  { href: "/cari", label: "Cari" },
 ];
