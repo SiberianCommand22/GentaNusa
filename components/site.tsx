@@ -47,7 +47,7 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className={pathname === "/" && item.href === "/" ? `${styles.navLink} ${styles.active}` : styles.navLink}
+              className={pathname === item.href ? `${styles.navLink} ${styles.active}` : styles.navLink}
             >
               {item.label}
             </Link>
