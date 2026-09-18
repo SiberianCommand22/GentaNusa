@@ -6,7 +6,7 @@ export async function GET() {
   const localCategories = await getCategories();
   const localSlugs = localCategories.map((c) => c.slug);
 
-  const result: Record<string, any> = {
+  const result: Record<string, unknown> = {
     localCount: localSlugs.length,
     localSlugs,
   };
@@ -21,7 +21,7 @@ export async function GET() {
     if (err) {
       result.db = { error: err.message };
     } else {
-      const dbSlugs = (dbCats || []).map((c: any) => c.slug);
+      const dbSlugs = (dbCats || []).map((c) => c.slug);
       result.db = {
         count: (dbCats || []).length,
         dbSlugs,

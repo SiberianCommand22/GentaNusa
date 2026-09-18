@@ -15,7 +15,7 @@ export async function GET() {
     if (err) {
       dbError = `categories: ${err.message}`;
     } else {
-      count = (dbCats as any[])?.length ?? 0;
+      count = (dbCats as unknown[])?.length ?? 0;
     }
   }
 

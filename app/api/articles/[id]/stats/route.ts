@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
 
 function isAdmin(req: NextRequest) {
-  return req.cookies.get("admin_session")?.value === "1";
+  return req.cookies.get("genta_admin")?.value === "1";
 }
 
 function ensureClient() {

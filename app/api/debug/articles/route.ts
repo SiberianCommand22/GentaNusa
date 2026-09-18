@@ -24,7 +24,7 @@ export async function GET() {
     if (err1) {
       dbError = `articles: ${err1.message}`;
     } else {
-      dbArticleIds = (dbArticles || []).map((a: any) => a.id).sort((a: number, b: number) => a - b);
+      dbArticleIds = (dbArticles || []).map((a) => a.id).sort((a: number, b: number) => a - b);
     }
 
     const { data: dbCats, error: err2 } = await client
@@ -34,7 +34,7 @@ export async function GET() {
     if (err2) {
       dbError = dbError ? `${dbError}; categories: ${err2.message}` : `categories: ${err2.message}`;
     } else {
-      dbCategorySlugs = (dbCats || []).map((c: any) => c.slug);
+      dbCategorySlugs = (dbCats || []).map((c) => c.slug);
     }
   }
 

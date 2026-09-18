@@ -58,7 +58,7 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${sourceSerif.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.jpg" type="image/jpeg" />
       </head>
       <body>
         <BackgroundCanvas />

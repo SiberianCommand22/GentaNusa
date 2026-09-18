@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import styles from "./site.module.css";
 import { navItems } from "./_types";
 import { ThemeToggle } from "./theme-toggle";
@@ -26,115 +26,127 @@ function useIsDark(): boolean {
   return dark;
 }
 
-const footerLinks = [
-  { label: "Beranda", href: "/" },
-  { label: "Kategori", href: "/kategori/politik" },
-  { label: "Tentang", href: "/tentang" },
-  { label: "Syarat & Ketentuan", href: "/syarat" },
-  { label: "Kebijakan Privasi", href: "/privasi" },
-  { label: "Penulis", href: "/penulis" },
-];
-
 export function Header() {
+  const dark = useIsDark();
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const isDark = useIsDark();
 
   return (
-    <>
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <Link href="/" className={styles.logo}>
-            <Image
-              src={isDark ? "/images/logo-gentanusa-white.png" : "/images/logo-gentanusa.png"}
-              alt="Logo GentaNusa"
-              width={130}
-              height={71}
-              className={styles.logoImg}
-            />
-          </Link>
+    <header className={styles.header}>
+      <div className={styles.headerInner}>
+        <Link href="/" className={styles.logo}>
+          <img
+            alt="Logo GentaNusa"
+            width={130}
+            height={71}
+            className={styles.logoImg}
+            src={dark ? "/images/logo-gentanusa-white.png" : "/images/logo-gentanusa.png"}
+          />
+        </Link>
+        <nav className={styles.nav}>
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={pathname === item.href ? `${styles.navLink} ${styles.active}` : styles.navLink}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <div className={styles.themeToggle}>
+          <ThemeToggle />
+        </div>
+        <HeaderSearch />
+        <Link href="/cari" className={styles.navLink}>
+          Cari
+        </Link>
+        <MobileNav />
+      </div>
+    </header>
+  );
+}
 
-          {/* Desktop nav */}
-          <nav className={`${styles.nav} ${menuOpen ? styles.navOpen : ""}`}>
-            {navItems.map((item) => (
+function MobileNav() {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  return (
+    <div className={styles.mobileNav}>
+      <button
+        className={styles.hamburger}
+        onClick={() => setOpen(!open)}
+        aria-label="Buka menu"
+        aria-expanded={open}
+      >
+        <span /> <span /> <span />
+      </button>
+      {open && (
+        <nav className={styles.mobileMenu}>
+          {navItems.map((item) => {
+            const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={
-                  pathname === item.href
-                    ? `${styles.navLink} ${styles.active}`
-                    : styles.navLink
-                }
-                onClick={() => setMenuOpen(false)}
+                className={isActive ? `${styles.mobileLink} ${styles.active}` : styles.mobileLink}
+                onClick={() => setOpen(false)}
               >
                 {item.label}
               </Link>
-            ))}
-          </nav>
-
-          <div className={styles.headerRight}>
-            <ThemeToggle />
-            <HeaderSearch
-              isOpen={searchOpen}
-              onToggle={() => setSearchOpen(!searchOpen)}
-              onClose={() => setSearchOpen(false)}
-            />
-            <Link href="/cari" className={styles.navLink}>
-              Cari
-            </Link>
-          </div>
-
-          {/* Mobile menu toggle */}
-          <button
-            className={styles.hamburger}
-            aria-label="Buka menu"
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-        </div>
-      </header>
-    </>
+            );
+          })}
+        </nav>
+      )}
+    </div>
   );
 }
 
 export function Footer() {
-  const isDark = useIsDark();
-
   return (
     <footer className={styles.footer}>
-      <div className={styles.footerInner}>
-        <div className={styles.footerTop}>
-          <Link href="/" className={styles.footerLogo}>
-            <Image
-              src="/images/logo-gentanusa-white.png"
-              alt="Logo GentaNusa"
-              width={130}
-              height={71}
-              className={styles.footerLogoImg}
-            />
-          </Link>
-          <nav className={styles.footerNav}>
-            {footerLinks.map((link) => (
-              <Link key={link.href} href={link.href} className={styles.footerLink}>
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+      <div className={styles.container}>
+        <div className={styles.footerGrid}>
+          <div>
+            <Link href="/" className={styles.logo}>
+              <img
+                alt="Logo GentaNusa"
+                loading="lazy"
+                width={130}
+                height={71}
+                className={styles.logoImgFooter}
+                src="/images/logo-gentanusa-white.png"
+              />
+            </Link>
+            <p className={styles.footerText}>Berita Nusantara terkini, akurat, dan terpercaya.</p>
+          </div>
+          <div className={styles.footerCol}>
+            <h4>Kategori</h4>
+            <Link href="/kategori/politik">Politik</Link>
+            <Link href="/kategori/ekonomi">Ekonomi</Link>
+            <Link href="/kategori/nasional">Nasional</Link>
+            <Link href="/kategori/kesehatan">Kesehatan</Link>
+            <Link href="/kategori/teknologi">Teknologi</Link>
+            <Link href="/kategori/pendidikan">Pendidikan</Link>
+            <Link href="/kategori/budaya">Budaya</Link>
+            <Link href="/kategori/lingkungan">Lingkungan</Link>
+            <Link href="/kategori/dunia">Dunia</Link>
+            <Link href="/kategori/olahraga">Olahraga</Link>
+          </div>
+          <div className={styles.footerCol}>
+            <h4>Kontak</h4>
+            <span>redaksi@gentanusa.id</span>
+            <span>Jakarta, Indonesia</span>
+            <a href="/feed.xml">RSS Feed</a>
+          </div>
+          <div className={styles.footerCol}>
+            <h4>Info</h4>
+            <a href="/tentang">Tentang Kami</a>
+            <a href="/sindikasi">Sindikasi</a>
+            <a href="/privasi">Kebijakan Privasi</a>
+            <a href="/syarat">Syarat & Ketentuan</a>
+          </div>
         </div>
-        <div className={styles.footerBottom}>
-          <p className={styles.footerCopyright}>
-            © {new Date().getFullYear()} GentaNusa — Berita Nusantara Terkini.
-            Hak cipta dilindungi.
-          </p>
-          <p className={styles.footerCredit}>
-            Redaksi GentaNusa
-          </p>
-        </div>
+        <div className={styles.footerBottom}>© 2026 GentaNusa. Seluruh hak cipta dilindungi.</div>
       </div>
     </footer>
   );

@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { rateLimit } from "../rate-limit";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
 import { apiError } from "../error-handler";
 
@@ -13,7 +12,7 @@ function ensureClient() {
 // GET /api/subscribers — daftar email subscriber (admin)
 export async function GET(req: NextRequest) {
   try {
-    if (req.cookies.get("admin_session")?.value !== "1") {
+    if (req.cookies.get("genta_admin")?.value !== "1") {
       return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
     }
     const c = ensureClient();
@@ -31,9 +30,6 @@ export async function GET(req: NextRequest) {
 
 // POST /api/subscribers — daftarkan email (publik, dari form)
 export async function POST(req: NextRequest) {
-  const rl = rateLimit(req);
-  if (!rl.ok) return rl.response;
-
   try {
     const body = await req.json().catch(() => null);
     const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";

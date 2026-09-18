@@ -7,6 +7,7 @@ export function ThemeToggle() {
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
+    // Baca setelah mount (hindari SSR/localStorage mismatch)
     let isDark = false;
     try {
       const saved = localStorage.getItem("genta-theme");
@@ -18,10 +19,7 @@ export function ThemeToggle() {
     } catch {}
 
     setDark(isDark);
-    document.documentElement.setAttribute(
-      "data-theme",
-      isDark ? "dark" : "light"
-    );
+    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
     try {
       localStorage.setItem("genta-theme", isDark ? "dark" : "light");
     } catch {}
@@ -31,18 +29,16 @@ export function ThemeToggle() {
     <button
       className={styles.toggle}
       onClick={() => {
-        const newDark = !dark;
-        setDark(newDark);
-        document.documentElement.setAttribute(
-          "data-theme",
-          newDark ? "dark" : "light"
-        );
+        const next = !dark;
+        setDark(next);
+        document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
         try {
-          localStorage.setItem("genta-theme", newDark ? "dark" : "light");
+          localStorage.setItem("genta-theme", next ? "dark" : "light");
         } catch {}
       }}
-      aria-label="Ganti ke mode gelap"
-      title="Mode gelap"
+      aria-label={dark ? "Ganti ke mode terang" : "Ganti ke mode gelap"}
+      title={dark ? "Mode terang" : "Mode gelap"}
+      suppressHydrationWarning
     >
       {dark ? "☀️" : "🌙"}
     </button>

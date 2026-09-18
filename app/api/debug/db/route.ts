@@ -7,7 +7,7 @@ export async function GET() {
   const localArticles = await getArticles();
   const localCategories = await getCategories();
 
-  const result: Record<string, any> = {
+  const result: Record<string, unknown> = {
     localArticles: localArticles.length,
     localCategories: localCategories.length,
     localArticleIds: localArticles.map((a) => a.id).sort((a, b) => a - b),
@@ -26,7 +26,7 @@ export async function GET() {
     } else {
       result.dbArticles = {
         count: (dbArticles || []).length,
-        ids: (dbArticles || []).map((a: any) => a.id).sort((a: number, b: number) => a - b),
+        ids: (dbArticles || []).map((a) => a.id).sort((a: number, b: number) => a - b),
       };
     }
 
