@@ -3,27 +3,26 @@
 import { useEffect, useState } from "react";
 import styles from "./theme-toggle.module.css";
 
+function getInitialTheme(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const saved = localStorage.getItem("genta-theme");
+    if (saved !== null) return saved === "dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  } catch {
+    return false;
+  }
+}
+
 export function ThemeToggle() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(getInitialTheme);
 
   useEffect(() => {
-    // Baca setelah mount (hindari SSR/localStorage mismatch)
-    let isDark = false;
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
     try {
-      const saved = localStorage.getItem("genta-theme");
-      if (saved !== null) {
-        isDark = saved === "dark";
-      } else {
-        isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      }
+      localStorage.setItem("genta-theme", dark ? "dark" : "light");
     } catch {}
-
-    setDark(isDark);
-    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
-    try {
-      localStorage.setItem("genta-theme", isDark ? "dark" : "light");
-    } catch {}
-  }, []);
+  }, [dark]);
 
   return (
     <button

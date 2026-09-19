@@ -1,1 +1,42 @@
-[{"slug": "politik", "name": "Politik"}, {"slug": "ekonomi", "name": "Ekonomi"}, {"slug": "nasional", "name": "Nasional"}, {"slug": "kesehatan", "name": "Kesehatan"}, {"slug": "olahraga", "name": "Olahraga"}, {"slug": "teknologi", "name": "Teknologi"}, {"slug": "pendidikan", "name": "Pendidikan"}, {"slug": "budaya", "name": "Budaya"}, {"slug": "lingkungan", "name": "Lingkungan"}, {"slug": "dunia", "name": "Dunia"}]
+[
+  {
+    "slug": "teknologi",
+    "name": "Teknologi"
+  },
+  {
+    "slug": "politik",
+    "name": "Politik"
+  },
+  {
+    "slug": "pendidikan",
+    "name": "Pendidikan"
+  },
+  {
+    "slug": "olahraga",
+    "name": "Olahraga"
+  },
+  {
+    "slug": "nasional",
+    "name": "Nasional"
+  },
+  {
+    "slug": "lingkungan",
+    "name": "Lingkungan"
+  },
+  {
+    "slug": "kesehatan",
+    "name": "Kesehatan"
+  },
+  {
+    "slug": "ekonomi",
+    "name": "Ekonomi"
+  },
+  {
+    "slug": "dunia",
+    "name": "Dunia"
+  },
+  {
+    "slug": "budaya",
+    "name": "Budaya"
+  }
+]

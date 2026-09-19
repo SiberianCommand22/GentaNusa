@@ -38,6 +38,19 @@ async function sync() {
     fetchAll("sources", "id"),
   ]);
 
+  const parseJson = (value) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === "string") {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
   // articles: ubah nama kolom DB (snake) → format JSON (camel)
   const mapped = articles.map((a) => ({
     id: a.id,
@@ -49,8 +62,13 @@ async function sync() {
     authorSlug: a.author_slug ?? "redaksi-generic",
     authorRole: a.author_role ?? undefined,
     image: a.image ?? undefined,
-    content: a.content ?? [],
-    tags: a.tags ?? [],
+    content: parseJson(a.content),
+    tags: parseJson(a.tags),
+  }));
+
+  const mappedCategories = categories.map((category) => ({
+    slug: category.slug,
+    name: category.name,
   }));
 
   fs.writeFileSync(
@@ -60,7 +78,7 @@ async function sync() {
   );
   fs.writeFileSync(
     path.join(dataDir, "categories.json"),
-    JSON.stringify(categories, null, 2),
+    JSON.stringify(mappedCategories, null, 2),
     "utf-8"
   );
   fs.writeFileSync(
