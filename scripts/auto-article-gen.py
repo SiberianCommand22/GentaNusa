@@ -38,7 +38,9 @@ LLM_URL = "http://127.0.0.1:20128/v1/chat/completions"
 LLM_MODEL = "FREEMAX"
 SOURCE_TIMEOUT = 10
 LLM_TIMEOUT = 60
-MAX_LLM_ATTEMPTS = 5
+# 2 retries is enough: the scheduler has a whole day, and each extra attempt
+# costs 60s of the global run budget for a model that usually fails the same way.
+MAX_LLM_ATTEMPTS = 2
 
 DEFAULT_SOURCE_IDS = [
     "antara-terkini",
@@ -623,7 +625,9 @@ def main() -> int:
         return 0
 
     start_time = time.time()
-    MAX_RUN_SECONDS = 120
+    # Must exceed LLM_TIMEOUT * MAX_LLM_ATTEMPTS for a single item, otherwise one
+    # slow source burns the whole budget and the run ends with zero articles.
+    MAX_RUN_SECONDS = 1800
 
     local_env = load_env_file(ROOT / ".env.local")
     service_url = local_env.get("NEXT_PUBLIC_SUPABASE_URL")
