@@ -28,10 +28,21 @@ export async function generateMetadata({ params }: Params) {
     title: article.title,
     description: article.excerpt,
     openGraph: {
+      type: "article",
+      siteName: "GentaNusa",
       title: article.title,
       description: article.excerpt,
       url: `${SITE_URL}/artikel/${article.id}`,
-      images: [{ url: absoluteImage, width: 1200, height: 630 }],
+      locale: "id_ID",
+      images: [{ url: absoluteImage, width: 1200, height: 630, alt: article.title }],
+    },
+    // Without this, X/Twitter falls back to app/layout.tsx and shows the site
+    // logo + generic headline instead of the article.
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.excerpt,
+      images: [absoluteImage],
     },
   };
 }
