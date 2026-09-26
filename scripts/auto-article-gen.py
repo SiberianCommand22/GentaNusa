@@ -352,18 +352,58 @@ def parse_llm_response(raw: str) -> str:
 
 
 def extract_json_object(text: str) -> dict | None:
-    try:
-        value = json.loads(text)
-        return value if isinstance(value, dict) else None
-    except json.JSONDecodeError:
-        match = re.search(r"\{.*\}", text, re.DOTALL)
-        if not match:
-            return None
+    if not text:
+        return None
+    # Strip markdown fences the model wraps JSON in (```json ... ```).
+    fenced = re.findall(r"```(?:json)?\s*(.+?)```", text, re.DOTALL)
+    # Reversed: the model often emits draft then revision, so the last block wins.
+    candidates = list(reversed(fenced)) or [text]
+    for blob in candidates:
+        blob = blob.strip()
         try:
-            value = json.loads(match.group(0))
-            return value if isinstance(value, dict) else None
+            value = json.loads(blob)
         except json.JSONDecodeError:
-            return None
+            # Model may return draft + revision in one reply; take the LAST
+            # balanced object, not a greedy span that fuses them into invalid JSON.
+            value = _last_json_object(blob)
+        if isinstance(value, dict):
+            return value
+    return None
+
+
+def _last_json_object(text: str) -> dict | None:
+    depth = 0
+    start = -1
+    found: list[dict] = []
+    in_string = False
+    escaped = False
+    for i, ch in enumerate(text):
+        if in_string:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+            continue
+        if ch == '"':
+            in_string = True
+        elif ch == "{":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch == "}":
+            if depth:
+                depth -= 1
+                if depth == 0 and start != -1:
+                    try:
+                        value = json.loads(text[start : i + 1])
+                        if isinstance(value, dict):
+                            found.append(value)
+                    except json.JSONDecodeError:
+                        pass
+                    start = -1
+    return found[-1] if found else None
 
 
 def call_freemax(prompt: str) -> dict | None:
@@ -391,13 +431,18 @@ def call_freemax(prompt: str) -> dict | None:
                     "11. Excerpt: ringkasan 1-2 kalimat, max 200 karakter.\n"
                     "12. Category: pilih HANYA dari: Politik, Ekonomi, Nasional, Kesehatan, Olahraga, Teknologi, Pendidikan, Budaya, Lingkungan, Dunia.\n"
                     "13. SETIAP paragraf minimal 3 kalimat dan minimal 80 karakter untuk memastikan kedalaman artikel.\n"
-                    "14. Total artikel minimal 500 karakter untuk memastikan substansi."
+                    "14. Total artikel minimal 500 karakter untuk memastikan substansi.\n"
+                    "15. JANGAN menulis draft lalu revisi. Balas SATU objek JSON final saja, tanpa basa-basi, tanpa penutup, tanpa markdown fence.\n"
+                    "16. Output WAJIB 100% huruf Latin dan tanda baca Indonesia. JANGAN sisipkan karakter dari aksara lain (Cina, Jepang, Korea, Arab, Yunani, Cyrillic) di mana pun, termasuk di dalam kata.\n"
+                    "17. Sebelum mengirim, periksa ulang outputmu: hapus setiap karakter non-Latin yang pernah muncul dan ganti dengan padanan Indonesia yang benar."
                 ),
             },
             {"role": "user", "content": prompt},
         ],
         "temperature": 0.3,
-        "max_tokens": 3000,
+        # Headroom: 6 paragraphs of Indonesian prose can exceed 3000 tokens and
+        # truncate mid-JSON, which used to fail every parse attempt.
+        "max_tokens": 6000,
     }
     for attempt in range(MAX_LLM_ATTEMPTS):
         request = urllib.request.Request(
@@ -455,6 +500,22 @@ def validate_article(raw: dict, source: dict) -> dict | None:
     if not isinstance(tags, list):
         tags = []
     tags = [str(tag).strip() for tag in tags if str(tag).strip()]
+    # Reject model artifacts that pass length checks but are worthless as journalism.
+    # Truncation leaves unfilled scaffolding; CJK noise means the model lost the thread.
+    blob = " ".join([title, excerpt, *content]).lower()
+    if "placeholder" in blob or "tbd" in blob or "lorem ipsum" in blob:
+        return None
+    if re.search(r"[\u3040-\u30ff\u4e00-\u9fff\uac00-\ud7af]", blob):
+        # One stray glyph is model noise, not a bad article. A run of them means
+        # the model lost the thread and the text is unusable.
+        non_asian = re.sub(r"[\u3040-\u30ff\u4e00-\u9fff\uac00-\ud7af]", "", blob)
+        asian = len(blob) - len(non_asian)
+        if asian > 2 or asian / max(len(blob), 1) > 0.002:
+            return None
+    # Degenerate loop guard: the model repeating one word to fill space.
+    words = blob.split()
+    if len(words) >= 30 and len(set(words)) / len(words) < 0.25:
+        return None
     requested_category = str(raw.get("category", "")).strip()
     names = category_names()
     category = next((name for name in names if name.lower() == requested_category.lower()), source.get("category") or "Nasional")
