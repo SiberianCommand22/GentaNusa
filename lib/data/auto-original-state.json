@@ -1,5 +1,5 @@
 {
-  "lastRunDate": "2026-09-25",
+  "lastRunDate": "2026-09-26",
   "processedLinks": [
     "https://otomotif.antaranews.com/berita/5725384/biaya-balik-nama-mobil-bekas-2026-ini-syarat-dan-caranya",
     "https://otomotif.antaranews.com/berita/5730459/7-bagian-kendaraan-yang-wajib-dicek-setelah-kena-abu-vulkanik",
@@ -14,6 +14,7 @@
     "https://www.antaranews.com/berita/5738267/minggu-transjakarta-alihkan-dua-rute-imbas-rekayasa-lalin-di-gbk",
     "https://www.antaranews.com/berita/5754449/pesawat-tempur-f-16-milik-as-jatuh-di-jerman-barat-pilot-cedera",
     "https://www.antaranews.com/berita/5757712/batu-yang-diduduki-mohamed-salah-mendadak-viral-ini-lokasinya",
+    "https://www.antaranews.com/berita/5760015/ratusan-wali-asuh-dan-wali-asrama-sr-se-sulsel-ikrar-kerja-totalitas",
     "https://www.antaranews.com/foto/5738264/bali-united-bungkam-isenmulang-4-1",
     "https://www.antaranews.com/video/5738212/hut-tni-al-kodaeral-iv-cat-ulang-rumah-warga-kampung-bahari-nusantara",
     "https://www.antaranews.com/video/5738247/pssi-jalin-kerja-sama-dengan-ajax-amsterdam-kembangkan-sepak-bola-ri",
@@ -23,6 +24,7 @@
     "https://www.cnbcindonesia.com/news/20260912171628-7-767430/momen-langka-di-korut-kim-jong-un-gendong-anjing-di-toko-hewan",
     "https://www.cnbcindonesia.com/news/20260912183652-7-767439/prabowo-tiba-di-ktt-brics-2026-bawa-misi-apa-untuk-ri",
     "https://www.cnbcindonesia.com/news/20260912185344-4-767445/polisi-amankan-obat-kurus-ilegal-senilai-rp26-m-dari-rumah-kontrakan",
+    "https://www.cnbcindonesia.com/news/20260924160514-8-770633/videoinvestor-properti-asing-lirik-ri-pengusaha-lokal-siap-bersaing",
     "https://www.cnbcindonesia.com/tech/20260912180507-37-767437/ahli-peringatkan-ai-bisa-musnahkan-manusia-ini-penjelasannya",
     "https://www.cnbcindonesia.com/tech/20260912185933-37-767446/tips-badan-intelijen-ojk-agar-hp-tidak-dibajak-maling-rekening",
     "https://www.cnnindonesia.com/hiburan/20260911201844-224-1403016/this-or-that-bareng-umay-shahab-dan-laura-basuki",
@@ -35,10 +37,10 @@
     "https://www.cnnindonesia.com/olahraga/20260912204531-142-1403233/hasil-super-league-drama-kiper-dadakan-borneo-gebuk-persijap"
   ],
   "lastArticle": {
-    "title": "Batu Viral di Pegunungan Trabzon yang Dikaitkan dengan Mohamed Salah",
-    "sourceId": "antara-terkini",
-    "sourceLink": "https://www.antaranews.com/berita/5757712/batu-yang-diduduki-mohamed-salah-mendadak-viral-ini-lokasinya",
-    "date": "2026-09-25",
-    "status": "pending_review"
+    "id": 147,
+    "title": "Investor Properti Asing Lirik RI, Pengusaha Lokal Siap Bersaing",
+    "sourceId": "cnbc-indonesia",
+    "sourceLink": "https://www.cnbcindonesia.com/news/20260924160514-8-770633/videoinvestor-properti-asing-lirik-ri-pengusaha-lokal-siap-bersaing",
+    "date": "2026-09-26"
   }
 }
