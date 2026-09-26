@@ -113,6 +113,9 @@
   .heroGrid {
     grid-template-columns: 1fr;
   }
+  .heroCard {
+    min-height: 280px;
+  }
 }
 
 .badge {
@@ -135,7 +138,7 @@
   display: block;
   border-radius: 16px;
   overflow: hidden;
-  min-height: 420px;
+  min-height: 360px;
 }
 
 .heroImage {

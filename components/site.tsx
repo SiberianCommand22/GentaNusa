@@ -53,14 +53,13 @@ export function Header() {
             </Link>
           ))}
         </nav>
-        <div className={styles.themeToggle}>
-          <ThemeToggle />
+        <div className={styles.headerActions}>
+          <HeaderSearch />
+          <div className={styles.themeToggle}>
+            <ThemeToggle />
+          </div>
+          <MobileNav />
         </div>
-        <HeaderSearch />
-        <Link href="/cari" className={styles.navLink}>
-          Cari
-        </Link>
-        <MobileNav />
       </div>
     </header>
   );

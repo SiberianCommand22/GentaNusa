@@ -137,6 +137,18 @@
   cursor: wait;
 }
 
+.imagePreview {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.help {
+  color: var(--muted, #4a4a5a);
+  font-size: 0.78rem;
+}
+
 .cancel {
   background: none;
   border: 1px solid var(--border, #e0e0e6);

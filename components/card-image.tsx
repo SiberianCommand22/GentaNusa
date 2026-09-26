@@ -13,11 +13,28 @@ export function CardImage({
   className?: string;
 }) {
   const [error, setError] = useState(false);
-  if (!src) return null;
+  const [loaded, setLoaded] = useState(false);
+  const imageSrc = error ? "/images/placeholder-article.svg" : (src || "/images/placeholder-article.svg");
   return (
-    <div className={className}>
+    <div
+      className={className}
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        backgroundColor: "var(--card, #f3f3f3)",
+      }}
+    >
+      {!loaded && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundColor: "var(--muted, #e5e5e5)",
+          }}
+        />
+      )}
       <Image
-        src={src}
+        src={imageSrc}
         alt={alt}
         width={1200}
         height={630}
@@ -25,9 +42,12 @@ export function CardImage({
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          opacity: error ? 0 : 1,
+          opacity: loaded ? 1 : 0,
+          transition: "opacity 0.3s ease",
         }}
         onError={() => setError(true)}
+        onLoad={() => setLoaded(true)}
+        priority={false}
       />
     </div>
   );

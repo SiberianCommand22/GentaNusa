@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "sync": "node scripts/sync-supabase.mjs",
-    "build": "node scripts/sync-supabase.mjs && next build",
+    "build": "next build",
+    "build:sync": "node scripts/sync-supabase.mjs && next build",
     "start": "next start",
     "lint": "eslint"
   },
@@ -13,7 +14,8 @@
     "@supabase/supabase-js": "^2.116.0",
     "next": "16.3.4",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "sharp": "^0.35.4"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -21,6 +23,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
+    "playwright": "^1.63.0",
     "typescript": "^5"
   }
 }

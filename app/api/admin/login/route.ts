@@ -1,5 +1,3 @@
-import fs from "fs";
-import path from "path";
 import { NextRequest, NextResponse } from "next/server";
 
 // Track rate per IP
@@ -27,17 +25,16 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { email, password } = body || {};
+    const { password } = body || {};
 
-    if (!email || !password) {
-      return NextResponse.json({ ok: false, error: "Email dan password diperlukan" }, { status: 400 });
+    if (!password) {
+      return NextResponse.json({ ok: false, error: "Password diperlukan" }, { status: 400 });
     }
 
-    const isAdmin =
-      email === "admin" && password === process.env.ADMIN_PASSWORD;
+    const isAdmin = password === process.env.ADMIN_PASSWORD;
 
     if (!isAdmin) {
-      return NextResponse.json({ ok: false, error: "Email atau password salah" }, { status: 401 });
+      return NextResponse.json({ ok: false, error: "Password salah" }, { status: 401 });
     }
 
     // Set cookie
@@ -47,10 +44,10 @@ export async function POST(request: NextRequest) {
       message: "Berhasil masuk",
     });
 
-    res.cookies.set("admin_session", "1", {
+    res.cookies.set("genta_admin", "1", {
       httpOnly: true,
       sameSite: "lax",
-      path: "/api/admin",
+      path: "/",
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60, // 1 hour
     });

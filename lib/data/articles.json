@@ -1,239 +1,296 @@
 [
   {
-    "id": 123,
-    "title": "Amran Ungkap Pelanggaran 25 Merek Beras Fortifikasi",
-    "category": "Nasional",
-    "excerpt": "Kepala Bapanas sekaligus Menteri Pertanian Andi Amran Sulaiman memaparkan berbagai bentuk pelanggaran yang dilakukan oleh 25 merek beras fortifikasi di Indonesia.",
-    "date": "2026-09-19",
+    "id": 142,
+    "title": "AS Siapkan Senjata Nuklir untuk Pertahanan Jepang dan Korea Selatan",
+    "category": "Dunia",
+    "excerpt": "Amerika Serikat menegaskan komitmennya untuk mempertahamkan Jepang dan Korea Selatan termasuk dengan penggunaan senjata nuklir jika diperlukan.",
+    "date": "2026-09-22",
     "author": "Redaksi GentaNusa",
     "authorSlug": "redaksi-gentanusa",
     "authorRole": "Jurnalis GentaNusa",
-    "image": "/images/placeholder-article.svg",
+    "image": "https://image.pollinations.ai/prompt/AS%20Siapkan%20Senjata%20Nuklir%20untuk%20Pertahanan%20Jepang%20dan%20Korea%20Selatan.%20news%20photography%2C%20documentary%20style%2C%20professional%20journalism.%20Tags%3A%20AS%2C%20Senjata%20Nuklir%2C%20Jepang.%20Professional%20photojournalism%2C%2016%3A9%20aspect%2C%20sharp%20focus%2C%20natural%20lighting%2C%20authentic%20moment%2C%20high%20resolution%2C%20editorial%20quality%2C%20no%20wate?width=1200&height=630&nologo=true&enhance=true&model=flux&private=true",
     "content": [
-      "Kepala Badan Pangan Nasional (Bapanas) sekaligus Menteri Pertanian Andi Amran Sulaiman memaparkan bentuk pelanggaran yang dilakukan oleh 25 merek beras fortifikasi yang beredar di pasaran. Penemuan ini mengungkap ketidaksesuaian antara standar yang ditetapkan dengan praktik aktual para produsen.",
-      "Pelanggaran yang teridentifikasi mencakup penyimpangan pada kandungan nutrisi, pelabelan yang tidak sesuai ketentuan, hingga proses fortifikasi yang tidak memenuhi standar teknis yang telah ditetapkan oleh otoritas pangan nasional.",
-      "Langkah ini merupakan bagian dari upaya pengawasan ketat terhadap produk pangan bernilai gizi tinggi guna melindungi konsumen dan memastikan program fortifikasi beras berjalan sesuai tujuan peningkatan kesehatan masyarakat."
+      "Amerika Serikat pada Senin (21/9) mengumumkan kesiapan untuk membela Jepang dan Korea Selatan, termasuk melalui penggunaan senjata nuklir sebagai bagian dari komitmen pertahanan strategis. Pernyataan ini disampaikan dalam konteks pembaruan kebijakan keamanan regional yang menimbang kembali ancaman nuklir di wilayah Pasifik.",
+      "Latar belakang kebijatan ini muncul seiring eskalasi ketegangan dengan Korea Utara dan dinamika kekuatan di Laut China Selatan. AS menekankan bahwa kebijakan ini tidak bersifat ancaman, melainkan upaya deterrence yang bertujuan mencegah konflik meluas. Namun, langkah ini diperkirakan akan memicu respons diplomatik dari Pyongyang dan Beijing.",
+      "Reaksi pemerintah Jepang dan Korea Selatan belum diumumkan secara resmi. Analis keamanan mengaitkan langkah ini dengan strategi AS untuk mengamankan kawasan pasca-Afghanistan dan menghadapi tantangan dari Cina. Kementerian Pertahanan AS belum merilis detail teknis mengenai kondisi penggunaan nuklir dalam skenario pertahanan.",
+      "Dampak jangka panjang dari kebijakan ini termasrafiakan pada ketegangan militer di wilayah Asia-Pasifik. Para ahli khawatir langkah ini dapat memicu laju senjata nuklir baru di kawasan, terutama jika Cina dan Korea Utara merespons dengan pengembangan arsenel mereka. Diplomasi multilateral diperkirakan akan menjadi mekanisme kunci untuk mencegah eskalasi.",
+      "Informasi tidak tersedia mengenai kutipan langsung dari narasumber.",
+      "Kebijatan AS ini mencerminkan transisi kebijakan keamanan global pasca Perang Dingin, di mana senjata nuklir tetap menjadi instrumen retoris dan operasional dalam diplomasi pertahanan. Konteks ini menambah kompleksitas pengelolaan konflik di kawasan yang sudah sensitif secara geopolitik."
     ],
     "tags": [
-      "Bapanas",
-      "Andi Amran Sulaiman",
-      "beras fortifikasi",
-      "pelanggaran merek",
-      "pengawasan pangan"
+      "AS",
+      "Senjata Nuklir",
+      "Jepang",
+      "Korea Selatan",
+      "Keamanan"
     ]
   },
   {
-    "id": 121,
-    "title": "Harga Emas Antam Naik ke Rp1,7 Juta per Gram, Sempat Rebutan Antrean",
+    "id": 141,
+    "title": "Jejak Warisan Papua Yang Mencair",
+    "category": "Lingkungan",
+    "excerpt": "Kisah Salju Terakhir dan Gunung Sakral Amungme–Moni Lapisan es di sekitar Puncak Carstensz, Pegunungan Tengah Papua, kini tinggal sekitar 2 persen dari luasnya pada 1988. Organisasi Meteorologi Dunia (WMO) memperkirakan gletser tropis terakhir di kawasan Pasifik barat daya ini habis pada akhir 2026 atau awal 2027. Bagi ilmuwan, hilangnya es ini menjadi penanda perubahan iklim. Bagi sejumlah komunitas adat di kaki pegunungan, yang menghilang adalah bagian dari gunung yang mereka anggap sakral.",
+    "date": "2026-09-21",
+    "author": "Adripa Dwitama",
+    "authorSlug": "redaksi-generic",
+    "authorRole": "Redaktur GentaNusa",
+    "image": "/media/aa94404d-e116-4854-a0d3-4828159e90b9.png",
+    "content": [
+      "Kisah Salju Terakhir dan Gunung Sakral Amungme–Moni",
+      "Lapisan es di sekitar Puncak Carstensz, Pegunungan Tengah Papua, kini tinggal sekitar 2 persen dari luasnya pada 1988. Organisasi Meteorologi Dunia (WMO) memperkirakan gletser tropis terakhir di kawasan Pasifik barat daya ini habis pada akhir 2026 atau awal 2027. Bagi ilmuwan, hilangnya es ini menjadi penanda perubahan iklim. Bagi sejumlah komunitas adat di kaki pegunungan, yang menghilang adalah bagian dari gunung yang mereka anggap sakral.",
+      "Seberapa Banyak yang Tersisa",
+      "Berdasarkan data Badan Meteorologi, Klimatologi, dan Geofisika (BMKG), tutupan es tinggal 0,09 kilometer persegi (sekitar 9 hektare) pada September 2025, menyusut drastis dari sekitar 4,3 kilometer persegi pada 1988. Ketebalan es di titik pantau East Northwall Firn tercatat turun dari 31,49 meter pada 2010 menjadi nol pada November 2024. Angka dari lembaga dan studi lain berbeda tipis karena perbedaan tanggal dan metode pengukuran  sebagian menggunakan survei lapangan langsung, sebagian lain analisis citra satelit. Salah satu laporan resmi mencatat 16,5 hektare pada 2024, sementara studi citra Landsat menghitung 0,19 kilometer persegi pada tahun yang sama dan memperkirakan es baru akan habis sekitar 2028–2030. Hampir semua sumber sepakat bahwa es mendekati akhir, meski tahun pastinya belum Tunggal,perbedaan itu mencerminkan perbedaan metode pengukuran, bukan data yang saling bertentangan.",
+      "Mengapa Es Mencair",
+      "Secara ilmiah, suhu yang naik mengangkat batas ketinggian titik beku, sehingga hujan lebih sering turun menggantikan salju. El Niño ,merupakan fenomena pemanasan suhu permukaan laut di Samudra Pasifik yang memicu cuaca lebih kering dan panas di Indonesia sehingga mempercepat proses tersebut. Data National Oceanic and Atmospheric Administration (NOAA) pertengahan September 2026 menunjukkan El Niño tahun ini telah masuk kategori “sangat kuat” dan diperkirakan memuncak awal 2027. Penjelasan ilmiah ini sejalan dengan temuan sejumlah peneliti iklim yang meneliti gletser Papua pada awal 2026, termasuk dari Charles University, yang menyebut kombinasi pemanasan atmosfer global dan El Niño sebagai penyebab utama percepatan pencairan.",
+      "Nemangkawi, Gunung yang Dijaga Bersama",
+      "Bagi orang Amungme, gunung ini dikenal dengan nama Nemangkawi, yang berarti “panah putih”merujuk pada salju yang dulu menyelimuti puncaknya. Dalam liputan yang pernah dipublikasikan diisi setelah dikonfirmasi (BBC News Indonesia), Elfrida Natkime, perempuan muda dari keluarga pemegang hak ulayat di dataran tinggi Mimika, dikutip mengatakan bahwa Nemangkawi adalah “tempat peristirahatan orang tua dan leluhur”, dan bahwa orang tuanya mengajarkan filosofi hidup lurus seperti anak panah  menjaga hubungan baik dengan diri sendiri, alam, dan sesama. Menurut catatan sejarah tahun 1970-an yang dikutip BBC, hak atas wilayah pegunungan itu dibagi menurut marga, dan tanah tidak diperjualbelikan, hanya dipinjamkan.",
+      "Di sisi utara, sebagian warga Moni di Intan Jaya menyebut puncak itu Mbainggela. Dalam liputan yang sama, Justinus Sondegau dikutip menuturkan bahwa para tetua menyebutnya sebagai tempat asal-usul, bukan hanya bagi Moni, tetapi juga bagi masyarakat Paniai, Dani, dan Nduga, sementara Magdalena Sondegau menyebut gunung itu hadir dalam nyanyian tradisional mereka. Liputan lain pada 2022 mencatat bahwa warga Moni di Ugimba menyebut puncak sakral itu dengan nama berbeda, Somatua, yang dimaknai sebagai sumber terang. Belum ada kepastian apakah nama-nama ini merujuk pada puncak yang sama persis. perbedaan penyebutan ini mencerminkan keragaman cara pandang antarkomunitas, bukan kesalahan data. Masyarakat Hubula dan Damal juga memandang kawasan ini sakral.",
+      "Di Kaki Gunung yang Sama",
+      "Sejarah pencatatan gunung ini dimulai sejak pelaut Belanda Jan Carstensz melaporkan pegunungan bersalju di Papua pada 1623. Ekspedisi Belanda mencapai lapisan es Ngga Pulu pada 1936, dan Freeport mulai menambang Ertsberg pada 1970. Berdasarkan dokumen resmi, pada 18–19 Februari 2026 pemerintah Indonesia dan Freeport-McMoRan menandatangani nota kesepahaman di Washington D.C. untuk memperpanjang Izin Usaha Pertambangan Khusus (IUPK) tambang Grasberg hingga 2061, disertai komitmen investasi tambahan sekitar USD 20 miliar dan kenaikan kepemilikan saham nasional dari 51 menjadi 63 persen pada 2041. Permohonan perpanjangan izin resmi dilaporkan diajukan perusahaan pada Juni 2026. Organisasi lingkungan WALHI menyatakan kritik terhadap proses perpanjangan tersebut melalui pernyataan publik pada Februari 2026. Relasi warga adat dengan tambang tidak tunggal. Dalam liputan yang dikutip di atas, Elfrida disebut mengaku sedih melihat eksploitasi dan kemiskinan yang masih dialami sebagian keluarganya, namun ia juga tidak menampik bahwa Nemangkawi telah menjadi sumber penghidupan bagi banyak orang. Adolfina, yang menurut liputan yang sama tumbuh di pesisir Agimuga setelah keluarganya pindah dari Tsinga pada awal 1960-an, mengenal gunung itu dari cerita turun-temurun; sebab perpindahan keluarganya sendiri masih diperdebatkan, sebagian menduga ada kaitan dengan masuknya Freeport, meski arsip kolonial yang tersedia belum menunjukkan hubungan tersebut secara pasti. Penelitian ilmiah yang ada mengaitkan pencairan es dengan pemanasan atmosfer global, bukan dengan aktivitas tambang.",
+      "Dampak yang Perlu Dipisahkan",
+      "Dari sisi ekologi, sampel es di kawasan ini diketahui menyimpan komunitas mikroorganisme dan hewan mikroskopis yang khas, sementara arsip iklim yang tersimpan di dalam inti es turut hilang sebelum sempat dipelajari secara tuntas.",
+      "Terkait air dan pangan, BMKG menyebut hilangnya es berpotensi mengganggu pasokan air dan pertanian di sekitarnya. Namun penilaian ini perlu dibaca berdampingan dengan pandangan sejumlah peneliti gletser yang menilai luas es yang tersisa saat ini sudah terlalu kecil untuk memengaruhi pasokan air secara regional . Keduanya adalah dua penilaian pada skala berbeda, bukan pernyataan yang saling bertentangan.",
+      "Sementara itu, terkait cuaca ekstrem, Kabupaten Lanny Jaya menetapkan status tanggap darurat pada 24 Agustus 2026, dengan 12.038 warga di tiga distrik terdampak kekeringan dan hujan es, serta 224 hektare lahan gagal panen di tujuh kampung Distrik Agandugume, Kabupaten Puncak. Kejadian ini berkaitan dengan cuaca ekstrem selama fase El Niño. Sejauh data yang tersedia, belum ada penetapan hubungan langsung antara peristiwa ini dengan pencairan gletser secara spesifik  penting untuk tidak menyimpulkan kausalitas yang belum terbukti.",
+      "Soal Emisi",
+      "Sejumlah peneliti gletser mencatat bahwa kontribusi masyarakat adat Papua terhadap emisi gas rumah kaca global tergolong sangat kecil, meski mereka menyaksikan langsung perubahan permanen di wilayah tempat tinggalnya  sebuah ketimpangan yang kerap disebut sebagai isu keadilan iklim. Indonesia secara keseluruhan berada di peringkat keenam penghasil emisi dunia. Di Papua sendiri, analisis citra satelit oleh Nusantara Atlas mencatat proyek strategis nasional Merauke sebagai penyebab terbesar hilangnya hutan primer pada 2024, disusul oleh perluasan perkebunan sawit.",
+      "Yang Hilang, dan yang Belum Pasti",
+      "Dalam liputan yang dikutip di atas, Magdalena disebut pernah memikul barang bawaan pendaki menuju Mbainggela sebanyak sembilan kali, sebelum penghasilannya dari kegiatan itu berhenti setelah jalur pendakian ditutup dengan alasan keamanan. Ini menunjukkan sebuah kisah yang menjelaskan bahwa gunung ini menyangkut nafkah dan akses warga sekitar, bukan sekadar simbol budaya."
+    ],
+    "tags": [
+      "Gunung",
+      "Budaya",
+      "Sejarah"
+    ]
+  },
+  {
+    "id": 140,
+    "title": "Qatar Serukan Kerangka Keamanan Regional Melibatkan Iran dan Negara Teluk",
+    "category": "Dunia",
+    "excerpt": "Perdana Menteri Qatar Syekh Mohammed bin Abdulrahman Al Thani menyerukan pembentukan kerangka keamanan regional melibatkan Iran dan negara-negara Teluk. Detail waktu, tempat, dan isi kerangka informasi tidak tersedia.",
+    "date": "2026-09-21",
+    "author": "Redaksi GentaNusa",
+    "authorSlug": "redaksi-gentanusa",
+    "authorRole": "Jurnalis GentaNusa",
+    "image": "https://image.pollinations.ai/prompt/Qatar%20Serukan%20Kerangka%20Keamanan%20Regional%20Melibatkan%20Iran%20dan%20Negara%20Teluk.%20news%20photography%2C%20documentary%20style%2C%20professional%20journalism.%20Tags%3A%20Qatar%2C%20Iran%2C%20Keamanan%20Regional.%20Professional%20photojournalism%2C%2016%3A9%20aspect%2C%20sharp%20focus%2C%20natural%20lighting%2C%20authentic%20moment%2C%20high%20resolution%2C%20editorial%20qualit?width=1200&height=630&nologo=true&enhance=true&model=flux&private=true",
+    "content": [
+      "Doha - Perdana Menteri sekaligus Menteri Luar Negeri Qatar, Syekh Mohammed bin Abdulrahman Al Thani, menyerukan pembentukan kerangka keamanan regional yang melibatkan Iran dan negara-negara Teluk. Informasi tidak tersedia mengenai waktu dan forum tempat seruan tersebut disampaikan.",
+      "Seruan ini muncul di tengah dinamika geopolitik di wilayah Teluk Persia yang kompleks. Qatar yang memposisikan diri sebagai mediator sering kali menjalin hubungan diplomatik baik dengan Iran maupun negara-negara Teluk seperti Arab Saudi dan Uni Emirat Arab. Informasi tidak tersedia mengenai latar belakang spesifik atau proposal teknis kerangka keamanan yang ditawarkan.",
+      "Hingga artikel ini ditulis, belum ada tanggapan resmi dari Iran maupun negara-negara Teluk terkait inisiatif Qatar. Informasi tidak tersedia mengenai reaksi komunitas internasional atau organisasi regional seperti Majlis Kerja Sama Teluk (GCC).",
+      "Inisiatif ini berpotensi menjadi titik tolak dialog keamanan kolektif di wilayah yang selama ini dipenuhi ketegangan. Keberhasilan kerangka tersebut akan bergantung pada kemauan politik semua pihak untuk berkompromi. Informasi tidak tersedia mengenai langkah lanjutan yang akan diambil Qatar.",
+      "Informasi tidak tersedia mengenai kutipan langsung dari narasumber atau pejabat terkait dalam laporan Antara Terkini."
+    ],
+    "tags": [
+      "Qatar",
+      "Iran",
+      "Keamanan Regional",
+      "Teluk Persia",
+      "Diplomasi"
+    ]
+  },
+  {
+    "id": 139,
+    "title": "Bantuan Beras Jadi Penyangga Daya Beli Saat Ritel Melambat",
     "category": "Ekonomi",
-    "excerpt": "Investor beralih ke logam mulia sebagai aset aman di tengah ketidakpastian pasar global.",
-    "date": "2026-09-12",
-    "author": "Siti Nurhaliza",
-    "authorSlug": "siti-nurhaliza",
-    "authorRole": "Jurnalis Ekonomi",
-    "image": "/images/articles/emas-antam-rp1-7-juta-per-gram.svg",
+    "excerpt": "Ekonom Irman Faiz menilai bantuan pangan beras mampu menopang daya beli masyarakat di tengah perlambatan sektor ritel.",
+    "date": "2026-09-21",
+    "author": "Redaksi GentaNusa",
+    "authorSlug": "redaksi-gentanusa",
+    "authorRole": "Jurnalis GentaNusa",
+    "image": "https://image.pollinations.ai/prompt/Bantuan%20Beras%20Jadi%20Penyangga%20Daya%20Beli%20Saat%20Ritel%20Melambat%2C%20ekonomi%2C%20bantuan%20pangan%2C%20daya%20beli%2C%20news%20photography%20style%2C%20photorealistic%2C%20professional%20journalism?width=1200&height=630&nologo=true&enhance=true",
     "content": [
-      "JAKARTA — Harga emas batangan Antam naik menyentuh Rp1,7 juta per gram pada perdagangan akhir pekan. Antrean pembeli sempat mengular di sejumlah butik logam mulia di Jakarta dan Surabaya.",
-      "Kenaikan ini dipicu kekhawatiran pelaku pasar terhadap eskalasi ketegangan dagang global dan pelemahan dolar AS. Logam mulia kembali menjadi pilihan utama investor dalam mencari aset aman.",
-      "Analis komoditas menilai tren penguatan emas masih berlanjut hingga akhir tahun. Ia menyarankan investor tetap memperhatikan harga jual kembali (buyback) yang juga ikut naik mengikuti harga dasar.",
-      "Bagi pembeli yang ingin berinvestasi, pengamat mengingatkan pentingnya membeli melalui lembaga resmi dan menyimpan bukti transaksi untuk menjamin kemudahan penjualan kembali di kemudian hari."
+      "Lead Economist PT Bank Danamon Indonesia Tbk Irman Faiz menilai bantuan pangan beras dapat menjadi penyangga daya beli masyarakat seiring melambatnya pertumbuhan sektor ritel.",
+      "Informasi tidak tersedia mengenai detail mekanisme, cakupan, serta waktu pelaksanaan bantuan tersebut.",
+      "Informasi tidak tersedia mengenai reaksi pemerintah, pengusaha ritel, atau data pendukung analisis Irman.",
+      "Informasi tidak tersedia mengenai dampak jangka panjang kebijakan ini terhadap inflasi dan pertumbuhan ekonomi."
     ],
     "tags": [
-      "Emas",
-      "Antam",
-      "Investasi",
-      "Logam Mulia"
+      "ekonomi",
+      "bantuan pangan",
+      "daya beli",
+      "sektor ritel",
+      "Bank Danamon"
     ]
   },
   {
-    "id": 100,
-    "title": "Pemerintah Percepat Vaksinasi Booster Kedua untuk Tenaga Kesehatan",
+    "id": 137,
+    "title": "CRISPR: Ketika Rekayasa DNA Mulai Memasuki Dunia Pengobatan",
     "category": "Kesehatan",
-    "excerpt": "Nakes pertama yang divaksin, menyusul lansia dan kelompok rentan pada tahap berikutnya.",
-    "date": "2026-09-11",
-    "author": "dr. Bambang Permadi",
-    "authorSlug": "bambang-permadi",
-    "authorRole": "Kontributor Kesehatan",
-    "image": "/images/articles/vaksinasi-booster-kedua-nakes.svg",
+    "excerpt": "CRISPR-Cas9 merupakan teknologi rekayasa genetik yang memungkinkan perubahan DNA secara lebih terarah dan kini mulai diterapkan dalam pengobatan, memiliki potensi luas namun masih menghadapi tantangan dalam penerapannya.",
+    "date": "2026-09-21",
+    "author": "Hypatia Dorothy",
+    "authorSlug": "redaksi-generic",
+    "authorRole": "Redaktur GentaNusa",
+    "image": "/media/19313be0-a1dd-464f-8731-67705efe3d1b.png",
     "content": [
-      "JAKARTA — Pemerintah memulai program vaksinasi booster kedua secara bertahap, dengan tenaga kesehatan (nakes) sebagai prioritas pertama. Langkah ini untuk menjaga kekebalan kelompok yang paling rentan terdampak.",
-      "Kementerian Kesehatan menyatakan vaksin yang digunakan telah melalui kajian keamanan dan efektivitas. Dosis akan didistribusikan ke puskesmas dan rumah sakit rujukan di seluruh provinsi.",
-      "Setelah nakes, giliran lansia dan penyandang komorbid yang akan menerima booster. Pemerintah mengimbau masyarakat tetap mematuhi protokol kesehatan meski cakupan vaksinasi sudah tinggi.",
-      "Epidemiolog menilai kebijakan ini tepat dilakukan menjelang musim hujan. Ia menekankan pentingnya memperbarui data penerima vaksin agar cakupan bisa dipantau secara akurat."
+      "Teknologi rekayasa genetik CRISPR-Cas9 terus berkembang dari teknologi laboratorium menjadi salah satu pendekatan terapi yang mulai digunakan dalam praktik klinis. Teknologi ini memungkinkan ilmuwan melakukan perubahan terarah pada DNA, sehingga berpotensi memperbaiki atau mengendalikan gen yang berkaitan dengan penyakit.",
+      "Perkembangan tersebut terlihat pada Casgevy, terapi berbasis CRISPR yang digunakan untuk penyakit sel sabit dan beta-thalassemia. Badan Pengawas Obat dan Makanan Amerika Serikat (FDA) memperluas persetujuannya untuk pasien berusia mulai dua tahun. FDA juga mencantumkan risiko \"off-target genome editing\", yakni kemungkinan terjadinya perubahan DNA di luar lokasi yang ditargetkan (7/2026).",
+      "CRISPR juga sedang dikembangkan untuk berbagai penyakit lain, termasuk kanker dan gangguan genetik. Penelitian terbaru menunjukkan bahwa perkembangan tidak hanya berfokus pada kemampuan mengedit DNA, tetapi juga bagaimana editor gen dapat dikirim secara tepat ke jaringan tertentu dan bagaimana dampaknya dipantau setelah terapi.",
+      "Di balik potensinya, keamanan tetap menjadi tantangan utama. FDA menerbitkan rancangan panduan yang menekankan penggunaan teknologi pengurutan generasi berikutnya untuk mendeteksi \"off-target editing\" dan perubahan genom yang tidak diinginkan sebelum terapi memasuki tahap klinis (4/2026).",
+      "Tantangan berikutnya adalah etika. Organisasi Kesehatan Dunia (WHO) membedakan penyuntingan sel tubuh yang tidak diwariskan dengan penyuntingan embrio atau sel reproduksi yang dapat diwariskan. WHO menilai penyuntingan genom yang diwariskan memiliki persoalan keamanan dan etika yang lebih besar serta membutuhkan tata kelola yang kuat.",
+      "Dengan demikian, masa depan CRISPR bukan hanya tentang kemampuan mengubah DNA, tetapi juga memastikan perubahan tersebut aman, dapat dipertanggungjawabkan, dan memberikan manfaat bagi masyarakat."
     ],
     "tags": [
-      "Vaksin",
-      "Kesehatan",
-      "Nakes",
-      "Booster"
+      "genetik",
+      "teknologi",
+      "medis"
     ]
   },
   {
-    "id": 92,
-    "title": "Gunung Semeru Erupsi Lagi: BMKG Naikkan Status ke Siaga, Warga Diimbau Waspada",
+    "id": 136,
+    "title": "Delapan Terdakwa Kasus Korupsi LPEI Divonis, Tuntutan Hingga 13 Tahun",
     "category": "Nasional",
-    "excerpt": "Erupsi Gunung Semeru terjadi pukul 09:41 WIB dengan kolom abu setinggi 400 meter. BMKG mengingatkan 3 gunung lain juga menunjukkan aktivitas tinggi.",
-    "date": "2026-09-14",
+    "excerpt": "Pengadilan Tipikor memutus vonis delapan terdakwa kasus dugaan korupsi pembiayaan ekspor di LPEI dengan tuntutan hingga 13 tahun penjara.",
+    "date": "2026-09-21",
     "author": "Redaksi GentaNusa",
     "authorSlug": "redaksi-gentanusa",
-    "authorRole": "Jurnalis Sains & Bencana",
-    "image": "/images/articles/artikel-semeru-erupsi.svg",
+    "authorRole": "Jurnalis GentaNusa",
+    "image": "https://image.pollinations.ai/prompt/Delapan%20Terdakwa%20Kasus%20Korupsi%20LPEI%20Divonis%2C%20Tuntutan%20Hingga%2013%20Tahun%2C%20Korupsi%2C%20LPEI%2C%20Pengadilan%20Tipikor%2C%20news%20photography%20style%2C%20photorealistic%2C%20professional%20journalism?width=1200&height=630&nologo=true&enhance=true",
     "content": [
-      "Gunung Semeru di Jawa Timur kembali menunjukkan aktivitas erupsi pada Senin (14/9) pukul 09:41 WIB. Kolom abu vulkanik teramati setinggi sekitar 400 meter di atas puncak, setara 4.076 meter di atas permukaan laut.",
-      "BMKG mencatat erupsi ini terjadi di tengah pengawasan ketat terhadap 3 gunung api aktif di Indonesia. Selain Semeru, Gunung Ibu di Maluku Utara dan Gunung Lewotolo di NTT juga menunjukkan peningkatan aktivitas seismik.",
-      "Status Semeru tetap pada Level III (Siaga). BMKG mengeluarkan rekomendasi: tidak beraktivitas dalam radius 5 km dari puncak, mewaspadai potensi awan panas dan guguran lava, serta waspada terhadap bahaya lahar di sungai-sungai kecil yang merupakan anak sungai dari Besuk Kobokan.",
-      "Peringatan dini ini menjadi penting mengingat letak Semeru yang berdekatan dengan pemukiman warga. Kasembar, Lumajang, dan wilayah sekitarnya menjadi zona perhatian utama. BPBD setempat telah menyiapkan posko dan jalur evakuasi.",
-      "Sementara itu, data historis menunjukkan Semeru erupsi rata-rata setiap 2-3 tahun. Erupsi terbesar dalam dekade terakhir terjadi pada Desember 2014 dan Februari 2021, keduanya menimbulkan korban jiwa."
+      "Pengadilan Tindak Pidana Korupsi (Tipikor) Jakarta memutus vonis delapan terdakwa dalam kasus dugaan korupsi pembiayaan ekspor nasional pada Lembaga Pembiayaan Ekspor Indonesia (LPEI), hari ini. Jaksa menuntut hukuman penjara hingga 13 tahun bagi para terdakwa.",
+      "Kasus ini terkait dugaan penyimpangan dana pembiayaan ekspor yang merugikan keuangan negara. Detail mekanisme korupsi dan total kerugian negara Informasi tidak tersedia.",
+      "Para terdakwa terdiri dari pejabat dan pihak pengelola LPEI serta pihak ketiga. Identitas lengkap dan peran masing-masing terdakwa Informasi tidak tersedia. Jaksa telah membacakan tuntutan pada sidang sebelumnya.",
+      "Vonis ini diharapkan menjadi deterrence effect bagi pelaku korupsi di sektor BUMN. Proses hukum lanjutan termasuk kemungkinan banding Informasi tidak tersedia."
     ],
     "tags": [
-      "Nasional",
-      "Semeru",
-      "BMKG",
-      "Gunung Api",
-      "Erupsi",
-      "Jawa Timur"
+      "Korupsi",
+      "LPEI",
+      "Pengadilan Tipikor",
+      "Keuangan Negara",
+      "Hukum"
     ]
   },
   {
-    "id": 91,
-    "title": "Suahasil Nazara Resmi Jadi Menteri Keuangan Baru, Rp17.669 ke Dolar",
-    "category": "Ekonomi",
-    "excerpt": "Reshuffle kabinet membawa wajah baru di Kementerian Keuangan. Nilai tukar rupiah melemah di tengah kabar ini, namun analis bilang bukan karena reshuffle.",
-    "date": "2026-09-14",
+    "id": 135,
+    "title": "Polres Malinau Amankan Delapan Terduga Pelaku Narkotika",
+    "category": "Nasional",
+    "excerpt": "Polres Malinau mengamankan delapan terduga pelaku narkotika dalam pengungkapan beberapa kasus. Detail operasi dan identitas tersangka belum diumumkan.",
+    "date": "2026-09-21",
     "author": "Redaksi GentaNusa",
     "authorSlug": "redaksi-gentanusa",
-    "authorRole": "Jurnalis Ekonomi",
-    "image": "/images/articles/artikel-rupiah-reshuffle.svg",
+    "authorRole": "Jurnalis GentaNusa",
+    "image": "https://image.pollinations.ai/prompt/Polres%20Malinau%20Amankan%20Delapan%20Terduga%20Pelaku%20Narkotika%2C%20Polres%20Malinau%2C%20Narkotika%2C%20Kalimantan%20Utara%2C%20news%20photography%20style%2C%20photorealistic%2C%20professional%20journalism?width=1200&height=630&nologo=true&enhance=true",
     "content": [
-      "Suahasil Nazara resmi dilantik sebagai Menteri Keuangan Republik Indonesia, menggantikan Purbaya Yudhi Sadewa. Pelantikan ini dilakukan oleh Presiden Prabowo Subianto dalam Sidang Kabinet Paripurna di Istana Negara.",
-      "Perubahan kursi menteri keuangan ini muncul di tengah tekanan nilai tukar rupiah. Rupiah ditutup melemah 58 poin ke level 17.669 per dolar AS pada perdagangan Senin (14/9). Namun, pengamat ekonomi menilai pelemahan ini bukan dampak langsung reshuffle.",
-      "Pengamat Ekonomi Ibrahim Assuaibi menyatakan bahwa pergerakan rupiah lebih banyak dipengaruhi oleh kondisi fiskal Indonesia dan kenaikan harga minyak mentah. 'Saat ini yang mempengaruhi rupiah, masih seputar defisit anggaran dan naiknya harga minyak mentah,' ujarnya.",
-      "Di sisi lain, Suahasil Nazara memiliki rekam jejak panjang di bidang keuangan. Ia sebelumnya menjabat sebagai Direktur Jenderal Pengelolaan Risiko dan Kualitas di Kementerian Keuangan. Pengalaman ini dianggap penting mengingat tantangan fiskal Indonesia yang semakin kompleks.",
-      "Harga minyak mentah dunia melampaui US$100 per barel, posisi Indonesia sebagai importir neto minyak menjadi tantangan berat. Pemerintah dihadapkan pada dilema: menaikkan harga BBM berisiko inflasi, tetapi tidak menaikkan beban fiskal meningkat."
+      "Polres Malinau, Polda Kalimantan Utara, mengamankan delapan orang terduga pelaku tindak pidana narkotika dalam pengungkapan sejumlah kasus. Informasi mengenai waktu dan lokasi pelaksanaan operasi tidak tersedia.",
+      "Pengungkapan kasus ini merupakan bagian dari upaya penegakan hukum terhadap peredaran gelap narkotika di wilayah Malinau. Detail mengenai jenis narkotika, jumlah bukti, serta modus operandi para terduga belum diumumkan secara resmi. Informasi tidak tersedia.",
+      "Kepala Polres Malinau atau pejabat terkait belum memberikan keterangan mendetail terkait identitas tersangka serta status hukum mereka. Koordinasi dengan Kejaksaan Negeri untuk proses penyidikan lanjutan informasi tidak tersedia.",
+      "Langkah ini diharapkan memberikan efek jera bagi pelaku perdagangan narkotika di Kalimantan Utara. Polres Malinau terus melakukan penyidikan untuk mengungkap jaringan lebih luas. Informasi tidak tersedia."
     ],
     "tags": [
-      "Ekonomi",
-      "Kementerian Keuangan",
-      "Rupiah",
-      "Reshuffle",
-      "Suahasil Nazara"
+      "Polres Malinau",
+      "Narkotika",
+      "Kalimantan Utara",
+      "Penegakan Hukum",
+      "Kriminalitas"
     ]
   },
   {
-    "id": 90,
-    "title": "Gugatan MK Ditolak: Gibran Tetap Resmi Sebagai Wakil Presiden",
-    "category": "Politik",
-    "excerpt": "Mahkamah Konstitusi menolak gugatan Denny Indrayana yang ingin mendiskualifikasi Gibran Rakabuming Raka. Apa implikasi hukum dan politiknya?",
-    "date": "2026-09-14",
+    "id": 134,
+    "title": "ASEAN-Korea Centre Resmikan Jeonju ASEAN Hall Perluas Pertukaran Budaya",
+    "category": "Budaya",
+    "excerpt": "ASEAN-Korea Centre meresmikan Jeonju ASEAN Hall pada 17 September untuk memperluas pertukaran budaya ASEAN-Korea.",
+    "date": "2026-09-21",
     "author": "Redaksi GentaNusa",
     "authorSlug": "redaksi-gentanusa",
-    "authorRole": "Jurnalis Politik",
-    "image": "/images/articles/artikel-gugatan-konstitusi-gibran.svg",
+    "authorRole": "Jurnalis GentaNusa",
+    "image": "https://image.pollinations.ai/prompt/ASEAN-Korea%20Centre%20Resmikan%20Jeonju%20ASEAN%20Hall%20Perluas%20Pertukaran%20Budaya%2C%20ASEAN%2C%20Korea%2C%20Budaya%2C%20news%20photography%20style%2C%20photorealistic%2C%20professional%20journalism?width=1200&height=630&nologo=true&enhance=true",
     "content": [
-      "Mahkamah Konstitusi (MK) resmi menolak gugatan yang diajukan Denny Indrayana terkait kelayakan Gibran Rakabuming Raka sebagai calon wakil presiden. Gugatan ini menilai bahwa Gibran tidak memenuhi syarat pendidikan sebagaimana diatur dalam UU Pemilu.",
-      "Dalam putusannya, MK menyatakan bahwa syarat pendidikan calon presiden dan wakil presiden merupakan ketentuan yang sudah final. MK menegaskan bahwa perubahan syarat tidak bisa diterapkan secara retrospektif untuk mendiskualifikasi seseorang yang sudah melalui proses pemilihan.",
-      "Denny Indrayana mengajukan permohonan ke MK untuk mendiskualifikasi Gibran karena dianggap tidak memenuhi syarat pencalonan, terutama terkait pendidikan. Denny mempertanyakan bukti ijazah SMA Gibran dan mengaitkannya dengan Pasal 169 huruf r UU No. 7 Tahun 2017 tentang Pemilu.",
-      "Pengamat hukum tata negara menilai putusan ini menegaskan stabilitas kerangka hukum pemilu di Indonesia. Meskipun gugatan ditolak, isu syarat calon pemimpin tetap menjadi perbincangan publik ke depannya.",
-      "Sementara itu, Presiden Prabowo Subianto menegaskan bahwa kabinetnya terus bekerja untuk rakyat. Gibran terus menjalankan tugasnya sebagai wakil presiden tanpa hambatan hukum yang berarti."
+      "ASEAN-Korea Centre (AKC) di bawah Sekretaris Jenderal Kim Jae-shin meresmikan Jeonju ASEAN Hall pada 17 September di Jeonju, Korea Selatan, guna memperluas pertukaran budaya antara ASEAN dan Korea.",
+      "Jeonju ASEAN Hall dibangun sebagai ruang pameran dan kegiatan budaya untuk menampilkan kekayaan budaya negara-negara ASEAN. Informasi tidak tersedia mengenai luas bangunan, biaya pembangunan, atau jadwal program pertamanya.",
+      "Sekretaris Jenderal Kim Jae-shin menyatakan harapan fasilitas ini menjadi jembatan pemahaman timbal balik. Informasi tidak tersedia mengenai sambutan pihak pemerintah Jeonju atau perwakilan negara-negara ASEAN.",
+      "AKC berencana menggelar serangkaian festival budaya, pameran, dan workshop di hall tersebut sepanjang tahun depan. Informasi tidak tersedia mengenai jadwal detail atau anggaran program."
+    ],
+    "tags": [
+      "ASEAN",
+      "Korea",
+      "Budaya",
+      "Jeonju",
+      "Diplomasi Budaya"
+    ]
+  },
+  {
+    "id": 131,
+    "title": "Houthis Kuasai Selat Bab el-Mandeb, Aliansi Iran dan Sekutu Perketat Cengkeraman di Laut Merah",
+    "category": "Dunia",
+    "excerpt": "Aliansi Iran dan sekutu memperkuat kendali Teheran atas selat Selat Bab el-Mandeb di Laut Merah melalui kemajuan cepat kelompok Houthi. ",
+    "date": "2026-09-19",
+    "author": "Andreas Wicaksono",
+    "authorSlug": "redaksi-generic",
+    "authorRole": "Redaktur GentaNusa",
+    "image": "/media/8fb17bec-85a6-4484-8d2d-8b27a6d8c0b5.webp",
+    "content": [
+      "Aliansi Iran dan sekutu memperkuat kendali Teheran atas selat Selat Bab el-Mandeb di Laut Merah melalui kemajuan cepat kelompok Houthi. Di balik perluasan militer yang cepat ini terletak jaringan pakar Iran, Irak, dan Lebanon yang memberikan kemampuan militer serta dukungan strategis. Teknologi Rusia dan China juga berperan penting dalam operasi ini.",
+      "Pada beberapa hari terakhir, Houthi merebut kontrol atas Pulau Hanish Besar dan Pulau Hanish Kecil di selatan Laut Merah. Mereka melanjutkan kemajuan cepat yang membawa kelompok tersebut ke posisi strategis di Selat Bab el-Mandeb. Houthi juga merebut kota pelabuhan Mocha pada awal bulan ini, mengusir pasukan terkait Dewan Kepemimpinan Presiden Saudi. Mereka merebut Pulau Perim yang berada tepat di dalam selat serta Pulau Zuqar lebih ke utara.",
+      "Kelompok milisi Syiah yang didukung Iran kini berada di titik terluas pantai, hanya 20 kilometer dari pantai Afrika. Hal ini memberikan mereka, dan oleh karena itu seluruh aliansi regional Iran, kendali efektif atas lalu lintas maritim melalui Teluk Aden menuju Laut Merah.",
+      "Dalam pernyataan saat mereka maju, Houthi menyatakan niat mereka menargetkan kapal pengiriman Saudi di selat tersebut, bukan melakukan blokade maritim umum.",
+      "Serangan drone milisi Syiah Irak menyertai kemajuan Houthi terhadap pipa minyak Saudi East-West Pipeline pada 10 September. Pipa tersebut digunakan Riyadh untuk mengangkut minyak ke Laut Merah, menghindari Serat Hormuz yang rentan serangan Iran. Pipa diperkirakan akan tidak berfungsi selama tiga hingga lima minggu.",
+      "Koordinasi Aliansi Iran Perkuat Tekanan di Koridor Laut Merah",
+      "Aksi terkoordinasi antara milisi Syiah Irak dan Houthi bertujuan memperluas kemampuan aliansi Iran untuk menerapkan aturan terhadap lalu lintas maritim dari Serat Hormuz hingga Laut Merah. Fokus pada Saudi Arabia – yang memicu eskalasi saat ini dengan serangan terhadap bandara Sanaa pada Juli – bertujuan menghindari respons balasan Amerika Serikat, yang mungkin terjadi jika dilakukan blokade umum terhadap Bab el-Mandeb.",
+      "Kemajuan ini menunjukkan bahwa blok regional Iran terus mampu bertindak secara terkoordinasi untuk tujuan bersama. Meskipun Israel telah menekan dan melemahkan klien Iran di Levant, Teheran dan sekutunya di wilayah Teluk tetap aktif.",
+      "Houthi Bukan Boneka Iran, Tetapi Gerakan Lokal Otonom",
+      "Kelompok Houthi memiliki akar lokal yang dalam, seperti Hamas. Mereka bukan sekadar cabang langsung atau proksi Korps Garda Revolusi Islam (IRGC) Iran. Houthi memiliki agenda dan preferensi sendiri. Sebagai contoh, Houthi menghindari keterlibatan langsung dalam pertempuran sebelum serangan Saudi, lalu mengarahkan usaha khusus terhadap Riyadh. Hal ini menunjukkan tingkat otonomi yang signifikan dari perintah Iran.",
+      "Namun, otonomi ini tidak boleh berlebihan. Meski Houthi tidak mengikuti perintah Iran secara mutlak, sebagian besar kemampuan militer mereka berasal langsung dari hubungan dengan Teheran. Bukti menunjukkan kehadiran langsung pakar Iran dan sekutu lain di tanah Yaman, serta keterlibatan langsung pakar Irak dan Lebanon yang memberikan instruksi dan pengelolaan kepada Houthi. China dan Rusia mendukung upaya ini berdasarkan kepentingan geopolitik bersama.",
+      "Dokumen Ungkap Dukungan Iran, Irak, dan Lebanon terhadap Houthi",
+      "Dokumen baru yang diperoleh Jerusalem Post dari sumber Yaman memberikan detail nyata ini. Dokumen tersebut mencantumkan nama dan identitas pakar Iran, Irak, dan Lebanon yang memberikan saran ahli dan pengawasan kepada Houthi di bidang drone, rudal, serta operasi intelijen dan keamanan.",
+      "Misalnya, warga negara Iran Haji Murtaza Mokhles dan warga negara Irak Abu Mukhtar Bari Mashour memberikan saran ahli di bidang intelijen dan operasi keamanan. Mereka bekerja sama dengan Abu Jihad Muhammad Alawi al-Tiri, pejabat senior Houthi dari desa Bayt Baws, sekitar 8 kilometer selatan Sanaa. Ia digambarkan sebagai pejabat senior “Houthi Security and Intelligence Service” yang berfungsi sebagai administrator Pusat Intelijen Militer dan pengawas Pusat Informasi Presiden.",
+      "Di bidang drone, dokumen menyebut warga negara Iran Hasan bin Hasan Danbous dan warga negara Irak Hasan Iyad al-Ameri, keduanya ahli senior, bekerja dengan komandan senior Houthi Hassan Sharafi dalam pengembangan bidang tersebut.",
+      "Untuk rudal, warga negara Irak Muhammad Sayed al-Hakim dan warga negara Iran Karar Mumammad al-Musawi bekerja dengan Abu Bashar Saleh al-Saree, yang mengelola departemen informasi pusat pasukan rudal.",
+      "Contoh ini merupakan bagian dari daftar yang jauh lebih panjang. Detail identifikasi, lokasi, serta nomor telepon kadang-kadang tercantum dalam dokumen.",
+      "Jaringan Pasokan Melibatkan Iran, Rusia, dan China",
+      "Dokumen juga mengungkap metode penyelundupan yang memungkinkan Houthi membawa komponen penting dan peralatan ke Yaman, serta peran Iran, Rusia, dan China. Mereka menyebut sejumlah pengusaha yang bermukim di wilayah Yaman yang dikendalikan Houthi bertanggung jawab atas impor suku cadang drone dari China ke Yaman yang dikendalikan Houthi. Di antaranya Safwan al-Dabai, Yasser al-Dabai, dan Rami al-Hajj al-Alimi, beserta yang lain. Nomor telepon Yaman dan dalam satu kasus nomor telepon China tercantum.",
+      "Menurut dokumen, setelah pertemuan yang diselenggarakan di bawah naungan Iran di Muscat, Oman, pada Maret 2024, beberapa perusahaan pengiriman China membayar Houthi dalam mata uang asing agar kapal mereka lewat lewat Teluk Aden dan Laut Merah tanpa terganggu. Perusahaan-perusahaan besar China yang disebutkan antara lain COSCO Shipping dan Sea Legend Shipping.",
+      "Dalam dua bagian lain, dokumen menyebut sistem komunikasi di selatan kota Saada yang terhubung dengan pusat di pegunungan Hajjah, Amran, Sanaa, dan pegunungan di pantai barat.",
+      "“Jaringan ini dibuat oleh pakar Iran dan menggunakan perangkat enkripsi buatan Iran, selain perangkat komunikasi dan enkripsi Rusia, terutama dalam sistem pesan Morse…”",
+      "“Serangan udara AS mampu menghancurkan banyak jaringan komunikasi dan perangkat jamming, dan milisi Houthi saat ini berusaha menggantinya dengan perangkat China, meski sementara, agar Iran dapat menyusupkan perangkat ke Yaman dan memulai kembali departemen komunikasi jihadi dengan seluruh kapasitasnya.”",
+      "Disebutkan juga bahwa “paling banyak sensor listrik dan inframerah optik yang digunakan milisi Houthi adalah sistem buatan Iran yang diselundupkan dari pelabuhan Iran Bandar Abbas dan Shahbar ke pelabuhan Saleef, Hodeidah, serta pantai gubernur Al-Mahra (proses ini masih berlangsung), di mana komponen rudal dan peralatan juga diselundupkan dalam bentuk suku cadang yang dirakit ulang saat tiba di Yaman. Sedangkan kamera termal – Houthi menggunakan kamera termal China yang diimpor melalui saluran resmi.”",
+      "Divisi Lemahkan Koalisi Anti-Houthi",
+      "Perbandingan dengan koalisi anti-Houthi menunjukkan pembagian yang memperlemah posisi lawan. Saudi Arabia menyerang milisi Yaman Selatan yang didukung Uni Emirat Arab yang sangat mampu lebih awal tahun ini, mengusir mereka dari medan perang. Selanjutnya, mereka menyepakati perjanjian dengan Turki dan Pakistan yang tampaknya membawa beberapa pejuang Sunni jihadi yang didukung Turki ke Yaman, tetapi sedikit sekali manfaat lainnya.",
+      "Amerika Serikat, sementara itu, mencari cara menghindari eskalasi. Saat ini tampaknya tidak terlibat. Posisinya didasarkan pada alasan bahwa Houthi hanya menargetkan sekutu AS, bukan lalu lintas pengiriman umum yang melewati selat.",
+      "Kemajuan ini menunjukkan struktur kerjasama dan bantuan mendalam dari mana Houthi memperoleh keuntungan, serta kekacauan relatif lawan mereka. Untuk membalikkan kemajuan ini, diperlukan penanganan terhadap kedua elemen tersebut.",
+      "(photo credit: Mohammed Hamoud/Getty Images)"
     ],
     "tags": [
       "Politik",
-      "MK",
-      "Gibran",
-      "Pemilu 2024",
-      "Konstitusi"
+      "Keamanan",
+      "Perang"
     ]
   },
   {
-    "id": 89,
-    "title": "Harga Beras Stabil Jelang Panen Raya, Bulog Siapkan Serapan Gabah",
-    "category": "Ekonomi",
-    "excerpt": "Stok CBP aman, pemerintah antisipasi kenaikan harga di masa paceklik dengan serapan lebih awal.",
-    "date": "2026-09-12",
-    "author": "Aulia Rahman",
-    "authorSlug": "aulia-rahman",
-    "authorRole": "Jurnalis Ekonomi",
-    "image": "/images/articles/beras-stabil-jelang-panen-bulog.svg",
-    "content": [
-      "JAKARTA — Stok beras pemerintah pada September 2026 tercatat stabil dengan Cadangan Beras Pemerintah (CBP) di angka aman. Harga gabah kering panen di tingkat petani mulai turun seiring masuknya masa panen raya di sejumlah daerah sentra.",
-      "Kepala Divisi Regional Bulog menyatakan pihaknya siap menyerap gabah sesuai Harga Pembelian Pemerintah (HPP) untuk menjaga harga di tingkat petani tetap menguntungkan. \"Kami buka titik serap di 12 provinsi sentra produksi,\" ujarnya.",
-      "Pemerintah juga mengingatkan agar ketersediaan stok menjelang akhir tahun tetap terjaga. Operasi pasar dilakukan secara berkala di pasar-pasar tradisional untuk meredam potensi kenaikan harga.",
-      "Pengamat pertanian menilai langkah serapan lebih awal ini tepat untuk mengamankan pasokan saat masa paceklik. Namun ia mengingatkan soal kesinambungan program agar harga gabah tidak jatuh terlalu dalam di musim panen raya."
-    ],
-    "tags": [
-      "Pangan",
-      "Beras",
-      "Bulog",
-      "Pertanian"
-    ]
-  },
-  {
-    "id": 77,
-    "title": "Gunung Merapi Siaga, Warga Lereng Diminta Waspadai Awan Panas",
-    "category": "Nasional",
-    "excerpt": "Aktivitas vulkanik meningkat, radius aman diperpanjang hingga lima kilometer dari puncak.",
-    "date": "2026-09-11",
-    "author": "Redaksi GentaNusa",
+    "id": 129,
+    "title": "UE Desak AS Cabut Larangan Visa Delegasi Palestina untuk Sidang PBB",
+    "category": "Dunia",
+    "excerpt": "Uni Eropa (UE) mendesak Amerika Serikat (AS) untuk mempertimbangkan kembali keputusan menolak visa bagi pejabat Otoritas Palestina (PA) yang akan menghadiri Sidang Umum Perserikatan Bangsa-Bangsa (UNGA) di New York",
+    "date": "2026-09-19",
+    "author": "Andreas Wicaksono",
     "authorSlug": "redaksi-generic",
     "authorRole": "Redaktur GentaNusa",
-    "image": "/images/articles/merapi-siaga-waspada-awan-panas.svg",
+    "image": "/media/cc6fdcf9-6773-44ac-b56e-0bf6dfd249b1.png",
     "content": [
-      "YOGYAKARTA — Status Gunung Merapi dinaikkan menjadi Siaga (Level III) menyusul meningkatnya aktivitas vulkanik yang terpantau dalam beberapa hari terakhir. Guguran lava pijar dan awan panas teramati mengarah ke barat daya.",
-      "Balai Penyelidikan dan Pengembangan Teknologi Kebencanaan Geologi (BPPTKG) memperpanjang radius aman hingga lima kilometer dari puncak. Warga di lereng diimbau tidak beraktivitas di dalam zona bahaya.",
-      "BPBD setempat telah menyiapkan pos pengungsian dan jalur evakuasi. Warga yang tinggal di sekitar bantaran sungai yang berhulu di Merapi diminta waspada terhadap potensi lahar saat hujan.",
-      "Masyarakat diimbau tetap tenang namun waspada, dan hanya mengikuti informasi resmi dari BPPTKG serta BPBD. Jalur pendakian ke puncak Merapi ditutup sementara."
+      "Uni Eropa (UE) mendesak Amerika Serikat (AS) untuk mempertimbangkan kembali keputusan menolak visa bagi pejabat Otoritas Palestina (PA) yang akan menghadiri Sidang Umum Perserikatan Bangsa-Bangsa (UNGA) di New York.",
+      "Desakan tersebut disampaikan UE pada Sabtu (19/9/2026). Keputusan AS itu merupakan tahun kedua secara berturut-turut yang membuat sejumlah pejabat Palestina tidak dapat menghadiri sidang tahunan PBB secara langsung.",
+      "Juru bicara layanan diplomatik UE, Anouar El Anouni, mengatakan pihaknya menyesalkan keputusan Washington tersebut.",
+      "“Dengan mempertimbangkan perjanjian markas besar yang ada dengan PBB serta kewajibannya sebagai negara tuan rumah, kami mendesak Amerika Serikat untuk mempertimbangkan kembali keputusan ini,” ujar El Anouni.",
+      "Abbas Akan Berpidato Melalui Rekaman Video",
+      "Presiden Palestina Mahmoud Abbas tetap akan menyampaikan pidato dalam Sidang Umum PBB ke-81 meski tidak dapat hadir secara langsung di New York.",
+      "Majelis Umum PBB sebelumnya memberikan izin kepada Abbas untuk menyampaikan pidato melalui rekaman video yang telah dibuat sebelumnya.",
+      "Keputusan tersebut diambil setelah AS memperpanjang pembatasan visa terhadap pejabat PA dan anggota Organisasi Pembebasan Palestina (PLO).",
+      "Sekretaris Jenderal PBB Antonio Guterres juga menyatakan penyesalannya terhadap keputusan Washington. Ia mengkhawatirkan kebijakan tersebut berdampak terhadap kemampuan Palestina untuk berpartisipasi secara penuh dalam kegiatan PBB.",
+      "AS Perpanjang Sanksi Visa",
+      "Departemen Luar Negeri AS mengumumkan pada Rabu (16/9/2026) bahwa pihaknya memperpanjang sanksi visa terhadap anggota PLO dan pejabat PA.",
+      "Menurut Departemen Luar Negeri AS, keputusan tersebut berkaitan dengan kegagalan PA melakukan reformasi yang sebelumnya menjadi komitmen kepada Washington.",
+      "AS juga menilai sejumlah aktivitas PA dapat menghambat prospek perdamaian.",
+      "Washington menuduh PA melanggar hukum AS dengan berupaya mendapatkan pengakuan internasional terhadap negara Palestina melalui jalur internasional, bukan melalui negosiasi langsung.",
+      "Selain itu, AS menyoroti keputusan PA membawa perselisihan dengan Israel ke pengadilan internasional serta dukungan finansial kepada orang-orang yang disebut AS dan Israel sebagai pelaku serangan yang telah dihukum beserta keluarganya.",
+      "Dorong Pengakuan Palestina",
+      "Pidato Abbas dalam sidang PBB mendatang diperkirakan akan menyoroti upaya memperoleh pengakuan internasional terhadap negara Palestina.",
+      "Abbas juga diperkirakan akan kembali mendorong solusi dua negara sebagai bagian dari upaya penyelesaian konflik Israel-Palestina.",
+      "Dalam pidatonya, Abbas juga akan menyoroti krisis kemanusiaan di Gaza serta perkembangan permukiman Israel di Tepi Barat yang diduduki.",
+      "Kementerian Luar Negeri Palestina menyambut keputusan PBB yang memungkinkan Abbas menyampaikan pidato melalui rekaman video.",
+      "Menurut kementerian tersebut, keputusan itu “mewakili upaya untuk mematahkan upaya mencegah Palestina berpartisipasi” dalam sidang tahunan UNGA.",
+      "(Genta Nusa)"
     ],
     "tags": [
-      "Merapi",
-      "Bencana",
-      "Vulkanologi",
-      "Yogyakarta"
-    ]
-  },
-  {
-    "id": 55,
-    "title": "PSSI Perpanjang Kerja Sama dengan Pelatih Baru hingga Piala Asia 2027",
-    "category": "Olahraga",
-    "excerpt": "Kontrak diperpanjang setelah sederet hasil positif di kualifikasi, target lolos babak utama.",
-    "date": "2026-09-10",
-    "author": "Rizki Pratama",
-    "authorSlug": "rizki-pratama",
-    "authorRole": "Jurnalis Olahraga",
-    "image": "/images/articles/pssi-perpanjang-kerja-sama-pelatih.svg",
-    "content": [
-      "JAKARTA — PSSI resmi memperpanjang kerja sama dengan pelatih tim nasional hingga berakhirnya Piala Asia 2027. Keputusan ini diambil setelah tim menunjukkan konsistensi permainan pada babak kualifikasi.",
-      "Sekretaris Jenderal PSSI menyatakan perpanjangan kontrak merupakan bentuk apresiasi atas perkembangan tim. \"Kami ingin membangun kesinambungan program pembinaan,\" ujarnya dalam konferensi pers.",
-      "Pelatih menyambut baik kepercayaan ini dan menyebut target utama adalah membawa tim lolos ke babak utama serta bersaing di level Asia. Ia berencana melakukan pemusatan latihan dan uji coba internasional.",
-      "Ia juga menekankan pentingnya regenerasi pemain muda dengan memperbanyak menit bermain bagi talenta lokal di kompetisi domestik."
-    ],
-    "tags": [
-      "PSSI",
-      "Timnas",
-      "Piala Asia",
-      "Sepak Bola"
-    ]
-  },
-  {
-    "id": 45,
-    "title": "Menteri Kehutanan Tegaskan Moratorium Izin Baru Tetap Berlaku",
-    "category": "Nasional",
-    "excerpt": "Kawasan hutan lindung dan gambut dilarang untuk aktivitas baru, izin lama di audit.",
-    "date": "2026-09-09",
-    "author": "Redaksi GentaNusa",
-    "authorSlug": "redaksi-generic",
-    "authorRole": "Redaktur GentaNusa",
-    "image": "/images/articles/moratorium-izin-hutan-tetap-berlaku.svg",
-    "content": [
-      "JAKARTA — Menteri Kehutanan menegaskan moratorium pemberian izin baru di kawasan hutan lindung dan lahan gambut tetap berlaku. Kebijakan ini merupakan komitmen pemerintah dalam menekan deforestasi.",
-      "Penegasan ini menyusul sejumlah usulan dari daerah agar sebagian kawasan dibuka kembali. Pemerintah memilih mengedepankan aspek keberlanjutan lingkungan jangka panjang.",
-      "Izin yang sudah terbit sebelumnya akan diaudit untuk memastikan tidak ada pelanggaran. Jika ditemukan penyimpangan, sanksi akan dijatuhkan sesuai peraturan perundang-undangan.",
-      "Direktur eksekutif lembaga lingkungan menilai sikap pemerintah ini sebagai sinyal positif. Pelaku usaha diharapkan menyelaraskan kegiatan dengan prinsip kelestarian agar tidak melanggar aturan."
-    ],
-    "tags": [
-      "Kehutanan",
-      "Moratorium",
-      "Lingkungan",
-      "Gambut"
+      "Politik",
+      "Dunia"
     ]
   }
 ]

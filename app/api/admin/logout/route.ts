@@ -7,7 +7,7 @@ export async function GET() {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: 0,
-    path: "/api/admin",
+    path: "/",
   });
   return res;
 }

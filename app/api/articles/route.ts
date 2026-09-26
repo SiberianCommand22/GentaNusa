@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Body JSON tidak valid" }, { status: 400 });
   }
 
-  const required = ["title", "category", "excerpt", "content", "tags", "image"];
+  const required = ["title", "category", "excerpt", "content", "tags"];
   for (const field of required) {
     if (!body[field]) {
       return NextResponse.json({ error: `${field} wajib` }, { status: 400 });

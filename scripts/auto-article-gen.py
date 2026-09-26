@@ -13,12 +13,14 @@ Usage:
 
 import argparse
 import atexit
+import difflib
 import json
 import os
 import re
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -28,6 +30,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "lib" / "data"
 SOURCES_FILE = DATA_DIR / "sources.json"
 STATE_FILE = DATA_DIR / "auto-original-state.json"
+PENDING_FILE = DATA_DIR / "pending-articles.json"
 LOCK_FILE = DATA_DIR / "auto-original.lock"
 LOG_FILE = DATA_DIR / "auto-original.log"
 UA = "GentaNusaAuto/1.0 (+https://gentanusa.id/robots.txt)"
@@ -43,6 +46,164 @@ DEFAULT_SOURCE_IDS = [
     "cnn-indonesia",
     "antara-ekonomi",
 ]
+
+# Image generation via 9Router (local) with Pollinations.ai fallback
+LLM_URL = "http://127.0.0.1:20128/v1/chat/completions"
+IMAGE_URL = "http://127.0.0.1:20128/v1/images/generations"
+IMAGE_MODEL = "cf/@cf/black-forest-labs/flux-2-klein-9b"
+POLLINATIONS_BASE = "https://image.pollinations.ai/prompt"
+POLLINATIONS_PARAMS = "width=1200&height=630&nologo=true&enhance=true&model=flux&private=true"
+
+
+def get_9router_image_url(prompt: str, api_key: str, supabase_url: str, supabase_key: str) -> str | None:
+    """Generate image via 9Router local Flux model, upload to Supabase Storage."""
+    import uuid, base64
+    payload = {
+        "model": IMAGE_MODEL,
+        "prompt": prompt,
+        "n": 1,
+    }
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        request = urllib.request.Request(
+            IMAGE_URL,
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+            },
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=120) as response:
+                result = json.loads(response.read().decode("utf-8"))
+                b64data = result.get("data", [{}])[0].get("b64_json")
+                if not b64data:
+                    log(f"9Router image attempt {attempt+1}: no b64_json in response")
+                    if attempt + 1 < max_attempts:
+                        time.sleep(1)
+                    continue
+                img_data = base64.b64decode(b64data)
+                if len(img_data) < 1000:
+                    log(f"9Router image attempt {attempt+1}: too small ({len(img_data)} bytes)")
+                    if attempt + 1 < max_attempts:
+                        time.sleep(1)
+                    continue
+                log(f"9Router image success on attempt {attempt+1}")
+                # Upload to Supabase Storage
+                object_name = f"articles/{uuid.uuid4()}.jpg"
+                upload_req = urllib.request.Request(
+                    f"{supabase_url}/storage/v1/object/{object_name}",
+                    data=img_data,
+                    headers={
+                        "apikey": supabase_key,
+                        "Authorization": f"Bearer {supabase_key}",
+                        "Content-Type": "image/jpeg",
+                        "Cache-Control": "public, max-age=31536000, immutable",
+                    },
+                    method="POST",
+                )
+                with urllib.request.urlopen(upload_req, timeout=30) as upload_resp:
+                    if upload_resp.status in (200, 201):
+                        return f"{supabase_url}/storage/v1/object/public/{object_name}"
+                log("9Router image: Supabase upload failed")
+                return None
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")[:200]
+            log(f"9Router image attempt {attempt+1}: HTTP {exc.code}: {detail}")
+            if "flagged" in detail.lower() and attempt + 1 < max_attempts:
+                time.sleep(1)
+                continue
+            return None
+        except Exception as exc:
+            log(f"9Router image error: {exc}")
+            return None
+    return None
+
+
+def is_duplicate_title(title: str, existing_titles: list[str], threshold: float = 0.85) -> bool:
+    """Check if title is too similar to existing articles."""
+    title_lower = title.lower().strip()
+    for existing in existing_titles:
+        if not existing:
+            continue
+        ratio = difflib.SequenceMatcher(None, title_lower, existing.lower().strip()).ratio()
+        if ratio >= threshold:
+            return True
+    return False
+
+
+def get_existing_titles(service_url: str, service_key: str, limit: int = 100) -> list[str]:
+    """Fetch recent article titles from Supabase for duplicate detection."""
+    request = urllib.request.Request(
+        f"{service_url}/rest/v1/articles?select=title&order=date.desc&limit={limit}",
+        headers={"apikey": service_key, "Authorization": f"Bearer {service_key}"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=15) as response:
+            rows = json.loads(response.read().decode("utf-8"))
+            return [str(row.get("title", "")) for row in rows if row.get("title")]
+    except Exception:
+        return []
+
+def build_image_prompt(title: str, category: str, tags: list[str]) -> str:
+    """Build a high-quality journalism-style prompt for image generation."""
+    tag_str = ", ".join(tags[:3]) if tags else category
+    
+    # Category-specific visual style
+    style_map = {
+        "Nasional": "Indonesian news photography, realistic documentary style",
+        "Internasional": "international news photography, wire service style",
+        "Ekonomi": "business finance photography, trading floor or corporate setting",
+        "Teknologi": "technology journalism photo, modern clean composition",
+        "Olahraga": "sports photography, dynamic action shot, stadium lighting",
+        "Hiburan": "entertainment journalism, red carpet or studio portrait style",
+        "Kesehatan": "medical health photography, clinical or hospital setting",
+        "Pendidikan": "education journalism, classroom or campus documentary",
+        "Hukum": "legal court photography, judicial setting, gavel or bench",
+        "Lainnya": "news photography, documentary style, professional journalism",
+    }
+    style = style_map.get(category, "news photography, documentary style, professional journalism")
+    
+    # Build detailed prompt
+    prompt = (
+        f"{title}. {style}. "
+        f"Tags: {tag_str}. "
+        f"Professional photojournalism, 16:9 aspect, "
+        f"sharp focus, natural lighting, authentic moment, "
+        f"high resolution, editorial quality, no watermark, no text"
+    )
+    return prompt[:300]  # Longer prompt for better results
+
+def get_pollinations_image_url(prompt: str) -> str:
+    """Generate Pollinations.ai image URL."""
+    encoded = urllib.parse.quote(prompt)
+    return f"{POLLINATIONS_BASE}/{encoded}?{POLLINATIONS_PARAMS}"
+
+
+def parse_rss_date(pub_date: str) -> str | None:
+    """Parse RFC 2822/822 pubDate to ISO YYYY-MM-DD."""
+    if not pub_date:
+        return None
+    try:
+        # Try RFC 2822 format: "Sat, 19 Sep 2026 10:30:00 +0700"
+        dt = datetime.strptime(pub_date[:25], "%a, %d %b %Y %H:%M:%S")
+        return dt.date().isoformat()
+    except ValueError:
+        pass
+    try:
+        # Try ISO format: "2026-09-19T10:30:00+07:00"
+        dt = datetime.fromisoformat(pub_date.replace("Z", "+00:00"))
+        return dt.date().isoformat()
+    except ValueError:
+        pass
+    try:
+        # Try common format: "19 Sep 2026 10:30:00"
+        dt = datetime.strptime(pub_date[:20], "%d %b %Y %H:%M:%S")
+        return dt.date().isoformat()
+    except ValueError:
+        pass
+    return None
 
 
 def load_env_file(path: Path) -> dict[str, str]:
@@ -152,9 +313,14 @@ def parse_rss_items(xml_text: str) -> list[dict[str, str]]:
         if not title or not link:
             continue
         excerpt = (item.findtext("description") or item.findtext("summary") or "").strip()
-        excerpt = re.sub(r"<[^>]+>", " ", excerpt)
-        excerpt = re.sub(r"\s+", " ", excerpt).strip()
-        items.append({"title": title, "link": link, "excerpt": excerpt[:500]})
+        # Clean HTML tags, images, attribution
+        clean_excerpt = re.sub(r"<[^>]+>", " ", excerpt)
+        clean_excerpt = re.sub(r"\s+", " ", clean_excerpt).strip()
+        clean_excerpt = re.sub(r"\s*\(photo credit:.*?\)", "", clean_excerpt, flags=re.IGNORECASE)
+        clean_excerpt = re.sub(r"\s*\(Genta Nusa\)", "", clean_excerpt, flags=re.IGNORECASE)
+        clean_excerpt = re.sub(r"\s*\(Antara News\)", "", clean_excerpt, flags=re.IGNORECASE)
+        pub_date = (item.findtext("pubDate") or item.findtext("pubdate") or item.findtext("published") or "").strip()
+        items.append({"title": title, "link": link, "excerpt": clean_excerpt[:800], "pubDate": pub_date})
     return items
 
 
@@ -201,6 +367,7 @@ def extract_json_object(text: str) -> dict | None:
 
 
 def call_freemax(prompt: str) -> dict | None:
+    api_key = os.environ.get('HERMES_OPENAI_API_KEY', load_env_file(Path.home() / '.hermes' / '.env').get('OPENAI_API_KEY', ''))
     payload = {
         "model": LLM_MODEL,
         "response_format": {"type": "json_object"},
@@ -208,26 +375,39 @@ def call_freemax(prompt: str) -> dict | None:
             {
                 "role": "system",
                 "content": (
-                    "Anda jurnalis GentaNusa. Tulis artikel original berbahasa Indonesia, "
-                    "gaya majalah, 3 paragraf. Gunakan hanya fakta yang diberikan; jangan "
-                    "mengarang nama, angka, kejadian, atau kutipan. Output hanya JSON valid "
-                    "dengan field title, excerpt, content (array 3 string), dan tags (array string)."
+                    "Anda jurnalis senior GentaNusa. Tulis artikel original berbahasa Indonesia, "
+                    "gaya majalah berita profesional (Kompas/Tempo), minimal 5 paragraf, idealnya 5-6 paragraf. "
+                    "Aturan ketat:\n"
+                    "1. HANYA gunakan fakta yang diberikan dalam prompt. JANGAN mengarang nama, angka, tanggal, kejadian, atau kutipan.\n"
+                    "2. Jika fakta tidak cukup untuk paragraf lengkap, tulis \"Informasi tidak tersedia\" di bagian terkait — jangan mengisi sendiri.\n"
+                    "3. Gaya: objektif, netral, kalimat efektif, hindari kata-kata berlebihan (\"hebat\", \"luar biasa\", \"mengejutkan\").\n"
+                    "4. Paragraf 1 (Lead): Siapa, apa, kapan, di mana, mengapa — max 2 kalimat, minimal 80 karakter.\n"
+                    "5. Paragraf 2-3: Detail konteks, latar belakang, reaksi pihak terkait (gunakan \"Informasi tidak tersedia\" jika tidak ada di fakta), minimal 100 karakter per paragraf.\n"
+                    "6. Paragraf 4: Dampak/lanjutan/ke depan, minimal 100 karakter.\n"
+                    "7. Paragraf 5 (wajib): Kutipan narasumber JIKA ada di fakta sumber, jika tidak: \"Informasi tidak tersedia mengenai kutipan langsung dari narasumber.\"\n"
+                    "8. Paragraf 6 (opsional): Perspektif lebih luas/konteks nasional/internasional.\n"
+                    "9. Output HANYA JSON valid dengan field: title, excerpt, content (array 5-6 string), tags (array 3-5 string), category (string).\n"
+                    "10. Title: informatif, max 80 karakter, tanpa clickbait.\n"
+                    "11. Excerpt: ringkasan 1-2 kalimat, max 200 karakter.\n"
+                    "12. Category: pilih HANYA dari: Politik, Ekonomi, Nasional, Kesehatan, Olahraga, Teknologi, Pendidikan, Budaya, Lingkungan, Dunia.\n"
+                    "13. SETIAP paragraf minimal 3 kalimat dan minimal 80 karakter untuk memastikan kedalaman artikel.\n"
+                    "14. Total artikel minimal 500 karakter untuk memastikan substansi."
                 ),
             },
             {"role": "user", "content": prompt},
         ],
         "temperature": 0.3,
-        "max_tokens": 1600,
+        "max_tokens": 3000,
     }
-    request = urllib.request.Request(
-        LLM_URL,
-        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {os.environ.get('HERMES_OPENAI_API_KEY', load_env_file(Path.home() / '.hermes' / '.env').get('OPENAI_API_KEY', ''))}",
-        },
-    )
     for attempt in range(MAX_LLM_ATTEMPTS):
+        request = urllib.request.Request(
+            LLM_URL,
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+            },
+        )
         try:
             with urllib.request.urlopen(request, timeout=LLM_TIMEOUT) as response:
                 raw = response.read().decode("utf-8", errors="replace")
@@ -262,7 +442,15 @@ def validate_article(raw: dict, source: dict) -> dict | None:
     if not isinstance(content, list):
         return None
     content = [str(part).strip() for part in content if str(part).strip()]
-    if not title or len(title) < 15 or len(excerpt) < 20 or len(content) < 3:
+    # Require at least 5 paragraphs, each with at least 3 sentences (rough check)
+    if not title or len(title) < 15 or len(excerpt) < 20 or len(content) < 5:
+        return None
+    shallow = [p for p in content if len(p) < 60]
+    if len(shallow) > 1:
+        return None
+    # Require total content length >= 500 chars (prevents near-empty articles)
+    total_content_len = sum(len(p) for p in content)
+    if total_content_len < 500:
         return None
     if not isinstance(tags, list):
         tags = []
@@ -279,6 +467,22 @@ def validate_article(raw: dict, source: dict) -> dict | None:
     }
 
 
+def check_existing_by_source_link(service_url: str, service_key: str, source_link: str) -> bool:
+    """Cek apakah artikel dengan sourceLink ini sudah ada di Supabase."""
+    if not source_link:
+        return False
+    request = urllib.request.Request(
+        f"{service_url}/rest/v1/articles?sourceLink=eq.{urllib.parse.quote(source_link)}&select=id&limit=1",
+        headers={"apikey": service_key, "Authorization": f"Bearer {service_key}"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=15) as response:
+            rows = json.loads(response.read().decode("utf-8"))
+            return len(rows) > 0
+    except Exception:
+        return False
+
+
 def get_max_id(service_url: str, service_key: str) -> int:
     request = urllib.request.Request(
         f"{service_url}/rest/v1/articles?select=id&order=id.desc&limit=1",
@@ -290,8 +494,8 @@ def get_max_id(service_url: str, service_key: str) -> int:
 
 
 def insert_article(service_url: str, service_key: str, article: dict) -> int:
+    # Remove id from payload - let Supabase auto-generate
     payload = {
-        "id": article["id"],
         "title": article["title"],
         "category": article["category"],
         "excerpt": article["excerpt"],
@@ -310,12 +514,18 @@ def insert_article(service_url: str, service_key: str, article: dict) -> int:
             "apikey": service_key,
             "Authorization": f"Bearer {service_key}",
             "Content-Type": "application/json",
-            "Prefer": "return=minimal",
+            "Prefer": "return=representation",
         },
         method="POST",
     )
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
+            if response.status in (200, 201):
+                result = json.loads(response.read().decode("utf-8"))
+                if isinstance(result, list) and result:
+                    return int(result[0].get("id", 0))
+                elif isinstance(result, dict):
+                    return int(result.get("id", 0))
             return response.status
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")[:200]
@@ -345,6 +555,7 @@ def selected_sources(configured: list[dict]) -> list[dict]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true", help="uji RSS dan FREEMAX tanpa menulis artikel")
+    parser.add_argument("--save-pending", action="store_true", help="simpan ke pending review вместо langsung publish")
     args = parser.parse_args()
 
     if not acquire_lock():
@@ -402,6 +613,16 @@ def main() -> int:
                 continue
             if len(item["title"]) < 20 or "iklan" in item["title"].lower():
                 continue
+            # Skip if already in Supabase (by sourceLink)
+            if check_existing_by_source_link(service_url, service_key, item["link"]):
+                processed.add(item["link"])
+                continue
+            # Fetch existing titles for duplicate detection
+            existing_titles = get_existing_titles(service_url, service_key)
+            if is_duplicate_title(item["title"], existing_titles):
+                log(f"Skip judul mirip: {item['title'][:70]}")
+                processed.add(item["link"])
+                continue
             attempted += 1
             prompt = (
                 f"Sumber: {source.get('name', source_id)} ({source.get('category', 'Umum')})\n"
@@ -424,28 +645,66 @@ def main() -> int:
                 log(f"DRY-RUN berhasil: {article['title']}")
                 return 0
 
-            article_id = get_max_id(service_url, service_key) + 1
-            article.update({
-                "id": article_id,
-                "date": today,
-                "image": "/images/placeholder-article.svg",
-            })
-            status = insert_article(service_url, service_key, article)
-            if status not in (200, 201, 204):
-                errors.append(f"insert ID {article_id} status {status}")
+            if not any(p.strip() for p in article.get("content", [])):
+                log("DRY-RUN: konten semua kosong, skip")
                 continue
 
+            img_prompt = build_image_prompt(article["title"], article["category"], article["tags"])
+            local_env = load_env_file(ROOT / ".env.local")
+            hermes_env = load_env_file(Path.home() / ".hermes" / ".env")
+            # Try 9Router with OPENAI_API_KEY (same key as text endpoint)
+            api_key = os.environ.get("NINEROUTER_KEY") or local_env.get("NINEROUTER_KEY") or hermes_env.get("OPENAI_API_KEY", "")
+            img_url = None
+            if api_key:
+                img_url = get_9router_image_url(img_prompt, api_key, service_url, service_key)
+            if not img_url:
+                img_url = get_pollinations_image_url(img_prompt)
+                log("Using Pollinations.ai fallback for image")
+
+            article_data = {
+                **article,
+                "date": parse_rss_date(item.get("pubDate", "")) or today,
+                "image": img_url,
+                "sourceId": source_id,
+                "sourceLink": item["link"],
+            }
+
+            if args.save_pending:
+                # Save to pending review (without ID)
+                pending = load_pending_from_file()
+                pending.append(article_data)
+                save_pending_to_file(pending)
+                state["lastRunDate"] = today
+                state["processedLinks"] = sorted(processed | {item["link"]})
+                state["lastArticle"] = {
+                    "title": article["title"],
+                    "sourceId": source_id,
+                    "sourceLink": item["link"],
+                    "date": today,
+                    "status": "pending_review",
+                }
+                save_state(state)
+                log(f"PENDING REVIEW: {article['title']}")
+                return 0
+
+            # Direct insert - let DB auto-generate ID
+            new_id = insert_article(service_url, service_key, article_data)
+            if not new_id or new_id <= 0:
+                errors.append(f"insert status {new_id}")
+                continue
+
+            article_data["id"] = new_id
             state["lastRunDate"] = today
             state["processedLinks"] = sorted(processed | {item["link"]})
             state["lastArticle"] = {
-                "id": article_id,
+                "id": new_id,
                 "title": article["title"],
                 "sourceId": source_id,
                 "sourceLink": item["link"],
                 "date": today,
             }
             save_state(state)
-            log(f"BERHASIL ID {article_id}: {article['title']}")
+            log(f"BERHASIL ID {new_id}: {article['title']}")
             return 0
 
     if attempted == 0:
@@ -457,6 +716,22 @@ def main() -> int:
 
     log("Gagal membuat artikel hari ini: " + "; ".join(errors[-3:]))
     return 1
+
+
+def load_pending_from_file() -> list[dict]:
+    if not PENDING_FILE.exists():
+        return []
+    try:
+        data = json.loads(PENDING_FILE.read_text(encoding="utf-8"))
+        return data if isinstance(data, list) else []
+    except (OSError, json.JSONDecodeError):
+        return []
+
+
+def save_pending_to_file(pending: list[dict]) -> None:
+    tmp = PENDING_FILE.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(pending, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.replace(PENDING_FILE)
 
 
 if __name__ == "__main__":

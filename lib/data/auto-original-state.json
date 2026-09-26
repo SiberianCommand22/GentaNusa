@@ -1,9 +1,10 @@
 {
-  "lastRunDate": "2026-09-19",
+  "lastRunDate": "2026-09-25",
   "processedLinks": [
     "https://otomotif.antaranews.com/berita/5725384/biaya-balik-nama-mobil-bekas-2026-ini-syarat-dan-caranya",
     "https://otomotif.antaranews.com/berita/5730459/7-bagian-kendaraan-yang-wajib-dicek-setelah-kena-abu-vulkanik",
     "https://otomotif.antaranews.com/berita/5730476/abu-vulkanik-berbahaya-bagi-pesawat-ini-alasan-penerbangan-ditutup",
+    "https://www.antaranews.com/berita/5725336/lowongan-kai-2026-dibuka-ini-jadwal-syarat-dan-cara-daftar",
     "https://www.antaranews.com/berita/5727132/umk-wajib-sertifikat-halal-simak-syarat-dan-cara-daftarnya",
     "https://www.antaranews.com/berita/5730401/phk-dan-resign-apa-bedanya-ini-perbedaan-hak-pesangonnya",
     "https://www.antaranews.com/berita/5738251/basarnas-evakuasi-jasad-wna-asal-australia-di-jurang-pantai-kelingking",
@@ -11,7 +12,8 @@
     "https://www.antaranews.com/berita/5738259/ponpes-darunnajah-rene-turos-group-perkuat-ekosistem-literasi-santri",
     "https://www.antaranews.com/berita/5738261/tnbts-sebut-kebakaran-di-kawasan-bromo-meluas-ke-jemplang-malang",
     "https://www.antaranews.com/berita/5738267/minggu-transjakarta-alihkan-dua-rute-imbas-rekayasa-lalin-di-gbk",
-    "https://www.antaranews.com/berita/5748979/amran-paparkan-bentuk-pelanggaran-25-merek-beras-fortifikasi",
+    "https://www.antaranews.com/berita/5754449/pesawat-tempur-f-16-milik-as-jatuh-di-jerman-barat-pilot-cedera",
+    "https://www.antaranews.com/berita/5757712/batu-yang-diduduki-mohamed-salah-mendadak-viral-ini-lokasinya",
     "https://www.antaranews.com/foto/5738264/bali-united-bungkam-isenmulang-4-1",
     "https://www.antaranews.com/video/5738212/hut-tni-al-kodaeral-iv-cat-ulang-rumah-warga-kampung-bahari-nusantara",
     "https://www.antaranews.com/video/5738247/pssi-jalin-kerja-sama-dengan-ajax-amsterdam-kembangkan-sepak-bola-ri",
@@ -29,15 +31,14 @@
     "https://www.cnnindonesia.com/internasional/20260912212309-113-1403238/prabowo-gaungkan-spirit-of-bandung-di-ktt-brics",
     "https://www.cnnindonesia.com/nasional/20260912204404-20-1403232/bnpb-ungkap-omc-dan-operasi-darat-paling-efektif-padamkan-karhutla",
     "https://www.cnnindonesia.com/nasional/20260912210409-20-1403237/hadiri-khitanan-putra-kiai-di-cirebon-jokowi-didampingi-pengurus-psi",
-    "https://www.cnnindonesia.com/nasional/20260918225443-32-1405646/ketua-komisi-xiii-beri-sejumlah-catatan-ke-perkapi-di-raker-perdana",
     "https://www.cnnindonesia.com/olahraga/20260912181652-142-1403206/magis-shin-tae-yong-spesialis-pemutus-rekor-buruk-persija",
     "https://www.cnnindonesia.com/olahraga/20260912204531-142-1403233/hasil-super-league-drama-kiper-dadakan-borneo-gebuk-persijap"
   ],
   "lastArticle": {
-    "id": 123,
-    "title": "Amran Ungkap Pelanggaran 25 Merek Beras Fortifikasi",
+    "title": "Batu Viral di Pegunungan Trabzon yang Dikaitkan dengan Mohamed Salah",
     "sourceId": "antara-terkini",
-    "sourceLink": "https://www.antaranews.com/berita/5748979/amran-paparkan-bentuk-pelanggaran-25-merek-beras-fortifikasi",
-    "date": "2026-09-19"
+    "sourceLink": "https://www.antaranews.com/berita/5757712/batu-yang-diduduki-mohamed-salah-mendadak-viral-ini-lokasinya",
+    "date": "2026-09-25",
+    "status": "pending_review"
   }
 }

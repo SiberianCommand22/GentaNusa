@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Source_Serif_4, Inter } from "next/font/google";
 import { BackToTop } from "@/components/back-to-top";
 import { BackgroundCanvas } from "@/components/background-canvas";
+import { AnalyticsTracker } from "@/components/analytics-tracker";
 import "./globals.css";
 
 const sourceSerif = Source_Serif_4({
@@ -26,6 +27,9 @@ export const metadata: Metadata = {
   description:
     "GentaNusa menyajikan berita politik, ekonomi, dan nasional Indonesia secara akurat, cepat, dan terpercaya.",
   metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: SITE_URL,
+  },
   openGraph: {
     type: "website",
     locale: "id_ID",
@@ -58,10 +62,12 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${sourceSerif.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
+        <script async src="https://pagead2.googlesource.com/pagead/js/adsbygoogle.js?client=ca-pub-5435057710252308" crossOrigin="anonymous"></script>
         <link rel="icon" href="/favicon.jpg" type="image/jpeg" />
       </head>
       <body>
         <BackgroundCanvas />
+        <AnalyticsTracker />
         {children}
         <BackToTop />
       </body>

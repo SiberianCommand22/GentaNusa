@@ -3,8 +3,11 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Header, Footer } from "@/components/site";
 import { getArticles, getCategoryBySlug, formatDate } from "@/lib/data";
+import { getArticleReadCount } from "@/lib/analytics-server";
 import { ArticleContent } from "@/components/article-content";
 import { CardImage } from "@/components/card-image";
+import { AdSlot } from "@/components/ad-slot";
+import { ShareButtons } from "@/components/share-buttons";
 import styles from "./article.module.css";
 
 type Params = { params: Promise<{ id: string }> };
@@ -18,6 +21,9 @@ export async function generateMetadata({ params }: Params) {
   const article = (await getArticles()).find((a) => a.id === Number(id));
   if (!article) return { title: "Artikel Tidak Ditemukan" };
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
+  const absoluteImage = article.image
+    ? `${SITE_URL}/api/og-image?image=${encodeURIComponent(article.image)}&title=${encodeURIComponent(article.title)}&category=${encodeURIComponent(article.category)}`
+    : `${SITE_URL}/images/placeholder-article.svg`;
   return {
     title: article.title,
     description: article.excerpt,
@@ -25,7 +31,7 @@ export async function generateMetadata({ params }: Params) {
       title: article.title,
       description: article.excerpt,
       url: `${SITE_URL}/artikel/${article.id}`,
-      images: [{ url: article.image || "/images/placeholder-article.svg", width: 1200, height: 630 }],
+      images: [{ url: absoluteImage, width: 1200, height: 630 }],
     },
   };
 }
@@ -38,8 +44,15 @@ export default async function ArticlePage({ params }: Params) {
   const article = (await getArticles()).find((a) => a.id === numId);
   if (!article) notFound();
 
+  const readCount = await getArticleReadCount(numId);
   const related = (await getArticles())
-    .filter((a) => a.id !== numId && a.category === article.category)
+    .filter((a) => {
+      if (a.id === numId) return false;
+      if (a.category === article.category) return true;
+      // tag match fallback
+      const shared = a.tags.filter((t) => article.tags.includes(t));
+      return shared.length > 0;
+    })
     .slice(0, 3);
 
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
@@ -75,26 +88,32 @@ export default async function ArticlePage({ params }: Params) {
             <span className={styles.author}>{article.author}</span>
             <span className={styles.dot}>•</span>
             <time dateTime={article.date}>{formatDate(article.date)}</time>
+            <span className={styles.dot}>•</span>
+            <span className={styles.readCount}>{readCount} kali dibaca</span>
           </div>
 
           <h1 className={styles.title}>{article.title}</h1>
 
           <div className={styles.content}>
-            <ArticleContent content={article.content} />
-          </div>
+                      <ArticleContent content={article.content} />
+                      {/* Google AdSense — In-article */}
+                      <AdSlot slot="1234567890" style={{ margin: "2rem 0", minHeight: "250px", background: "#f8f9fa", borderRadius: "8px" }} />
+                    </div>
 
           <div className={styles.tags}>
-            {article.tags.map((tag) => (
-              <span key={tag} className={styles.tag}>
-                #{tag}
-              </span>
-            ))}
-          </div>
-        </article>
+                      {article.tags.map((tag) => (
+                        <span key={tag} className={styles.tag}>
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    <ShareButtons title={article.title} url={`${SITE_URL}/artikel/${article.id}`} />
+                  </article>
 
         {related.length > 0 && (
           <section className={styles.related}>
-            <h2 className={styles.relatedTitle}>Terrelated</h2>
+            <h2 className={styles.relatedTitle}>Berita Terkait</h2>
             <div className={styles.relatedGrid}>
               {related.map((a) => (
                 <Link key={a.id} href={`/artikel/${a.id}`} className={styles.relatedCard}>

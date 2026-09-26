@@ -33,7 +33,8 @@ const icons: Record<string, React.ReactNode> = {
 
 export function ShareButtons({ title, url }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
-  const fullUrl = typeof window !== "undefined" ? window.location.origin + url : url;
+  const isAbsolute = url.startsWith("http://") || url.startsWith("https://");
+  const fullUrl = typeof window !== "undefined" && !isAbsolute ? window.location.origin + url : url;
 
   const shareLinks = [
     {

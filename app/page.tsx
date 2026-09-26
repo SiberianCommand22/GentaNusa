@@ -3,6 +3,7 @@ import { getArticles, getCategories, formatDate, sortByDate } from "@/lib/data";
 import { Header, Footer } from "@/components/site";
 import { NewsletterBox } from "@/components/newsletter";
 import { CardImage } from "@/components/card-image";
+import { AdSlot } from "@/components/ad-slot";
 import styles from "./page.module.css";
 
 export const metadata = { title: "Beranda" };
@@ -20,18 +21,16 @@ export default async function Home() {
         <div className={styles.container}>
           <div className={styles.heroGrid}>
             <article className={styles.heroMain}>
-              <a href={`/artikel/${featured.id}`} className={styles.heroCard}>
-                {featured.image && (
-                  <div className={styles.heroImage}>
-                    <img
-                      src={featured.image}
-                      alt={featured.title}
-                      width={1200}
-                      height={630}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  </div>
-                )}
+                          <a href={`/artikel/${featured.id}`} className={styles.heroCard}>
+                            <div className={styles.heroImage}>
+                              <img
+                                src={featured.image || "/images/placeholder-article.svg"}
+                                alt={featured.title}
+                                width={1200}
+                                height={630}
+                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                              />
+                            </div>
                 <div className={styles.heroOverlay}>
                   <span className={styles.badge} style={{ background: "#1a5c8a" }}>
                     {featured.category}
@@ -88,11 +87,13 @@ export default async function Home() {
           </div>
         </div>
       </section>
-      <section className={styles.section}>
-        <div className={styles.container}>
-          <NewsletterBox />
-        </div>
-      </section>
+            {/* Google AdSense — In-feed */}
+            <AdSlot slot="0987654321" style={{ margin: "2rem auto", maxWidth: "1200px", minHeight: "100px", background: "#f8f9fa", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center" }} />
+            <section className={styles.section}>
+              <div className={styles.container}>
+                <NewsletterBox />
+              </div>
+            </section>
       {categories.map((cat) => (
         <section key={cat.slug} className={styles.section}>
           <div className={styles.container}>

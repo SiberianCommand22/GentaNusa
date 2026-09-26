@@ -52,6 +52,11 @@
   color: var(--text-faint);
 }
 
+.readCount {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .article {
   background: var(--surface);
   border: 1px solid var(--border);

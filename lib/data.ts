@@ -35,12 +35,13 @@ const cache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_TTL = 30000;
 
 export function formatDate(dateStr: string): string {
-  const d = new Date(dateStr + "T00:00:00+07:00");
+  const d = new Date(dateStr + "T00:00:00Z");
   if (isNaN(d.getTime())) return dateStr;
   return new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
     month: "long",
     year: "numeric",
+    timeZone: "UTC",
   }).format(d);
 }
 
