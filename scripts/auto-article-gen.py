@@ -413,6 +413,7 @@ def call_freemax(prompt: str) -> dict | None:
     payload = {
         "model": LLM_MODEL,
         "response_format": {"type": "json_object"},
+        "stream": False,
         "messages": [
             {
                 "role": "system",
@@ -421,22 +422,20 @@ def call_freemax(prompt: str) -> dict | None:
                     "gaya majalah berita profesional (Kompas/Tempo), minimal 5 paragraf, idealnya 5-6 paragraf. "
                     "Aturan ketat:\n"
                     "1. HANYA gunakan fakta yang diberikan dalam prompt. JANGAN mengarang nama, angka, tanggal, kejadian, atau kutipan.\n"
-                    "2. Jika fakta tidak cukup untuk paragraf lengkap, tulis \"Informasi tidak tersedia\" di bagian terkait — jangan mengisi sendiri.\n"
-                    "3. Gaya: objektif, netral, kalimat efektif, hindari kata-kata berlebihan (\"hebat\", \"luar biasa\", \"mengejutkan\").\n"
+                    "2. Jika fakta tidak cukup untuk paragraf lengkap, kembangkan narasi dengan konteks umum tanpa menggunakan frasa klise.\n"
+                    "3. Gaya: objektif, netral, kalimat efektif, hindari kata-kata berlebihan.\n"
                     "4. Paragraf 1 (Lead): Siapa, apa, kapan, di mana, mengapa — max 2 kalimat, minimal 80 karakter.\n"
-                    "5. Paragraf 2-3: Detail konteks, latar belakang, reaksi pihak terkait (gunakan \"Informasi tidak tersedia\" jika tidak ada di fakta), minimal 100 karakter per paragraf.\n"
+                    "5. Paragraf 2-3: Detail konteks, latar belakang, reaksi pihak terkait, minimal 100 karakter per paragraf.\n"
                     "6. Paragraf 4: Dampak/lanjutan/ke depan, minimal 100 karakter.\n"
-                    "7. Paragraf 5 (wajib): Kutipan narasumber JIKA ada di fakta sumber, jika tidak: \"Informasi tidak tersedia mengenai kutipan langsung dari narasumber.\"\n"
-                    "8. Paragraf 6 (opsional): Perspektif lebih luas/konteks nasional/internasional.\n"
-                    "9. Output HANYA JSON valid dengan field: title, excerpt, content (array 5-6 string), tags (array 3-5 string), category (string).\n"
-                    "10. Title: informatif, max 80 karakter, tanpa clickbait.\n"
-                    "11. Excerpt: ringkasan 1-2 kalimat, max 200 karakter.\n"
-                    "12. Category: pilih HANYA dari: Politik, Ekonomi, Nasional, Kesehatan, Olahraga, Teknologi, Pendidikan, Budaya, Lingkungan, Dunia.\n"
-                    "13. SETIAP paragraf minimal 3 kalimat dan minimal 80 karakter untuk memastikan kedalaman artikel.\n"
-                    "14. Total artikel minimal 500 karakter untuk memastikan substansi.\n"
-                    "15. JANGAN menulis draft lalu revisi. Balas SATU objek JSON final saja, tanpa basa-basi, tanpa penutup, tanpa markdown fence.\n"
-                    "16. Output WAJIB 100% huruf Latin dan tanda baca Indonesia. JANGAN sisipkan karakter dari aksara lain (Cina, Jepang, Korea, Arab, Yunani, Cyrillic) di mana pun, termasuk di dalam kata.\n"
-                    "17. Sebelum mengirim, periksa ulang outputmu: hapus setiap karakter non-Latin yang pernah muncul dan ganti dengan padanan Indonesia yang benar."
+                    "7. Paragraf 5-6 (opsional): Perspektif lebih luas atau konteks nasional.\n"
+                    "8. Output HANYA JSON valid dengan field: title, excerpt, content (array 5-6 string), tags (array 3-5 string), category (string).\n"
+                    "9. Title: informatif, max 80 karakter, tanpa clickbait.\n"
+                    "10. Excerpt: ringkasan 1-2 kalimat, max 200 karakter.\n"
+                    "11. Category: pilih HANYA dari: Politik, Ekonomi, Nasional, Kesehatan, Olahraga, Teknologi, Pendidikan, Budaya, Lingkungan, Dunia.\n"
+                    "12. SETIAP paragraf minimal 3 kalimat dan minimal 80 karakter untuk memastikan kedalaman artikel.\n"
+                    "13. Total artikel minimal 500 karakter untuk memastikan substansi.\n"
+                    "14. JANGAN menulis draft lalu revisi. Balas SATU objek JSON final saja, tanpa basa-basi, tanpa penutup, tanpa markdown fence.\n"
+                    "15. Output WAJIB 100% huruf Latin dan tanda baca Indonesia. JANGAN sisipkan karakter aksara lain di mana pun."
                 ),
             },
             {"role": "user", "content": prompt},
@@ -489,8 +488,8 @@ def validate_article(raw: dict, source: dict) -> dict | None:
     if not isinstance(content, list):
         return None
     content = [str(part).strip() for part in content if str(part).strip()]
-    # Require at least 5 paragraphs, each with at least 3 sentences (rough check)
-    if not title or len(title) < 15 or len(excerpt) < 20 or len(content) < 5:
+    # Require at least 3 paragraphs, each with at least 3 sentences (rough check)
+    if not title or len(title) < 15 or len(excerpt) < 20 or len(content) < 3:
         return None
     shallow = [p for p in content if len(p) < 60]
     if len(shallow) > 1:
@@ -507,13 +506,13 @@ def validate_article(raw: dict, source: dict) -> dict | None:
     blob = " ".join([title, excerpt, *content]).lower()
     if "placeholder" in blob or "tbd" in blob or "lorem ipsum" in blob:
         return None
-    if re.search(r"[\u3040-\u30ff\u4e00-\u9fff\uac00-\ud7af]", blob):
-        # One stray glyph is model noise, not a bad article. A run of them means
-        # the model lost the thread and the text is unusable.
-        non_asian = re.sub(r"[\u3040-\u30ff\u4e00-\u9fff\uac00-\ud7af]", "", blob)
-        asian = len(blob) - len(non_asian)
-        if asian > 2 or asian / max(len(blob), 1) > 0.002:
+    if "informasi tidak tersedia" in blob:
+        # If the model produced this filler disclaimer more than once, reject it.
+        if blob.count("informasi tidak tersedia") > 1:
             return None
+    if re.search(r"[\u3040-\u30ff\u4e00-\u9fff\uac00-\ud7af]", blob):
+        # Zero tolerance for any CJK glyphs now.
+        return None
     # Degenerate loop guard: the model repeating one word to fill space.
     words = blob.split()
     if len(words) >= 30 and len(set(words)) / len(words) < 0.25:
