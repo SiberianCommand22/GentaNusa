@@ -33,8 +33,9 @@ const icons: Record<string, React.ReactNode> = {
 
 export function ShareButtons({ title, url }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
   const isAbsolute = url.startsWith("http://") || url.startsWith("https://");
-  const fullUrl = typeof window !== "undefined" && !isAbsolute ? window.location.origin + url : url;
+  const fullUrl = isAbsolute ? url : `${SITE_URL}${url.startsWith("/") ? url : `/${url}`}`;
 
   const shareLinks = [
     {
