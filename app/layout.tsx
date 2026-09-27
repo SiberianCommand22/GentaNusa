@@ -26,10 +26,12 @@ export const metadata: Metadata = {
   },
   description:
     "GentaNusa menyajikan berita politik, ekonomi, dan nasional Indonesia secara akurat, cepat, dan terpercaya.",
+  // No global `alternates.canonical` here. A layout-level canonical without a path
+  // leaks onto every page that doesn't override it, so /kategori/nasional and
+  // /artikel/151 both declared the homepage as their canonical URL. Next.js derives a
+  // per-page canonical from metadataBase on its own; each page that needs an
+  // explicit one sets it in its own metadata export.
   metadataBase: new URL(SITE_URL),
-  alternates: {
-    canonical: SITE_URL,
-  },
   openGraph: {
     type: "website",
     locale: "id_ID",
