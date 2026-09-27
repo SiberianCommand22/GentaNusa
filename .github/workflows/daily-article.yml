@@ -2,8 +2,10 @@ name: GentaNusa Daily Article
 
 on:
   schedule:
-    # GitHub Actions cron is UTC. 01:00 UTC = 08:00 WIB.
-    - cron: "0 1 * * *"
+    # GitHub Actions cron is UTC. 13:00 UTC = 20:00 WIB, deliberately offset from
+    # the 08:00 WIB Windows Task Scheduler run so the two never race for the same
+    # RSS item and the site gets two articles a day instead of one or a conflict.
+    - cron: "0 13 * * *"
   workflow_dispatch:
 
 permissions:
