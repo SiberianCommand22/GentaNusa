@@ -46,6 +46,14 @@ DEFAULT_SOURCE_IDS = [
     "cnbc-indonesia",
     "cnn-indonesia",
     "antara-ekonomi",
+    "detik-nasional",
+    "detik-kesehatan",
+    "detik-pendidikan",
+    "cnn-ekonomi",
+    "cnn-teknologi",
+    "republika",
+    "bbc-indonesia",
+    "detik-bola",
 ]
 
 # Image generation via 9Router (local) with Pollinations.ai fallback

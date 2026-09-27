@@ -38,5 +38,69 @@
     "category": "Ekonomi",
     "color": "#c8102e",
     "notice": "Konten ditautkan dari Antara News. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "detik-nasional",
+    "name": "Detik Nasional",
+    "url": "https://news.detik.com/rss/nasional",
+    "category": "Nasional",
+    "color": "#e64a19",
+    "notice": "Konten ditautkan dari Detik. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "detik-kesehatan",
+    "name": "Detik Kesehatan",
+    "url": "https://health.detik.com/rss",
+    "category": "Kesehatan",
+    "color": "#00897b",
+    "notice": "Konten ditautkan dari Detik Health. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "detik-pendidikan",
+    "name": "Detik Pendidikan",
+    "url": "https://www.detik.com/edu/rss",
+    "category": "Pendidikan",
+    "color": "#3949ab",
+    "notice": "Konten ditautkan dari Detik Edu. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "cnn-ekonomi",
+    "name": "CNN Ekonomi",
+    "url": "https://www.cnnindonesia.com/ekonomi/rss",
+    "category": "Ekonomi",
+    "color": "#d81b60",
+    "notice": "Konten ditautkan dari CNN Indonesia. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "cnn-teknologi",
+    "name": "CNN Teknologi",
+    "url": "https://www.cnnindonesia.com/teknologi/rss",
+    "category": "Teknologi",
+    "color": "#5e35b1",
+    "notice": "Konten ditautkan dari CNN Indonesia. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "republika",
+    "name": "Republika",
+    "url": "https://www.republika.co.id/rss",
+    "category": "Politik",
+    "color": "#0d47a1",
+    "notice": "Konten ditautkan dari Republika. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "bbc-indonesia",
+    "name": "BBC Indonesia",
+    "url": "https://feeds.bbci.co.uk/indonesia/rss.xml",
+    "category": "Dunia",
+    "color": "#bb0000",
+    "notice": "Konten ditautkan dari BBC News Indonesia. Semua hak cipta milik penyedia sumber."
+  },
+  {
+    "id": "detik-bola",
+    "name": "Detik Bola",
+    "url": "https://sport.detik.com/rss",
+    "category": "Olahraga",
+    "color": "#f57c00",
+    "notice": "Konten ditautkan dari Detik Sport. Semua hak cipta milik penyedia sumber."
   }
 ]
