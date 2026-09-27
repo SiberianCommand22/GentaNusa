@@ -561,10 +561,12 @@ def validate_article(raw: dict, source: dict) -> dict | None:
     if not isinstance(content, list):
         return None
     content = [str(part).strip() for part in content if str(part).strip()]
-    # Require at least 3 paragraphs, each with at least 3 sentences (rough check)
     if not title or len(title) < 15 or len(excerpt) < 20 or len(content) < 3:
         return None
-    shallow = [p for p in content if len(p) < 60]
+    # A short line is a legitimate subheading only when the model marked it as one.
+    # Anything else short (leftover scaffolding, a stray photo credit) means the
+    # output is not a publishable article, so count those against the limit.
+    shallow = [p for p in content if len(p) < 60 and not p.startswith("#")]
     if len(shallow) > 1:
         return None
     # Require total content length >= 500 chars (prevents near-empty articles)
@@ -585,6 +587,18 @@ def validate_article(raw: dict, source: dict) -> dict | None:
             return None
     if re.search(r"[\u3040-\u30ff\u4e00-\u9fff\uac00-\ud7af]", blob):
         # Zero tolerance for any CJK glyphs now.
+        return None
+    # The model sometimes narrates its own instructions ("Berikut ringkasannya...")
+    # or emits its editorial checklist into the body. Both reach the public page
+    # verbatim, and Google reads them as thin/auto-generated content.
+    if re.search(
+        r"ringkasannya dalam|paragraf naratif|lengkapi tautan"
+        r"|wajib dikonfirmasi ke media asal|sebelum publikasi",
+        blob,
+    ):
+        return None
+    # The excerpt must not open with the model's framing preamble.
+    if re.match(r"^\s*(berikut (ringkasan|artikel|isi)|tulis(lah)? artikel|ini adalah artikel)\b", excerpt, re.I):
         return None
     # Degenerate loop guard: the model repeating one word to fill space.
     words = blob.split()

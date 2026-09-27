@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Header, Footer } from "@/components/site";
 import { getArticles, getCategoryBySlug, formatDate } from "@/lib/data";
+import { ogImageOrFallback, ogUrlFor } from "@/lib/og";
 import { getArticleReadCount } from "@/lib/analytics-server";
 import { ArticleContent } from "@/components/article-content";
 import { CardImage } from "@/components/card-image";
@@ -21,9 +22,13 @@ export async function generateMetadata({ params }: Params) {
   const article = (await getArticles()).find((a) => a.id === Number(id));
   if (!article) return { title: "Artikel Tidak Ditemukan" };
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
-  const absoluteImage = article.image
-    ? `${SITE_URL}/api/og-image?image=${encodeURIComponent(article.image)}&title=${encodeURIComponent(article.title)}&category=${encodeURIComponent(article.category)}`
-    : `${SITE_URL}/images/placeholder-article.svg`;
+  // og/<hash>.png is written by scripts/auto-article-gen.py when the article is
+  // created — same charCode*31 hash as Python's og_object_name(). Crawlers get
+  // a static file instantly; the /api/og-image route stays as the fallback for
+  // rows created before this existed.
+  const preRendered = ogUrlFor(article.title);
+  const dynamicCard = `${SITE_URL}/api/og-image?image=${encodeURIComponent(article.image ?? "")}&title=${encodeURIComponent(article.title)}&category=${encodeURIComponent(article.category)}`;
+  const absoluteImage = article.image ? await ogImageOrFallback(preRendered, dynamicCard) : `${SITE_URL}/images/placeholder-article.svg`;
   return {
     title: article.title,
     description: article.excerpt,
