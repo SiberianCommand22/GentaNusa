@@ -71,7 +71,7 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${sourceSerif.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
-        <script async src="https://pagead2.googlesource.com/pagead/js/adsbygoogle.js?client=ca-pub-5435057710252308" crossOrigin="anonymous"></script>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5435057710252308" crossOrigin="anonymous"></script>
         <link rel="icon" href="/favicon.jpg" type="image/jpeg" />
       </head>
       <body>
