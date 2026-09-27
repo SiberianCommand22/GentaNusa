@@ -16,8 +16,14 @@ export async function GET(req: NextRequest) {
   const category = searchParams.get("category") || "";
 
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
+  // articleImage may be a full remote URL (Supabase, Pollinations) or a local
+  // /media/... path. Prefixing SITE_URL onto an absolute URL produced
+  // "https://gentanusa.idhttps://..." which 404s, dropping every share preview
+  // into the logo-only fallback.
   const baseImage = articleImage
-    ? `${SITE_URL}${articleImage}`
+    ? /^https?:\/\//i.test(articleImage)
+      ? articleImage
+      : `${SITE_URL}${articleImage}`
     : `${SITE_URL}/images/placeholder-article.svg`;
 
   const logoPath = path.join(process.cwd(), "public/images/logo-gentanusa-white.png");
