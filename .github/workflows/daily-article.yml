@@ -1,0 +1,30 @@
+name: GentaNusa Daily Article
+
+on:
+  schedule:
+    # GitHub Actions cron is UTC. 01:00 UTC = 08:00 WIB.
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # stdlib only — the generator imports nothing outside the standard library,
+      # so there is no requirements.txt to install or keep in sync.
+      - name: Generate artikel harian
+        run: python scripts/auto-article-gen.py

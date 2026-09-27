@@ -695,8 +695,9 @@ def main() -> int:
     MAX_RUN_SECONDS = 1800
 
     local_env = load_env_file(ROOT / ".env.local")
-    service_url = local_env.get("NEXT_PUBLIC_SUPABASE_URL")
-    service_key = local_env.get("SUPABASE_SERVICE_KEY")
+    # env first so CI can inject secrets without a .env.local in the checkout
+    service_url = os.environ.get("NEXT_PUBLIC_SUPABASE_URL") or local_env.get("NEXT_PUBLIC_SUPABASE_URL")
+    service_key = os.environ.get("SUPABASE_SERVICE_KEY") or local_env.get("SUPABASE_SERVICE_KEY")
     if not service_url or not service_key:
         log("ERROR: env Supabase tidak lengkap")
         return 2
@@ -716,7 +717,11 @@ def main() -> int:
     processed = {str(link) for link in state.get("processedLinks", [])}
     processed.update(existing_syndicated_links())
 
-    if state.get("lastRunDate") == today and not args.dry_run:
+    # CI checks out a committed snapshot of the state file, so lastRunDate there is
+    # stale by definition. Duplicate protection there comes from Supabase instead
+    # (check_existing_by_source_link + is_duplicate_title below), which is stronger.
+    is_ci = os.environ.get("CI") == "true"
+    if not is_ci and state.get("lastRunDate") == today and not args.dry_run:
         last = state.get("lastArticle") or {}
         log(f"Sudah ada artikel otomatis hari {today}; tidak membuat duplikat. Terakhir: {last.get('title', '')}")
         return 0
