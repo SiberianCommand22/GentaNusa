@@ -55,6 +55,14 @@ export const metadata: Metadata = {
       "GentaNusa menyajikan berita politik, ekonomi, dan nasional Indonesia secara akurat, cepat, dan terpercaya.",
     images: ["/images/placeholder-article.svg"],
   },
+  // Search Console / Publisher Center verification tokens. Set the env var on Vercel
+  // and redeploy — no code edit needed. Multiple owners can each add a token.
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
+  other: process.env.BING_SITE_VERIFICATION
+    ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION }
+    : undefined,
 };
 
 export default function RootLayout({
