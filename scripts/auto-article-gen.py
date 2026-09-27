@@ -408,6 +408,91 @@ def _last_json_object(text: str) -> dict | None:
     return found[-1] if found else None
 
 
+# Shared by both LLM paths (9Router local, Gemini direct) so the two never drift.
+ARTICLE_SYSTEM_PROMPT = (
+    "Anda jurnalis senior GentaNusa. Tulis artikel original berbahasa Indonesia, "
+    "gaya majalah berita profesional (Kompas/Tempo), minimal 5 paragraf, idealnya 5-6 paragraf. "
+    "Aturan ketat:\n"
+    "1. HANYA gunakan fakta yang diberikan dalam prompt. JANGAN mengarang nama, angka, tanggal, kejadian, atau kutipan.\n"
+    "2. Jika fakta tidak cukup untuk paragraf lengkap, kembangkan narasi dengan konteks umum tanpa menggunakan frasa klise.\n"
+    "3. Gaya: objektif, netral, kalimat efektif, hindari kata-kata berlebihan.\n"
+    "4. Paragraf 1 (Lead): Siapa, apa, kapan, di mana, mengapa — max 2 kalimat, minimal 80 karakter.\n"
+    "5. Paragraf 2-3: Detail konteks, latar belakang, reaksi pihak terkait, minimal 100 karakter per paragraf.\n"
+    "6. Paragraf 4: Dampak/lanjutan/ke depan, minimal 100 karakter.\n"
+    "7. Paragraf 5-6 (opsional): Perspektif lebih luas atau konteks nasional.\n"
+    "8. Output HANYA JSON valid dengan field: title, excerpt, content (array 5-6 string), tags (array 3-5 string), category (string).\n"
+    "9. Title: informatif, max 80 karakter, tanpa clickbait.\n"
+    "10. Excerpt: ringkasan 1-2 kalimat, max 200 karakter.\n"
+    "11. Category: pilih HANYA dari: Politik, Ekonomi, Nasional, Kesehatan, Olahraga, Teknologi, Pendidikan, Budaya, Lingkungan, Dunia.\n"
+    "12. SETIAP paragraf minimal 3 kalimat dan minimal 80 karakter untuk memastikan kedalaman artikel.\n"
+    "13. Total artikel minimal 500 karakter untuk memastikan substansi.\n"
+    "14. JANGAN menulis draft lalu revisi. Balas SATU objek JSON final saja, tanpa basa-basi, tanpa penutup, tanpa markdown fence.\n"
+    "15. Output WAJIB 100% huruf Latin dan tanda baca Indonesia. JANGAN sisipkan karakter aksara lain di mana pun."
+)
+
+# Gemini 2.5 Flash is retired for new projects (API returns 404 and names
+# gemini-3.8-flash as the successor). Point this at a live model or the whole
+# cloud fallback silently dies.
+#
+# These are tried in order: 503 "high demand" hits one model for minutes at a
+# time while the others stay healthy, so walking the list beats retrying one.
+GEMINI_MODELS = [
+    model
+    for model in (os.environ.get("GEMINI_MODEL", ""), "gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite-preview")
+    if model
+]
+GEMINI_URL_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
+
+
+def gemini_api_key() -> str:
+    """Key from env first, then .env.local — GitHub Actions injects it as a secret."""
+    return (
+        os.environ.get("GEMINI_API_KEY", "")
+        or load_env_file(ROOT / ".env.local").get("GEMINI_API_KEY", "")
+    )
+
+
+def call_gemini_direct(prompt: str) -> dict | None:
+    """Cloud fallback for when 9Router on localhost is not running (CI, laptop off).
+
+    Same contract as call_freemax: returns a parsed JSON object or None.
+    """
+    api_key = gemini_api_key()
+    if not api_key:
+        return None
+    payload = {
+        "contents": [
+            {"role": "user", "parts": [{"text": ARTICLE_SYSTEM_PROMPT + "\n\n" + prompt}]}
+        ],
+        "generationConfig": {
+            "temperature": 0.3,
+            "maxOutputTokens": 6000,
+            "responseMimeType": "application/json",
+        },
+    }
+    body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    for model in GEMINI_MODELS:
+        request = urllib.request.Request(
+            f"{GEMINI_URL_BASE}/{model}:generateContent",
+            data=body,
+            headers={
+                "Content-Type": "application/json",
+                "x-goog-api-key": api_key,
+            },
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=LLM_TIMEOUT * 2) as response:
+                data = json.loads(response.read().decode("utf-8", errors="replace"))
+            text = data["candidates"][0]["content"]["parts"][0]["text"]
+            article = extract_json_object(text)
+            if article:
+                return article
+            log(f"Gemini {model}: output tidak valid JSON")
+        except Exception as exc:
+            log(f"Gemini {model} gagal: {exc}")
+    return None
+
+
 def call_freemax(prompt: str) -> dict | None:
     api_key = os.environ.get('HERMES_OPENAI_API_KEY', load_env_file(Path.home() / '.hermes' / '.env').get('OPENAI_API_KEY', ''))
     payload = {
@@ -417,26 +502,7 @@ def call_freemax(prompt: str) -> dict | None:
         "messages": [
             {
                 "role": "system",
-                "content": (
-                    "Anda jurnalis senior GentaNusa. Tulis artikel original berbahasa Indonesia, "
-                    "gaya majalah berita profesional (Kompas/Tempo), minimal 5 paragraf, idealnya 5-6 paragraf. "
-                    "Aturan ketat:\n"
-                    "1. HANYA gunakan fakta yang diberikan dalam prompt. JANGAN mengarang nama, angka, tanggal, kejadian, atau kutipan.\n"
-                    "2. Jika fakta tidak cukup untuk paragraf lengkap, kembangkan narasi dengan konteks umum tanpa menggunakan frasa klise.\n"
-                    "3. Gaya: objektif, netral, kalimat efektif, hindari kata-kata berlebihan.\n"
-                    "4. Paragraf 1 (Lead): Siapa, apa, kapan, di mana, mengapa — max 2 kalimat, minimal 80 karakter.\n"
-                    "5. Paragraf 2-3: Detail konteks, latar belakang, reaksi pihak terkait, minimal 100 karakter per paragraf.\n"
-                    "6. Paragraf 4: Dampak/lanjutan/ke depan, minimal 100 karakter.\n"
-                    "7. Paragraf 5-6 (opsional): Perspektif lebih luas atau konteks nasional.\n"
-                    "8. Output HANYA JSON valid dengan field: title, excerpt, content (array 5-6 string), tags (array 3-5 string), category (string).\n"
-                    "9. Title: informatif, max 80 karakter, tanpa clickbait.\n"
-                    "10. Excerpt: ringkasan 1-2 kalimat, max 200 karakter.\n"
-                    "11. Category: pilih HANYA dari: Politik, Ekonomi, Nasional, Kesehatan, Olahraga, Teknologi, Pendidikan, Budaya, Lingkungan, Dunia.\n"
-                    "12. SETIAP paragraf minimal 3 kalimat dan minimal 80 karakter untuk memastikan kedalaman artikel.\n"
-                    "13. Total artikel minimal 500 karakter untuk memastikan substansi.\n"
-                    "14. JANGAN menulis draft lalu revisi. Balas SATU objek JSON final saja, tanpa basa-basi, tanpa penutup, tanpa markdown fence.\n"
-                    "15. Output WAJIB 100% huruf Latin dan tanda baca Indonesia. JANGAN sisipkan karakter aksara lain di mana pun."
-                ),
+                "content": ARTICLE_SYSTEM_PROMPT,
             },
             {"role": "user", "content": prompt},
         ],
@@ -695,12 +761,14 @@ def main() -> int:
                 f"Link sumber: {item['link']}\n\n"
                 "Tulis artikel original GentaNusa berdasarkan fakta di atas."
             )
-            candidate = call_freemax(prompt)
+            # 9Router on localhost first (free, unlimited); cloud Gemini covers the
+            # cases it cannot: laptop off, router down, or model returning junk twice.
+            candidate = call_freemax(prompt) or call_gemini_direct(prompt)
             if not candidate:
                 continue
             article = validate_article(candidate, source)
             if not article:
-                log(f"Output FREEMAX tidak valid untuk {item['title'][:50]}")
+                log(f"Output LLM tidak valid untuk {item['title'][:50]}")
                 continue
 
             if args.dry_run:
