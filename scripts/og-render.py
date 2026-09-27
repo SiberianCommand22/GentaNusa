@@ -17,6 +17,7 @@ import json
 import os
 import pathlib
 import sys
+import urllib.parse
 import urllib.request
 
 try:
@@ -55,19 +56,39 @@ def og_object_name(title: str) -> str:
 
 
 def fetch_image(url: str, timeout: int = 45) -> Image.Image:
-    request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        if response.status != 200:
-            raise RuntimeError(f"HTTP {response.status}")
-        return Image.open(io.BytesIO(response.read())).convert("RGB")
+    """Fetch the article photo, retrying through a public image proxy.
+
+    Local /media/... files only exist on the deployed site, so a machine that
+    cannot reach the production host (or a CI runner) still needs a way in.
+    """
+    candidates = [url]
+    if url.startswith("http"):
+        bare = url.split("://", 1)[1]
+        candidates.append(f"https://wsrv.nl/?url={urllib.parse.quote(bare, safe='')}")
+    last: Exception | None = None
+    for candidate in candidates:
+        try:
+            request = urllib.request.Request(candidate, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                if response.status != 200:
+                    last = RuntimeError(f"HTTP {response.status}")
+                    continue
+                return Image.open(io.BytesIO(response.read())).convert("RGB")
+        except Exception as exc:
+            last = exc
+    raise last if last else RuntimeError("tidak ada sumber gambar")
 
 
 def render_card(photo: Image.Image, logo: Image.Image) -> bytes:
-    canvas = photo.resize((WIDTH, HEIGHT - BANNER), Image.LANCZOS)
+    canvas = Image.new("RGB", (WIDTH, HEIGHT), BANNER_BG)
+    # Paste photo into the top slot only; Image.paste silently clips anything
+    # that would fall outside the canvas, which is how the banner went missing
+    # and every card shipped as a bare 1200x510 crop.
+    canvas.paste(photo.resize((WIDTH, HEIGHT - BANNER), Image.LANCZOS), (0, 0))
     banner = Image.new("RGB", (WIDTH, BANNER), BANNER_BG)
     mark = logo.copy()
     mark.thumbnail((160, 160), Image.LANCZOS)
-    banner.paste(mark, ((WIDTH - mark.width) // 2, (BANNER - mark.height) // 2))
+    banner.paste(mark, ((WIDTH - mark.width) // 2, (BANNER - mark.height) // 2), mark)
     canvas.paste(banner, (0, HEIGHT - BANNER))
     out = io.BytesIO()
     canvas.save(out, format="PNG", optimize=True)
