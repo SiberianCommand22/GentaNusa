@@ -160,21 +160,52 @@ export async function getRelated(article: Article, count = 3): Promise<Article[]
   return sortByDate([...byCategory, ...rest]).slice(0, count);
 }
 
-const authors: Author[] = [
-  {
-    slug: "redaksi-generic",
-    name: "Redaksi",
-    role: "Redaktur GentaNusa",
-    bio: "Tim redaksi GentaNusa menyajikan berita politik, ekonomi, dan nasional secara akurat, cepat, dan terpercaya.",
-  },
-];
+// Authors are derived from the article rows, not a hardcoded list. The DB already
+// stores the real bylines (Andreas Wicaksono, Hypatia Dorothy, Adripa Dwitama,
+// Redaksi GentaNusa); keeping a separate static list here is what left
+// /penulis/<byline-slug> returning 404 for every real author.
+type AuthorRow = { name: string; slug: string };
 
-export function getAuthor(slug: string): Author | undefined {
-  return authors.find((a) => a.slug === slug);
+async function fetchAuthorRows(): Promise<AuthorRow[]> {
+  if (!supabaseAnon) return [];
+  try {
+    const { data, error } = await supabaseAnon
+      .from("articles")
+      .select("author,author_slug")
+      .not("author_slug", "like", "staging-%")
+      .not("author", "is", null);
+    if (error) throw error;
+    const seen = new Map<string, AuthorRow>();
+    for (const row of data ?? []) {
+      const slug = String(row.author_slug ?? "").trim();
+      const name = String(row.author ?? "").trim();
+      if (slug && name && !seen.has(slug)) seen.set(slug, { name, slug });
+    }
+    return [...seen.values()].sort((a, b) => a.name.localeCompare(b.name, "id"));
+  } catch (e) {
+    console.warn("Supabase authors gagal:", e);
+    return [];
+  }
 }
 
-export function getAuthors(): Author[] {
-  return authors;
+function bioFor(name: string): string {
+  return `${name} menulis untuk GentaNusa — portal berita politik, ekonomi, dan nasional Indonesia.`;
+}
+
+export async function getAuthors(): Promise<Author[]> {
+  const cached = cache.get("authors");
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data as Author[];
+
+  const rows = await fetchAuthorRows();
+  const list: Author[] = rows.length
+    ? rows.map((r) => ({ slug: r.slug, name: r.name, role: "Jurnalis GentaNusa", bio: bioFor(r.name) }))
+    : [{ slug: "redaksi-gentanusa", name: "Redaksi GentaNusa", role: "Redaktur GentaNusa", bio: bioFor("Redaksi GentaNusa") }];
+  cache.set("authors", { data: list, timestamp: Date.now() });
+  return list;
+}
+
+export async function getAuthor(slug: string): Promise<Author | undefined> {
+  return (await getAuthors()).find((a) => a.slug === slug);
 }
 
 export async function getArticlesByAuthor(slug: string): Promise<Article[]> {

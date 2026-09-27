@@ -11,14 +11,14 @@ type Params = { params: Promise<{ slug: string }> };
 export const revalidate = 60;
 
 export async function generateStaticParams() {
-  return getAuthors().map((a) => ({ slug: a.slug }));
+  return (await getAuthors()).map((a) => ({ slug: a.slug }));
 }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const author = getAuthor(slug);
+  const author = await getAuthor(slug);
   if (!author) return { title: "Penulis tidak ditemukan" };
   const url = `${SITE_URL}/penulis/${slug}`;
   return {
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function AuthorPage({ params }: Params) {
   const { slug } = await params;
-  const author = getAuthor(slug);
+  const author = await getAuthor(slug);
   if (!author) notFound();
 
   const articles = await getArticlesByAuthor(slug);
