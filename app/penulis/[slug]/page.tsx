@@ -14,13 +14,18 @@ export async function generateStaticParams() {
   return getAuthors().map((a) => ({ slug: a.slug }));
 }
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
+
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const author = getAuthor(slug);
   if (!author) return { title: "Penulis tidak ditemukan" };
+  const url = `${SITE_URL}/penulis/${slug}`;
   return {
     title: `${author.name} — Penulis`,
     description: author.bio,
+    alternates: { canonical: url },
+    openGraph: { url, title: `${author.name} — Penulis | GentaNusa`, description: author.bio },
   };
 }
 

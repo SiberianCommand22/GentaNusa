@@ -4,10 +4,19 @@ import { getSyndicated, getSources } from "@/lib/syndication";
 import { formatDate } from "@/lib/data";
 import styles from "./syndication.module.css";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
+
 export const metadata: Metadata = {
   title: "Sindikasi",
   description:
     "Kumpulan judul dan tautan berita pilihan dari berbagai kantor berita dan media — dengan atribusi sumber lengkap.",
+  alternates: { canonical: `${SITE_URL}/sindikasi` },
+  openGraph: {
+    url: `${SITE_URL}/sindikasi`,
+    title: "Sindikasi | GentaNusa",
+    description:
+      "Kumpulan judul dan tautan berita pilihan dari berbagai kantor berita dan media — dengan atribusi sumber lengkap.",
+  },
 };
 
 export default function SyndicationPage() {

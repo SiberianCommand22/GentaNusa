@@ -2,10 +2,19 @@ import type { Metadata } from "next";
 import { Header, Footer } from "@/components/site";
 import styles from "./about.module.css";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
+
 export const metadata: Metadata = {
   title: "Tentang Kami",
   description:
     "GentaNusa adalah portal berita nasional yang menyajikan informasi politik, ekonomi, dan nasional secara akurat dan terpercaya.",
+  alternates: { canonical: `${SITE_URL}/tentang` },
+  openGraph: {
+    url: `${SITE_URL}/tentang`,
+    title: "Tentang Kami | GentaNusa",
+    description:
+      "GentaNusa adalah portal berita nasional yang menyajikan informasi politik, ekonomi, dan nasional secara akurat dan terpercaya.",
+  },
 };
 
 export default function AboutPage() {
