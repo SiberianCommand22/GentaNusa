@@ -6,7 +6,10 @@ import { CardImage } from "@/components/card-image";
 import { AdSlot } from "@/components/ad-slot";
 import styles from "./page.module.css";
 
-export const metadata = { title: "Beranda" };
+export const metadata = {
+  title: "Portal Berita Politik, Ekonomi & Nasional Terkini",
+  description: "Baca berita terbaru hari ini seputar politik, ekonomi, hukum, dan peristiwa nasional Indonesia secara akurat dan mendalam di GentaNusa.",
+};
 export const revalidate = 60;
 
 export default async function Home() {
