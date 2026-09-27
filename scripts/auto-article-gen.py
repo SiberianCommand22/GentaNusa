@@ -30,7 +30,6 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "lib" / "data"
 SOURCES_FILE = DATA_DIR / "sources.json"
 STATE_FILE = DATA_DIR / "auto-original-state.json"
-PENDING_FILE = DATA_DIR / "pending-articles.json"
 LOCK_FILE = DATA_DIR / "auto-original.lock"
 LOG_FILE = DATA_DIR / "auto-original.log"
 UA = "GentaNusaAuto/1.0 (+https://gentanusa.id/robots.txt)"
@@ -621,7 +620,22 @@ def get_max_id(service_url: str, service_key: str) -> int:
     return max((int(row["id"]) for row in rows), default=120)
 
 
-def insert_article(service_url: str, service_key: str, article: dict) -> int:
+def staging_slug(title: str) -> str:
+    """Stable per-title slug so approve/reject can target a staged row by query.
+
+    Index-based targeting breaks the moment the admin panel's 30s poll refetches
+    the list and an earlier item is removed. Both the generator (Python) and the
+    admin API (TS) must produce identical slugs, so the hash is a simple
+    charCode-based rolling sum that any language can reproduce.
+    """
+    h = 0
+    for char in title:
+        h = ((h * 31) + ord(char)) & 0xFFFFFFFF
+    base = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:40]
+    return f"{base}-{h:x}"
+
+
+def insert_article(service_url: str, service_key: str, article: dict, staging: bool = False) -> int:
     # Remove id from payload - let Supabase auto-generate
     payload = {
         "title": article["title"],
@@ -629,7 +643,9 @@ def insert_article(service_url: str, service_key: str, article: dict) -> int:
         "excerpt": article["excerpt"],
         "date": article["date"],
         "author": "Redaksi GentaNusa",
-        "author_slug": "redaksi-gentanusa",
+        # staging- marks the row as awaiting editorial review; the admin API promotes
+        # it to the real slug on approve. Rows without the prefix are live.
+        "author_slug": f"staging-{staging_slug(article['title'])}" if staging else "redaksi-gentanusa",
         "author_role": "Jurnalis GentaNusa",
         "image": article.get("image") or "/images/placeholder-article.svg",
         "content": article["content"],
@@ -807,13 +823,18 @@ def main() -> int:
             }
 
             if args.save_pending:
-                # Save to pending review (without ID)
-                pending = load_pending_from_file()
-                pending.append(article_data)
-                save_pending_to_file(pending)
+                # Stage in Supabase with a staging- author_slug so the admin panel can
+                # approve/reject it from anywhere. A local JSON file cannot work: the
+                # admin API and the generator run on different machines (and on Vercel
+                # the filesystem is read-only), so the file was never shared.
+                staged_id = insert_article(service_url, service_key, article_data, staging=True)
+                if not staged_id or staged_id <= 0:
+                    errors.append(f"stage pending insert status {staged_id}")
+                    continue
                 state["lastRunDate"] = today
                 state["processedLinks"] = sorted(processed | {item["link"]})
                 state["lastArticle"] = {
+                    "id": staged_id,
                     "title": article["title"],
                     "sourceId": source_id,
                     "sourceLink": item["link"],
@@ -821,7 +842,7 @@ def main() -> int:
                     "status": "pending_review",
                 }
                 save_state(state)
-                log(f"PENDING REVIEW: {article['title']}")
+                log(f"PENDING REVIEW ID {staged_id}: {article['title']}")
                 return 0
 
             # Direct insert - let DB auto-generate ID
@@ -853,22 +874,6 @@ def main() -> int:
 
     log("Gagal membuat artikel hari ini: " + "; ".join(errors[-3:]))
     return 1
-
-
-def load_pending_from_file() -> list[dict]:
-    if not PENDING_FILE.exists():
-        return []
-    try:
-        data = json.loads(PENDING_FILE.read_text(encoding="utf-8"))
-        return data if isinstance(data, list) else []
-    except (OSError, json.JSONDecodeError):
-        return []
-
-
-def save_pending_to_file(pending: list[dict]) -> None:
-    tmp = PENDING_FILE.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(pending, ensure_ascii=False, indent=2), encoding="utf-8")
-    tmp.replace(PENDING_FILE)
 
 
 if __name__ == "__main__":
