@@ -18,12 +18,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const articlePages = (await getArticles()).filter((a) => a.id <= 1000).map((a) => ({
-    url: `${SITE_URL}/artikel/${a.id}`,
-    lastModified: now,
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
-  }));
+  // Pinning lastModified to "now" told Google every article changed today, which is
+  // a lie it learns to ignore. Per-article dates are already stored as YYYY-MM-DD.
+  const articlePages = (await getArticles())
+    .filter((a) => a.id <= 1000)
+    .map((a) => ({
+      url: `${SITE_URL}/artikel/${a.id}`,
+      lastModified: /^\d{4}-\d{2}-\d{2}/.test(a.date)
+        ? new Date(`${a.date}T00:00:00+07:00`)
+        : now,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
 
   return [...staticPages, ...categoryPages, ...articlePages];
 }
