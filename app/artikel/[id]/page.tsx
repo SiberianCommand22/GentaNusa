@@ -20,13 +20,14 @@ export async function generateMetadata({ params }: Params) {
   const { id } = await params;
   const article = (await getArticles()).find((a) => a.id === Number(id));
   if (!article) return { title: "Artikel Tidak Ditemukan" };
-  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
   const absoluteImage = article.image
     ? `${SITE_URL}/api/og-image?image=${encodeURIComponent(article.image)}&title=${encodeURIComponent(article.title)}&category=${encodeURIComponent(article.category)}`
     : `${SITE_URL}/images/placeholder-article.svg`;
   return {
     title: article.title,
     description: article.excerpt,
+    alternates: { canonical: `${SITE_URL}/artikel/${article.id}` },
     openGraph: {
       type: "article",
       siteName: "GentaNusa",

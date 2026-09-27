@@ -6,9 +6,15 @@ import { CardImage } from "@/components/card-image";
 import { AdSlot } from "@/components/ad-slot";
 import styles from "./page.module.css";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
+
 export const metadata = {
   title: "Portal Berita Politik, Ekonomi & Nasional Terkini",
   description: "Baca berita terbaru hari ini seputar politik, ekonomi, hukum, dan peristiwa nasional Indonesia secara akurat dan mendalam di GentaNusa.",
+  alternates: { canonical: `${SITE_URL}/` },
+  openGraph: {
+    url: `${SITE_URL}/`,
+  },
 };
 export const revalidate = 60;
 

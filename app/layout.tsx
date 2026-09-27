@@ -35,7 +35,6 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "id_ID",
-    url: SITE_URL,
     siteName: "GentaNusa",
     title: "GentaNusa — Berita Nusantara Terkini",
     description:

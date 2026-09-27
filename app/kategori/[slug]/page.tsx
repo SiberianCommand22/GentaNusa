@@ -20,13 +20,18 @@ export async function generateStaticParams() {
   return (await getCategories()).map((c) => ({ slug: c.slug }));
 }
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
+
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const cat = await loadCategory(slug);
   if (!cat) return { title: "Kategori tidak ditemukan" };
+  const url = `${SITE_URL}/kategori/${cat.slug}`;
   return {
     title: `${cat.name} — Berita`,
     description: `Kumpulan berita ${cat.name} terbaru dari GentaNusa.`,
+    alternates: { canonical: url },
+    openGraph: { url, title: `${cat.name} — Berita`, description: `Kumpulan berita ${cat.name} terbaru dari GentaNusa.` },
   };
 }
 
