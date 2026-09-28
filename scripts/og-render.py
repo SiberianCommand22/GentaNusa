@@ -52,7 +52,7 @@ def og_object_name(title: str) -> str:
     h = 0
     for char in title:
         h = ((h * 31) + ord(char)) & 0xFFFFFFFF
-    return f"{BUCKET}/og-{h:x}.png"
+    return f"{BUCKET}/og-{h:x}.jpg"
 
 
 def fetch_image(url: str, timeout: int = 45) -> Image.Image:
@@ -90,9 +90,12 @@ def render_card(photo: Image.Image, logo: Image.Image) -> bytes:
     mark.thumbnail((160, 160), Image.LANCZOS)
     banner.paste(mark, ((WIDTH - mark.width) // 2, (BANNER - mark.height) // 2), mark)
     canvas.paste(banner, (0, HEIGHT - BANNER))
-    out = io.BytesIO()
-    canvas.save(out, format="PNG", optimize=True)
-    return out.getvalue()
+    # JPEG, not PNG. A 1200x630 PNG of a photo lands around 500 KB, which is
+    # what crawlers are most likely to give up on; JPEG q82 is visually
+    # identical here and roughly a quarter of the size.
+    buf = io.BytesIO()
+    canvas.save(buf, format="JPEG", quality=82, optimize=True, progressive=True)
+    return buf.getvalue()
 
 
 def upload(env: dict, name: str, data: bytes) -> str:
@@ -102,7 +105,7 @@ def upload(env: dict, name: str, data: bytes) -> str:
         headers={
             "apikey": env["SUPABASE_SERVICE_KEY"],
             "Authorization": f"Bearer {env['SUPABASE_SERVICE_KEY']}",
-            "Content-Type": "image/png",
+            "Content-Type": "image/jpeg",
             "x-upsert": "true",
         },
         method="POST",

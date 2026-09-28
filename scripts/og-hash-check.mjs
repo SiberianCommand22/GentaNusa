@@ -1,4 +1,4 @@
-// og-<hash>.png must be spelled the same way in Python and TypeScript, or the
+// og-<hash>.jpg must be spelled the same way in Python and TypeScript, or the
 // article page points at a file the renderer never wrote and every share
 // preview silently falls back to the slow dynamic route.
 //
@@ -15,5 +15,5 @@ function ogHash(title) {
 
 const titles = process.argv.slice(2);
 for (const t of titles.length ? titles : ["Rahasia Kelam Perburuan dan Pemusnahan Jutaan Buku untuk Melatih AI"]) {
-  console.log(`articles/og-${ogHash(t)}.png`);
+  console.log(`articles/og-${ogHash(t)}.jpg`);
 }

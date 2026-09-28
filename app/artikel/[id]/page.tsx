@@ -26,11 +26,7 @@ export async function generateMetadata({ params }: Params) {
   // created — same charCode*31 hash as Python's og_object_name(). Crawlers get
   // a static file instantly; the /api/og-image route stays as the fallback for
   // rows created before this existed.
-  const ogImage = ogImageOrFallback({
-    title: article.title,
-    image: article.image,
-    category: article.category
-  });
+  const ogImage = ogImageOrFallback({ title: article.title });
 
   return {
     title: article.title,
