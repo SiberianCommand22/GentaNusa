@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Header, Footer } from "@/components/site";
 import { getArticles, getCategoryBySlug, formatDate } from "@/lib/data";
-import { ogImageOrFallback, ogUrlFor } from "@/lib/og";
+import { ogImageOrFallback } from "@/lib/og";
 import { getArticleReadCount } from "@/lib/analytics-server";
 import { ArticleContent } from "@/components/article-content";
 import { CardImage } from "@/components/card-image";
@@ -26,9 +26,12 @@ export async function generateMetadata({ params }: Params) {
   // created — same charCode*31 hash as Python's og_object_name(). Crawlers get
   // a static file instantly; the /api/og-image route stays as the fallback for
   // rows created before this existed.
-  const preRendered = ogUrlFor(article.title);
-  const dynamicCard = `${SITE_URL}/api/og-image?image=${encodeURIComponent(article.image ?? "")}&title=${encodeURIComponent(article.title)}&category=${encodeURIComponent(article.category)}`;
-  const absoluteImage = article.image ? await ogImageOrFallback(preRendered, dynamicCard) : `${SITE_URL}/images/placeholder-article.svg`;
+  const ogImage = ogImageOrFallback({
+    title: article.title,
+    image: article.image,
+    category: article.category
+  });
+
   return {
     title: article.title,
     description: article.excerpt,
@@ -40,15 +43,13 @@ export async function generateMetadata({ params }: Params) {
       description: article.excerpt,
       url: `${SITE_URL}/artikel/${article.id}`,
       locale: "id_ID",
-      images: [{ url: absoluteImage, width: 1200, height: 630, alt: article.title }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: article.title }],
     },
-    // Without this, X/Twitter falls back to app/layout.tsx and shows the site
-    // logo + generic headline instead of the article.
     twitter: {
       card: "summary_large_image",
       title: article.title,
       description: article.excerpt,
-      images: [absoluteImage],
+      images: [ogImage],
     },
   };
 }

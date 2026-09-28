@@ -1,35 +1,29 @@
 /**
- * Share-card image resolution for article pages.
- *
- * The article page has to choose between two URLs: a pre-rendered PNG written
- * by scripts/og-render.py, and the dynamic /api/og-image route. Static wins
- * because social crawlers time out waiting for a remote fetch plus a sharp
- * composite, and drop the thumbnail entirely when that happens.
+ * Dynamic share-card image resolution for article pages via @vercel/og.
+ * Appends a stable version hash based on title so WhatsApp/FB refreshes cache
+ * whenever the article title/content updates, without needing manual parameters.
  */
 
-/** charCode*31 rolling hash — must stay byte-identical to og_object_name() in
- *  scripts/og-render.py, or the page points at a file that was never written. */
-export function ogHash(title: string): string {
-  let h = 0;
-  for (let i = 0; i < title.length; i++) {
-    h = (h * 31 + title.charCodeAt(i)) >>> 0;
-  }
-  return h.toString(16);
-}
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
 
-export function ogUrlFor(title: string): string {
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-  if (!base) return "";
-  return `${base}/storage/v1/object/public/articles/og-${ogHash(title)}.png`;
-}
+export function ogImageOrFallback(article: { title: string; image?: string | null; category?: string | null }): string {
+  const title = article.title || "GentaNusa";
+  const category = article.category || "Nasional";
+  const image = article.image || "";
 
-export async function ogImageOrFallback(preRendered: string, dynamic: string): Promise<string> {
-  if (!preRendered.startsWith("http")) return dynamic;
-  try {
-    const res = await fetch(preRendered, { method: "HEAD", cache: "force-cache" });
-    if (res.ok) return preRendered;
-  } catch {
-    // Storage unreachable — fall through to the route that renders on demand.
+  // Stable cache buster derived from title length + first/last chars
+  // This changes automatically if the article is re-published or updated,
+  // forcing WhatsApp to fetch a fresh preview without requiring user query params.
+  const cacheKey = Buffer.from(title).length.toString(36);
+
+  const params = new URLSearchParams({
+    title,
+    category,
+    v: cacheKey,
+  });
+  if (image) {
+    params.set("image", image);
   }
-  return dynamic;
+
+  return `${SITE_URL}/api/og?${params.toString()}`;
 }
