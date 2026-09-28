@@ -35,7 +35,13 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
   const isAbsolute = url.startsWith("http://") || url.startsWith("https://");
-  const fullUrl = isAbsolute ? url : `${SITE_URL}${url.startsWith("/") ? url : `/${url}`}`;
+  const baseUrl = isAbsolute ? url : `${SITE_URL}${url.startsWith("/") ? url : `/${url}`}`;
+
+  // Always append a fresh cache-buster query parameter to force WhatsApp/FB
+  // to scrape the thumbnail fresh every single time the share button is clicked,
+  // bypassing WhatsApp's stubborn negative cache completely.
+  const sep = baseUrl.includes("?") ? "&" : "?";
+  const fullUrl = `${baseUrl}${sep}t=${Date.now()}`;
 
   const shareLinks = [
     {
