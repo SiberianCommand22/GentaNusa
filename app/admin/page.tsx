@@ -53,8 +53,6 @@ const emptyForm = {
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
@@ -110,11 +108,12 @@ export default function AdminPage() {
   }, [imagePreview]);
 
   useEffect(() => {
-    // cek status login via endpoint khusus
     fetch("/api/admin/check").then((r) => {
       if (r.ok) {
         setAuthed(true);
         load();
+      } else {
+        window.location.href = "/admin/login";
       }
     });
   }, [load]);
@@ -126,22 +125,6 @@ export default function AdminPage() {
     const id = setInterval(() => loadPending(), 30000);
     return () => clearInterval(id);
   }, [authed, loadPending]);
-
-  async function doLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    const r = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
-    if (r.ok) {
-      setAuthed(true);
-      load();
-    } else {
-      setError("Password salah");
-    }
-  }
 
   async function saveArticle(e: React.FormEvent) {
     e.preventDefault();
@@ -296,23 +279,7 @@ export default function AdminPage() {
   }, [tab]);
 
   if (!authed) {
-    return (
-      <div className={styles.loginWrap}>
-        <form onSubmit={doLogin} className={styles.login}>
-          <h1>🔐 Admin GentaNusa</h1>
-          <input
-            type="password"
-            placeholder="Password admin"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={styles.input}
-            autoFocus
-          />
-          {error && <p className={styles.err}>{error}</p>}
-          <button className={styles.btn} type="submit">Masuk</button>
-        </form>
-      </div>
-    );
+    return null;
   }
 
   return (

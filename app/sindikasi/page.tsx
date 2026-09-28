@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Header, Footer } from "@/components/site";
+import { Footer } from "@/components/site";
 import { getSyndicated, getSources } from "@/lib/syndication";
 import { formatDate } from "@/lib/data";
 import styles from "./syndication.module.css";
@@ -25,7 +25,6 @@ export default function SyndicationPage() {
 
   return (
     <>
-      <Header />
       <main className={styles.main}>
         <div className={styles.container}>
           <h1 className={styles.title}>Sindikasi Nusantara</h1>

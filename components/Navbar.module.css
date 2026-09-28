@@ -1,0 +1,228 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  z-index: 50;
+}
+
+.headerInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hamburger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  font-size: 14px;
+  color: #1e293b;
+}
+
+.hamburgerIcon {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hamburgerIcon span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #1e293b;
+  border-radius: 1px;
+}
+
+.hamburgerText {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.logoImg {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+.loginBtn {
+  padding: 6px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e293b;
+  background: #fff;
+  transition: background 0.2s;
+}
+
+.loginBtn:hover {
+  background: #f8fafc;
+}
+
+.drawerOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 320px;
+  max-width: 85vw;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.drawerTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.drawerClose {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #64748b;
+  padding: 4px;
+}
+
+.drawerSearch {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+
+.searchInput:focus {
+  border-color: #1e3a8a;
+}
+
+.drawerNav {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.drawerLink {
+  display: block;
+  padding: 10px 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.drawerLink:last-child {
+  border-bottom: none;
+}
+
+.drawerCategories {
+  padding: 16px 20px;
+  flex: 1;
+}
+
+.drawerCategoriesTitle {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.drawerCategory {
+  display: block;
+  padding: 8px 0;
+  font-size: 14px;
+  color: #475569;
+}
+
+.drawerCategory:hover {
+  color: #1e3a8a;
+}
+
+.drawerFooter {
+  padding: 16px 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.socialLinks {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.socialLink {
+  font-size: 14px;
+  color: #475569;
+}
+
+.socialLink:hover {
+  color: #1e3a8a;
+}
+
+.loginCmsBtn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: #1e3a8a;
+  color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.loginCmsBtn:hover {
+  opacity: 0.9;
+}

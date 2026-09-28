@@ -1,11 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Header, Footer } from "@/components/site";
+import { Footer } from "@/components/site";
 
 export default function NotFound() {
   return (
     <>
-      <Header />
       <main className="flex min-h-[60vh] flex-col items-center justify-center text-center px-4">
         <Image
           src="/images/illustration-404.svg"

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import styles from "./page.module.css";
-import { Header, Footer } from "@/components/site";
+import { Footer } from "@/components/site";
 import { SkeletonCard } from "@/components/skeleton";
 
 export const metadata: Metadata = {

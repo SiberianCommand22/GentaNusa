@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Header, Footer } from "@/components/site";
+import { Footer } from "@/components/site";
 import styles from "./legal.module.css";
 
 export const metadata: Metadata = {
@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <>
-      <Header />
       <main className={styles.container}>
         <h1 className={styles.title}>Kebijakan Privasi</h1>
         <p className={styles.updated}>Terakhir diperbarui: September 2026</p>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Header, Footer } from "@/components/site";
+import { Footer } from "@/components/site";
 import { getArticles, getCategories, getCategoryBySlug, formatDate, sortByDate } from "@/lib/data";
 import styles from "./category.module.css";
 
@@ -44,7 +44,6 @@ export default async function CategoryPage({ params }: Params) {
 
   return (
     <>
-      <Header />
       <main className={styles.container}>
         {/* ===== Banner Kategori ===== */}
         <div className={styles.banner}>

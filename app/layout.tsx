@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Source_Serif_4, Inter } from "next/font/google";
+import { Navbar } from "@/components/Navbar";
 import { BackToTop } from "@/components/back-to-top";
-import { BackgroundCanvas } from "@/components/background-canvas";
 import { AnalyticsTracker } from "@/components/analytics-tracker";
 import "./globals.css";
 
@@ -26,11 +26,6 @@ export const metadata: Metadata = {
   },
   description:
     "GentaNusa menyajikan berita politik, ekonomi, dan nasional Indonesia secara akurat, cepat, dan terpercaya.",
-  // No global `alternates.canonical` here. A layout-level canonical without a path
-  // leaks onto every page that doesn't override it, so /kategori/nasional and
-  // /artikel/151 both declared the homepage as their canonical URL. Next.js derives a
-  // per-page canonical from metadataBase on its own; each page that needs an
-  // explicit one sets it in its own metadata export.
   metadataBase: new URL(SITE_URL),
   openGraph: {
     type: "website",
@@ -55,8 +50,6 @@ export const metadata: Metadata = {
       "GentaNusa menyajikan berita politik, ekonomi, dan nasional Indonesia secara akurat, cepat, dan terpercaya.",
     images: ["/images/placeholder-article.svg"],
   },
-  // Search Console / Publisher Center verification tokens. Set the env var on Vercel
-  // and redeploy — no code edit needed. Multiple owners can each add a token.
   verification: process.env.GOOGLE_SITE_VERIFICATION
     ? { google: process.env.GOOGLE_SITE_VERIFICATION }
     : undefined,
@@ -69,13 +62,12 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="id" className={`${sourceSerif.variable} ${inter.variable}`} suppressHydrationWarning>
+    <html lang="id" className={`${sourceSerif.variable} ${inter.variable}`}>
       <head>
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5435057710252308" crossOrigin="anonymous"></script>
         <link rel="icon" href="/favicon.jpg" type="image/jpeg" />
       </head>
       <body>
-        <BackgroundCanvas />
+        <Navbar />
         <AnalyticsTracker />
         {children}
         <BackToTop />

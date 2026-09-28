@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Header, Footer } from "@/components/site";
+import { Footer } from "@/components/site";
 import styles from "./about.module.css";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
@@ -20,7 +20,6 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      <Header />
       <main className={styles.container}>
         <h1 className={styles.title}>Tentang GentaNusa</h1>
         <p className={styles.lead}>

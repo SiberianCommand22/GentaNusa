@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Header, Footer } from "@/components/site";
+import { Footer } from "@/components/site";
 import { getAuthor, getAuthors, getArticlesByAuthor, formatDate } from "@/lib/data";
 import styles from "./author.module.css";
 
@@ -38,7 +38,6 @@ export default async function AuthorPage({ params }: Params) {
 
   return (
     <>
-      <Header />
       <main className={styles.container}>
         <section className={styles.profile}>
           <div className={styles.avatar}>{author.name.charAt(0)}</div>

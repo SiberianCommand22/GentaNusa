@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Header, Footer } from "@/components/site";
+import { Footer } from "@/components/site";
 import { getArticles, getCategoryBySlug, formatDate } from "@/lib/data";
 import { ogImageOrFallback } from "@/lib/og";
 import { getArticleReadCount } from "@/lib/analytics-server";
@@ -73,7 +73,6 @@ export default async function ArticlePage({ params }: Params) {
 
   return (
     <>
-      <Header />
       <main className={styles.container}>
         {/* Breadcrumb */}
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
