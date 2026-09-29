@@ -80,9 +80,20 @@
 .caption {
   padding: 12px 24px;
   font-size: 12px;
+  font-style: italic;
   color: var(--text-muted);
   background: var(--bg);
   border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.credit {
+  font-weight: 600;
+  font-style: italic;
+  white-space: nowrap;
 }
 
 /* ===== Content ===== */

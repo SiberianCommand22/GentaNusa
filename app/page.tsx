@@ -27,7 +27,19 @@ export default async function Home() {
   if (latest.length === 0) {
     return (
       <main>
-        <div className="py-24 text-center text-slate-400 text-sm">Belum ada berita yang diterbitkan.</div>
+        <div className={styles.emptyWrap}>
+          <div className={styles.emptyIcon}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0V9" />
+              <path d="M18 14h-8M15 18h-5M10 6H8v4h2" />
+            </svg>
+          </div>
+          <h3 className={styles.emptyTitle}>Belum Ada Berita yang Diterbitkan</h3>
+          <p className={styles.emptyText}>
+            Redaksi GentaNusa sedang menyiapkan liputan terkini untuk Anda.
+            Silakan kembali beberapa saat lagi.
+          </p>
+        </div>
         <Footer />
       </main>
     );

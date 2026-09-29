@@ -9,6 +9,45 @@
   padding: 32px 0;
 }
 
+/* ===== Empty state (0 berita) ===== */
+.emptyWrap {
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 96px 16px;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  color: #94a3b8;
+}
+
+.emptyTitle {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px;
+}
+
+.emptyText {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #64748b;
+  max-width: 24rem;
+  margin: 0;
+}
+
 .heroGrid {
   display: grid;
   grid-template-columns: 2fr 1fr;

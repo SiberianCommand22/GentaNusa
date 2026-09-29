@@ -89,7 +89,10 @@ export default async function ArticlePage({ params }: Params) {
                 className={styles.featuredImage}
               />
               <figcaption className={styles.caption}>
-                Foto: {coverCredit || "GentaNusa"} — {formatDate(article.date)}
+                <span>{article.image_caption || `Foto: ${coverCredit || "GentaNusa"} — ${formatDate(article.date)}`}</span>
+                {article.image_credit && (
+                  <span className={styles.credit}>Foto: {article.image_credit}</span>
+                )}
               </figcaption>
             </figure>
           )}

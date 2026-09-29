@@ -18,6 +18,8 @@ const emptyForm = {
   category: "Nasional",
   tags: "",
   author: "",
+  image_caption: "",
+  image_credit: "",
   date: new Date().toISOString().split("T")[0],
   headline: false,
 };
@@ -58,6 +60,8 @@ export default function NewPostPage() {
         category: a.category ?? "Nasional",
         tags: tags.filter((t) => t !== HEADLINE_TAG).join(", "),
         author: a.author ?? "",
+        image_caption: a.image_caption ?? "",
+        image_credit: a.image_credit ?? "",
         date: a.date ?? new Date().toISOString().split("T")[0],
         headline: tags.includes(HEADLINE_TAG),
       });
@@ -89,6 +93,50 @@ export default function NewPostPage() {
       el.focus();
       el.setSelectionRange(s + before.length, s + before.length + selected.length);
     });
+  }
+
+  // Terapkan prefix ke setiap baris dalam seleksi (toggle: tambah/hapus).
+  function prefixLines(prefix: string) {
+    const el = contentRef.current;
+    if (!el) return;
+    const { selectionStart: s, selectionEnd: e, value } = el;
+    const lineStart = value.lastIndexOf("\n", s - 1) + 1;
+    const lineEnd = e >= value.length ? value.length : value.indexOf("\n", e);
+    const end = lineEnd === -1 ? value.length : lineEnd;
+    const lines = value.slice(lineStart, end).split("\n");
+    const next =
+      value.slice(0, lineStart) +
+      lines
+        .map((ln) => (ln.startsWith(prefix) ? ln.slice(prefix.length) : prefix + ln))
+        .join("\n") +
+      value.slice(end);
+    setForm((f) => ({ ...f, content: next }));
+    requestAnimationFrame(() => el.focus());
+  }
+
+  // Perataan paragraf: penanda [L]/[C]/[R]/[J] (toggle, satu per baris).
+  function alignLines(code: "L" | "C" | "R" | "J") {
+    const el = contentRef.current;
+    if (!el) return;
+    const { selectionStart: s, selectionEnd: e, value } = el;
+    const lineStart = value.lastIndexOf("\n", s - 1) + 1;
+    const lineEnd = e >= value.length ? value.length : value.indexOf("\n", e);
+    const end = lineEnd === -1 ? value.length : lineEnd;
+    const marker = `[${code}] `;
+    const lines = value.slice(lineStart, end).split("\n");
+    const next =
+      value.slice(0, lineStart) +
+      lines
+        .map((ln) => {
+          const stripped = ln.replace(/^\[(L|C|R|J)\]\s*/, "");
+          return stripped === ln.replace(marker, "") && ln.startsWith(marker)
+            ? stripped
+            : marker + stripped;
+        })
+        .join("\n") +
+      value.slice(end);
+    setForm((f) => ({ ...f, content: next }));
+    requestAnimationFrame(() => el.focus());
   }
 
   async function uploadImage(): Promise<string | null> {
@@ -144,6 +192,8 @@ export default function NewPostPage() {
         excerpt: lead,
         content: paras,
         cover_image: imagePath || "/images/placeholder-article.svg",
+        image_caption: form.image_caption.trim(),
+        image_credit: form.image_credit.trim(),
         category: form.category,
         author: form.author.trim() || "Redaksi GentaNusa",
         date: form.date || new Date().toISOString().split("T")[0],
@@ -217,20 +267,39 @@ export default function NewPostPage() {
               <label className={styles.fieldLabel} htmlFor="content">
                 Konten Artikel (1 paragraf per baris)
               </label>
-              <div className={styles.toolbar} role="toolbar" aria-label="Format teks">
-                <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("**", "**", "teks tebal")} title="Tebal">B</button>
-                <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("*", "*", "teks miring")} title="Miring"><em>I</em></button>
-                <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("[", "](https://)", "tautan")} title="Tautan">Link</button>
+              <div className={styles.editor}>
+                <div className={styles.toolbar} role="toolbar" aria-label="Format teks">
+                  <span className={styles.toolGroup}>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("**", "**", "teks tebal")} title="Tebal"><strong>B</strong></button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("*", "*", "teks miring")} title="Miring"><em>I</em></button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<u>", "</u>", "garis bawah")} title="Garis bawah"><u>U</u></button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<s>", "</s>", "coret")} title="Coret"><s>S</s></button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("[", "](https://)", "tautan")} title="Tautan">Link</button>
+                  </span>
+                  <span className={styles.toolGroup}>
+                    <button type="button" className={styles.toolBtn} onClick={() => alignLines("L")} title="Rata kiri">≡←</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => alignLines("C")} title="Rata tengah">≡</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => alignLines("R")} title="Rata kanan">→≡</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => alignLines("J")} title="Rata kiri-kanan (justify)">≣</button>
+                  </span>
+                  <span className={styles.toolGroup}>
+                    <button type="button" className={styles.toolBtn} onClick={() => prefixLines("## ")} title="Heading 2">H2</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => prefixLines("### ")} title="Heading 3">H3</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => prefixLines("> ")} title="Kutipan">“</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => prefixLines("- ")} title="Bullet list">•</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => prefixLines("1. ")} title="Numbered list">1.</button>
+                  </span>
+                </div>
+                <textarea
+                  id="content"
+                  ref={contentRef}
+                  className={`${styles.textarea} ${styles.editorArea}`}
+                  rows={14}
+                  value={form.content}
+                  onChange={(e) => setForm({ ...form, content: e.target.value })}
+                  placeholder={"Paragraf 1\nParagraf 2\n…"}
+                />
               </div>
-              <textarea
-                id="content"
-                ref={contentRef}
-                className={styles.textarea}
-                rows={14}
-                value={form.content}
-                onChange={(e) => setForm({ ...form, content: e.target.value })}
-                placeholder={"Paragraf 1\nParagraf 2\n…"}
-              />
             </div>
           </div>
 
@@ -294,6 +363,30 @@ export default function NewPostPage() {
               </div>
             )}
             {imgErr && <p className={styles.err}>{imgErr}</p>}
+            <div className={styles.captionGrid}>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel} htmlFor="image_caption">Keterangan Gambar / Caption</label>
+                <input
+                  id="image_caption"
+                  name="image_caption"
+                  className={styles.input}
+                  value={form.image_caption}
+                  onChange={(e) => setForm({ ...form, image_caption: e.target.value })}
+                  placeholder="Contoh: Suasana sidang paripurna di Gedung DPR RI..."
+                />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel} htmlFor="image_credit">Kredit Sumber / Fotografer</label>
+                <input
+                  id="image_credit"
+                  name="image_credit"
+                  className={styles.input}
+                  value={form.image_credit}
+                  onChange={(e) => setForm({ ...form, image_credit: e.target.value })}
+                  placeholder="Contoh: Antara Foto / Hafidz Mubarak"
+                />
+              </div>
+            </div>
           </div>
         </div>
 

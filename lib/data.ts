@@ -12,6 +12,8 @@ export type Article = {
   authorSlug?: string;
   authorRole?: string;
   image?: string;
+  image_caption?: string;
+  image_credit?: string;
   content: string[];
   tags: string[];
 };
@@ -65,6 +67,8 @@ type DbArticle = {
   author_slug?: string;
   author_role?: string;
   image?: string;
+  image_caption?: string;
+  image_credit?: string;
   content?: string[];
   tags?: string[];
 };
@@ -80,6 +84,8 @@ function mapRow(a: DbArticle): Article {
     authorSlug: a.author_slug ?? "redaksi-generic",
     authorRole: a.author_role ?? undefined,
     image: a.image ?? undefined,
+    image_caption: a.image_caption ?? undefined,
+    image_credit: a.image_credit ?? undefined,
     content: Array.isArray(a.content) ? a.content : JSON.parse(a.content || "[]"),
     tags: Array.isArray(a.tags) ? a.tags : JSON.parse(a.tags || "[]"),
   };

@@ -89,7 +89,9 @@ export async function POST(req: NextRequest) {
 
   // status "draft" → baris staging (tersembunyi dari publik); default terbit.
   // Skema DB memakai `image` (payload form boleh memakai alias `cover_image`);
-  // `slug` diabaikan — tabel memakai id numerik sebagai kunci.
+  // `slug`, `image_caption`, `image_credit` diabaikan — belum ada kolomnya
+  // (migrasi: ALTER TABLE articles ADD COLUMN image_caption TEXT,
+  // ADD COLUMN image_credit TEXT). Form tetap mengirimnya agar frontend siap.
   const isDraft = body.status === "draft";
 
   const { data, error } = await c.client

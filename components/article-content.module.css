@@ -37,3 +37,53 @@
 .paragraph a:hover {
   color: #c8102e;
 }
+
+.heading2 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.35;
+  color: var(--text);
+  margin: 0.5rem 0 0;
+}
+
+.heading3 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text);
+  margin: 0.5rem 0 0;
+}
+
+.quote {
+  border-left: 4px solid #c8102e;
+  padding: 0.75rem 1.25rem;
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.8;
+  font-style: italic;
+  color: var(--text-muted);
+  background: var(--hover);
+  border-radius: 0 8px 8px 0;
+}
+
+.ulist,
+.olist {
+  margin: 0;
+  padding-left: 1.5rem;
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ulist {
+  list-style: disc;
+}
+
+.olist {
+  list-style: decimal;
+}
