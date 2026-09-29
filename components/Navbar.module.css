@@ -1,18 +1,18 @@
 .header {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  background: #fff;
-  border-bottom: 1px solid #e2e8f0;
   z-index: 50;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .headerInner {
   max-width: 80rem;
   margin: 0 auto;
   padding: 0 16px;
-  min-height: 64px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -23,7 +23,6 @@
   .headerInner {
     padding-left: 24px;
     padding-right: 24px;
-    min-height: 80px;
   }
 }
 
@@ -55,14 +54,34 @@
 
 .hamburgerText {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  color: #1e293b;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 12px;
   flex: 1;
+  justify-content: center;
+  min-width: 0;
+}
+
+.logoMark {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.brandType {
+  font-family: var(--font-serif);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  font-size: 20px;
+  line-height: 1;
+  color: #0f172a;
+  white-space: nowrap;
 }
 
 .logoImg {
@@ -72,10 +91,18 @@
   object-fit: contain;
 }
 
-/* Layar kecil 360–412px: logo menyusut agar tak terpotong */
+/* Layar kecil 360–412px: lockup menyusut agar tak terpotong */
 @media (max-width: 480px) {
   .logoImg {
     max-width: 140px;
+  }
+
+  .logoMark {
+    height: 30px;
+  }
+
+  .brandType {
+    font-size: 16px;
   }
 
   .hamburgerText {
@@ -84,18 +111,23 @@
 }
 
 .loginBtn {
-  padding: 6px 16px;
+  padding: 8px 20px;
   border: 1px solid #cbd5e1;
   border-radius: 9999px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #1e293b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #334155;
   background: #fff;
-  transition: background 0.2s;
+  white-space: nowrap;
+  transition: all 0.2s;
 }
 
 .loginBtn:hover {
-  background: #f8fafc;
+  border-color: #0f172a;
+  background: #0f172a;
+  color: #fff;
 }
 
 .drawerOverlay {

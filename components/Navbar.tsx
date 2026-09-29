@@ -46,13 +46,14 @@ export function Navbar() {
 
           <Link href="/" className={styles.logo} aria-label="GentaNusa — Beranda">
             <Image
-              src="/images/logo-gentanusa.png"
-              alt="GentaNusa"
-              width={168}
-              height={40}
+              src="/images/logo-gentanusa-dark.svg"
+              alt=""
+              width={54}
+              height={36}
               priority
-              className={styles.logoImg}
+              className={styles.logoMark}
             />
+            <span className={styles.brandType}>GENTANUSA</span>
           </Link>
 
           <Link href="/admin/login" className={styles.loginBtn}>

@@ -46,8 +46,8 @@ export default function AdminLoginPage() {
             <Image
               src="/images/logo-gentanusa.png"
               alt="GentaNusa"
-              width={160}
-              height={40}
+              width={208}
+              height={52}
               className={styles.logo}
               priority
             />

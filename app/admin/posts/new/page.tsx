@@ -33,6 +33,8 @@ export default function NewPostPage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const [imgErr, setImgErr] = useState("");
@@ -61,6 +63,14 @@ export default function NewPostPage() {
       });
     });
   }, []);
+
+  function pickFile(file: File | null) {
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImageFile(file);
+    setImagePreview(file ? URL.createObjectURL(file) : null);
+    setImgErr("");
+    if (!file) setForm((f) => ({ ...f, image: "" }));
+  }
 
   useEffect(() => {
     return () => {
@@ -214,29 +224,61 @@ export default function NewPostPage() {
           <div className={styles.panel}>
             <h3 className={styles.panelTitle}>Foto Sampul</h3>
             <input
-              className={styles.input}
+              ref={fileRef}
+              className={styles.dropzoneInput}
               type="file"
               accept="image/jpeg,image/png,image/webp"
               onChange={(e) => {
-                const file = e.target.files?.[0] ?? null;
-                if (imagePreview) URL.revokeObjectURL(imagePreview);
-                setImageFile(file);
-                setImagePreview(file ? URL.createObjectURL(file) : null);
-                setImgErr("");
-                if (!file) setForm((f) => ({ ...f, image: "" }));
+                pickFile(e.target.files?.[0] ?? null);
                 e.target.value = "";
               }}
             />
-            <p className={styles.help}>JPG, PNG, atau WebP. Maksimal 5 MB. Seret & letakkan berkas atau klik untuk memilih.</p>
-            {(imagePreview || form.image) && (
-              <Image
-                src={imagePreview || form.image}
-                alt="Pratinjau foto sampul"
-                width={640}
-                height={360}
-                unoptimized
-                className={styles.previewImg}
-              />
+            {!imagePreview && !form.image ? (
+              <div
+                className={`${styles.dropzone} ${dragActive ? styles.dropzoneActive : ""}`}
+                role="button"
+                tabIndex={0}
+                aria-label="Unggah foto sampul"
+                onClick={() => fileRef.current?.click()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") fileRef.current?.click();
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragActive(true);
+                }}
+                onDragLeave={() => setDragActive(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragActive(false);
+                  pickFile(e.dataTransfer.files?.[0] ?? null);
+                }}
+              >
+                <span className={styles.dropzoneIcon}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                    <circle cx="12" cy="13" r="4" />
+                  </svg>
+                </span>
+                <p className={styles.dropzoneText}>Seret dan lepas foto sampul di sini, atau klik untuk memilih</p>
+                <p className={styles.dropzoneHint}>JPG, PNG, WebP maks 5MB</p>
+              </div>
+            ) : (
+              <div>
+                <Image
+                  src={imagePreview || form.image}
+                  alt="Pratinjau foto sampul"
+                  width={640}
+                  height={360}
+                  unoptimized
+                  className={styles.previewImg}
+                />
+                <div style={{ marginTop: 12 }}>
+                  <button type="button" className={styles.btnSecondary} onClick={() => fileRef.current?.click()}>
+                    Ganti Foto
+                  </button>
+                </div>
+              </div>
             )}
             {imgErr && <p className={styles.err}>{imgErr}</p>}
           </div>
