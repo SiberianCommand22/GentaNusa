@@ -8,77 +8,6 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
-/* ===== Top utility bar (ikut scroll, tidak sticky) ===== */
-.utilityBar {
-  background: #0f172a;
-  color: #cbd5e1;
-  font-size: 12px;
-  border-bottom: 1px solid #1e293b;
-}
-
-.utilityInner {
-  max-width: 80rem;
-  margin: 0 auto;
-  padding: 6px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-@media (min-width: 640px) {
-  .utilityInner {
-    padding-left: 32px;
-    padding-right: 32px;
-  }
-}
-
-.dateLine {
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.ticker {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  flex: 1;
-  justify-content: flex-end;
-}
-
-.breaking {
-  background: #dc2626;
-  color: #fff;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  margin-right: 8px;
-  flex-shrink: 0;
-}
-
-.tickerTitle {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: #e2e8f0;
-}
-
-.tickerTitle:hover {
-  color: #fff;
-}
-
-@media (max-width: 640px) {
-  .dateLine {
-    display: none;
-  }
-
-  .ticker {
-    justify-content: flex-start;
-  }
-}
-
 .headerInner {
   max-width: 80rem;
   margin: 0 auto;
@@ -94,7 +23,6 @@
   .headerInner {
     padding-left: 32px;
     padding-right: 32px;
-    height: 80px;
   }
 }
 
@@ -107,7 +35,13 @@
   cursor: pointer;
   padding: 8px;
   font-size: 14px;
+  font-weight: 700;
   color: #1e293b;
+  transition: color 0.15s;
+}
+
+.hamburger:hover {
+  color: #1e3a8a;
 }
 
 .hamburgerIcon {
@@ -138,71 +72,24 @@
   min-width: 0;
 }
 
-/* Logo resmi di latar putih: siluet hitam pekat, tajam, proporsional */
-.logoImgOfficial {
-  height: 40px;
-  width: auto;
-  max-width: 240px;
-  object-fit: contain;
-  filter: brightness(0);
-}
-
-.headerRight {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
-
-.searchBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 9999px;
-  border: none;
-  background: transparent;
-  color: #334155;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-
-.searchBtn:hover {
-  background: #f1f5f9;
-  color: #0f172a;
-}
-
-.quickSearch {
-  border-top: 1px solid #f1f5f9;
-  padding: 12px 16px;
-}
-
-.quickForm {
-  max-width: 80rem;
-  margin: 0 auto;
-}
-
 @media (max-width: 480px) {
   .hamburgerText {
     display: none;
   }
-
-  .logoImgOfficial {
-    height: 34px;
-    max-width: 170px;
-  }
 }
 
 .loginBtn {
-  padding: 6px 16px;
+  padding: 8px 20px;
   border: 1px solid #cbd5e1;
   border-radius: 9999px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: #334155;
   background: #fff;
   white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
   transition: all 0.2s;
 }
 
@@ -215,7 +102,9 @@
 .drawerOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   z-index: 100;
 }
 
@@ -230,7 +119,9 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  animation: slideIn 0.2s ease-out;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  z-index: 101;
+  animation: slideIn 0.3s ease-out;
 }
 
 @keyframes slideIn {
@@ -251,9 +142,10 @@
 }
 
 .drawerTitle {
-  font-size: 18px;
+  font-family: var(--font-serif);
+  font-size: 20px;
   font-weight: 700;
-  color: #1e293b;
+  color: #0f172a;
 }
 
 .drawerClose {
@@ -265,22 +157,41 @@
   padding: 4px;
 }
 
-.drawerSearch {
-  padding: 16px 20px;
-  border-bottom: 1px solid #e2e8f0;
+.drawerSearchForm {
+  position: relative;
+  margin: 16px 20px 24px;
+}
+
+.drawerSearchIcon {
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  pointer-events: none;
 }
 
 .searchInput {
   width: 100%;
-  padding: 10px 14px;
-  border: 1px solid #cbd5e1;
+  padding: 10px 16px 10px 40px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
+  color: #0f172a;
   outline: none;
+  transition: all 0.15s;
+}
+
+.searchInput::placeholder {
+  color: #94a3b8;
 }
 
 .searchInput:focus {
-  border-color: #1e3a8a;
+  background: #fff;
+  border-color: #0b192c;
+  box-shadow: 0 0 0 1px #0b192c;
 }
 
 .drawerNav {

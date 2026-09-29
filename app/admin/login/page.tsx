@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { BrandLogo } from "@/components/BrandLogo";
 import styles from "./login.module.css";
 
 export default function AdminLoginPage() {
@@ -42,11 +43,7 @@ export default function AdminLoginPage() {
     <div className={styles.container}>
       <div className={styles.card}>
         <div className={styles.logoWrapper}>
-          <img
-            src="/images/logo-gentanusa.png"
-            alt="GentaNusa"
-            className={styles.logoImgOfficial}
-          />
+          <BrandLogo theme="light" size="lg" href="/" />
         </div>
           <p className={styles.tagline}>CEPAT • AKURAT • TERPERCAYA</p>
           <h1 className={styles.title}>Login CMS</h1>

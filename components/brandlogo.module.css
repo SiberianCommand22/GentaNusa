@@ -1,0 +1,74 @@
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  user-select: none;
+}
+
+.emblem {
+  width: auto;
+  flex-shrink: 0;
+}
+
+.word {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* Ukuran emblem */
+.sm .emblem {
+  height: 28px;
+}
+
+.md .emblem {
+  height: 36px;
+}
+
+.lg .emblem {
+  height: 44px;
+}
+
+/* Ukuran teks */
+.sm .word {
+  font-size: 18px;
+}
+
+.md .word {
+  font-size: 24px;
+}
+
+.lg .word {
+  font-size: 30px;
+}
+
+/* Tema terang: navy pekat */
+.onLight .emblem {
+  color: #0b192c;
+}
+
+.onLight .word {
+  color: #0b192c;
+}
+
+/* Tema gelap: putih bersih */
+.onDark .emblem {
+  color: #fff;
+}
+
+.onDark .word {
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .md .emblem {
+    height: 30px;
+  }
+
+  .md .word {
+    font-size: 19px;
+  }
+}

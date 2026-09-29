@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Logo } from "@/components/Logo";
+import { BrandLogo } from "@/components/BrandLogo";
 import styles from "./site.module.css";
 
 export function Footer() {
@@ -8,7 +8,7 @@ export function Footer() {
       <div className={styles.container}>
         <div className={styles.footerGrid}>
           <div className={styles.brandCol}>
-            <Logo variant="white" />
+            <BrandLogo theme="dark" size="md" href="/" />
             <p className={styles.footerText}>
               Portal berita nasional independen menyajikan informasi akurat,
               berimbang, dan tepercaya dari seluruh penjuru Nusantara.

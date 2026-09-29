@@ -33,17 +33,9 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
   padding: 8px 8px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 16px;
-}
-
-/* Logo master putih di sidebar gelap */
-.brandImg {
-  height: 40px;
-  width: auto;
-  object-fit: contain;
 }
 
 .nav {
@@ -591,6 +583,8 @@
 
 .cellNarrow {
   white-space: nowrap;
+  font-size: 12px;
+  color: #475569;
 }
 
 .cellAuthor {

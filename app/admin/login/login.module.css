@@ -25,15 +25,6 @@
   margin-bottom: 12px;
 }
 
-/* Logo resmi di kartu putih: siluet hitam pekat tanpa artefak */
-.logoImgOfficial {
-  height: 44px;
-  width: auto;
-  max-width: 230px;
-  object-fit: contain;
-  filter: brightness(0);
-}
-
 .tagline {
   font-size: 11px;
   letter-spacing: 0.25em;

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { BrandLogo } from "@/components/BrandLogo";
 import styles from "./Navbar.module.css";
 
 const mainNav = [
@@ -14,62 +14,10 @@ const mainNav = [
 ];
 
 export function Navbar() {
-  const router = useRouter();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [quickOpen, setQuickOpen] = useState(false);
-  const [quickQuery, setQuickQuery] = useState("");
-  const [breaking, setBreaking] = useState<{ id: number; title: string } | null>(null);
-
-  const today = new Intl.DateTimeFormat("id-ID", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date());
-
-  // Ticker berita terhangat untuk utility bar (gagal diam-diam bila offline)
-  useEffect(() => {
-    fetch("/api/articles")
-      .then((r) => (r.ok ? r.json() : []))
-      .then((list) => {
-        if (Array.isArray(list) && list.length > 0) {
-          setBreaking({ id: list[0].id, title: list[0].title });
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/cari?q=${encodeURIComponent(searchQuery.trim())}`);
-      setDrawerOpen(false);
-    }
-  };
-
-  const handleQuickSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (quickQuery.trim()) {
-      router.push(`/cari?q=${encodeURIComponent(quickQuery.trim())}`);
-      setQuickQuery("");
-      setQuickOpen(false);
-    }
-  };
 
   return (
     <>
-      <div className={styles.utilityBar}>
-        <div className={styles.utilityInner}>
-          <span className={styles.dateLine}>{today} • Edisi Digital</span>
-          {breaking && (
-            <a href={`/artikel/${breaking.id}`} className={styles.ticker}>
-              <span className={styles.breaking}>BREAKING</span>
-              <span className={styles.tickerTitle}>{breaking.title}</span>
-            </a>
-          )}
-        </div>
-      </div>
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <button
@@ -86,47 +34,13 @@ export function Navbar() {
           </button>
 
           <div className={styles.logo}>
-            <Link href="/" aria-label="GentaNusa — Beranda">
-              <img
-                src="/images/logo-gentanusa.png"
-                alt="GentaNusa"
-                className={styles.logoImgOfficial}
-              />
-            </Link>
+            <BrandLogo theme="light" size="md" href="/" />
           </div>
 
-          <div className={styles.headerRight}>
-            <button
-              className={styles.searchBtn}
-              onClick={() => setQuickOpen((v) => !v)}
-              aria-label="Pencarian cepat"
-              aria-expanded={quickOpen}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-            </button>
-            <Link href="/admin/login" className={styles.loginBtn}>
-              Masuk Redaksi
-            </Link>
-          </div>
+          <Link href="/admin/login" className={styles.loginBtn}>
+            Login
+          </Link>
         </div>
-        {quickOpen && (
-          <div className={styles.quickSearch}>
-            <form onSubmit={handleQuickSearch} className={styles.quickForm}>
-              <input
-                autoFocus
-                type="search"
-                placeholder="Cari berita…"
-                value={quickQuery}
-                onChange={(e) => setQuickQuery(e.target.value)}
-                className={styles.searchInput}
-                aria-label="Cari berita"
-              />
-            </form>
-          </div>
-        )}
       </header>
 
       {drawerOpen && (
@@ -143,13 +57,17 @@ export function Navbar() {
               </button>
             </div>
 
-            <form onSubmit={handleSearch} className={styles.drawerSearch}>
+            <form action="/cari" method="GET" className={styles.drawerSearchForm}>
+              <svg className={styles.drawerSearchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
               <input
-                type="search"
-                placeholder="Cari Berita"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                type="text"
+                name="q"
+                placeholder="Cari berita..."
                 className={styles.searchInput}
+                aria-label="Cari berita"
               />
             </form>
 
