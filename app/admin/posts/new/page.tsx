@@ -95,50 +95,6 @@ export default function NewPostPage() {
     });
   }
 
-  // Terapkan prefix ke setiap baris dalam seleksi (toggle: tambah/hapus).
-  function prefixLines(prefix: string) {
-    const el = contentRef.current;
-    if (!el) return;
-    const { selectionStart: s, selectionEnd: e, value } = el;
-    const lineStart = value.lastIndexOf("\n", s - 1) + 1;
-    const lineEnd = e >= value.length ? value.length : value.indexOf("\n", e);
-    const end = lineEnd === -1 ? value.length : lineEnd;
-    const lines = value.slice(lineStart, end).split("\n");
-    const next =
-      value.slice(0, lineStart) +
-      lines
-        .map((ln) => (ln.startsWith(prefix) ? ln.slice(prefix.length) : prefix + ln))
-        .join("\n") +
-      value.slice(end);
-    setForm((f) => ({ ...f, content: next }));
-    requestAnimationFrame(() => el.focus());
-  }
-
-  // Perataan paragraf: penanda [L]/[C]/[R]/[J] (toggle, satu per baris).
-  function alignLines(code: "L" | "C" | "R" | "J") {
-    const el = contentRef.current;
-    if (!el) return;
-    const { selectionStart: s, selectionEnd: e, value } = el;
-    const lineStart = value.lastIndexOf("\n", s - 1) + 1;
-    const lineEnd = e >= value.length ? value.length : value.indexOf("\n", e);
-    const end = lineEnd === -1 ? value.length : lineEnd;
-    const marker = `[${code}] `;
-    const lines = value.slice(lineStart, end).split("\n");
-    const next =
-      value.slice(0, lineStart) +
-      lines
-        .map((ln) => {
-          const stripped = ln.replace(/^\[(L|C|R|J)\]\s*/, "");
-          return stripped === ln.replace(marker, "") && ln.startsWith(marker)
-            ? stripped
-            : marker + stripped;
-        })
-        .join("\n") +
-      value.slice(end);
-    setForm((f) => ({ ...f, content: next }));
-    requestAnimationFrame(() => el.focus());
-  }
-
   async function uploadImage(): Promise<string | null> {
     if (!imageFile) return form.image || null;
     const fd = new FormData();
@@ -270,24 +226,24 @@ export default function NewPostPage() {
               <div className={styles.editor}>
                 <div className={styles.toolbar} role="toolbar" aria-label="Format teks">
                   <span className={styles.toolGroup}>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("**", "**", "teks tebal")} title="Tebal"><strong>B</strong></button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("*", "*", "teks miring")} title="Miring"><em>I</em></button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<strong>", "</strong>", "teks tebal")} title="Tebal"><strong>B</strong></button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<em>", "</em>", "teks miring")} title="Miring"><em>I</em></button>
                     <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<u>", "</u>", "garis bawah")} title="Garis bawah"><u>U</u></button>
                     <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<s>", "</s>", "coret")} title="Coret"><s>S</s></button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("[", "](https://)", "tautan")} title="Tautan">Link</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<a href="https://" class="text-blue-600 underline">', "</a>", "tautan")} title="Tautan">Link</button>
                   </span>
                   <span className={styles.toolGroup}>
-                    <button type="button" className={styles.toolBtn} onClick={() => alignLines("L")} title="Rata kiri">≡←</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => alignLines("C")} title="Rata tengah">≡</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => alignLines("R")} title="Rata kanan">→≡</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => alignLines("J")} title="Rata kiri-kanan (justify)">≣</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p class="text-left">', "</p>", "paragraf rata kiri")} title="Rata kiri">≡←</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p class="text-center">', "</p>", "paragraf rata tengah")} title="Rata tengah">≡</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p class="text-right">', "</p>", "paragraf rata kanan")} title="Rata kanan">→≡</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p class="text-justify leading-relaxed">', "</p>", "paragraf justify")} title="Rata kiri-kanan (justify)">≣</button>
                   </span>
                   <span className={styles.toolGroup}>
-                    <button type="button" className={styles.toolBtn} onClick={() => prefixLines("## ")} title="Heading 2">H2</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => prefixLines("### ")} title="Heading 3">H3</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => prefixLines("> ")} title="Kutipan">“</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => prefixLines("- ")} title="Bullet list">•</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => prefixLines("1. ")} title="Numbered list">1.</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<h2>", "</h2>", "Subjudul")} title="Heading 2">H2</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<h3>", "</h3>", "Subjudul kecil")} title="Heading 3">H3</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<blockquote class="border-l-4 border-[#0B192C] pl-4 italic my-2">', "</blockquote>", "kutipan")} title="Kutipan">“</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<ul>\n<li>", "</li>\n</ul>", "poin")} title="Bullet list">•</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<ol>\n<li>", "</li>\n</ol>", "poin")} title="Numbered list">1.</button>
                   </span>
                 </div>
                 <textarea
@@ -456,7 +412,7 @@ export default function NewPostPage() {
                 {busy ? "Menyimpan…" : "Simpan Draft"}
               </button>
               <button className={styles.btnPrimary} disabled={busy} onClick={() => save("published")}>
-                {busy ? "Memublikasikan..." : editId ? "Perbarui & Publikasikan" : "Publikasikan"}
+                {busy ? "Memublikasikan..." : editId ? "Simpan Perubahan" : "Publikasikan"}
               </button>
             </div>
           </div>

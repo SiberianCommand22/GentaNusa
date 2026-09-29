@@ -2,6 +2,59 @@ import styles from "./article-content.module.css";
 
 export type ContentBlock = string;
 
+// Tag yang boleh lolos sanitasi (semua yang dihasilkan toolbar CMS).
+const SAFE_TAGS = new Set([
+  "strong", "b", "em", "i", "u", "s", "code", "a",
+  "p", "br", "h2", "h3", "blockquote", "ul", "ol", "li",
+]);
+
+// Token class yang diizinkan (subset aman ala prose, tanpa Tailwind).
+const SAFE_CLASSES = new Set([
+  "text-left",
+  "text-center",
+  "text-right",
+  "text-justify",
+  "leading-relaxed",
+  "border-l-4",
+  "pl-4",
+  "italic",
+  "my-2",
+  "text-blue-600",
+  "underline",
+]);
+
+const FORBIDDEN = /javascript:|data:text\/html|<script|on\w+=/gi;
+
+function cleanAttrs(tag: string, name: string, attrs: string): string {
+  let out = "";
+  const href = attrs.match(/href\s*=\s*"([^"]*)"/i);
+  if (name === "a" && href && (/^https?:\/\//i.test(href[1]) || href[1].startsWith("/"))) {
+    out += ` href="${href[1]}"`;
+  }
+  const cls = attrs.match(/class\s*=\s*"([^"]*)"/i);
+  if (cls) {
+    const kept = cls[1].split(/\s+/).filter((t) => SAFE_CLASSES.has(t));
+    if (kept.length > 0) out += ` class="${kept.join(" ")}"`;
+  }
+  return `<${tag}${out}`;
+}
+
+// Parser tag ringan: tag tak dikenal dibuang (isi dipertahankan),
+// atribut disaring ketat. Blok komentar & doctype dibuang.
+function sanitizeHtml(html: string): string {
+  return html
+    .replace(FORBIDDEN, "")
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b([^<>]*)>/g, (full, rawName: string, attrs: string) => {
+      const closing = full.startsWith("</");
+      const name = rawName.toLowerCase();
+      if (!SAFE_TAGS.has(name)) return "";
+      if (closing) return `</${name}>`;
+      if (full.endsWith("/>")) return `${cleanAttrs(name, name, attrs)}/>`;
+      return cleanAttrs(name, name, attrs) + ">";
+    });
+}
+
 function parseInline(text: string) {
   return text
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
@@ -12,114 +65,45 @@ function parseInline(text: string) {
     .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
 }
 
-// Sanitasi: buang tag/atribut berbahaya dari input user (XSS).
-// u/s/h2/h3/blockquote/ul/ol/li diizinkan karena toolbar CMS resmi
-// menghasilkannya; atribut selain href selalu dibuang.
-const SAFE_TAGS = ["strong", "b", "em", "i", "u", "s", "code", "a", "p", "br", "h2", "h3", "blockquote", "ul", "ol", "li"];
-const FORBIDDEN = /javascript:|data:text\/html|<script|on\w+=/gi;
+// Fallback penanda lawas CMS ([L]/[C]/[R]/[J], ##, >, -) → HTML setara.
+const ALIGN_OF: Record<string, string> = { L: "text-left", C: "text-center", R: "text-right", J: "text-justify" };
 
-function sanitizeHtml(html: string) {
-  return html
-    .replace(FORBIDDEN, "")
-    .replace(/<a\s+href="([^"]*)"/g, (_, href) => {
-      if (!/^https?:\/\//i.test(href) && !href.startsWith("/")) {
-        return "<a";
-      }
-      return `<a href="${href}"`;
-    })
-    .replace(/<(?!\/?(?:strong|b|em|i|u|s|code|a|p|br|h2|h3|blockquote|ul|ol|li)\b)[^>]*>/gi, "");
-}
-
-// Konvensi blok CMS (ditulis toolbar, dikupas saat render):
-//   ## / ###  → h2 / h3        >  → quote      - / 1. → list
-//   [L] [C] [R] [J] → rata kiri / tengah / kanan / justify
-type Align = "left" | "center" | "right" | "justify" | null;
-
-const ALIGN_CODE: Record<string, Exclude<Align, null>> = {
-  L: "left",
-  C: "center",
-  R: "right",
-  J: "justify",
-};
-
-function splitAlign(block: string): { align: Align; rest: string } {
-  const m = block.match(/^\[(L|C|R|J)\]\s*/);
-  if (!m) return { align: null, rest: block };
-  return { align: ALIGN_CODE[m[1]], rest: block.slice(m[0].length) };
-}
-
-function cleanInline(text: string): string {
-  return sanitizeHtml(parseInline(text));
-}
-
-function ContentBlockRenderer({ block }: { block: string }) {
-  const { align, rest } = splitAlign(block.trim());
-  const style = align ? { textAlign: align as React.CSSProperties["textAlign"] } : undefined;
-
+function legacyToHtml(block: string): string {
+  let align = "";
+  let rest = block;
+  const am = rest.match(/^\[(L|C|R|J)\]\s*/);
+  if (am) {
+    align = am[1] === "L" ? "" : ` class="${ALIGN_OF[am[1]]}"`;
+    rest = rest.slice(am[0].length);
+  }
   let m: RegExpMatchArray | null;
-  if ((m = rest.match(/^###\s+([\s\S]*)$/))) {
-    return <h2 className={styles.heading3} style={style} dangerouslySetInnerHTML={{ __html: cleanInline(m[1]) }} />;
-  }
-  if ((m = rest.match(/^##\s+([\s\S]*)$/))) {
-    return <h2 className={styles.heading2} style={style} dangerouslySetInnerHTML={{ __html: cleanInline(m[1]) }} />;
-  }
-  if ((m = rest.match(/^>\s?([\s\S]*)$/))) {
-    return <blockquote className={styles.quote} style={style} dangerouslySetInnerHTML={{ __html: cleanInline(m[1]) }} />;
-  }
-  return (
-    <p
-      className={styles.paragraph}
-      style={style}
-      dangerouslySetInnerHTML={{ __html: cleanInline(rest) }}
-    />
-  );
+  if ((m = rest.match(/^###\s+([\s\S]*)$/))) return `<h3${align}>${m[1]}</h3>`;
+  if ((m = rest.match(/^##\s+([\s\S]*)$/))) return `<h2${align}>${m[1]}</h2>`;
+  if ((m = rest.match(/^>\s?([\s\S]*)$/))) return `<blockquote${align}>${m[1]}</blockquote>`;
+  const t = rest.trim();
+  const um = t.match(/^[-•]\s+([\s\S]*)$/);
+  if (um) return `<ul${align}><li>${um[1]}</li></ul>`;
+  const om = t.match(/^1[.)]\s+([\s\S]*)$/);
+  if (om) return `<ol${align}><li>${om[1]}</li></ol>`;
+  if (align) return `<p${align}>${rest}</p>`;
+  return rest;
 }
 
-function isListItem(b: string, ordered: boolean): string | null {
-  const t = b.trim().replace(/^\[(L|C|R|J)\]\s*/, "");
-  const m = ordered ? t.match(/^1[.)]\s+([\s\S]*)$/) : t.match(/^[-•]\s+([\s\S]*)$/);
-  return m ? m[1] : null;
-}
-
-function listAlign(items: string[]): Align {
-  for (const b of items) {
-    const m = b.trim().match(/^\[(L|C|R|J)\]/);
-    if (m) return ALIGN_CODE[m[1]];
-  }
-  return null;
-}
+const BLOCK_TAG = /^\s*<(p|h2|h3|blockquote|ul|ol)\b/i;
 
 export function ArticleContent({ content }: { content: ContentBlock[] }) {
-  const out: React.ReactNode[] = [];
-  let i = 0;
-  let key = 0;
-  while (i < content.length) {
-    const block = content[i];
-    const ulItem = isListItem(block, false);
-    const olItem = isListItem(block, true);
-    if (ulItem !== null || olItem !== null) {
-      const ordered = olItem !== null;
-      const items: string[] = [];
-      while (i < content.length) {
-        const it = isListItem(content[i], ordered);
-        if (it === null) break;
-        items.push(it);
-        i++;
-      }
-      const align = listAlign(items);
-      const style = align ? { textAlign: align as React.CSSProperties["textAlign"] } : undefined;
-      const Tag = ordered ? "ol" : "ul";
-      out.push(
-        <Tag key={key++} className={ordered ? styles.olist : styles.ulist} style={style}>
-          {items.map((it, j) => (
-            <li key={j} dangerouslySetInnerHTML={{ __html: cleanInline(it) }} />
-          ))}
-        </Tag>
-      );
-      continue;
-    }
-    out.push(<ContentBlockRenderer key={key++} block={block} />);
-    i++;
-  }
-  return <div className={styles.articleContent}>{out}</div>;
+  return (
+    <div className={`${styles.articleContent} richtext`}>
+      {content.map((raw, i) => {
+        // Blok ber-tag HTML (toolbar baru) atau teks polos/penanda lawas.
+        const html = sanitizeHtml(raw.includes("<") ? raw : parseInline(legacyToHtml(raw)));
+        if (BLOCK_TAG.test(html)) {
+          return <div key={i} className={styles.rawBlock} dangerouslySetInnerHTML={{ __html: html }} />;
+        }
+        return (
+          <p key={i} className={styles.paragraph} dangerouslySetInnerHTML={{ __html: html }} />
+        );
+      })}
+    </div>
+  );
 }

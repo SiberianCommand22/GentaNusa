@@ -64,8 +64,6 @@ export default async function ArticlePage({ params }: Params) {
     })
     .slice(0, 3);
 
-  const coverCredit = article.tags.find((t) => t !== "headline");
-
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
 
   return (
@@ -88,12 +86,14 @@ export default async function ArticlePage({ params }: Params) {
                 alt={article.title}
                 className={styles.featuredImage}
               />
+            {article.image_caption && (
               <figcaption className={styles.caption}>
-                <span>{article.image_caption || `Foto: ${coverCredit || "GentaNusa"} — ${formatDate(article.date)}`}</span>
+                <span>{article.image_caption}</span>
                 {article.image_credit && (
                   <span className={styles.credit}>Foto: {article.image_credit}</span>
                 )}
               </figcaption>
+            )}
             </figure>
           )}
 
