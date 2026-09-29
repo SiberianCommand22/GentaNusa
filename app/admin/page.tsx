@@ -28,18 +28,6 @@ type AnalyticsReport = {
   articles: Array<{ id: number; title: string; date: string; reads: number }>;
 };
 
-type PendingArticle = {
-  title: string;
-  excerpt: string;
-  content: string[];
-  tags: string[];
-  category: string;
-  date: string;
-  image: string;
-  sourceId: string;
-  sourceLink: string;
-};
-
 const emptyForm = {
   title: "",
   category: "Nasional",
@@ -61,7 +49,7 @@ export default function AdminPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
-  const [tab, setTab] = useState<"artikel" | "kategori" | "sumber" | "subscriber" | "statistik" | "review">("artikel");
+  const [tab, setTab] = useState<"artikel" | "kategori" | "sumber" | "subscriber" | "statistik">("artikel");
   const [newCat, setNewCat] = useState({ slug: "", name: "", color: "#c8102e" });
   const [newSrc, setNewSrc] = useState({ id: "", name: "", url: "", category: "", color: "#666666" });
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -70,8 +58,6 @@ export default function AdminPage() {
   const [imageUploading, setImageUploading] = useState(false);
   const [analyticsReport, setAnalyticsReport] = useState<AnalyticsReport | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
-  const [pendingArticles, setPendingArticles] = useState<PendingArticle[]>([]);
-  const [pendingLoading, setPendingLoading] = useState(false);
 
   const load = useCallback(async () => {
     const [a, c, s, sub] = await Promise.all([
@@ -84,21 +70,6 @@ export default function AdminPage() {
     setCategories(Array.isArray(c) ? c : []);
     setSources(Array.isArray(s) ? s : []);
     setSubscribers(Array.isArray(sub) ? sub : []);
-  }, []);
-
-  const loadPending = useCallback(async () => {
-    setPendingLoading(true);
-    try {
-      const r = await fetch("/api/admin/pending");
-      if (r.ok) {
-        const data = await r.json();
-        setPendingArticles(Array.isArray(data) ? data : []);
-      }
-    } catch (e) {
-      console.error("[admin] load pending:", e);
-    } finally {
-      setPendingLoading(false);
-    }
   }, []);
 
   useEffect(() => {
@@ -117,18 +88,6 @@ export default function AdminPage() {
       }
     });
   }, [load]);
-
-  // Polling Review tab — refresh pending list every 30s when authed.
-  // Initial fetch didefer via timeout agar tidak setState sinkron di body effect.
-  useEffect(() => {
-    if (!authed) return;
-    const initial = window.setTimeout(() => loadPending(), 0);
-    const id = window.setInterval(() => loadPending(), 30000);
-    return () => {
-      window.clearTimeout(initial);
-      window.clearInterval(id);
-    };
-  }, [authed, loadPending]);
 
   async function saveArticle(e: React.FormEvent) {
     e.preventDefault();
@@ -296,7 +255,6 @@ export default function AdminPage() {
           <button className={styles.tab} onClick={() => setTab("sumber")} data-active={tab === "sumber"}>Sumber RSS</button>
           <button className={styles.tab} onClick={() => setTab("subscriber")} data-active={tab === "subscriber"}>Subscribers ({subscribers.length})</button>
           <button className={styles.tab} onClick={() => setTab("statistik")} data-active={tab === "statistik"}>📊 Statistik</button>
-          <button className={styles.tab} onClick={() => { setTab("review"); loadPending(); }} data-active={tab === "review"}>📝 Review ({pendingArticles.length})</button>
           <button className={styles.tab} onClick={logout}>Logout</button>
         </div>
       </div>
@@ -537,88 +495,6 @@ export default function AdminPage() {
             </>
           ) : (
             <p style={{ color: "var(--muted, #4a4a5a)" }}>Belum ada data statistik. Data mulai dihitung setelah tracker aktif.</p>
-          )}
-        </div>
-      )}
-
-      {tab === "review" && (
-        <div className={styles.form}>
-          <h2>📝 Review Artikel Pending ({pendingArticles.length})</h2>
-          {pendingLoading ? (
-            <p style={{ color: "var(--muted, #4a4a5a)" }}>Memuat daftar review…</p>
-          ) : pendingArticles.length === 0 ? (
-            <p style={{ color: "var(--muted, #4a4a5a)" }}>Tidak ada artikel pending review.</p>
-          ) : (
-            <div className={styles.list}>
-              {pendingArticles.map((a, idx) => (
-                <div key={idx} className={styles.item}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <strong>{a.title}</strong>
-                    <div style={{ fontSize: "0.85rem", color: "var(--muted, #4a4a5a)", marginTop: "0.25rem" }}>
-                      {a.category} • {a.date} • Sumber: {a.sourceId || "unknown"}
-                      <br />
-                      <a href={a.sourceLink} target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent, #c8102e)" }}>
-                        Lihat sumber →
-                      </a>
-                    </div>
-                    <details style={{ marginTop: "0.5rem" }}>
-                      <summary style={{ cursor: "pointer", color: "var(--muted, #4a4a5a)" }}>Pratinjau isi ({a.content?.length || 0} paragraf)</summary>
-                      <div style={{ marginTop: "0.5rem", fontSize: "0.85rem", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
-                        {Array.isArray(a.content) ? a.content.join("\n\n") : a.content}
-                      </div>
-                    </details>
-                  </div>
-                  <div className={styles.itemActions} style={{ flexDirection: "column", gap: "0.5rem" }}>
-                    <button
-                      className={styles.mini}
-                      disabled={busy}
-                      onClick={async () => {
-                        setBusy(true);
-                        const res = await fetch("/api/admin/pending", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ action: "approve", index: idx }),
-                        });
-                        const data = await res.json();
-                        setBusy(false);
-                        if (res.ok) {
-                          setMsg("✅ " + data.message);
-                          loadPending();
-                          load();
-                        } else {
-                          setMsg("❌ " + (data.error || "Gagal approve"));
-                        }
-                      }}
-                    >
-                      ✅ Approve
-                    </button>
-                    <button
-                      className={styles.miniDanger}
-                      disabled={busy}
-                      onClick={async () => {
-                        if (!confirm("Tolak artikel ini?")) return;
-                        setBusy(true);
-                        const res = await fetch("/api/admin/pending", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ action: "reject", index: idx }),
-                        });
-                        const data = await res.json();
-                        setBusy(false);
-                        if (res.ok) {
-                          setMsg("🗑️ " + data.message);
-                          loadPending();
-                        } else {
-                          setMsg("❌ " + (data.error || "Gagal reject"));
-                        }
-                      }}
-                    >
-                      🗑️ Tolak
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
           )}
         </div>
       )}

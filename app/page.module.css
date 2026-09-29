@@ -9,6 +9,35 @@
   padding: 32px 0;
 }
 
+/* ===== Empty state (tabel artikel kosong) ===== */
+.emptyState {
+  text-align: center;
+  padding: 72px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.emptyTitle {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  font-family: var(--font-serif);
+}
+
+.emptyText {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-muted);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
 .heroGrid {
   display: grid;
   grid-template-columns: 2fr 1fr;

@@ -22,8 +22,8 @@ export async function generateMetadata({ params }: Params) {
   const article = (await getArticles()).find((a) => a.id === Number(id));
   if (!article) return { title: "Artikel Tidak Ditemukan" };
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
-  // og/<hash>.png is written by scripts/auto-article-gen.py when the article is
-  // created — same charCode*31 hash as Python's og_object_name(). Crawlers get
+  // og/<hash>.png is pre-rendered by scripts/og-render.py (manual tool) —
+  // same charCode*31 hash as Python's og_object_name(). Crawlers get
   // a static file instantly; the /api/og-image route stays as the fallback for
   // rows created before this existed.
   const ogImage = ogImageOrFallback({ title: article.title });

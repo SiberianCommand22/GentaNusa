@@ -15,10 +15,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - `npm run build` — build without Supabase sync (uses stale JSON)
 - `npm run lint` — ESLint (only verification command; no test suite exists)
 - `npx tsc --noEmit` — typecheck (no script alias)
-- `python scripts/fetch_rss.py` — fetch RSS syndication items → `lib/data/syndicated.json`
-- `python scripts/auto-article-gen.py` — generate one original article from RSS via LLM
-- `python scripts/auto-article-gen.py --dry-run` — test without writing
-- `python scripts/auto-article-gen.py --save-pending` — stage article for admin review
+- `python scripts/og-render.py --id <id>` — pre-render OG share card (needs Pillow)
+
+## Publishing (100% manual)
+
+No cron, no GitHub Actions schedule, no auto-generator. All articles are
+created by a logged-in admin in `/admin` (cookie `genta_admin=1`) via
+`POST /api/articles`, which rejects unauthenticated requests with 401.
 
 ## Data flow
 
@@ -28,23 +31,11 @@ Supabase is the source of truth. `lib/data/*.json` is a build-time snapshot for 
 - `scripts/sync-supabase.mjs` pulls Supabase → JSON (runs automatically in `build:sync`)
 - After DB changes, wait up to 30s for cache to expire or restart dev server
 
-## Auto-article pipeline
+## Staging workflow (retired)
 
-`scripts/auto-article-gen.py` (stdlib only, no requirements.txt):
-
-1. Fetches RSS from sources in `lib/data/sources.json`
-2. Sends to LLM: 9Router local (`127.0.0.1:20128`) first, Gemini cloud fallback
-3. Validates output (length, no CJK, no placeholder text)
-4. Inserts into Supabase with `author_slug = "staging-<slug>"` (pending review) or `"redaksi-gentanusa"` (live)
-
-**Critical**: `staging_slug()` in Python and `slugOf()` in `app/api/admin/pending/route.ts` must stay byte-identical (same hash algorithm). Changing one breaks approve/reject.
-
-## Staging workflow
-
-1. Generator inserts with `--save-pending` → row has `staging-` prefix in `author_slug`
-2. Public site excludes `staging-%` rows (filter in `lib/data.ts`)
-3. Admin panel (`/admin`) polls `/api/admin/pending` every 30s
-4. Approve → rewrites `author_slug` to `redaksi-gentanusa`; Reject → deletes row
+The auto-article generator, its GitHub Actions cron, and the
+`/api/admin/pending` approve/reject route were removed. The `staging-%`
+filter in `lib/data.ts` stays as defense-in-depth against legacy rows.
 
 ## Environment
 
@@ -69,12 +60,12 @@ Copy `.env.example` → `.env.local`. Key vars:
 
 ## CI
 
-GitHub Actions (`.github/workflows/daily-article.yml`): runs `auto-article-gen.py` at 13:00 UTC (20:00 WIB) daily. Uses `GEMINI_API_KEY` secret. Offset from local Task Scheduler run (08:00 WIB) to avoid duplicate articles.
+No scheduled workflows. (The former `daily-article.yml` cron was removed
+with the auto-generator; publishing is manual-only.)
 
 ## Gotchas
 
 - `lib/data.ts` caches for 30s — restart dev server to see DB changes immediately
-- `fetch_rss.py` has duplicate `fetch_xml` definition (second overrides first) — harmless but confusing
 - No test suite — `verify-all.mjs` is a manual smoke test, not automated
 - `app/page.tsx` imports `NextResponse` from `next/server` (unused) — harmless but sloppy
 - Python scripts use stdlib only; no `requirements.txt` to install

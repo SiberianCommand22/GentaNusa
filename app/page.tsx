@@ -20,6 +20,30 @@ export const revalidate = 60;
 
 export default async function Home() {
   const latest = sortByDate(await getArticles());
+
+  // Empty state — tabel artikel kosong (mis. DB baru): sambut pembaca
+  // dengan pesan elegan, bukan crash (latest[0] undefined) atau hero kosong.
+  if (latest.length === 0) {
+    return (
+      <main>
+        <section className={styles.hero}>
+          <div className={styles.container}>
+            <div className={styles.emptyState}>
+              <p className={styles.emptyIcon}>📰</p>
+              <h1 className={styles.emptyTitle}>Belum ada berita terbaru</h1>
+              <p className={styles.emptyText}>
+                Redaksi kami sedang menyiapkan liputan terbaru untuk Anda.
+                Silakan kembali lagi nanti.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <Footer />
+      </main>
+    );
+  }
+
   const featured = latest[0];
   const popular = latest.slice(1, 6);
   const recent = latest.slice(0, 6);

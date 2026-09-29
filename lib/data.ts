@@ -88,10 +88,9 @@ function mapRow(a: DbArticle): Article {
 async function fetchArticlesDb(): Promise<Article[] | null> {
   if (!supabaseAnon) return null;
   try {
-    // Exclude rows still awaiting editorial review. Pending articles are staged in
-    // the same table with a `staging-` author_slug (see app/api/admin/pending), so
-    // without this filter a draft would appear on the public site the moment the
-    // generator stages it.
+    // Exclude rows still awaiting editorial review. Legacy auto-pipeline rows
+    // carry a `staging-` author_slug prefix, so without this filter a draft
+    // would appear on the public site. Publishing is 100% manual via /admin.
     const { data, error } = await supabaseAnon
       .from("articles")
       .select("*")
