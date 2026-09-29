@@ -56,7 +56,7 @@ export function sortByDate(articles: Article[]): Article[] {
 
 // Slug SEO turunan dari judul. Tabel Supabase belum punya kolom `slug`
 // (API mengabaikannya saat insert), jadi slug dihitung deterministik di
-// sini agar URL /artikel/<slug> stabil tanpa migrasi DB.
+// sini agar URL /<slug> stabil tanpa migrasi DB.
 export function slugifyTitle(title: string): string {
   const slug = String(title || "")
     .toLowerCase()
@@ -72,7 +72,8 @@ export function articleSlug(a: { slug?: string; title: string }): string {
 }
 
 export function articleUrl(a: { slug?: string; id: number; title: string }): string {
-  return `/artikel/${articleSlug(a) || a.id}`;
+  const slug = articleSlug(a) || a.id.toString();
+  return `/${slug}`;
 }
 
 function readJson(file: string) {
@@ -179,7 +180,7 @@ export async function getArticle(id: number): Promise<Article | undefined> {
 }
 
 // Cari artikel berdasarkan slug SEO, dengan fallback ID numerik untuk
-// tautan lama /artikel/<id>. Pencocokan slug juga mentolerir akhiran
+// tautan lama /<id>. Pencocokan slug juga mentolerir akhiran
 // "-<id>" bila kelak slug dibuat unik per baris.
 export async function getArticleBySlugOrId(slugOrId: string): Promise<Article | undefined> {
   const key = String(slugOrId || "").trim();

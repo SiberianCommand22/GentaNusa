@@ -3,6 +3,27 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
+const RESERVED_SLUGS = [
+  "admin",
+  "api",
+  "cari",
+  "tentang",
+  "kebijakan-privasi",
+  "syarat-ketentuan",
+  "robots.txt",
+  "sitemap.xml",
+  "favicon.ico",
+  "kontak",
+  "susunan-redaksi",
+  "sindikasi",
+  "kategori",
+  "penulis",
+  "privasi",
+  "syarat",
+  "feed.xml",
+  "news-sitemap.xml",
+];
+
 function getVisitorId() {
   const key = "gentanusa_visitor_id";
   const existing = window.localStorage.getItem(key);
@@ -18,6 +39,13 @@ function isTrackablePath(pathname: string) {
     !pathname.startsWith("/api/") &&
     !pathname.startsWith("/media/")
   );
+}
+
+function isArticlePath(pathname: string): boolean {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length !== 1) return false;
+  const slug = segments[0];
+  return !RESERVED_SLUGS.includes(slug);
 }
 
 function sendEvent(
@@ -47,8 +75,17 @@ export function AnalyticsTracker() {
 
     sendEvent("site", pathname);
 
-    const match = pathname.match(/^\/artikel\/(\d+)\/?$/);
-    if (match) sendEvent("article", pathname, Number(match[1]));
+    // Match old /artikel/<id> pattern
+    const legacyMatch = pathname.match(/^\/artikel\/(\d+)\/?$/);
+    if (legacyMatch) {
+      sendEvent("article", pathname, Number(legacyMatch[1]));
+      return;
+    }
+
+    // Match new root-level /<slug> pattern for articles
+    if (isArticlePath(pathname)) {
+      sendEvent("article", pathname);
+    }
   }, [pathname]);
 
   return null;
