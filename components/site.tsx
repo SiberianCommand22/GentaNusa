@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 import styles from "./site.module.css";
 
 export function Footer() {
@@ -7,16 +8,7 @@ export function Footer() {
       <div className={styles.container}>
         <div className={styles.footerGrid}>
           <div className={styles.brandCol}>
-            <Link href="/" className={styles.logo} aria-label="GentaNusa — Beranda">
-              <img
-                alt="Logo GentaNusa"
-                loading="lazy"
-                width={220}
-                height={72}
-                className={styles.logoImgFooter}
-                src="/images/logo-gentanusa-white.png"
-              />
-            </Link>
+            <Logo variant="white" />
             <p className={styles.footerText}>
               Portal berita nasional independen menyajikan informasi akurat,
               berimbang, dan tepercaya dari seluruh penjuru Nusantara.

@@ -1,0 +1,41 @@
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.mark {
+  height: 36px;
+  width: auto;
+  color: #0b192c;
+  flex-shrink: 0;
+}
+
+.word {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+.lockupWhite .mark {
+  color: #fff;
+}
+
+.lockupWhite .word {
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .mark {
+    height: 30px;
+  }
+
+  .word {
+    font-size: 19px;
+  }
+}

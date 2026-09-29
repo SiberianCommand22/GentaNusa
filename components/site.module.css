@@ -1,17 +1,3 @@
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.logoImgFooter {
-  width: auto;
-  height: 72px;
-  max-width: 100%;
-  object-fit: contain;
-}
-
 /* ===== Footer editorial navy ===== */
 .footer {
   background: #0b192c;

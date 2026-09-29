@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Logo } from "@/components/Logo";
 import styles from "./login.module.css";
 
 export default function AdminLoginPage() {
@@ -43,15 +43,8 @@ export default function AdminLoginPage() {
     <div className={styles.container}>
       <div className={styles.card}>
         <div className={styles.logoWrapper}>
-            <Image
-              src="/images/logo-gentanusa.png"
-              alt="GentaNusa"
-              width={208}
-              height={52}
-              className={styles.logo}
-              priority
-            />
-          </div>
+          <Logo />
+        </div>
           <p className={styles.tagline}>CEPAT • AKURAT • TERPERCAYA</p>
           <h1 className={styles.title}>Login CMS</h1>
           <p className={styles.subtitle}>Masuk ke ruang kerja redaksi</p>

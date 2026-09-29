@@ -8,11 +8,82 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
+/* ===== Top utility bar (ikut scroll, tidak sticky) ===== */
+.utilityBar {
+  background: #0f172a;
+  color: #cbd5e1;
+  font-size: 12px;
+  border-bottom: 1px solid #1e293b;
+}
+
+.utilityInner {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .utilityInner {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+.dateLine {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ticker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.breaking {
+  background: #dc2626;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.tickerTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #e2e8f0;
+}
+
+.tickerTitle:hover {
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .dateLine {
+    display: none;
+  }
+
+  .ticker {
+    justify-content: flex-start;
+  }
+}
+
 .headerInner {
   max-width: 80rem;
   margin: 0 auto;
   padding: 0 16px;
-  height: 80px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -21,8 +92,9 @@
 
 @media (min-width: 640px) {
   .headerInner {
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: 32px;
+    padding-right: 32px;
+    height: 80px;
   }
 }
 
@@ -61,63 +133,59 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex: 1;
   justify-content: center;
+  flex: 1;
   min-width: 0;
 }
 
-.logoMark {
-  height: 36px;
-  width: auto;
-  object-fit: contain;
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   flex-shrink: 0;
 }
 
-.brandType {
-  font-family: var(--font-serif);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  font-size: 20px;
-  line-height: 1;
+.searchBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: #334155;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.searchBtn:hover {
+  background: #f1f5f9;
   color: #0f172a;
-  white-space: nowrap;
 }
 
-.logoImg {
-  height: 40px;
-  width: auto;
-  max-width: 200px;
-  object-fit: contain;
+.quickSearch {
+  border-top: 1px solid #f1f5f9;
+  padding: 12px 16px;
 }
 
-/* Layar kecil 360–412px: lockup menyusut agar tak terpotong */
+.quickForm {
+  max-width: 80rem;
+  margin: 0 auto;
+}
+
 @media (max-width: 480px) {
-  .logoImg {
-    max-width: 140px;
-  }
-
-  .logoMark {
-    height: 30px;
-  }
-
-  .brandType {
-    font-size: 16px;
-  }
-
   .hamburgerText {
     display: none;
   }
 }
 
 .loginBtn {
-  padding: 8px 20px;
+  padding: 6px 16px;
   border: 1px solid #cbd5e1;
   border-radius: 9999px;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 600;
   color: #334155;
   background: #fff;
   white-space: nowrap;
