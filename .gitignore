@@ -1,5 +1,6 @@
 # dependencies
 /node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -13,6 +14,7 @@
 
 # next.js
 /.next/
+.next/
 /out/
 
 # production
@@ -21,6 +23,9 @@
 # misc
 .DS_Store
 *.pem
+service-account*.json
+serviceAccount*.json
+*-service-account.json
 
 # debug
 npm-debug.log*

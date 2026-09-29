@@ -6,9 +6,12 @@ export function AdSlot({ slot, style }: { slot: string; style?: React.CSSPropert
 
   useEffect(() => {
     try {
-      (window as any).adsbygoogle = (window as any).adsbygoogle || [];
-      (window as any).adsbygoogle.push({});
-    } catch (e) {}
+      const w = window as unknown as { adsbygoogle?: unknown[] };
+      w.adsbygoogle = w.adsbygoogle || [];
+      w.adsbygoogle.push({});
+    } catch {
+      // ads not available (adblock/offline) — abaikan
+    }
   }, []);
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import styles from "./share-buttons.module.css";
 
 interface ShareButtonsProps {
@@ -37,11 +37,12 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
   const isAbsolute = url.startsWith("http://") || url.startsWith("https://");
   const baseUrl = isAbsolute ? url : `${SITE_URL}${url.startsWith("/") ? url : `/${url}`}`;
 
-  // Always append a fresh cache-buster query parameter to force WhatsApp/FB
-  // to scrape the thumbnail fresh every single time the share button is clicked,
-  // bypassing WhatsApp's stubborn negative cache completely.
+  // Cache-buster unik per mount (murni, stabil antar render) agar WhatsApp/FB
+  // scrape thumbnail fresh setiap komponen dipasang, tanpa memanggil
+  // fungsi impure saat render.
+  const cacheBuster = useId().replace(/[^a-zA-Z0-9]/g, "");
   const sep = baseUrl.includes("?") ? "&" : "?";
-  const fullUrl = `${baseUrl}${sep}t=${Date.now()}`;
+  const fullUrl = `${baseUrl}${sep}t=${cacheBuster}`;
 
   const shareLinks = [
     {

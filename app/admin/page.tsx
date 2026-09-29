@@ -118,12 +118,16 @@ export default function AdminPage() {
     });
   }, [load]);
 
-  // Polling Review tab — refresh pending list every 30s when authed
+  // Polling Review tab — refresh pending list every 30s when authed.
+  // Initial fetch didefer via timeout agar tidak setState sinkron di body effect.
   useEffect(() => {
     if (!authed) return;
-    loadPending();
-    const id = setInterval(() => loadPending(), 30000);
-    return () => clearInterval(id);
+    const initial = window.setTimeout(() => loadPending(), 0);
+    const id = window.setInterval(() => loadPending(), 30000);
+    return () => {
+      window.clearTimeout(initial);
+      window.clearInterval(id);
+    };
   }, [authed, loadPending]);
 
   async function saveArticle(e: React.FormEvent) {

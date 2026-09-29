@@ -7,7 +7,7 @@ export async function GET() {
   const cookie = store.get("genta_admin");
 
   if (cookie?.value === "1") {
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ authed: true });
   }
-  return NextResponse.json({ error: "Belum login" }, { status: 401 });
+  return NextResponse.json({ authed: false }, { status: 401 });
 }
