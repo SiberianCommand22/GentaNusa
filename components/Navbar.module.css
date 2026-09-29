@@ -9,12 +9,20 @@
 }
 
 .headerInner {
-  max-width: 1200px;
+  max-width: 80rem;
   margin: 0 auto;
-  padding: 12px 20px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .headerInner {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
 }
 
 .hamburger {
@@ -58,6 +66,7 @@
 .logoImg {
   height: 40px;
   width: auto;
+  max-width: 200px;
   object-fit: contain;
 }
 
@@ -149,7 +158,6 @@
 
 .drawerNav {
   padding: 16px 20px;
-  border-bottom: 1px solid #e2e8f0;
 }
 
 .drawerLink {
@@ -165,34 +173,10 @@
   border-bottom: none;
 }
 
-.drawerCategories {
-  padding: 16px 20px;
-  flex: 1;
-}
-
-.drawerCategoriesTitle {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #64748b;
-  margin-bottom: 12px;
-}
-
-.drawerCategory {
-  display: block;
-  padding: 8px 0;
-  font-size: 14px;
-  color: #475569;
-}
-
-.drawerCategory:hover {
-  color: #1e3a8a;
-}
-
 .drawerFooter {
   padding: 16px 20px;
   border-top: 1px solid #e2e8f0;
+  margin-top: auto;
 }
 
 .socialLinks {
@@ -202,7 +186,11 @@
 }
 
 .socialLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 14px;
+  font-weight: 500;
   color: #475569;
 }
 

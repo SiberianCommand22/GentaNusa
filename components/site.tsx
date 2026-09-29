@@ -40,10 +40,9 @@ export function Footer() {
           </div>
           <div className={styles.footerCol}>
             <h4>Info</h4>
-            <a href="/tentang">Tentang Kami</a>
-            <a href="/sindikasi">Sindikasi</a>
-            <a href="/privasi">Kebijakan Privasi</a>
-            <a href="/syarat">Syarat & Ketentuan</a>
+            <Link href="/tentang">Tentang Kami</Link>
+            <Link href="/kebijakan-privasi">Kebijakan Privasi</Link>
+            <Link href="/syarat-ketentuan">Syarat & Ketentuan</Link>
           </div>
         </div>
         <div className={styles.footerBottom}>© 2026 GentaNusa. Seluruh hak cipta dilindungi.</div>
