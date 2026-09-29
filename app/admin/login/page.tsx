@@ -60,10 +60,12 @@ export default function AdminLoginPage() {
             <input
               id="email"
               type="email"
-              placeholder="redaksi@gentanusa.id"
+              placeholder="nama@gentanusa.id"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={styles.input}
+              autoComplete="username"
+              required
             />
           </div>
 
@@ -73,10 +75,12 @@ export default function AdminLoginPage() {
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Masukkan password"
+                placeholder="Masukkan kata sandi"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={styles.input}
+                autoComplete="current-password"
+                required
               />
               <button
                 type="button"

@@ -57,6 +57,8 @@ export async function PUT(
       excerpt: body.excerpt,
       content: body.content,
       image: body.image ?? null,
+      // Kolom opsional — hanya ditulis bila ada nilainya (lihat POST).
+      ...(body.video_url ? { video_url: body.video_url } : {}),
       tags: body.tags ?? [],
       author: body.author,
       author_slug: body.authorSlug ?? null,

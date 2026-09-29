@@ -9,35 +9,6 @@
   padding: 32px 0;
 }
 
-/* ===== Empty state (tabel artikel kosong) ===== */
-.emptyState {
-  text-align: center;
-  padding: 72px 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-}
-
-.emptyIcon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.emptyTitle {
-  font-size: 28px;
-  font-weight: 800;
-  margin-bottom: 12px;
-  font-family: var(--font-serif);
-}
-
-.emptyText {
-  font-size: 15px;
-  line-height: 1.7;
-  color: var(--text-muted);
-  max-width: 480px;
-  margin: 0 auto;
-}
-
 .heroGrid {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -210,19 +181,19 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: 20px;
 }
 
-@media (max-width: 900px) {
+@media (min-width: 640px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 600px) {
+@media (min-width: 1024px) {
   .grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 

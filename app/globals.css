@@ -36,6 +36,13 @@ html {
 
 body {
   padding-top: 64px;
+  overflow-x: hidden;
+}
+
+@media (min-width: 640px) {
+  body {
+    padding-top: 80px;
+  }
 }
 
 a {

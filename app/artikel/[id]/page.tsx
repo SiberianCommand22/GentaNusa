@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Footer } from "@/components/site";
 import { getArticles, getCategoryBySlug, formatDate } from "@/lib/data";
-import { ogImageOrFallback } from "@/lib/og";
 import { getArticleReadCount } from "@/lib/analytics-server";
 import { ArticleContent } from "@/components/article-content";
 import { CardImage } from "@/components/card-image";
@@ -22,30 +21,26 @@ export async function generateMetadata({ params }: Params) {
   const article = (await getArticles()).find((a) => a.id === Number(id));
   if (!article) return { title: "Artikel Tidak Ditemukan" };
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
-  // og/<hash>.png is pre-rendered by scripts/og-render.py (manual tool) —
-  // same charCode*31 hash as Python's og_object_name(). Crawlers get
-  // a static file instantly; the /api/og-image route stays as the fallback for
-  // rows created before this existed.
-  const ogImage = ogImageOrFallback({ title: article.title });
+  const coverImage = article.image || "/logo.png";
 
   return {
     title: article.title,
-    description: article.excerpt,
+    description: article.excerpt || article.title,
     alternates: { canonical: `${SITE_URL}/artikel/${article.id}` },
     openGraph: {
       type: "article",
       siteName: "GentaNusa",
       title: article.title,
-      description: article.excerpt,
+      description: article.excerpt || article.title,
       url: `${SITE_URL}/artikel/${article.id}`,
       locale: "id_ID",
-      images: [{ url: ogImage, width: 1200, height: 630, alt: article.title }],
+      images: [{ url: coverImage, width: 1200, height: 630, alt: article.title }],
     },
     twitter: {
       card: "summary_large_image",
       title: article.title,
-      description: article.excerpt,
-      images: [ogImage],
+      description: article.excerpt || article.title,
+      images: [coverImage],
     },
   };
 }

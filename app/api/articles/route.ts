@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
         date: a.date,
         author: a.author,
         image: a.image,
+        video_url: a.video_url,
         tags: a.tags,
       }))
     );
@@ -69,6 +70,9 @@ export async function POST(req: NextRequest) {
         content: body.content,
         tags: body.tags,
         image: body.image,
+        // video_url hanya dikirim bila diisi — kolomnya opsional di DB
+        // (migrasi: ALTER TABLE articles ADD COLUMN video_url TEXT).
+        ...(body.video_url ? { video_url: body.video_url } : {}),
         date: body.date || new Date().toISOString().split("T")[0],
         author: body.author || "Redaksi GentaNusa",
         author_slug: body.authorSlug || "redaksi-generic",

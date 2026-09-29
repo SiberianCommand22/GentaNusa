@@ -11,6 +11,7 @@ type Article = {
   excerpt: string;
   content: string[] | string;
   image: string | null;
+  video_url?: string | null;
   tags: string[] | string;
   author: string;
   author_slug: string | null;
@@ -34,6 +35,7 @@ const emptyForm = {
   excerpt: "",
   content: "",
   image: "",
+  video_url: "",
   tags: "",
   author: "Redaksi",
   date: "",
@@ -154,6 +156,7 @@ export default function AdminPage() {
       excerpt: a.excerpt,
       content: Array.isArray(a.content) ? a.content.join("\n") : a.content,
       image: a.image || "",
+      video_url: a.video_url || "",
       tags: (typeof a.tags === "string" ? JSON.parse(a.tags || "[]") : a.tags || []).join(", "),
       author: a.author,
       date: a.date,
@@ -321,6 +324,17 @@ export default function AdminPage() {
               )}
               {imageError && <p className={styles.err}>{imageError}</p>}
               <small className={styles.help}>JPG, PNG, atau WebP. Maksimal 5 MB.</small>
+            </label>
+            <label>Video URL (Opsional - MP4 / WebM / Direct Link)
+              <input
+                className={styles.input}
+                type="url"
+                name="video_url"
+                value={form.video_url}
+                onChange={(e) => setForm({ ...form, video_url: e.target.value })}
+                placeholder="https://contoh.com/video.mp4"
+              />
+              <small className={styles.help}>Jika diisi, hero beranda memutar video autoplay (muted, loop).</small>
             </label>
             <button className={styles.btn} disabled={busy || imageUploading}>
               {busy ? "Menyimpan…" : imageUploading ? "Mengunggah foto…" : editingId ? "Simpan Perubahan" : "Tambahkan Artikel"}

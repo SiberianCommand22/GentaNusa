@@ -20,23 +20,9 @@ export function Footer() {
             <p className={styles.footerText}>Berita Nusantara terkini, akurat, dan terpercaya.</p>
           </div>
           <div className={styles.footerCol}>
-            <h4>Kategori</h4>
-            <Link href="/kategori/politik">Politik</Link>
-            <Link href="/kategori/ekonomi">Ekonomi</Link>
-            <Link href="/kategori/nasional">Nasional</Link>
-            <Link href="/kategori/kesehatan">Kesehatan</Link>
-            <Link href="/kategori/teknologi">Teknologi</Link>
-            <Link href="/kategori/pendidikan">Pendidikan</Link>
-            <Link href="/kategori/budaya">Budaya</Link>
-            <Link href="/kategori/lingkungan">Lingkungan</Link>
-            <Link href="/kategori/dunia">Dunia</Link>
-            <Link href="/kategori/olahraga">Olahraga</Link>
-          </div>
-          <div className={styles.footerCol}>
             <h4>Kontak</h4>
             <span>redaksi@gentanusa.id</span>
             <span>Jakarta, Indonesia</span>
-            <a href="/feed.xml">RSS Feed</a>
           </div>
           <div className={styles.footerCol}>
             <h4>Info</h4>

@@ -16,29 +16,18 @@ const categoryColors: Record<string, string> = {
   "Olahraga": "#d84315",
 };
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function Home() {
   const latest = sortByDate(await getArticles());
 
-  // Empty state — tabel artikel kosong (mis. DB baru): sambut pembaca
-  // dengan pesan elegan, bukan crash (latest[0] undefined) atau hero kosong.
+  // Empty state — tidak ada artikel yang diterbitkan: jangan render kartu
+  // kosong, tampilkan pesan minimalis di tengah.
   if (latest.length === 0) {
     return (
       <main>
-        <section className={styles.hero}>
-          <div className={styles.container}>
-            <div className={styles.emptyState}>
-              <p className={styles.emptyIcon}>📰</p>
-              <h1 className={styles.emptyTitle}>Belum ada berita terbaru</h1>
-              <p className={styles.emptyText}>
-                Redaksi kami sedang menyiapkan liputan terbaru untuk Anda.
-                Silakan kembali lagi nanti.
-              </p>
-            </div>
-          </div>
-        </section>
-
+        <div className="py-24 text-center text-slate-400 text-sm">Belum ada berita yang diterbitkan.</div>
         <Footer />
       </main>
     );
@@ -56,13 +45,25 @@ export default async function Home() {
             <article className={styles.heroMain}>
               <a href={`/artikel/${featured.id}`} className={styles.heroCard}>
                 <div className={styles.heroImage}>
-                  <img
-                    src={featured.image || "/images/placeholder-article.svg"}
-                    alt={featured.title}
-                    width={1200}
-                    height={630}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  />
+                  {featured.video_url ? (
+                    <video
+                      src={featured.video_url}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="w-full h-full object-cover rounded-md"
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  ) : (
+                    <img
+                      src={featured.image || "/images/placeholder-article.svg"}
+                      alt={featured.title}
+                      width={1200}
+                      height={630}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  )}
                 </div>
                 <div className={styles.heroOverlay}>
                   <span className={styles.badge}>{featured.category}</span>
