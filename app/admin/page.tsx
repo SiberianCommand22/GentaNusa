@@ -11,7 +11,6 @@ type Article = {
   excerpt: string;
   content: string[] | string;
   image: string | null;
-  video_url?: string | null;
   tags: string[] | string;
   author: string;
   author_slug: string | null;
@@ -35,7 +34,6 @@ const emptyForm = {
   excerpt: "",
   content: "",
   image: "",
-  video_url: "",
   tags: "",
   author: "Redaksi",
   date: "",
@@ -46,12 +44,11 @@ export default function AdminPage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
-  const [subscribers, setSubscribers] = useState<{ id: number; email: string; created_at: string }[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
-  const [tab, setTab] = useState<"artikel" | "kategori" | "sumber" | "subscriber" | "statistik">("artikel");
+  const [tab, setTab] = useState<"artikel" | "kategori" | "sumber" | "statistik">("artikel");
   const [newCat, setNewCat] = useState({ slug: "", name: "", color: "#c8102e" });
   const [newSrc, setNewSrc] = useState({ id: "", name: "", url: "", category: "", color: "#666666" });
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -62,16 +59,14 @@ export default function AdminPage() {
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   const load = useCallback(async () => {
-    const [a, c, s, sub] = await Promise.all([
+    const [a, c, s] = await Promise.all([
       fetch("/api/articles").then((r) => r.json()),
       fetch("/api/categories").then((r) => r.json()),
       fetch("/api/sources").then((r) => r.json()),
-      fetch("/api/subscribers").then((r) => r.json()).catch(() => []),
     ]);
     setArticles(Array.isArray(a) ? a : []);
     setCategories(Array.isArray(c) ? c : []);
     setSources(Array.isArray(s) ? s : []);
-    setSubscribers(Array.isArray(sub) ? sub : []);
   }, []);
 
   useEffect(() => {
@@ -156,7 +151,6 @@ export default function AdminPage() {
       excerpt: a.excerpt,
       content: Array.isArray(a.content) ? a.content.join("\n") : a.content,
       image: a.image || "",
-      video_url: a.video_url || "",
       tags: (typeof a.tags === "string" ? JSON.parse(a.tags || "[]") : a.tags || []).join(", "),
       author: a.author,
       date: a.date,
@@ -170,7 +164,12 @@ export default function AdminPage() {
     const r = await fetch(`/api/articles/${id}`, { method: "DELETE" });
     if (r.ok) {
       setMsg("Artikel dihapus 🗑️");
+      // Mutasi lokal realtime — counter tab "Artikel (X)" langsung berkurang
+      setArticles((prev) => prev.filter((item) => item.id !== id));
       load();
+    } else {
+      const j = await r.json().catch(() => ({}));
+      setMsg("Gagal menghapus: " + (j.error || r.status));
     }
   }
 
@@ -256,7 +255,6 @@ export default function AdminPage() {
           <button className={styles.tab} onClick={() => setTab("artikel")} data-active={tab === "artikel"}>Artikel ({articles.length})</button>
           <button className={styles.tab} onClick={() => setTab("kategori")} data-active={tab === "kategori"}>Kategori</button>
           <button className={styles.tab} onClick={() => setTab("sumber")} data-active={tab === "sumber"}>Sumber RSS</button>
-          <button className={styles.tab} onClick={() => setTab("subscriber")} data-active={tab === "subscriber"}>Subscribers ({subscribers.length})</button>
           <button className={styles.tab} onClick={() => setTab("statistik")} data-active={tab === "statistik"}>📊 Statistik</button>
           <button className={styles.tab} onClick={logout}>Logout</button>
         </div>
@@ -324,17 +322,6 @@ export default function AdminPage() {
               )}
               {imageError && <p className={styles.err}>{imageError}</p>}
               <small className={styles.help}>JPG, PNG, atau WebP. Maksimal 5 MB.</small>
-            </label>
-            <label>Video URL (Opsional - MP4 / WebM / Direct Link)
-              <input
-                className={styles.input}
-                type="url"
-                name="video_url"
-                value={form.video_url}
-                onChange={(e) => setForm({ ...form, video_url: e.target.value })}
-                placeholder="https://contoh.com/video.mp4"
-              />
-              <small className={styles.help}>Jika diisi, hero beranda memutar video autoplay (muted, loop).</small>
             </label>
             <button className={styles.btn} disabled={busy || imageUploading}>
               {busy ? "Menyimpan…" : imageUploading ? "Mengunggah foto…" : editingId ? "Simpan Perubahan" : "Tambahkan Artikel"}
@@ -422,27 +409,6 @@ export default function AdminPage() {
             ))}
           </div>
         </form>
-      )}
-    {tab === "subscriber" && (
-        <div className={styles.form}>
-          <h2>📧 Subscribers ({subscribers.length})</h2>
-          {subscribers.length === 0 ? (
-            <p style={{ color: "var(--muted, #4a4a5a)" }}>Belum ada yang berlangganan.</p>
-          ) : (
-            <div className={styles.list}>
-              {subscribers.map((s) => (
-                <div key={s.id} className={styles.item}>
-                  <div>
-                    <strong>{s.email}</strong>
-                    <span className={styles.itemMeta}>
-                      {new Date(s.created_at).toLocaleString("id-ID")}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       )}
 
       {tab === "statistik" && (

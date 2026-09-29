@@ -45,25 +45,13 @@ export default async function Home() {
             <article className={styles.heroMain}>
               <a href={`/artikel/${featured.id}`} className={styles.heroCard}>
                 <div className={styles.heroImage}>
-                  {featured.video_url ? (
-                    <video
-                      src={featured.video_url}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      className="w-full h-full object-cover rounded-md"
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  ) : (
-                    <img
-                      src={featured.image || "/images/placeholder-article.svg"}
-                      alt={featured.title}
-                      width={1200}
-                      height={630}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  )}
+                  <img
+                    src={featured.image || "/images/placeholder-article.svg"}
+                    alt={featured.title}
+                    width={1200}
+                    height={630}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
                 </div>
                 <div className={styles.heroOverlay}>
                   <span className={styles.badge}>{featured.category}</span>

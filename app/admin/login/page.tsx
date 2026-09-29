@@ -43,16 +43,17 @@ export default function AdminLoginPage() {
     <div className={styles.container}>
       <div className={styles.card}>
         <div className={styles.logoWrapper}>
-          <Image
-            src="/images/logo-gentanusa.png"
-            alt="GentaNusa"
-            width={120}
-            height={36}
-            className={styles.logo}
-          />
+            <Image
+              src="/images/logo-gentanusa.png"
+              alt="GentaNusa"
+              width={128}
+              height={32}
+              className={styles.logo}
+              priority
+            />
         </div>
-        <h1 className={styles.title}>Login CMS</h1>
-        <p className={styles.subtitle}>Masuk ke ruang kerja redaksi</p>
+        <h1 className={styles.title}>Ruang Kerja Redaksi</h1>
+        <p className={styles.subtitle}>Silakan masuk untuk mengelola publikasi berita.</p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
@@ -111,7 +112,7 @@ export default function AdminLoginPage() {
         </form>
 
         <Link href="/" className={styles.backLink}>
-          ← Kembali ke beranda
+          ← Kembali ke Beranda
         </Link>
       </div>
     </div>

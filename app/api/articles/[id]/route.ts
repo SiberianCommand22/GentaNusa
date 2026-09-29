@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
 
 function isAdmin(req: NextRequest) {
@@ -57,8 +58,6 @@ export async function PUT(
       excerpt: body.excerpt,
       content: body.content,
       image: body.image ?? null,
-      // Kolom opsional — hanya ditulis bila ada nilainya (lihat POST).
-      ...(body.video_url ? { video_url: body.video_url } : {}),
       tags: body.tags ?? [],
       author: body.author,
       author_slug: body.authorSlug ?? null,
@@ -84,7 +83,10 @@ export async function DELETE(
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
 
   const { id } = await params;
+  // Permanent delete via service_role (bypass RLS) — admin only (dicek di atas).
   const { error } = await c.client.from("articles").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidatePath("/");
+  revalidatePath("/admin");
   return NextResponse.json({ ok: true });
 }

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Source_Serif_4, Inter } from "next/font/google";
-import { Navbar } from "@/components/Navbar";
-import { BackToTop } from "@/components/back-to-top";
 import { AnalyticsTracker } from "@/components/analytics-tracker";
+import { SiteChrome } from "@/components/site-chrome";
 import "./globals.css";
 
 const sourceSerif = Source_Serif_4({
@@ -64,10 +63,8 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.jpg" type="image/jpeg" />
       </head>
       <body>
-        <Navbar />
         <AnalyticsTracker />
-        {children}
-        <BackToTop />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );
