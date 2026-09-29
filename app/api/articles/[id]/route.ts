@@ -50,6 +50,17 @@ export async function PUT(
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Body kosong" }, { status: 400 });
 
+  // status "draft" → kembalikan ke staging; "published" → terbitkan dengan
+  // slug redaksi. Tanpa status: pertahankan perilaku lama (slug dari body).
+  const isDraft = body.status === "draft";
+  const authorSlug = isDraft
+    ? `staging-${String(body.title || "artikel")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "")
+        .slice(0, 40)}-${Date.now().toString(36)}`
+    : body.authorSlug ?? null;
+
   const { data, error } = await c.client
     .from("articles")
     .update({
@@ -60,7 +71,7 @@ export async function PUT(
       image: body.image ?? null,
       tags: body.tags ?? [],
       author: body.author,
-      author_slug: body.authorSlug ?? null,
+      author_slug: authorSlug,
       author_role: body.authorRole ?? null,
       date: body.date,
     })
@@ -68,6 +79,8 @@ export async function PUT(
     .select()
     .single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidatePath("/");
+  revalidatePath("/admin");
   return NextResponse.json(data);
 }
 

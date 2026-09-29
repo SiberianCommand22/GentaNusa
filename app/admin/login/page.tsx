@@ -46,14 +46,15 @@ export default function AdminLoginPage() {
             <Image
               src="/images/logo-gentanusa.png"
               alt="GentaNusa"
-              width={128}
-              height={32}
+              width={160}
+              height={40}
               className={styles.logo}
               priority
             />
-        </div>
-        <h1 className={styles.title}>Ruang Kerja Redaksi</h1>
-        <p className={styles.subtitle}>Silakan masuk untuk mengelola publikasi berita.</p>
+          </div>
+          <p className={styles.tagline}>CEPAT • AKURAT • TERPERCAYA</p>
+          <h1 className={styles.title}>Login CMS</h1>
+          <p className={styles.subtitle}>Masuk ke ruang kerja redaksi</p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
@@ -107,7 +108,7 @@ export default function AdminLoginPage() {
           {error && <p className={styles.error}>{error}</p>}
 
           <button type="submit" className={styles.submitBtn} disabled={loading}>
-            {loading ? "Memproses..." : "Masuk"}
+            {loading ? "Memeriksa..." : "Masuk"}
           </button>
         </form>
 

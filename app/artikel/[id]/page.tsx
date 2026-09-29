@@ -58,11 +58,13 @@ export default async function ArticlePage({ params }: Params) {
     .filter((a) => {
       if (a.id === numId) return false;
       if (a.category === article.category) return true;
-      // tag match fallback
-      const shared = a.tags.filter((t) => article.tags.includes(t));
+      // tag match fallback (abaikan penanda internal "headline")
+      const shared = a.tags.filter((t) => t !== "headline" && article.tags.includes(t));
       return shared.length > 0;
     })
     .slice(0, 3);
+
+  const coverCredit = article.tags.find((t) => t !== "headline");
 
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
 
@@ -87,7 +89,7 @@ export default async function ArticlePage({ params }: Params) {
                 className={styles.featuredImage}
               />
               <figcaption className={styles.caption}>
-                Foto: {article.tags[0] || "GentaNusa"} — {formatDate(article.date)}
+                Foto: {coverCredit || "GentaNusa"} — {formatDate(article.date)}
               </figcaption>
             </figure>
           )}
@@ -109,7 +111,7 @@ export default async function ArticlePage({ params }: Params) {
                     </div>
 
           <div className={styles.tags}>
-                      {article.tags.map((tag) => (
+                      {article.tags.filter((tag) => tag !== "headline").map((tag) => (
                         <span key={tag} className={styles.tag}>
                           #{tag}
                         </span>

@@ -15,8 +15,35 @@ function ensureClient() {
   return { ok: true as const, client: adminClient };
 }
 
+// Slug unik untuk draft — prefix `staging-` disembunyikan dari situs publik
+// oleh filter di lib/data.ts hingga redaksi mempublikasikannya.
+function draftSlug(title: string): string {
+  const base =
+    String(title || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "")
+      .slice(0, 40) || "artikel";
+  return `staging-${base}-${Date.now().toString(36)}`;
+}
+
 // GET — daftar artikel (public) — tanpa field sensitif
+// GET ?scope=draft — baris draft (admin saja, untuk metrik CMS)
 export async function GET(req: NextRequest) {
+  if (req.nextUrl.searchParams.get("scope") === "draft") {
+    if (!isAdmin(req)) {
+      return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
+    }
+    const c = ensureClient();
+    if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
+    const { data, error } = await c.client
+      .from("articles")
+      .select("id,title,category,excerpt,date,author,image,tags")
+      .like("author_slug", "staging-%")
+      .order("date", { ascending: false });
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(data ?? []);
+  }
   const c = ensureClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
   try {
@@ -60,6 +87,9 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // status "draft" → baris staging (tersembunyi dari publik); default terbit.
+  const isDraft = body.status === "draft";
+
   const { data, error } = await c.client
     .from("articles")
     .insert([
@@ -72,7 +102,7 @@ export async function POST(req: NextRequest) {
         image: body.image,
         date: body.date || new Date().toISOString().split("T")[0],
         author: body.author || "Redaksi GentaNusa",
-        author_slug: body.authorSlug || "redaksi-generic",
+        author_slug: isDraft ? draftSlug(body.title) : body.authorSlug || "redaksi-generic",
         author_role: body.authorRole || "Redaktur GentaNusa",
       },
     ])
@@ -80,6 +110,8 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidatePath("/");
+  revalidatePath("/admin");
   return NextResponse.json(data, { status: 201 });
 }
 
