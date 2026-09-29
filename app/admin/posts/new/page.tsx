@@ -115,12 +115,8 @@ export default function NewPostPage() {
     const paras = form.content.split("\n").map((p) => p.trim()).filter(Boolean);
     // Ringkasan/lead: isi otomatis dari 150 karakter pertama konten bila kosong.
     const lead = form.excerpt.trim() || paras.join(" ").slice(0, 150);
-    // Slug otomatis dari judul (disimpan server bila skema mendukungnya).
-    const slug =
-      title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)+/g, "") + "-" + Date.now();
+    // Slug wajib terisi sebelum POST/PUT — turunan deterministik dari judul.
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || "artikel";
     if (!title) {
       setMsg("Judul wajib diisi.");
       return;

@@ -51,6 +51,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       articles.map((a) => ({
         id: a.id,
+        slug: a.slug,
         title: a.title,
         category: a.category,
         excerpt: a.excerpt,

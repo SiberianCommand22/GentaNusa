@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Footer } from "@/components/site";
-import { getAuthor, getAuthors, getArticlesByAuthor, formatDate } from "@/lib/data";
+import { getAuthor, getAuthors, getArticlesByAuthor, formatDate, articleUrl } from "@/lib/data";
 import styles from "./author.module.css";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -57,7 +57,7 @@ export default async function AuthorPage({ params }: Params) {
         ) : (
           <div className={styles.grid}>
             {articles.map((a) => (
-              <a key={a.id} href={`/artikel/${a.id}`} className={styles.card}>
+              <a key={a.id} href={articleUrl(a)} className={styles.card}>
                 {a.image && (
                   <div className={styles.cardImage}>
                     <Image

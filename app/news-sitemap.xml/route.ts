@@ -1,4 +1,4 @@
-import { getArticles, sortByDate } from "@/lib/data";
+import { getArticles, sortByDate, articleUrl } from "@/lib/data";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
@@ -30,7 +30,7 @@ export async function GET() {
 
   const items = articles
     .map((a) => {
-      const url = `${SITE_URL}/artikel/${a.id}`;
+      const url = `${SITE_URL}${articleUrl(a)}`;
       // Article images must be reachable without a cookie and at least 1200px wide,
       // otherwise Google silently drops the whole article from the News tab.
       const raw = a.image || "/images/placeholder-article.svg";

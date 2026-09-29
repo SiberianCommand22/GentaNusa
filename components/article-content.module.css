@@ -21,21 +21,21 @@
 }
 
 .paragraph code {
-  background: #f0f0f0;
+  background: #eff6ff;
   padding: 0.125rem 0.375rem;
   border-radius: 4px;
   font-family: "Fira Code", "Courier New", monospace;
   font-size: 0.9em;
-  color: #c8102e;
+  color: #1d4ed8;
 }
 
 .paragraph a {
-  color: #1a5c8a;
+  color: #2563eb;
   text-decoration: underline;
 }
 
 .paragraph a:hover {
-  color: #c8102e;
+  color: #1d4ed8;
 }
 
 .rawBlock > *:first-child {
@@ -65,7 +65,7 @@
 }
 
 .quote {
-  border-left: 4px solid #c8102e;
+  border-left: 4px solid #2563EB;
   padding: 0.75rem 1.25rem;
   margin: 0;
   font-size: 1.125rem;

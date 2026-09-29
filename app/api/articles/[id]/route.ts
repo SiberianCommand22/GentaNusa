@@ -20,19 +20,23 @@ async function getArticle(id: string) {
   return data;
 }
 
-// GET /api/articles/[id] — satu artikel (public)
+// GET /api/articles/[id] — satu artikel (public).
+// Mendukung slug SEO maupun ID numerik lawas.
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const numId = Number(id);
-  if (!Number.isFinite(numId)) {
-    return NextResponse.json({ error: "ID tidak valid" }, { status: 400 });
+  // Jalur cepat: ID numerik via service_role.
+  if (/^\d+$/.test(String(id).trim())) {
+    const data = await getArticle(String(Number(id)));
+    if (data) return NextResponse.json(data);
   }
-  const data = await getArticle(String(numId));
-  if (!data) return NextResponse.json({ error: "Tidak ditemukan" }, { status: 404 });
-  return NextResponse.json(data);
+  // Fallback: cocokkan slug turunan (tanpa perlu kolom slug di DB).
+  const { getArticleBySlugOrId } = await import("@/lib/data");
+  const bySlug = await getArticleBySlugOrId(id);
+  if (bySlug) return NextResponse.json(bySlug);
+  return NextResponse.json({ error: "Tidak ditemukan" }, { status: 404 });
 }
 
 // PUT /api/articles/[id] — update artikel (admin)

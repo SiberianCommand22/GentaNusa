@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getArticles, getCategories } from "@/lib/data";
+import { getArticles, getCategories, articleUrl } from "@/lib/data";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
 
@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const articlePages = (await getArticles())
     .filter((a) => a.id <= 1000)
     .map((a) => ({
-      url: `${SITE_URL}/artikel/${a.id}`,
+      url: `${SITE_URL}${articleUrl(a)}`,
       lastModified: /^\d{4}-\d{2}-\d{2}/.test(a.date)
         ? new Date(`${a.date}T00:00:00+07:00`)
         : now,

@@ -1,6 +1,7 @@
 :root {
   --genta-red: #c8102e;
-  --genta-navy: #1e3a8a;
+  --genta-blue: #2563EB;
+  --genta-navy: #0B192C;
   --genta-slate: #0f172a;
   --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -86,7 +87,7 @@ a {
 }
 
 .richtext blockquote {
-  border-left: 4px solid #0b192c;
+  border-left: 4px solid #2563EB;
   padding-left: 1rem;
   font-style: italic;
   margin: 0.5rem 0;
@@ -107,6 +108,10 @@ a {
 .richtext a {
   color: #2563eb;
   text-decoration: underline;
+}
+
+.richtext a:hover {
+  color: #1d4ed8;
 }
 
 .richtext p {

@@ -1,4 +1,4 @@
-import { getArticles, sortByDate } from "@/lib/data";
+import { getArticles, sortByDate, articleUrl } from "@/lib/data";
 
 export const dynamic = "force-static";
 
@@ -27,10 +27,11 @@ export async function GET() {
   const items = articles
     .map((a) => {
       const pubDate = toUTC(a.date);
+      const loc = `${SITE_URL}${articleUrl(a)}`;
       return `    <item>
       <title>${escapeXml(a.title)}</title>
-      <link>${SITE_URL}/artikel/${a.id}</link>
-      <guid>${SITE_URL}/artikel/${a.id}</guid>
+      <link>${loc}</link>
+      <guid>${loc}</guid>
       <pubDate>${pubDate}</pubDate>
       <category>${escapeXml(a.category)}</category>
       <description>${escapeXml(a.excerpt)}</description>

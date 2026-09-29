@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Footer } from "@/components/site";
-import { getArticles, getCategories, getCategoryBySlug, formatDate, sortByDate } from "@/lib/data";
+import { getArticles, getCategories, getCategoryBySlug, formatDate, sortByDate, articleUrl } from "@/lib/data";
 import styles from "./category.module.css";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -62,7 +62,7 @@ export default async function CategoryPage({ params }: Params) {
         ) : (
           <div className={styles.grid}>
             {list.map((a) => (
-              <a key={a.id} href={`/artikel/${a.id}`} className={styles.card}>
+              <a key={a.id} href={articleUrl(a)} className={styles.card}>
                 {a.image && (
                   <div className={styles.cardImage}>
                     <Image

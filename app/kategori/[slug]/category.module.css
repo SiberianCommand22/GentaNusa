@@ -9,7 +9,7 @@
   position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-left: 6px solid #c8102e;
+  border-left: 6px solid #2563EB;
   border-radius: 12px;
   padding: 28px 32px;
   margin-bottom: 28px;
@@ -44,7 +44,7 @@
   color: var(--text-muted);
 }
 
-/* aksen merah di pojok */
+/* aksen biru editorial di pojok */
 .bannerAccent {
   position: absolute;
   top: -40px;
@@ -52,7 +52,7 @@
   width: 160px;
   height: 160px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(200,16,46,0.25), transparent 70%);
+  background: radial-gradient(circle, rgba(37,99,235,0.25), transparent 70%);
   opacity: 1;
 }
 
@@ -125,13 +125,15 @@
 
 .cardBadge {
   align-self: flex-start;
-  padding: 3px 10px;
-  border-radius: 20px;
+  padding: 4px 12px;
+  border-radius: 6px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: #fff;
-  background: #c8102e;
+  background: #2563EB;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.35);
 }
 
 .cardTitle {
@@ -141,7 +143,7 @@
 }
 
 .cardTitle:hover {
-  color: #c8102e;
+  color: #2563EB;
 }
 
 .cardExcerpt {

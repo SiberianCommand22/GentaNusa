@@ -4,6 +4,7 @@ import { supabaseAnon } from "./supabase";
 
 export type Article = {
   id: number;
+  slug: string;
   title: string;
   category: string;
   excerpt: string;
@@ -53,12 +54,34 @@ export function sortByDate(articles: Article[]): Article[] {
   );
 }
 
+// Slug SEO turunan dari judul. Tabel Supabase belum punya kolom `slug`
+// (API mengabaikannya saat insert), jadi slug dihitung deterministik di
+// sini agar URL /artikel/<slug> stabil tanpa migrasi DB.
+export function slugifyTitle(title: string): string {
+  const slug = String(title || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+  return slug || "artikel";
+}
+
+export function articleSlug(a: { slug?: string; title: string }): string {
+  const s = String(a.slug || "").trim();
+  if (s) return s;
+  return slugifyTitle(a.title);
+}
+
+export function articleUrl(a: { slug?: string; id: number; title: string }): string {
+  return `/artikel/${articleSlug(a) || a.id}`;
+}
+
 function readJson(file: string) {
   return JSON.parse(fs.readFileSync(path.join(dataDir, file), "utf-8"));
 }
 
 type DbArticle = {
   id: number;
+  slug?: string;
   title: string;
   category: string;
   excerpt: string;
@@ -76,6 +99,7 @@ type DbArticle = {
 function mapRow(a: DbArticle): Article {
   return {
     id: a.id,
+    slug: String(a.slug || "").trim() || slugifyTitle(a.title),
     title: a.title,
     category: a.category,
     excerpt: a.excerpt,
@@ -152,6 +176,23 @@ export async function getCategoryBySlug(slug: string): Promise<Category | undefi
 
 export async function getArticle(id: number): Promise<Article | undefined> {
   return (await getArticles()).find((a) => a.id === id);
+}
+
+// Cari artikel berdasarkan slug SEO, dengan fallback ID numerik untuk
+// tautan lama /artikel/<id>. Pencocokan slug juga mentolerir akhiran
+// "-<id>" bila kelak slug dibuat unik per baris.
+export async function getArticleBySlugOrId(slugOrId: string): Promise<Article | undefined> {
+  const key = String(slugOrId || "").trim();
+  if (!key) return undefined;
+  const all = await getArticles();
+  const direct = all.find((a) => a.slug === key);
+  if (direct) return direct;
+  if (!isNaN(Number(key))) {
+    const byId = all.find((a) => a.id === Number(key));
+    if (byId) return byId;
+  }
+  const suffixed = all.find((a) => key === `${a.slug}-${a.id}`);
+  return suffixed;
 }
 
 export async function getRelated(article: Article, count = 3): Promise<Article[]> {
