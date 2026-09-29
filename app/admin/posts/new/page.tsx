@@ -108,56 +108,69 @@ export default function NewPostPage() {
     setMsg("");
     setImgErr("");
     const title = form.title.trim();
-    const lead = form.excerpt.trim();
     const paras = form.content.split("\n").map((p) => p.trim()).filter(Boolean);
+    // Ringkasan/lead: isi otomatis dari 150 karakter pertama konten bila kosong.
+    const lead = form.excerpt.trim() || paras.join(" ").slice(0, 150);
+    // Slug otomatis dari judul (disimpan server bila skema mendukungnya).
+    const slug =
+      title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, "") + "-" + Date.now();
     if (!title) {
       setMsg("Judul wajib diisi.");
+      return;
+    }
+    if (paras.length === 0) {
+      setMsg("Konten wajib diisi.");
       return;
     }
     if (status === "published" && (lead.length < 20 || lead.length > 600)) {
       setMsg("Kutipan/lead harus 20–600 karakter untuk publikasi.");
       return;
     }
-    if (paras.length === 0) {
-      setMsg("Konten artikel masih kosong.");
-      return;
-    }
     setBusy(true);
-    const imagePath = await uploadImage();
-    if (imageFile && !imagePath) {
+    try {
+      const imagePath = await uploadImage();
+      if (imageFile && !imagePath) {
+        setBusy(false);
+        return;
+      }
+      const tags = splitTags(form.tags).filter((t) => t !== HEADLINE_TAG);
+      if (form.headline) tags.unshift(HEADLINE_TAG);
+      const payload = {
+        title,
+        slug,
+        excerpt: lead,
+        content: paras,
+        cover_image: imagePath || "/images/placeholder-article.svg",
+        category: form.category,
+        author: form.author.trim() || "Redaksi GentaNusa",
+        date: form.date || new Date().toISOString().split("T")[0],
+        status,
+        tags,
+      };
+      const r = editId
+        ? await fetch(`/api/articles/${editId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+        : await fetch("/api/articles", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
       setBusy(false);
-      return;
-    }
-    const tags = splitTags(form.tags).filter((t) => t !== HEADLINE_TAG);
-    if (form.headline) tags.unshift(HEADLINE_TAG);
-    const payload = {
-      title,
-      category: form.category,
-      excerpt: lead,
-      content: paras,
-      image: imagePath,
-      tags,
-      author: form.author.trim() || "Redaksi GentaNusa",
-      date: form.date || new Date().toISOString().split("T")[0],
-      status,
-    };
-    const r = editId
-      ? await fetch(`/api/articles/${editId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        })
-      : await fetch("/api/articles", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-    setBusy(false);
-    if (r.ok) {
-      router.push("/admin/posts");
-    } else {
-      const j = await r.json().catch(() => ({}));
-      setMsg("Gagal menyimpan: " + (j.error || r.status));
+      if (r.ok || r.status === 201) {
+        router.push("/admin/posts");
+      } else {
+        const j = await r.json().catch(() => ({}));
+        setMsg(`Gagal mempublikasikan: ${j.error || r.status}`);
+      }
+    } catch (e) {
+      setBusy(false);
+      setMsg(`Gagal mempublikasikan: ${e instanceof Error ? e.message : "kesalahan jaringan"}`);
     }
   }
 
@@ -345,11 +358,12 @@ export default function NewPostPage() {
 
           <div className={styles.panel}>
             <div className={styles.actions}>
+              {msg && <p className={styles.err}>{msg}</p>}
               <button className={styles.btnSecondary} disabled={busy} onClick={() => save("draft")}>
                 {busy ? "Menyimpan…" : "Simpan Draft"}
               </button>
               <button className={styles.btnPrimary} disabled={busy} onClick={() => save("published")}>
-                {busy ? "Menyimpan…" : editId ? "Perbarui & Publikasikan" : "Publikasikan"}
+                {busy ? "Memublikasikan..." : editId ? "Perbarui & Publikasikan" : "Publikasikan"}
               </button>
             </div>
           </div>

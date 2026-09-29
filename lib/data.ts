@@ -118,13 +118,14 @@ async function fetchCategoriesDb(): Promise<Category[] | null> {
   return null;
 }
 
-// Baca artikel: dari Supabase (cached) → fallback JSON
+// Baca artikel: dari Supabase (cached). Tanpa fallback array — bila database
+// kosong / tidak terjangkau, kembalikan [] agar halaman tampil empty state.
 export async function getArticles(): Promise<Article[]> {
   const cached = cache.get("articles");
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data as Article[];
 
   const fromDb = await fetchArticlesDb();
-  const result = fromDb ?? sortByDate(readJson("articles.json"));
+  const result = fromDb ?? [];
   cache.set("articles", { data: result, timestamp: Date.now() });
   return result;
 }

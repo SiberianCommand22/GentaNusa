@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Logo } from "@/components/Logo";
 import styles from "./Navbar.module.css";
 
 const mainNav = [
@@ -87,7 +86,13 @@ export function Navbar() {
           </button>
 
           <div className={styles.logo}>
-            <Logo />
+            <Link href="/" aria-label="GentaNusa — Beranda">
+              <img
+                src="/images/logo-gentanusa.png"
+                alt="GentaNusa"
+                className={styles.logoImgOfficial}
+              />
+            </Link>
           </div>
 
           <div className={styles.headerRight}>

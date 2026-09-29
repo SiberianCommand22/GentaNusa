@@ -42,7 +42,6 @@ export default function AdminDashboard() {
   const published = articles.length;
   const draftCount = drafts.length;
   const total = published + draftCount;
-  const recent = articles.slice(0, 5);
 
   return (
     <div>
@@ -75,26 +74,6 @@ export default function AdminDashboard() {
             {loading ? "…" : published}
           </p>
         </div>
-      </div>
-
-      <div className={styles.panel}>
-        <h3 className={styles.panelTitle}>Terbaru diterbitkan</h3>
-        {recent.length === 0 ? (
-          <p className={styles.emptyNote}>
-            {loading ? "Memuat…" : "Belum ada berita yang diterbitkan."}
-          </p>
-        ) : (
-          <div className={styles.recentList}>
-            {recent.map((a) => (
-              <div key={a.id} className={styles.recentItem}>
-                <span className={styles.recentTitle}>{a.title}</span>
-                <span className={styles.recentMeta}>
-                  {a.category} • {a.date}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

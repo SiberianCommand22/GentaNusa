@@ -25,9 +25,13 @@
   margin-bottom: 12px;
 }
 
-/* Logo tampil besar di kartu login */
-.logoWrapper svg {
-  height: 52px;
+/* Logo resmi di kartu putih: siluet hitam pekat tanpa artefak */
+.logoImgOfficial {
+  height: 44px;
+  width: auto;
+  max-width: 230px;
+  object-fit: contain;
+  filter: brightness(0);
 }
 
 .tagline {

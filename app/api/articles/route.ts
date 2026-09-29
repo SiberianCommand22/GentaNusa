@@ -88,6 +88,8 @@ export async function POST(req: NextRequest) {
   }
 
   // status "draft" → baris staging (tersembunyi dari publik); default terbit.
+  // Skema DB memakai `image` (payload form boleh memakai alias `cover_image`);
+  // `slug` diabaikan — tabel memakai id numerik sebagai kunci.
   const isDraft = body.status === "draft";
 
   const { data, error } = await c.client
@@ -99,7 +101,7 @@ export async function POST(req: NextRequest) {
         excerpt: body.excerpt,
         content: body.content,
         tags: body.tags,
-        image: body.image,
+        image: body.image ?? body.cover_image ?? null,
         date: body.date || new Date().toISOString().split("T")[0],
         author: body.author || "Redaksi GentaNusa",
         author_slug: isDraft ? draftSlug(body.title) : body.authorSlug || "redaksi-generic",
@@ -112,6 +114,7 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
   revalidatePath("/admin");
+  revalidatePath("/admin/posts");
   return NextResponse.json(data, { status: 201 });
 }
 
@@ -132,5 +135,6 @@ export async function DELETE(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
   revalidatePath("/admin");
+  revalidatePath("/admin/posts");
   return NextResponse.json({ ok: true });
 }

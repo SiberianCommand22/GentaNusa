@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import styles from "./cms.module.css";
 
@@ -88,14 +87,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className={styles.sidebar}>
         <div>
           <div className={styles.brand}>
-            <Image
-              src="/images/logo-gentanusa-white.png"
+            <img
+              src="/logo-gentanusa.png"
               alt="GentaNusa"
-              width={120}
-              height={32}
-              className={styles.brandLogo}
+              className={styles.brandImg}
             />
-            <span className={styles.brandName}>GENTANUSA</span>
           </div>
           <nav className={styles.nav}>
             {NAV.map((item) => {

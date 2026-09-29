@@ -68,7 +68,7 @@ export async function PUT(
       category: body.category,
       excerpt: body.excerpt,
       content: body.content,
-      image: body.image ?? null,
+      image: body.image ?? body.cover_image ?? null,
       tags: body.tags ?? [],
       author: body.author,
       author_slug: authorSlug,
@@ -81,6 +81,7 @@ export async function PUT(
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
   revalidatePath("/admin");
+  revalidatePath("/admin/posts");
   return NextResponse.json(data);
 }
 
@@ -101,5 +102,6 @@ export async function DELETE(
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
   revalidatePath("/admin");
+  revalidatePath("/admin/posts");
   return NextResponse.json({ ok: true });
 }

@@ -98,17 +98,17 @@ export default function ManagePostsPage() {
                       <span className={styles.thumbEmpty} />
                     )}
                   </td>
-                  <td>{a.category}</td>
-                  <td>{a.author}</td>
-                  <td>{a.date}</td>
-                  <td>
+                  <td className={styles.cellNarrow}>{a.category}</td>
+                  <td className={styles.cellAuthor}>{a.author}</td>
+                  <td className={styles.cellNarrow}>{a.date}</td>
+                  <td className={styles.cellNarrow}>
                     {a.isDraft ? (
                       <span className={`${styles.badge} ${styles.badgeAmber}`}>Draft</span>
                     ) : (
                       <span className={`${styles.badge} ${styles.badgeGreen}`}>Published</span>
                     )}
                   </td>
-                  <td>
+                  <td className={styles.cellCenter}>
                     <div className={styles.rowActions}>
                       <button
                         className={styles.iconBtn}
