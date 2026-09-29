@@ -1,19 +1,31 @@
 :root {
-  --genta-red: #c8102e;
-  --genta-blue: #2563EB;
   --genta-navy: #0B192C;
-  --genta-slate: #0f172a;
+  --genta-blue: #2563EB;
+  --genta-slate: #0F172A;
+  --genta-slate-50: #F1F5F9;
+  --genta-slate-100: #E2E8F0;
+  --genta-slate-200: #CBD5E1;
+  --genta-slate-300: #94A3B8;
+  --genta-slate-400: #64748B;
+  --genta-slate-500: #475569;
+  --genta-slate-600: #334155;
+  --genta-slate-700: #1E293B;
+  --genta-slate-800: #1E293B;
+  --genta-slate-900: #0F172A;
   --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
 
-  --bg: #ffffff;
-  --surface: #ffffff;
-  --border: #e2e8f0;
-  --text: #0f172a;
+  --bg: #F1F5F9;
+  --surface: #FFFFFF;
+  --border: #E2E8F0;
+  --text: #0F172A;
   --text-muted: #475569;
-  --text-faint: #94a3b8;
-  --hover: #f8fafc;
+  --text-faint: #94A3B8;
+  --hover: #F8FAFC;
+  --focus: #0B192C;
+  --accent: #2563EB;
+  --accent-hover: #1D4ED8;
 }
 
 * {
@@ -66,7 +78,7 @@ a {
 }
 
 .richtext {
-  color: #1e293b;
+  color: #1E293B;
   line-height: 1.8;
 }
 
@@ -123,4 +135,35 @@ h2,
 h3 {
   font-family: var(--font-serif);
   letter-spacing: -0.01em;
+}
+
+/* ===== Scrollbar styling ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--genta-slate-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--genta-slate-300);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--genta-slate-400);
+}
+
+/* ===== Focus visible for accessibility ===== */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ===== Selection ===== */
+::selection {
+  background: var(--accent);
+  color: white;
 }

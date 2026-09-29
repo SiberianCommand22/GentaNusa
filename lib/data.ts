@@ -1,5 +1,3 @@
-import fs from "fs";
-import path from "path";
 import { supabaseAnon } from "./supabase";
 
 export type Article = {
@@ -30,8 +28,6 @@ export type Category = {
   slug: string;
   name: string;
 };
-
-const dataDir = path.join(process.cwd(), "lib", "data");
 
 // Cache per-process: fetch sekali, reuse semua request. TTL 30 detik.
 const cache = new Map<string, { data: unknown; timestamp: number }>();
@@ -74,10 +70,6 @@ export function articleSlug(a: { slug?: string; title: string }): string {
 export function articleUrl(a: { slug?: string; id: number; title: string }): string {
   const slug = articleSlug(a) || a.id.toString();
   return `/${slug}`;
-}
-
-function readJson(file: string) {
-  return JSON.parse(fs.readFileSync(path.join(dataDir, file), "utf-8"));
 }
 
 type DbArticle = {
@@ -166,7 +158,7 @@ export async function getCategories(): Promise<Category[]> {
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data as Category[];
 
   const fromDb = await fetchCategoriesDb();
-  const result = fromDb ?? readJson("categories.json");
+  const result = fromDb ?? [];
   cache.set("categories", { data: result, timestamp: Date.now() });
   return result;
 }
@@ -245,9 +237,12 @@ export async function getAuthors(): Promise<Author[]> {
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data as Author[];
 
   const rows = await fetchAuthorRows();
-  const list: Author[] = rows.length
-    ? rows.map((r) => ({ slug: r.slug, name: r.name, role: "Jurnalis GentaNusa", bio: bioFor(r.name) }))
-    : [{ slug: "redaksi-gentanusa", name: "Redaksi GentaNusa", role: "Redaktur GentaNusa", bio: bioFor("Redaksi GentaNusa") }];
+  const list: Author[] = rows.map((r) => ({
+    slug: r.slug,
+    name: r.name,
+    role: "Jurnalis GentaNusa",
+    bio: bioFor(r.name),
+  }));
   cache.set("authors", { data: list, timestamp: Date.now() });
   return list;
 }

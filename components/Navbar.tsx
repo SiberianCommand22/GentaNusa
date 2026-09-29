@@ -68,6 +68,7 @@ export function Navbar() {
                 placeholder="Cari berita..."
                 className={styles.searchInput}
                 aria-label="Cari berita"
+                autoFocus
               />
             </form>
 

@@ -116,7 +116,7 @@ export default function ManagePostsPage() {
                           className={styles.iconBtn}
                           title="Lihat artikel publik"
                           aria-label={`Lihat ${a.title}`}
-                          href={`/artikel/${a.slug || a.id}`}
+                          href={`/${a.slug || a.id}`}
                           target="_blank"
                           rel="noopener noreferrer"
                         >

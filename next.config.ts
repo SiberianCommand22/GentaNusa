@@ -17,6 +17,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/artikel/:slug",
+        destination: "/:slug",
+        permanent: true, // 301 Permanent Redirect untuk SEO
+      },
+    ];
+  },
   async headers() {
     return [
       {

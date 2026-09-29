@@ -71,7 +71,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.replace("/admin/login");
   }
 
-  // Halaman login tampil mandiri — tanpa sidebar CMS.
   if (isLogin) {
     return <>{children}</>;
   }

@@ -4,9 +4,8 @@
   padding: 0 20px;
 }
 
-/* ===== Hero ===== */
-.hero {
-  padding: 32px 0;
+.main {
+  min-height: 100vh;
 }
 
 /* ===== Empty state (0 berita) ===== */
@@ -24,28 +23,33 @@
   width: 64px;
   height: 64px;
   border-radius: 9999px;
-  background: #f1f5f9;
+  background: #F1F5F9;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
-  color: #94a3b8;
+  color: #94A3B8;
 }
 
 .emptyTitle {
   font-family: var(--font-serif);
   font-size: 20px;
   font-weight: 700;
-  color: #1e293b;
+  color: #0F172A;
   margin: 0 0 4px;
 }
 
 .emptyText {
   font-size: 14px;
   line-height: 1.7;
-  color: #64748b;
+  color: #64748B;
   max-width: 24rem;
   margin: 0;
+}
+
+/* ===== Hero ===== */
+.hero {
+  padding: 32px 0;
 }
 
 .heroGrid {
@@ -99,8 +103,9 @@
   aspect-ratio: 16 / 9;
   min-height: 420px;
   max-height: 500px;
-  background: #0f172a;
+  background: #0F172A;
   box-shadow: 0 12px 32px rgba(11, 25, 44, 0.25);
+  border: 1px solid rgba(191, 219, 254, 0.2);
 }
 
 .heroCard:hover .heroImage img {
@@ -122,7 +127,7 @@
   transition: transform 0.5s ease;
 }
 
-/* Gradien pelindung: 50% atas foto tetap bersih, gelap menumpuk di bawah. */
+/* Gradien pelindung: HANYA 45% dasar bawah — 55% atas bersih */
 .heroGradient {
   position: absolute;
   inset: 0;
@@ -130,8 +135,9 @@
   background: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.9) 0%,
-    rgba(0, 0, 0, 0.4) 42%,
-    transparent 58%
+    rgba(0, 0, 0, 0.6) 30%,
+    rgba(0, 0, 0, 0.15) 45%,
+    transparent 55%
   );
   pointer-events: none;
 }
@@ -168,7 +174,7 @@
 }
 
 .heroCard:hover .heroTitle {
-  color: #bfdbfe;
+  color: #BFDBFE;
 }
 
 @media (min-width: 640px) {
@@ -188,7 +194,7 @@
   font-size: 12px;
   line-height: 1.65;
   font-weight: 400;
-  color: #e2e8f0;
+  color: #E2E8F0;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
   margin-top: 8px;
   max-width: 42rem;
@@ -210,7 +216,7 @@
   gap: 8px;
   font-size: 11px;
   font-weight: 500;
-  color: #cbd5e1;
+  color: #CBD5E1;
   margin-top: 12px;
 }
 
@@ -319,7 +325,7 @@
 .card:hover {
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
   transform: translateY(-4px);
-  border-color: #c8c8d2;
+  border-color: #C8C8D2;
 }
 
 .cardImage {
@@ -327,7 +333,7 @@
   aspect-ratio: 16 / 9;
   overflow: hidden;
   position: relative;
-  background: #f5f5f5;
+  background: #F5F5F5;
 }
 
 .cardImage img {

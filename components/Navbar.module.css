@@ -5,7 +5,7 @@
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 2px solid rgba(37, 99, 235, 0.2);
 }
 
 .headerInner {
@@ -36,12 +36,12 @@
   padding: 8px;
   font-size: 14px;
   font-weight: 700;
-  color: #1e293b;
+  color: #0B192C;
   transition: color 0.15s;
 }
 
 .hamburger:hover {
-  color: #1e3a8a;
+  color: #2563EB;
 }
 
 .hamburgerIcon {
@@ -54,14 +54,14 @@
   display: block;
   width: 20px;
   height: 2px;
-  background: #1e293b;
+  background: #0B192C;
   border-radius: 1px;
 }
 
 .hamburgerText {
   font-size: 14px;
   font-weight: 600;
-  color: #1e293b;
+  color: #0B192C;
 }
 
 .logo {
@@ -80,13 +80,13 @@
 
 .loginBtn {
   padding: 8px 20px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid #CBD5E1;
   border-radius: 9999px;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #334155;
+  color: #0B192C;
   background: #fff;
   white-space: nowrap;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
@@ -94,8 +94,8 @@
 }
 
 .loginBtn:hover {
-  border-color: #0f172a;
-  background: #0f172a;
+  border-color: #2563EB;
+  background: #0B192C;
   color: #fff;
 }
 
@@ -138,14 +138,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #E2E8F0;
 }
 
 .drawerTitle {
   font-family: var(--font-serif);
   font-size: 20px;
   font-weight: 700;
-  color: #0f172a;
+  color: #0F172A;
 }
 
 .drawerClose {
@@ -153,7 +153,7 @@
   border: none;
   font-size: 20px;
   cursor: pointer;
-  color: #64748b;
+  color: #64748B;
   padding: 4px;
 }
 
@@ -165,7 +165,7 @@
 .drawerSearchIcon {
   width: 16px;
   height: 16px;
-  color: #94a3b8;
+  color: #94A3B8;
   position: absolute;
   left: 14px;
   top: 14px;
@@ -175,23 +175,23 @@
 .searchInput {
   width: 100%;
   padding: 10px 16px 10px 40px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
   border-radius: 8px;
   font-size: 14px;
-  color: #0f172a;
+  color: #0F172A;
   outline: none;
   transition: all 0.15s;
 }
 
 .searchInput::placeholder {
-  color: #94a3b8;
+  color: #94A3B8;
 }
 
 .searchInput:focus {
   background: #fff;
-  border-color: #0b192c;
-  box-shadow: 0 0 0 1px #0b192c;
+  border-color: #0B192C;
+  box-shadow: 0 0 0 1px #0B192C;
 }
 
 .drawerNav {
@@ -203,8 +203,8 @@
   padding: 10px 0;
   font-size: 15px;
   font-weight: 500;
-  color: #1e293b;
-  border-bottom: 1px solid #f1f5f9;
+  color: #0F172A;
+  border-bottom: 1px solid #F1F5F9;
 }
 
 .drawerLink:last-child {
@@ -213,7 +213,7 @@
 
 .drawerFooter {
   padding: 16px 20px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #E2E8F0;
   margin-top: auto;
 }
 
@@ -233,14 +233,14 @@
 }
 
 .socialLink:hover {
-  color: #1e3a8a;
+  color: #1E3A8A;
 }
 
 .loginCmsBtn {
   display: block;
   width: 100%;
   padding: 12px;
-  background: #1e3a8a;
+  background: #0B192C;
   color: #fff;
   text-align: center;
   border-radius: 8px;

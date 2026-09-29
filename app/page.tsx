@@ -4,23 +4,30 @@ import { Footer } from "@/components/site";
 import { CardImage } from "@/components/card-image";
 import styles from "./page.module.css";
 
-// Biru Editorial Berwibawa — satu aksen untuk seluruh badge kategori.
 const CATEGORY_BADGE_BG = "#2563EB";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function Home() {
   const latest = sortByDate(await getArticles());
 
-  // Empty state — tidak ada artikel yang diterbitkan: jangan render kartu
-  // kosong, tampilkan pesan minimalis di tengah.
   if (latest.length === 0) {
     return (
       <main>
         <div className={styles.emptyWrap}>
           <div className={styles.emptyIcon}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0V9" />
               <path d="M18 14h-8M15 18h-5M10 6H8v4h2" />
             </svg>
@@ -37,17 +44,15 @@ export default async function Home() {
   }
 
   const headlineArticle = latest[0];
-  const popular = latest.slice(1, 6);
-  // Cegah duplikasi: "Berita Terbaru" tidak memuat ulang headline hero.
+  const popular = latest.slice(1, 4);
   const recentArticles = latest
     .filter((a) => a.slug !== headlineArticle.slug && a.id !== headlineArticle.id)
     .slice(0, 6);
 
-  // Kolom TERPOPULER hanya dirender bila ada isinya (>=3 artikel total).
   const showPopular = latest.length >= 3 && popular.length > 0;
 
   return (
-    <main>
+    <main className={styles.main}>
       <section className={styles.hero}>
         <div className={styles.container}>
           <div className={showPopular ? styles.heroGrid : styles.heroGridFull}>
