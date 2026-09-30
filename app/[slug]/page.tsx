@@ -143,15 +143,16 @@ export default async function ArticlePage({ params }: Params) {
   return (
     <>
       <main className={styles.container}>
-        {/* 1. Breadcrumb */}
+        {/* 1. Breadcrumb ringkas — hanya sampai kategori, tanpa duplikat judul */}
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
           <Link href="/">Beranda</Link>
-          <span className={styles.breadcrumbSep}></span>
-          <Link href={"/kategori/" + slugifyTitle(article.category)}>
-            {article.category}
+          <span className={styles.breadcrumbSep}>/</span>
+          <Link
+            href={"/kategori/" + slugifyTitle(article.category)}
+            className={styles.breadcrumbCategory}
+          >
+            {article.category || "Nasional"}
           </Link>
-          <span className={styles.breadcrumbSep}></span>
-          <span>{article.title}</span>
         </nav>
 
         <article className={styles.article}>
@@ -181,12 +182,17 @@ export default async function ArticlePage({ params }: Params) {
                 alt={article.title}
                 className={styles.featuredImage}
               />
-              <figcaption className={styles.caption}>
-                <span>{article.image_caption || "Dokumentasi redaksi"}</span>
-                <span className={styles.credit}>
-                  Foto: {article.image_credit || "Redaksi GentaNusa"}
-                </span>
-              </figcaption>
+              {/* HANYA tampil bila caption/kredit asli ada di database */}
+              {(article.image_caption || article.image_credit) && (
+                <figcaption className={styles.caption}>
+                  <span>{article.image_caption || ""}</span>
+                  {article.image_credit && (
+                    <span className={styles.credit}>
+                      Foto: {article.image_credit}
+                    </span>
+                  )}
+                </figcaption>
+              )}
             </figure>
           )}
 

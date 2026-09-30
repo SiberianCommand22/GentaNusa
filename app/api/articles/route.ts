@@ -90,8 +90,8 @@ export async function POST(req: NextRequest) {
 
   // status "draft" → baris staging (tersembunyi dari publik); default terbit.
   // Skema DB memakai `image` (payload form boleh memakai alias `cover_image`).
-  // Kolom slug/lead/cover_image/image_caption/image_credit dicoba dulu; bila
-  // DB belum dimigrasi, insert diulang dengan kolom inti agar tetap tersimpan.
+  // Kolom yang belum dimigrasi dibuang satu per satu otomatis — kolom valid
+  // (lead/image_caption/image_credit) TETAP tersimpan.
   const isDraft = body.status === "draft";
 
   const fullRow: Record<string, unknown> = {
@@ -112,24 +112,18 @@ export async function POST(req: NextRequest) {
   };
   if (body.slug) fullRow.slug = body.slug;
 
-  let { data, error } = await c.client
-    .from("articles")
-    .insert([fullRow])
-    .select()
-    .single();
-
-  if (
-    error &&
-    /could not find the .* column|schema cache|column .* does not exist/i.test(
-      error.message || ""
-    )
-  ) {
-    const { slug, lead, cover_image, image_caption, image_credit, ...baseRow } = fullRow;
-    ({ data, error } = await c.client
-      .from("articles")
-      .insert([baseRow])
-      .select()
-      .single());
+  const pending: Record<string, unknown> = { ...fullRow };
+  let data = null;
+  let error = null;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const res = await c.client.from("articles").insert([pending]).select().single();
+    data = res.data;
+    error = res.error;
+    if (!error) break;
+    const m = /Could not find the '([^']+)' column/i.exec(error.message || "");
+    if (!m || !(m[1] in pending)) break;
+    delete pending[m[1]];
+    error = null;
   }
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

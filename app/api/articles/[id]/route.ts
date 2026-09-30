@@ -13,15 +13,38 @@ function ensureClient() {
   return { ok: true as const, client: adminClient };
 }
 
-// Kolom slug/lead/cover_image/image_caption/image_credit ada bila migrasi
-// scripts/migrate-articles.sql sudah dijalankan. Update dicoba LENGKAP dulu;
-// bila DB belum dimigrasi, jatuh ke kolom inti agar edit TETAP tersimpan
-// (zero data loss) tanpa error schema-cache. `status`/`updated_at` TIDAK
-// dikirim — kolomnya tidak ada di skema (draft dikodekan via author_slug).
-function isMissingColumnError(message: string): boolean {
-  return /could not find the .* column|schema cache|column .* does not exist/i.test(
-    message || ""
-  );
+// Kolom slug/cover_image/status/updated_at BELUM ada di DB produksi
+// (kolom lead/image_caption/image_credit sudah ada). Update dikirim LENGKAP
+// dulu; setiap kolom yang ditolak schema-cache dibuang satu per satu lalu
+// diulang — caption/kredit yang valid TETAP tersimpan (zero data loss).
+// `status`/`updated_at` TIDAK dikirim — kolomnya tidak ada di skema
+// (draft dikodekan via author_slug staging-).
+function isMissingColumnError(message: string): { column: string } | null {
+  const m = /Could not find the '([^']+)' column/i.exec(message || "");
+  return m ? { column: m[1] } : null;
+}
+
+async function updateTolerant(
+  client: { from: (t: string) => any },
+  id: string,
+  values: Record<string, unknown>
+) {
+  const pending: Record<string, unknown> = { ...values };
+  let lastError: { message: string } | null = null;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const { data, error } = await client
+      .from("articles")
+      .update(pending)
+      .eq("id", id)
+      .select()
+      .single();
+    if (!error) return { data, error: null };
+    const miss = isMissingColumnError(error.message);
+    if (!miss || !(miss.column in pending)) return { data: null, error };
+    delete pending[miss.column];
+    lastError = error;
+  }
+  return { data: null, error: lastError };
 }
 
 async function getArticle(id: string) {
@@ -103,24 +126,8 @@ export async function PUT(
   // Slug lama dipertahankan form; jangan timpa dengan nilai kosong.
   if (body.slug) fullUpdate.slug = body.slug;
 
-  let { data, error } = await c.client
-    .from("articles")
-    .update(fullUpdate)
-    .eq("id", id)
-    .select()
-    .single();
+  let { data, error } = await updateTolerant(c.client, id, fullUpdate);
 
-  // DB belum dimigrasi → ulangi dengan kolom inti saja, edit tetap tersimpan.
-  if (error && isMissingColumnError(error.message)) {
-    const { slug, lead, cover_image, image_caption, image_credit, ...baseUpdate } =
-      fullUpdate;
-    ({ data, error } = await c.client
-      .from("articles")
-      .update(baseUpdate)
-      .eq("id", id)
-      .select()
-      .single());
-  }
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
   revalidatePath("/[slug]", "page");
