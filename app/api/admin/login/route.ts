@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { getClientIp } from "@/lib/get-client-ip";
 
 // Track rate per IP
 const rateMap = new Map<string, { count: number; resetAt: number }>();
@@ -31,9 +32,8 @@ function cookieFlags(maxAge: number) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting
-    const ip =
-      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    // Rate limiting (IP asli via Cloudflare-aware helper)
+    const ip = getClientIp(request);
     const now = Date.now();
     const entry = rateMap.get(ip);
     if (entry && now < entry.resetAt) {

@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getClientIp } from "@/lib/get-client-ip";
 
 const rateMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT = 10; // max attempts per window
 const WINDOW_MS = 60 * 1000; // 1 minute
 
 export function rateLimit(req: NextRequest): { ok: true } | { ok: false; response: NextResponse } {
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "unknown";
+  const ip = getClientIp(req);
 
   const now = Date.now();
   const entry = rateMap.get(ip);
