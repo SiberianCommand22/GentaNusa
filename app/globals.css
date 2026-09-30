@@ -141,12 +141,28 @@ a {
   hyphens: auto;
 }
 
-/* Halaman baca root-slug: body artikel justify inter-word. */
-.article-body p {
-  text-align: justify;
-  text-justify: inter-word;
-  line-height: 1.8;
-  margin-bottom: 1.25rem;
+/* Otomatisasi Justify Standar Editorial — berlaku di admin & publik. */
+.article-body,
+.article-body p,
+.article-body div {
+  text-align: justify !important;
+  text-justify: inter-word !important;
+  line-height: 1.85;
+  hyphens: auto;
+}
+
+/* Pengecualian jika editor sengaja memilih rata tengah. */
+.article-body p[style*="text-align: center"],
+.article-body .text-center {
+  text-align: center !important;
+}
+
+.article-body h2,
+.article-body h3 {
+  text-align: left !important;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 /* Konten olahan toolbar CMS (inline style aman): hormati perataan eksplisit. */
@@ -176,14 +192,6 @@ a {
 .article-content b {
   font-weight: 700 !important;
   color: #0f172a;
-}
-
-/* Di layar sempit, justify menghasilkan "rivers" yang sulit dibaca. */
-@media (max-width: 640px) {
-  .richtext p:not([class]) {
-    text-align: left;
-    hyphens: none;
-  }
 }
 
 h1,

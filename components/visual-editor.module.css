@@ -80,6 +80,8 @@
   color: #0F172A;
   outline: none;
   overflow-wrap: break-word;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .canvas:focus {
@@ -102,6 +104,7 @@
   font-size: 1.5rem;
   font-weight: 800;
   line-height: 1.35;
+  text-align: left;
   margin: 1rem 0 0.5rem;
 }
 
@@ -110,6 +113,7 @@
   font-size: 1.25rem;
   font-weight: 700;
   line-height: 1.4;
+  text-align: left;
   margin: 1rem 0 0.5rem;
 }
 

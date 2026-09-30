@@ -217,6 +217,7 @@ export default function NewPostPage() {
                 value={form.excerpt}
                 onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
                 placeholder="Ringkasan pembuka yang memikat pembaca…"
+                style={{ textAlign: "justify" }}
               />
               <p className={styles.help} style={{ textAlign: "right" }}>{form.excerpt.trim().length}/600 karakter</p>
             </div>
