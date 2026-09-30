@@ -30,26 +30,18 @@ export function Navbar() {
         <div className={styles.headerInner}>
           <div style={{ display: "flex", alignItems: "center" }}>
             <button
-              className={styles.hamburger}
+              className={styles.menuSearchBtn}
               onClick={() => setDrawerOpen(true)}
-              aria-label="Buka menu"
+              aria-label="Buka menu dan pencarian"
             >
-              <span className={styles.hamburgerIcon}>
-                <span />
-                <span />
-                <span />
-              </span>
-              <span className={styles.hamburgerText}>Menu</span>
-            </button>
-            <button
-              onClick={() => setDrawerOpen(true)}
-              aria-label="Cari cepat"
-              style={{ background: "none", border: "none", cursor: "pointer", padding: 8, marginLeft: 12, display: "flex", alignItems: "center" }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg className={styles.menuIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              <svg className={styles.searchIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.3-4.3" />
               </svg>
+              <span className={styles.menuSearchLabel}>Menu & Cari</span>
             </button>
           </div>
 
@@ -58,7 +50,11 @@ export function Navbar() {
           </div>
 
           <Link href="/admin/login" className={styles.loginBtn}>
-            Login
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span>Login</span>
           </Link>
         </div>
 

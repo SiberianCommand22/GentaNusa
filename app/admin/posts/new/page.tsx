@@ -12,6 +12,7 @@ const HEADLINE_TAG = "headline";
 
 const emptyForm = {
   title: "",
+  slug: "",
   excerpt: "",
   content: "",
   image: "",
@@ -23,6 +24,13 @@ const emptyForm = {
   date: new Date().toISOString().split("T")[0],
   headline: false,
 };
+
+function slugifyBase(title: string): string {
+  return (
+    title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') ||
+    "artikel"
+  );
+}
 
 function splitTags(raw: string): string[] {
   return raw.split(",").map((t) => t.trim()).filter(Boolean);
@@ -54,9 +62,10 @@ export default function NewPostPage() {
       setEditId(numId);
       setForm({
         title: a.title ?? "",
-        excerpt: a.excerpt ?? "",
+        slug: a.slug ?? "",
+        excerpt: a.excerpt ?? a.lead ?? "",
         content: Array.isArray(a.content) ? a.content.join("\n") : a.content ?? "",
-        image: a.image ?? "",
+        image: a.image ?? a.cover_image ?? "",
         category: a.category ?? "Nasional",
         tags: tags.filter((t) => t !== HEADLINE_TAG).join(", "),
         author: a.author ?? "",
@@ -115,8 +124,11 @@ export default function NewPostPage() {
     const paras = form.content.split("\n").map((p) => p.trim()).filter(Boolean);
     // Ringkasan/lead: isi otomatis dari 150 karakter pertama konten bila kosong.
     const lead = form.excerpt.trim() || paras.join(" ").slice(0, 150);
-    // Slug wajib terisi sebelum POST/PUT — turunan deterministik dari judul + timestamp unik.
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') + '-' + Date.now();
+    // BARU: slug unik dari judul + timestamp. EDIT: PERTAHANKAN slug lama —
+    // jangan regenerasi agar URL publik tidak rusak / tidak kena unique conflict.
+    const slug = editId
+      ? form.slug.trim() || slugifyBase(title)
+      : `${slugifyBase(title)}-${Date.now()}`;
     if (!title) {
       setMsg("Judul wajib diisi.");
       return;
@@ -131,19 +143,22 @@ export default function NewPostPage() {
     }
     setBusy(true);
     try {
-      const imagePath = await uploadImage();
-      if (imageFile && !imagePath) {
+      const uploadedPath = await uploadImage();
+      if (imageFile && !uploadedPath) {
         setBusy(false);
         return;
       }
       const tags = splitTags(form.tags).filter((t) => t !== HEADLINE_TAG);
       if (form.headline) tags.unshift(HEADLINE_TAG);
+      const imagePath = uploadedPath || "/images/placeholder-article.svg";
       const payload = {
         title,
         slug,
         excerpt: lead,
+        lead,
         content: paras,
-        cover_image: imagePath || "/images/placeholder-article.svg",
+        image: imagePath,
+        cover_image: imagePath,
         image_caption: form.image_caption.trim(),
         image_credit: form.image_credit.trim(),
         category: form.category,
@@ -165,7 +180,8 @@ export default function NewPostPage() {
           });
       setBusy(false);
       if (r.ok || r.status === 201) {
-        router.push("/admin/posts");
+        setMsg(editId ? "Berita berhasil diperbarui." : "Berita berhasil diterbitkan.");
+        window.setTimeout(() => router.push("/admin/posts"), 600);
       } else {
         const j = await r.json().catch(() => ({}));
         setMsg(`Gagal mempublikasikan: ${j.error || r.status}`);
@@ -229,10 +245,10 @@ export default function NewPostPage() {
                     <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<a href="https://" class="text-blue-600 underline">', "</a>", "tautan")} title="Tautan">Link</button>
                   </span>
                   <span className={styles.toolGroup}>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p class="text-left">', "</p>", "paragraf rata kiri")} title="Rata kiri">≡←</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p class="text-center">', "</p>", "paragraf rata tengah")} title="Rata tengah">≡</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p class="text-right">', "</p>", "paragraf rata kanan")} title="Rata kanan">→≡</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p class="text-justify leading-relaxed">', "</p>", "paragraf justify")} title="Rata kiri-kanan (justify)">≣</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p style="text-align: left;">', "</p>", "paragraf rata kiri")} title="Rata kiri">≡←</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p style="text-align: center;">', "</p>", "paragraf rata tengah")} title="Rata tengah">≡</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p style="text-align: right;">', "</p>", "paragraf rata kanan")} title="Rata kanan">→≡</button>
+                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p style="text-align: justify; text-justify: inter-word;">', "</p>", "paragraf justify")} title="Rata kiri-kanan (justify)">≣</button>
                   </span>
                   <span className={styles.toolGroup}>
                     <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<h2>", "</h2>", "Subjudul")} title="Heading 2">H2</button>

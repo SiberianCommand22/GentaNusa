@@ -149,6 +149,35 @@ a {
   margin-bottom: 1.25rem;
 }
 
+/* Konten olahan toolbar CMS (inline style aman): hormati perataan eksplisit. */
+.article-content p {
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+}
+
+.article-content p[style*="text-align: justify"] {
+  text-align: justify !important;
+  text-justify: inter-word !important;
+}
+
+.article-content p[style*="text-align: center"] {
+  text-align: center !important;
+}
+
+.article-content p[style*="text-align: right"] {
+  text-align: right !important;
+}
+
+.article-content p[style*="text-align: left"] {
+  text-align: left !important;
+}
+
+.article-content strong,
+.article-content b {
+  font-weight: 700 !important;
+  color: #0f172a;
+}
+
 /* Di layar sempit, justify menghasilkan "rivers" yang sulit dibaca. */
 @media (max-width: 640px) {
   .richtext p:not([class]) {

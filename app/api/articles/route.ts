@@ -89,33 +89,52 @@ export async function POST(req: NextRequest) {
   }
 
   // status "draft" → baris staging (tersembunyi dari publik); default terbit.
-  // Skema DB memakai `image` (payload form boleh memakai alias `cover_image`);
-  // `slug`, `image_caption`, `image_credit` diabaikan — belum ada kolomnya
-  // (migrasi: ALTER TABLE articles ADD COLUMN image_caption TEXT,
-  // ADD COLUMN image_credit TEXT). Form tetap mengirimnya agar frontend siap.
+  // Skema DB memakai `image` (payload form boleh memakai alias `cover_image`).
+  // Kolom slug/lead/cover_image/image_caption/image_credit dicoba dulu; bila
+  // DB belum dimigrasi, insert diulang dengan kolom inti agar tetap tersimpan.
   const isDraft = body.status === "draft";
 
-  const { data, error } = await c.client
+  const fullRow: Record<string, unknown> = {
+    title: body.title,
+    category: body.category,
+    excerpt: body.excerpt,
+    lead: body.lead ?? body.excerpt,
+    content: body.content,
+    tags: body.tags,
+    image: body.image ?? body.cover_image ?? null,
+    cover_image: body.cover_image ?? body.image ?? null,
+    image_caption: body.image_caption ?? "",
+    image_credit: body.image_credit ?? "",
+    date: body.date || new Date().toISOString().split("T")[0],
+    author: body.author || "Redaksi GentaNusa",
+    author_slug: isDraft ? draftSlug(body.title) : body.authorSlug || "redaksi-generic",
+    author_role: body.authorRole || "Redaktur GentaNusa",
+  };
+  if (body.slug) fullRow.slug = body.slug;
+
+  let { data, error } = await c.client
     .from("articles")
-    .insert([
-      {
-        title: body.title,
-        category: body.category,
-        excerpt: body.excerpt,
-        content: body.content,
-        tags: body.tags,
-        image: body.image ?? body.cover_image ?? null,
-        date: body.date || new Date().toISOString().split("T")[0],
-        author: body.author || "Redaksi GentaNusa",
-        author_slug: isDraft ? draftSlug(body.title) : body.authorSlug || "redaksi-generic",
-        author_role: body.authorRole || "Redaktur GentaNusa",
-      },
-    ])
+    .insert([fullRow])
     .select()
     .single();
 
+  if (
+    error &&
+    /could not find the .* column|schema cache|column .* does not exist/i.test(
+      error.message || ""
+    )
+  ) {
+    const { slug, lead, cover_image, image_caption, image_credit, ...baseRow } = fullRow;
+    ({ data, error } = await c.client
+      .from("articles")
+      .insert([baseRow])
+      .select()
+      .single());
+  }
+
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
+  revalidatePath("/[slug]", "page");
   revalidatePath("/admin");
   revalidatePath("/admin/posts");
   return NextResponse.json(data, { status: 201 });

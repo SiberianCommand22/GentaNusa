@@ -31,6 +31,21 @@ function cleanAttrs(tag: string, name: string, attrs: string): string {
   if (name === "a" && href && (/^https?:\/\//i.test(href[1]) || href[1].startsWith("/"))) {
     out += ` href="${href[1]}"`;
   }
+  // Inline style diloloskan HANYA untuk perataan teks toolbar
+  // (text-align + text-justify). Deklarasi lain dibuang agar aman.
+  const style = attrs.match(/style\s*=\s*"([^"]*)"/i);
+  if (style && (name === "p" || name === "h2" || name === "h3" || name === "blockquote")) {
+    const kept = style[1]
+      .split(";")
+      .map((d) => d.trim())
+      .filter(Boolean)
+      .filter(
+        (d) =>
+          /^text-align\s*:\s*(left|center|right|justify)$/i.test(d) ||
+          /^text-justify\s*:\s*inter-word$/i.test(d)
+      );
+    if (kept.length > 0) out += ` style="${kept.join("; ")};"`;
+  }
   const cls = attrs.match(/class\s*=\s*"([^"]*)"/i);
   if (cls) {
     const kept = cls[1].split(/\s+/).filter((t) => SAFE_CLASSES.has(t));
@@ -105,7 +120,7 @@ const BLOCK_TAG = /^\s*<(p|h2|h3|blockquote|ul|ol)\b/i;
 
 export function ArticleContent({ content }: { content: ContentBlock[] }) {
   return (
-    <div className={`${styles.articleContent} richtext article-body`}>
+    <div className={`${styles.articleContent} richtext article-body article-content`}>
       {content.map((raw, i) => {
         // Dekode entitas escape dulu, lalu sanitasi. Render SELALU via
         // dangerouslySetInnerHTML — jangan pernah `{p}` teks biasa.

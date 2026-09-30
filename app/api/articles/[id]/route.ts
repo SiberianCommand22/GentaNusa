@@ -13,6 +13,17 @@ function ensureClient() {
   return { ok: true as const, client: adminClient };
 }
 
+// Kolom slug/lead/cover_image/image_caption/image_credit ada bila migrasi
+// scripts/migrate-articles.sql sudah dijalankan. Update dicoba LENGKAP dulu;
+// bila DB belum dimigrasi, jatuh ke kolom inti agar edit TETAP tersimpan
+// (zero data loss) tanpa error schema-cache. `status`/`updated_at` TIDAK
+// dikirim — kolomnya tidak ada di skema (draft dikodekan via author_slug).
+function isMissingColumnError(message: string): boolean {
+  return /could not find the .* column|schema cache|column .* does not exist/i.test(
+    message || ""
+  );
+}
+
 async function getArticle(id: string) {
   const c = ensureClient();
   if (!c.ok) return null;
@@ -54,6 +65,14 @@ export async function PUT(
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Body kosong" }, { status: 400 });
 
+  // Baris lama dibaca dulu agar author_slug yang sudah mapan (mis. nama
+  // penulis) lestari saat redaksi menerbitkan tanpa nilai eksplisit.
+  const { data: existing } = await c.client
+    .from("articles")
+    .select("author_slug")
+    .eq("id", id)
+    .single();
+
   // status "draft" → kembalikan ke staging; "published" → terbitkan dengan
   // slug redaksi. Tanpa status: pertahankan perilaku lama (slug dari body).
   const isDraft = body.status === "draft";
@@ -63,27 +82,48 @@ export async function PUT(
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "")
         .slice(0, 40)}-${Date.now().toString(36)}`
-    : body.authorSlug ?? null;
+    : body.authorSlug ?? existing?.author_slug ?? "redaksi-generic";
 
-  const { data, error } = await c.client
+  const fullUpdate: Record<string, unknown> = {
+    title: body.title,
+    category: body.category,
+    excerpt: body.excerpt,
+    lead: body.lead ?? body.excerpt,
+    content: body.content,
+    image: body.image ?? body.cover_image ?? null,
+    cover_image: body.cover_image ?? body.image ?? null,
+    image_caption: body.image_caption ?? "",
+    image_credit: body.image_credit ?? "",
+    tags: body.tags ?? [],
+    author: body.author,
+    author_slug: authorSlug,
+    author_role: body.authorRole ?? null,
+    date: body.date,
+  };
+  // Slug lama dipertahankan form; jangan timpa dengan nilai kosong.
+  if (body.slug) fullUpdate.slug = body.slug;
+
+  let { data, error } = await c.client
     .from("articles")
-    .update({
-      title: body.title,
-      category: body.category,
-      excerpt: body.excerpt,
-      content: body.content,
-      image: body.image ?? body.cover_image ?? null,
-      tags: body.tags ?? [],
-      author: body.author,
-      author_slug: authorSlug,
-      author_role: body.authorRole ?? null,
-      date: body.date,
-    })
+    .update(fullUpdate)
     .eq("id", id)
     .select()
     .single();
+
+  // DB belum dimigrasi → ulangi dengan kolom inti saja, edit tetap tersimpan.
+  if (error && isMissingColumnError(error.message)) {
+    const { slug, lead, cover_image, image_caption, image_credit, ...baseUpdate } =
+      fullUpdate;
+    ({ data, error } = await c.client
+      .from("articles")
+      .update(baseUpdate)
+      .eq("id", id)
+      .select()
+      .single());
+  }
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
+  revalidatePath("/[slug]", "page");
   revalidatePath("/admin");
   revalidatePath("/admin/posts");
   return NextResponse.json(data);
