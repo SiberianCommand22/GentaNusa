@@ -80,22 +80,22 @@
 }
 
 .loginBtn {
-  padding: 8px 20px;
-  border: 1px solid rgba(147, 197, 253, 0.5);
+  padding: 6px 20px;
+  background: #2563EB;
+  border: 1px solid #60A5FA;
   border-radius: 9999px;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #DBEAFE;
-  background: transparent;
+  color: #fff;
   white-space: nowrap;
-  transition: all 0.2s;
+  transition: background 0.2s;
 }
 
 .loginBtn:hover {
-  border-color: #2563EB;
-  background: #2563EB;
+  background: #3B82F6;
+  border-color: #93C5FD;
   color: #fff;
 }
 

@@ -79,7 +79,7 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
 
   return (
     <div className={styles.share}>
-      <span className={styles.label}>Bagikan:</span>
+      <span className={styles.label}>BAGIKAN:</span>
       <div className={styles.buttons}>
         {shareLinks.map((s) => (
           <a

@@ -26,7 +26,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className={styles.header}>
+      <header className={`sticky top-0 z-50 w-full bg-[#0B192C] shadow-md ${styles.header}`}>
         <div className={styles.headerInner}>
           <div style={{ display: "flex", alignItems: "center" }}>
             <button

@@ -41,8 +41,18 @@ export async function generateStaticParams() {
   return (await getArticles()).map((a) => ({ slug: a.slug }));
 }
 
-function resolveAbsoluteImageUrl(image?: string): string {
-  const siteUrl = "https://www.gentanusa.id";
+// Lucuti tag HTML + entitas escape agar lead/excerpt selalu teks polos.
+function stripHtml(s: string): string {
+  return String(s || "")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&[^;\s]+;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function resolveAbsoluteImageUrl(image?: string): string {  const siteUrl = "https://www.gentanusa.id";
   const fallback = `${siteUrl}/gentanusa.jpeg`;
   if (!image) return fallback;
   if (image.startsWith("http://") || image.startsWith("https://")) return image;
@@ -120,9 +130,13 @@ export default async function ArticlePage({ params }: Params) {
     .slice(0, 3);
 
   const SITE_URL = "https://www.gentanusa.id";
-  // Kolom `lead` tidak ada di skema, jadi turunkan ke paragraf pertama konten.
-  const [firstParagraph, ...body] = article.content;
-  const lead = article.lead || firstParagraph;
+  // Lead HARUS teks polos: blok mentah toolbar (<p class="...">) atau lead
+  // yang mengandung tag dilucuti agar tidak tampil mentah di layar.
+  const paras = Array.isArray(article.content)
+    ? article.content
+    : [String(article.content ?? "")];
+  const [firstParagraph, ...body] = paras;
+  const lead = stripHtml(article.lead || firstParagraph || "");
   const coverImage = article.cover_image || article.image;
 
   return (

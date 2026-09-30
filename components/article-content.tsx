@@ -55,6 +55,18 @@ function sanitizeHtml(html: string): string {
     });
 }
 
+// Blok yang terlanjur tersimpan sebagai entitas escape (`&lt;p ...&gt;`)
+// didekode kembali menjadi HTML sebelum sanitasi agar tidak tampil mentah.
+function decodeEscapedHtml(block: string): string {
+  if (!block.includes("&lt;")) return block;
+  return block
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&");
+}
+
 function parseInline(text: string) {
   return text
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
@@ -93,10 +105,12 @@ const BLOCK_TAG = /^\s*<(p|h2|h3|blockquote|ul|ol)\b/i;
 
 export function ArticleContent({ content }: { content: ContentBlock[] }) {
   return (
-    <div className={`${styles.articleContent} richtext`}>
+    <div className={`${styles.articleContent} richtext article-body`}>
       {content.map((raw, i) => {
-        // Blok ber-tag HTML (toolbar baru) atau teks polos/penanda lawas.
-        const html = sanitizeHtml(raw.includes("<") ? raw : parseInline(legacyToHtml(raw)));
+        // Dekode entitas escape dulu, lalu sanitasi. Render SELALU via
+        // dangerouslySetInnerHTML — jangan pernah `{p}` teks biasa.
+        const decoded = decodeEscapedHtml(raw);
+        const html = sanitizeHtml(decoded.includes("<") ? decoded : parseInline(legacyToHtml(decoded)));
         if (BLOCK_TAG.test(html)) {
           return <div key={i} className={styles.rawBlock} dangerouslySetInnerHTML={{ __html: html }} />;
         }
