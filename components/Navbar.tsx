@@ -26,7 +26,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className={`sticky top-0 z-50 w-full bg-[#0B192C] shadow-md ${styles.header}`}>
+      <header className={`sticky top-0 z-50 w-full bg-white ${styles.header}`}>
         <div className={styles.headerInner}>
           <div style={{ display: "flex", alignItems: "center" }}>
             <button
@@ -54,15 +54,11 @@ export function Navbar() {
           </div>
 
           <div className={styles.logo}>
-            <BrandLogo theme="dark" size="md" href="/" />
+            <BrandLogo theme="light" size="md" href="/" />
           </div>
 
           <Link href="/admin/login" className={styles.loginBtn}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-            <span>Login</span>
+            Login
           </Link>
         </div>
 
