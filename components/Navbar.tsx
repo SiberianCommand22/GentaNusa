@@ -30,18 +30,26 @@ export function Navbar() {
         <div className={styles.headerInner}>
           <div style={{ display: "flex", alignItems: "center" }}>
             <button
-              className={styles.menuSearchBtn}
+              type="button"
               onClick={() => setDrawerOpen(true)}
-              aria-label="Buka menu dan pencarian"
+              className={styles.menuSearchIconBtn}
+              aria-label="Menu dan Pencarian"
             >
-              <svg className={styles.menuIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-                <path d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <line x1="3" y1="6" x2="15" y2="6" />
+                <line x1="3" y1="12" x2="11" y2="12" />
+                <line x1="3" y1="18" x2="13" y2="18" />
+                <circle cx="16.5" cy="13.5" r="3.5" />
+                <line x1="19" y1="16" x2="22" y2="19" />
               </svg>
-              <svg className={styles.searchIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-              <span className={styles.menuSearchLabel}>Menu & Cari</span>
             </button>
           </div>
 
