@@ -53,13 +53,6 @@ function stripHtml(s: string): string {
     .trim();
 }
 
-function resolveAbsoluteImageUrl(image?: string): string {  const siteUrl = "https://www.gentanusa.id";
-  const fallback = `${siteUrl}/gentanusa.jpeg`;
-  if (!image) return fallback;
-  if (image.startsWith("http://") || image.startsWith("https://")) return image;
-  return `${siteUrl}${image.startsWith("/") ? "" : "/"}${image}`;
-}
-
 export async function generateMetadata({ params }: Params) {
   const { slug } = await params;
 
@@ -68,41 +61,51 @@ export async function generateMetadata({ params }: Params) {
   }
 
   const article = await getArticleBySlugOrId(slug);
-  if (!article) return { title: "Artikel Tidak Ditemukan" };
+  if (!article) return { title: "Berita Tidak Ditemukan - GentaNusa" };
 
-  const SITE_URL = "https://www.gentanusa.id";
-  const canonical = `${SITE_URL}/${article.slug || article.id}`;
-  // cover_image (jika ada) menang atas image; keduanya tetap punya fallback
-  // OG card 1200x630 di /public agar tidak pernah ada share tanpa gambar.
-  const imageUrl = resolveAbsoluteImageUrl(article.cover_image || article.image);
-  const description = article.lead || article.excerpt || article.title;
+  const siteUrl = "https://www.gentanusa.id";
+
+  // 1. URL gambar absolut HTTPS dan valid (wajib untuk scraper WhatsApp).
+  let imageUrl = article.cover_image || `${siteUrl}/gentanusa.jpeg`;
+  if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
+    imageUrl = `${siteUrl}${imageUrl.startsWith("/") ? "" : "/"}${imageUrl}`;
+  }
+  imageUrl = imageUrl.replace("http://", "https://");
+
+  const articleUrl = `${siteUrl}/${article.slug || article.id}`;
+  const title = article.title;
+  const description = stripHtml(article.lead || article.excerpt || article.title).slice(0, 160);
+  const mimeType = imageUrl.toLowerCase().endsWith(".png") ? "image/png" : "image/jpeg";
 
   return {
-    title: article.title,
-    description,
-    alternates: { canonical },
+    title: `${title} - GentaNusa`,
+    description: description,
+    metadataBase: new URL(siteUrl),
+    alternates: { canonical: articleUrl },
     openGraph: {
-      type: "article",
+      title: title,
+      description: description,
+      url: articleUrl,
       siteName: "GentaNusa",
-      title: article.title,
-      description,
-      url: canonical,
       locale: "id_ID",
-      publishedTime: article.created_at || article.date,
+      type: "article",
+      publishedTime: article.created_at,
       authors: [article.author || "Redaksi GentaNusa"],
       images: [
         {
           url: imageUrl,
+          secureUrl: imageUrl,
           width: 1200,
           height: 630,
-          alt: article.title,
+          type: mimeType,
+          alt: title,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: article.title,
-      description,
+      title: title,
+      description: description,
       images: [imageUrl],
     },
   };

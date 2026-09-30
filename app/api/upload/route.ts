@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
+import sharp from "sharp";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
 import { rateLimit } from "@/app/api/rate-limit";
 
@@ -81,12 +82,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Kompresi WhatsApp-friendly: maks lebar 1200px, JPEG kualitas 78
+    // (target akhir 100–300 KB agar thumbnail selalu lolos scraper).
+    let payload: Uint8Array = bytes;
+    let objectName = `${randomUUID()}${EXTENSIONS[type]}`;
+    let contentType: string = type;
+    try {
+      const compressed = await sharp(Buffer.from(bytes))
+        .resize({ width: 1200, withoutEnlargement: true })
+        .jpeg({ quality: 78 })
+        .toBuffer();
+      if (compressed.length > 0 && compressed.length <= MAX_IMAGE_BYTES) {
+        payload = new Uint8Array(compressed);
+        objectName = `${randomUUID()}.jpg`;
+        contentType = "image/jpeg";
+      }
+    } catch {
+      // sharp gagal (binding native hilang) → berkas asli yang sudah
+      // lolos validasi magic-byte tetap diunggah apa adanya.
+    }
+
     // Penamaan UUID agar lolos validator proksi /media/[name].
-    const objectName = `${randomUUID()}${EXTENSIONS[type]}`;
     const { error: uploadError } = await adminClient.storage
       .from("articles")
-      .upload(`articles/${objectName}`, bytes, {
-        contentType: type,
+      .upload(`articles/${objectName}`, payload, {
+        contentType,
         cacheControl: "public, max-age=31536000, immutable",
         upsert: false,
       });
