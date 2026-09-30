@@ -10,15 +10,15 @@ const mainNav = [
   { href: "/tentang", label: "Tentang Kami" },
   { href: "/kebijakan-privasi", label: "Kebijakan Privasi" },
   { href: "/syarat-ketentuan", label: "Syarat & Ketentuan" },
-  { href: "/kontak", label: "Kontak" },
+  { href: "/kontak", label: "Kontak Redaksi" },
 ];
 
 const categoryNav = [
-  { slug: "nasional", label: "NASIONAL" },
-  { slug: "pertahanan", label: "PERTAHANAN" },
-  { slug: "politik", label: "POLITIK" },
-  { slug: "ekonomi", label: "EKONOMI" },
-  { slug: "dunia", label: "DUNIA" },
+  { slug: "nasional", label: "Nasional" },
+  { slug: "pertahanan", label: "Pertahanan" },
+  { slug: "politik", label: "Politik" },
+  { slug: "ekonomi", label: "Ekonomi" },
+  { slug: "dunia", label: "Dunia" },
 ];
 
 export function Navbar() {
@@ -108,7 +108,7 @@ export function Navbar() {
             </form>
 
             <nav className={styles.drawerNav}>
-              <span className={styles.drawerSectionTitle}>Kategori</span>
+              <p className={styles.drawerSectionTitle}>KATEGORI</p>
               {categoryNav.map((c) => (
                 <Link
                   key={c.slug}
@@ -119,7 +119,7 @@ export function Navbar() {
                   {c.label}
                 </Link>
               ))}
-              <span className={styles.drawerSectionTitle}>Informasi</span>
+              <p className={styles.drawerSectionTitle}>INFORMASI</p>
               {mainNav.map((item) => (
                 <Link
                   key={item.href}

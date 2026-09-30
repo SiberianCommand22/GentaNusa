@@ -165,12 +165,23 @@ export default async function ArticlePage({ params }: Params) {
           {/* 3. Judul utama */}
           <h1 className={styles.title}>{article.title}</h1>
 
-          {/* 4. Metadata penulis & tanggal */}
+          {/* 4. Metadata penulis & tanggal — nama terhubung ke profil */}
           <div className={styles.meta}>
             <span className={styles.avatar} aria-hidden="true">
-              {(article.author || "R").charAt(0).toUpperCase()}
+              {(article.author || "G").charAt(0).toUpperCase()}
             </span>
-            <span className={styles.author}>{article.author}</span>
+            <span className={styles.authorBox}>
+              <Link
+                href={`/penulis/${article.authorSlug || "redaksi-generic"}`}
+                className={styles.author}
+                title={`Lihat profil ${article.author || "Redaksi GentaNusa"}`}
+              >
+                {article.author || "Redaksi GentaNusa"}
+              </Link>
+              <span className={styles.authorRole}>
+                {article.authorRole || "Jurnalis / Tim Redaksi"}
+              </span>
+            </span>
             <span className={styles.dot}>•</span>
             <time dateTime={article.date}>{formatDate(article.date)}</time>
             <span className={styles.dot}>•</span>
