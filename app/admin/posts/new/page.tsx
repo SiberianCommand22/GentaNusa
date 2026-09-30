@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { VisualEditor, blocksToHtml, htmlToBlocks, htmlToText } from "@/components/visual-editor";
 import styles from "../../cms.module.css";
 
 const CATEGORIES = ["Nasional", "Pertahanan", "Politik", "Ekonomi", "Dunia"];
@@ -38,7 +39,6 @@ function splitTags(raw: string): string[] {
 
 export default function NewPostPage() {
   const router = useRouter();
-  const contentRef = useRef<HTMLTextAreaElement>(null);
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState<number | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -64,7 +64,7 @@ export default function NewPostPage() {
         title: a.title ?? "",
         slug: a.slug ?? "",
         excerpt: a.excerpt ?? a.lead ?? "",
-        content: Array.isArray(a.content) ? a.content.join("\n") : a.content ?? "",
+        content: blocksToHtml(Array.isArray(a.content) ? a.content : [String(a.content ?? "")]),
         image: a.image ?? a.cover_image ?? "",
         category: a.category ?? "Nasional",
         tags: tags.filter((t) => t !== HEADLINE_TAG).join(", "),
@@ -91,19 +91,6 @@ export default function NewPostPage() {
     };
   }, [imagePreview]);
 
-  function wrapSelection(before: string, after: string, placeholder: string) {
-    const el = contentRef.current;
-    if (!el) return;
-    const { selectionStart: s, selectionEnd: e, value } = el;
-    const selected = value.slice(s, e) || placeholder;
-    const next = value.slice(0, s) + before + selected + after + value.slice(e);
-    setForm((f) => ({ ...f, content: next }));
-    requestAnimationFrame(() => {
-      el.focus();
-      el.setSelectionRange(s + before.length, s + before.length + selected.length);
-    });
-  }
-
   async function uploadImage(): Promise<string | null> {
     if (!imageFile) return form.image || null;
     const fd = new FormData();
@@ -121,9 +108,11 @@ export default function NewPostPage() {
     setMsg("");
     setImgErr("");
     const title = form.title.trim();
-    const paras = form.content.split("\n").map((p) => p.trim()).filter(Boolean);
+    // Konten visual → blok DB yang bersih (satu string per elemen blok).
+    const paras = htmlToBlocks(form.content);
+    const plainText = htmlToText(form.content);
     // Ringkasan/lead: isi otomatis dari 150 karakter pertama konten bila kosong.
-    const lead = form.excerpt.trim() || paras.join(" ").slice(0, 150);
+    const lead = form.excerpt.trim() || plainText.slice(0, 150);
     // BARU: slug unik dari judul + timestamp. EDIT: PERTAHANKAN slug lama —
     // jangan regenerasi agar URL publik tidak rusak / tidak kena unique conflict.
     const slug = editId
@@ -229,45 +218,17 @@ export default function NewPostPage() {
                 onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
                 placeholder="Ringkasan pembuka yang memikat pembaca…"
               />
-              <p className={styles.help}>{form.excerpt.trim().length}/600 karakter</p>
+              <p className={styles.help} style={{ textAlign: "right" }}>{form.excerpt.trim().length}/600 karakter</p>
             </div>
             <div className={styles.field}>
               <label className={styles.fieldLabel} htmlFor="content">
-                Konten Artikel (1 paragraf per baris)
+                Konten Artikel
               </label>
-              <div className={styles.editor}>
-                <div className={styles.toolbar} role="toolbar" aria-label="Format teks">
-                  <span className={styles.toolGroup}>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<strong>", "</strong>", "teks tebal")} title="Tebal"><strong>B</strong></button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<em>", "</em>", "teks miring")} title="Miring"><em>I</em></button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<u>", "</u>", "garis bawah")} title="Garis bawah"><u>U</u></button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<s>", "</s>", "coret")} title="Coret"><s>S</s></button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<a href="https://" class="text-blue-600 underline">', "</a>", "tautan")} title="Tautan">Link</button>
-                  </span>
-                  <span className={styles.toolGroup}>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p style="text-align: left;">', "</p>", "paragraf rata kiri")} title="Rata kiri">≡←</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p style="text-align: center;">', "</p>", "paragraf rata tengah")} title="Rata tengah">≡</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p style="text-align: right;">', "</p>", "paragraf rata kanan")} title="Rata kanan">→≡</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<p style="text-align: justify; text-justify: inter-word;">', "</p>", "paragraf justify")} title="Rata kiri-kanan (justify)">≣</button>
-                  </span>
-                  <span className={styles.toolGroup}>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<h2>", "</h2>", "Subjudul")} title="Heading 2">H2</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<h3>", "</h3>", "Subjudul kecil")} title="Heading 3">H3</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection('<blockquote class="border-l-4 border-[#0B192C] pl-4 italic my-2">', "</blockquote>", "kutipan")} title="Kutipan">“</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<ul>\n<li>", "</li>\n</ul>", "poin")} title="Bullet list">•</button>
-                    <button type="button" className={styles.toolBtn} onClick={() => wrapSelection("<ol>\n<li>", "</li>\n</ol>", "poin")} title="Numbered list">1.</button>
-                  </span>
-                </div>
-                <textarea
-                  id="content"
-                  ref={contentRef}
-                  className={`${styles.textarea} ${styles.editorArea}`}
-                  rows={14}
-                  value={form.content}
-                  onChange={(e) => setForm({ ...form, content: e.target.value })}
-                  placeholder={"Paragraf 1\nParagraf 2\n…"}
-                />
-              </div>
+              <VisualEditor
+                value={form.content}
+                onChange={(html) => setForm((f) => ({ ...f, content: html }))}
+                placeholder="Tulis isi berita di sini — tebal, miring, dan perataan langsung terlihat…"
+              />
             </div>
           </div>
 
