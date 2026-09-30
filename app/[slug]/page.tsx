@@ -12,6 +12,7 @@ import styles from "./page.module.css";
 import { getArticleReadCount } from "@/lib/analytics-server";
 import { ArticleContent } from "@/components/article-content";
 import { CardImage } from "@/components/card-image";
+import { AdSlot } from "@/components/ad-slot";
 import { ShareButtons } from "@/components/share-buttons";
 
 const RESERVED_SLUGS = [
@@ -195,6 +196,9 @@ export default async function ArticlePage({ params }: Params) {
           {/* 7. Isi artikel — render HTML toolbar via sanitasi, justify inter-word */}
           <div className={styles.content}>
             <ArticleContent content={body.length > 0 ? body : []} />
+            {/* Google AdSense — In-article (tanpa placeholder abu-abu:
+                div kolaps bila iklan diblokir, tidak ada kotak kosong) */}
+            <AdSlot slot="1234567890" style={{ margin: "2rem 0" }} />
           </div>
 
           <div className={styles.tags}>
