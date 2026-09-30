@@ -7,25 +7,25 @@
   z-index: 50;
   width: 100%;
   background: #fff;
-  border-bottom: 1px solid #E2E8F0;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
 .headerInner {
   max-width: 80rem;
   margin: 0 auto;
-  padding: 0 16px;
-  height: 80px;
+  padding: 0 24px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  border-bottom: 1px solid #F1F5F9;
 }
 
 @media (min-width: 640px) {
   .headerInner {
-    padding-left: 32px;
-    padding-right: 32px;
+    padding-left: 40px;
+    padding-right: 40px;
   }
 }
 
@@ -75,28 +75,50 @@
   color: #F1F5F9;
 }
 
-/* Glif terpadu Menu & Cari — satu ikon SVG (hamburger + lupa) */
-.menuSearchIconBtn {
+/* Tombol terpadu Menu + Cari — touch-target h-9 seimbang */
+.menuBtn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 8px;
-  border: none;
+  gap: 10px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid #E2E8F0;
   border-radius: 8px;
-  background: transparent;
-  color: #1E293B;
+  background: rgba(248, 250, 252, 0.6);
+  color: #334155;
   cursor: pointer;
-  transition: color 0.15s, background 0.15s;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 
-.menuSearchIconBtn:hover {
-  color: #2563EB;
+.menuBtn:hover {
+  border-color: #CBD5E1;
   background: #F1F5F9;
+  color: #2563EB;
 }
 
-.menuSearchIconBtn svg {
-  width: 24px;
-  height: 24px;
+.menuBtn svg {
+  width: 16px;
+  height: 16px;
+  color: #475569;
+  transition: color 0.15s;
+}
+
+.menuBtn:hover svg {
+  color: #2563EB;
+}
+
+.menuBtnLabel {
+  display: none;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .menuBtnLabel {
+    display: inline;
+  }
 }
 
 @media (max-width: 480px) {
@@ -109,35 +131,37 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 24px;
-  background: transparent;
+  height: 36px;
+  padding: 0 20px;
+  background: #fff;
   border: 1px solid #CBD5E1;
   border-radius: 9999px;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: #1E293B;
   white-space: nowrap;
   transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
 .loginBtn:hover {
-  border-color: #1E293B;
+  border-color: #0B192C;
   color: #fff;
   background: #0B192C;
 }
 
-/* Tier 2 — kategori editorial: putih bersih, rata tengah presisi */
+/* Tier 2 — kategori editorial: putih bersih, ramping, rata tengah presisi */
 .categoryBar {
   background: #fff;
-  border-bottom: 1px solid #E2E8F0;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .categoryBarInner {
-  max-width: 64rem;
+  max-width: 80rem;
   margin: 0 auto;
   padding: 0 16px;
-  height: 44px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -148,6 +172,12 @@
 }
 
 @media (min-width: 640px) {
+  .categoryBarInner {
+    gap: 48px;
+  }
+}
+
+@media (min-width: 768px) {
   .categoryBarInner {
     gap: 56px;
   }
@@ -168,20 +198,20 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  height: 44px;
-  padding: 8px 0;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  height: 40px;
+  padding: 6px 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #1E293B;
+  color: #475569;
   white-space: nowrap;
   transition: color 0.15s;
 }
 
 @media (min-width: 640px) {
   .categoryLink {
-    font-size: 13px;
+    font-size: 12px;
   }
 }
 
@@ -192,6 +222,7 @@
   right: 0;
   bottom: 0;
   height: 2px;
+  border-radius: 9999px;
   background: #2563EB;
   transform: scaleX(0);
   transition: transform 0.2s;

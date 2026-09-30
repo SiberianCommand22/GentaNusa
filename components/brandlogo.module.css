@@ -29,7 +29,7 @@
 }
 
 .lg .emblem {
-  height: 44px;
+  height: 36px;
 }
 
 /* Ukuran teks */
@@ -42,7 +42,15 @@
 }
 
 .lg .word {
-  font-size: 30px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 640px) {
+  .lg .word {
+    font-size: 26px;
+  }
 }
 
 /* Tema terang: navy pekat */

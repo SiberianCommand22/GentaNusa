@@ -32,7 +32,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
-              className={styles.menuSearchIconBtn}
+              className={styles.menuBtn}
               aria-label="Menu dan Pencarian"
             >
               <svg
@@ -44,17 +44,18 @@ export function Navbar() {
                 strokeLinejoin="round"
                 aria-hidden="true"
               >
-                <line x1="3" y1="6" x2="15" y2="6" />
-                <line x1="3" y1="12" x2="11" y2="12" />
-                <line x1="3" y1="18" x2="13" y2="18" />
+                <line x1="3" y1="6" x2="14" y2="6" />
+                <line x1="3" y1="12" x2="10" y2="12" />
+                <line x1="3" y1="18" x2="12" y2="18" />
                 <circle cx="16.5" cy="13.5" r="3.5" />
                 <line x1="19" y1="16" x2="22" y2="19" />
               </svg>
+              <span className={styles.menuBtnLabel}>Menu</span>
             </button>
           </div>
 
           <div className={styles.logo}>
-            <BrandLogo theme="light" size="md" href="/" />
+            <BrandLogo theme="light" size="lg" href="/" />
           </div>
 
           <Link href="/admin/login" className={styles.loginBtn}>
