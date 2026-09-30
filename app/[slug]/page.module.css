@@ -80,8 +80,8 @@
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: #DBEAFE;
   color: #2563EB;
@@ -89,8 +89,9 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 14px;
   flex-shrink: 0;
+  user-select: none;
 }
 
 .authorBox {
