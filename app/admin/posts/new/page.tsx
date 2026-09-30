@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import styles from "../../cms.module.css";
 
-const CATEGORIES = ["Nasional", "Politik", "Ekonomi", "Teknologi", "Olahraga", "Budaya", "Hiburan"];
+const CATEGORIES = ["Nasional", "Pertahanan", "Politik", "Ekonomi", "Dunia"];
 
 // Penanda headline disimpan sebagai tag khusus (difilter dari tampilan publik).
 const HEADLINE_TAG = "headline";
@@ -115,8 +115,8 @@ export default function NewPostPage() {
     const paras = form.content.split("\n").map((p) => p.trim()).filter(Boolean);
     // Ringkasan/lead: isi otomatis dari 150 karakter pertama konten bila kosong.
     const lead = form.excerpt.trim() || paras.join(" ").slice(0, 150);
-    // Slug wajib terisi sebelum POST/PUT — turunan deterministik dari judul.
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || "artikel";
+    // Slug wajib terisi sebelum POST/PUT — turunan deterministik dari judul + timestamp unik.
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') + '-' + Date.now();
     if (!title) {
       setMsg("Judul wajib diisi.");
       return;

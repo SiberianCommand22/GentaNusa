@@ -44,12 +44,13 @@ export default async function Home() {
   }
 
   const headlineArticle = latest[0];
-  const popular = latest.slice(1, 4);
+  // TERPOPULER adalah bagian permanen: begitu ada artikel kedua, sisanya
+  // dipamerkan sebagai daftar terpopuler. Tidak ada kondisi hide/show lagi.
+  const popularList = latest.length > 1 ? latest.slice(1) : latest;
+  const showPopular = popularList.length > 0;
   const recentArticles = latest
     .filter((a) => a.slug !== headlineArticle.slug && a.id !== headlineArticle.id)
     .slice(0, 6);
-
-  const showPopular = latest.length >= 3 && popular.length > 0;
 
   return (
     <main className={styles.main}>
@@ -83,7 +84,7 @@ export default async function Home() {
             {showPopular && (
               <aside className={styles.heroSide} aria-label="Berita terpopuler">
                 <h3 className={styles.sideHeading}>Terpopuler</h3>
-                {popular.map((a, i) => (
+                {popularList.slice(0, 4).map((a, i) => (
                   <Link key={a.id} href={articleUrl(a)} className={styles.sideItem}>
                     <span className={styles.sideNum}>{String(i + 1).padStart(2, "0")}</span>
                     <span>

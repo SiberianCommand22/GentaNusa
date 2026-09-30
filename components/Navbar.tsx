@@ -13,6 +13,14 @@ const mainNav = [
   { href: "/kontak", label: "Kontak" },
 ];
 
+const categoryNav = [
+  { slug: "nasional", label: "NASIONAL" },
+  { slug: "pertahanan", label: "PERTAHANAN" },
+  { slug: "politik", label: "POLITIK" },
+  { slug: "ekonomi", label: "EKONOMI" },
+  { slug: "dunia", label: "DUNIA" },
+];
+
 export function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -20,27 +28,53 @@ export function Navbar() {
     <>
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <button
-            className={styles.hamburger}
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Buka menu"
-          >
-            <span className={styles.hamburgerIcon}>
-              <span />
-              <span />
-              <span />
-            </span>
-            <span className={styles.hamburgerText}>Menu</span>
-          </button>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <button
+              className={styles.hamburger}
+              onClick={() => setDrawerOpen(true)}
+              aria-label="Buka menu"
+            >
+              <span className={styles.hamburgerIcon}>
+                <span />
+                <span />
+                <span />
+              </span>
+              <span className={styles.hamburgerText}>Menu</span>
+            </button>
+            <button
+              onClick={() => setDrawerOpen(true)}
+              aria-label="Cari cepat"
+              style={{ background: "none", border: "none", cursor: "pointer", padding: 8, marginLeft: 12, display: "flex", alignItems: "center" }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </button>
+          </div>
 
           <div className={styles.logo}>
-            <BrandLogo theme="light" size="md" href="/" />
+            <BrandLogo theme="dark" size="md" href="/" />
           </div>
 
           <Link href="/admin/login" className={styles.loginBtn}>
             Login
           </Link>
         </div>
+
+        <nav className={styles.categoryBar} aria-label="Kategori berita">
+          <div className={styles.categoryBarInner}>
+            {categoryNav.map((c) => (
+              <Link
+                key={c.slug}
+                href={`/kategori/${c.slug}`}
+                className={styles.categoryLink}
+              >
+                {c.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
       </header>
 
       {drawerOpen && (
@@ -73,6 +107,18 @@ export function Navbar() {
             </form>
 
             <nav className={styles.drawerNav}>
+              <span className={styles.drawerSectionTitle}>Kategori</span>
+              {categoryNav.map((c) => (
+                <Link
+                  key={c.slug}
+                  href={`/kategori/${c.slug}`}
+                  className={styles.drawerLink}
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  {c.label}
+                </Link>
+              ))}
+              <span className={styles.drawerSectionTitle}>Informasi</span>
               {mainNav.map((item) => (
                 <Link
                   key={item.href}

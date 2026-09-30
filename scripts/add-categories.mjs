@@ -1,4 +1,19 @@
+import fs from "fs";
+import path from "path";
 import { createClient } from "@supabase/supabase-js";
+
+// Node belum auto-load .env.local — muat manual (env proses tetap menang).
+const envPath = path.join(process.cwd(), ".env.local");
+if (fs.existsSync(envPath)) {
+  const env = fs.readFileSync(envPath, "utf-8");
+  for (const raw of env.split("\n")) {
+    const line = raw.trim();
+    const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
+    if (m && !process.env[m[1]]) {
+      process.env[m[1]] = m[2].trim().replace(/^["']|["']$/g, "");
+    }
+  }
+}
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || "";
@@ -15,6 +30,7 @@ const newCategories = [
   { slug: "lingkungan", name: "Lingkungan", color: "#1a5c8a" },
   { slug: "dunia", name: "Dunia", color: "#1a5c8a" },
   { slug: "olahraga", name: "Olahraga", color: "#1a5c8a" },
+  { slug: "pertahanan", name: "Pertahanan", color: "#0F2744" },
 ];
 
 async function main() {

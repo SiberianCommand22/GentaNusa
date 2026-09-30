@@ -37,7 +37,6 @@
 html,
 body {
   max-width: 100vw;
-  overflow-x: hidden;
   font-family: var(--font-sans);
   color: var(--text);
   background: var(--bg);
@@ -48,7 +47,11 @@ html {
 }
 
 body {
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+main {
+  overflow-x: clip;
 }
 
 a {
@@ -128,6 +131,30 @@ a {
 
 .richtext p {
   margin: 0;
+}
+
+/* Default body rata kanan-kiri. `:not([class])` menjaga hierarki spesifisitas
+   agar kelas eksplisit dari toolbar (text-left/center/right/justify) tetap
+   menang. */
+.richtext p:not([class]) {
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* Halaman baca root-slug: body artikel justify inter-word. */
+.article-body p {
+  text-align: justify;
+  text-justify: inter-word;
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+}
+
+/* Di layar sempit, justify menghasilkan "rivers" yang sulit dibaca. */
+@media (max-width: 640px) {
+  .richtext p:not([class]) {
+    text-align: left;
+    hyphens: none;
+  }
 }
 
 h1,

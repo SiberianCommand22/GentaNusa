@@ -11,8 +11,11 @@ export type Article = {
   authorSlug?: string;
   authorRole?: string;
   image?: string;
+  cover_image?: string;
   image_caption?: string;
   image_credit?: string;
+  lead?: string;
+  created_at?: string;
   content: string[];
   tags: string[];
 };
@@ -83,8 +86,11 @@ type DbArticle = {
   author_slug?: string;
   author_role?: string;
   image?: string;
+  cover_image?: string;
   image_caption?: string;
   image_credit?: string;
+  lead?: string;
+  created_at?: string;
   content?: string[];
   tags?: string[];
 };
@@ -101,8 +107,11 @@ function mapRow(a: DbArticle): Article {
     authorSlug: a.author_slug ?? "redaksi-generic",
     authorRole: a.author_role ?? undefined,
     image: a.image ?? undefined,
+    cover_image: a.cover_image ?? a.image ?? undefined,
     image_caption: a.image_caption ?? undefined,
     image_credit: a.image_credit ?? undefined,
+    lead: a.lead ?? a.excerpt ?? undefined,
+    created_at: a.created_at ?? a.date ?? undefined,
     content: Array.isArray(a.content) ? a.content : JSON.parse(a.content || "[]"),
     tags: Array.isArray(a.tags) ? a.tags : JSON.parse(a.tags || "[]"),
   };
@@ -165,6 +174,31 @@ export async function getCategories(): Promise<Category[]> {
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
   return (await getCategories()).find((c) => c.slug === slug);
+}
+
+// Query per kategori di sisi database (ilike, case-insensitive) alih-alih
+// memfilter hasil getArticles() di memori. Bila Supabase tidak terjangkau,
+// jatuh kembali ke filter lokal supaya halaman tetap merender empty state.
+export async function getArticlesByCategory(slug: string): Promise<Article[]> {
+  const key = String(slug || "").trim();
+  if (!key) return [];
+  if (supabaseAnon) {
+    try {
+      const { data, error } = await supabaseAnon
+        .from("articles")
+        .select("*")
+        .ilike("category", key)
+        .not("author_slug", "like", "staging-%")
+        .order("date", { ascending: false });
+      if (!error && data) return data.map(mapRow);
+      if (error) throw error;
+    } catch (e) {
+      console.warn("Supabase category query gagal:", e);
+    }
+  }
+  return (await getArticles()).filter(
+    (a) => a.category.toLowerCase() === key.toLowerCase()
+  );
 }
 
 export async function getArticle(id: number): Promise<Article | undefined> {

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Footer } from "@/components/site";
-import { getArticles, getCategories, getCategoryBySlug, formatDate, sortByDate, articleUrl } from "@/lib/data";
+import { getArticlesByCategory, getCategories, getCategoryBySlug, formatDate, articleUrl } from "@/lib/data";
 import styles from "./category.module.css";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -40,7 +40,9 @@ export default async function CategoryPage({ params }: Params) {
   const cat = await loadCategory(slug);
   if (!cat) notFound();
 
-  const list = sortByDate((await getArticles()).filter((a) => a.category === cat.name));
+  // Query DB per kategori (ilike) supaya baris baru langsung tampil tanpa
+  // deploy, dan supaya pencocokan tidak bergantung kapitalisasi nama kategori.
+  const list = await getArticlesByCategory(cat.slug);
 
   return (
     <>

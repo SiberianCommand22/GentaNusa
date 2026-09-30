@@ -6,12 +6,12 @@ import {
   getArticleBySlugOrId,
   formatDate,
   articleUrl,
+  slugifyTitle,
 } from "@/lib/data";
 import styles from "./page.module.css";
 import { getArticleReadCount } from "@/lib/analytics-server";
 import { ArticleContent } from "@/components/article-content";
 import { CardImage } from "@/components/card-image";
-import { AdSlot } from "@/components/ad-slot";
 import { ShareButtons } from "@/components/share-buttons";
 
 const RESERVED_SLUGS = [
@@ -61,20 +61,23 @@ export async function generateMetadata({ params }: Params) {
 
   const SITE_URL = "https://www.gentanusa.id";
   const canonical = `${SITE_URL}/${article.slug || article.id}`;
-  const imageUrl = resolveAbsoluteImageUrl(article.image);
+  // cover_image (jika ada) menang atas image; keduanya tetap punya fallback
+  // OG card 1200x630 di /public agar tidak pernah ada share tanpa gambar.
+  const imageUrl = resolveAbsoluteImageUrl(article.cover_image || article.image);
+  const description = article.lead || article.excerpt || article.title;
 
   return {
     title: article.title,
-    description: article.excerpt || article.title,
+    description,
     alternates: { canonical },
     openGraph: {
       type: "article",
       siteName: "GentaNusa",
       title: article.title,
-      description: article.excerpt || article.title,
+      description,
       url: canonical,
       locale: "id_ID",
-      publishedTime: article.date,
+      publishedTime: article.created_at || article.date,
       authors: [article.author || "Redaksi GentaNusa"],
       images: [
         {
@@ -88,7 +91,7 @@ export async function generateMetadata({ params }: Params) {
     twitter: {
       card: "summary_large_image",
       title: article.title,
-      description: article.excerpt || article.title,
+      description,
       images: [imageUrl],
     },
   };
@@ -117,7 +120,10 @@ export default async function ArticlePage({ params }: Params) {
     .slice(0, 3);
 
   const SITE_URL = "https://www.gentanusa.id";
-  const [lead, ...body] = article.content;
+  // Kolom `lead` tidak ada di skema, jadi turunkan ke paragraf pertama konten.
+  const [firstParagraph, ...body] = article.content;
+  const lead = article.lead || firstParagraph;
+  const coverImage = article.cover_image || article.image;
 
   return (
     <>
@@ -126,7 +132,7 @@ export default async function ArticlePage({ params }: Params) {
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
           <Link href="/">Beranda</Link>
           <span className={styles.breadcrumbSep}></span>
-          <Link href={"/kategori/" + article.category.toLowerCase()}>
+          <Link href={"/kategori/" + slugifyTitle(article.category)}>
             {article.category}
           </Link>
           <span className={styles.breadcrumbSep}></span>
@@ -153,10 +159,10 @@ export default async function ArticlePage({ params }: Params) {
           </div>
 
           {/* 5. Foto sampul + caption */}
-          {article.image && (
+          {coverImage && (
             <figure className={styles.heroFigure}>
               <CardImage
-                src={article.image}
+                src={coverImage}
                 alt={article.title}
                 className={styles.featuredImage}
               />
@@ -172,19 +178,9 @@ export default async function ArticlePage({ params }: Params) {
           {/* 6. Lead pembuka */}
           {lead && <p className={styles.lead}>{lead}</p>}
 
-          {/* 7. Isi artikel */}
+          {/* 7. Isi artikel — render HTML toolbar via sanitasi, justify inter-word */}
           <div className={styles.content}>
             <ArticleContent content={body.length > 0 ? body : []} />
-            {/* Google AdSense — In-article */}
-            <AdSlot
-              slot="1234567890"
-              style={{
-                margin: "2rem 0",
-                minHeight: "250px",
-                background: "#f8f9fa",
-                borderRadius: "8px",
-              }}
-            />
           </div>
 
           <div className={styles.tags}>

@@ -1,11 +1,12 @@
+/* Two-tier masthead: navy editorial bar (72px) + category bar (44px).
+   --nav-offset dipakai untuk scroll-padding agar anchor tidak tertutup header. */
+
 .header {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 2px solid rgba(37, 99, 235, 0.2);
+  background: #0B192C;
+  border-bottom: 3px solid #2563EB;
 }
 
 .headerInner {
@@ -26,6 +27,14 @@
   }
 }
 
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+}
+
 .hamburger {
   display: flex;
   align-items: center;
@@ -36,12 +45,12 @@
   padding: 8px;
   font-size: 14px;
   font-weight: 700;
-  color: #0B192C;
+  color: #F1F5F9;
   transition: color 0.15s;
 }
 
 .hamburger:hover {
-  color: #2563EB;
+  color: #93C5FD;
 }
 
 .hamburgerIcon {
@@ -54,22 +63,14 @@
   display: block;
   width: 20px;
   height: 2px;
-  background: #0B192C;
+  background: #F1F5F9;
   border-radius: 1px;
 }
 
 .hamburgerText {
   font-size: 14px;
   font-weight: 600;
-  color: #0B192C;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  min-width: 0;
+  color: #F1F5F9;
 }
 
 @media (max-width: 480px) {
@@ -80,23 +81,71 @@
 
 .loginBtn {
   padding: 8px 20px;
-  border: 1px solid #CBD5E1;
+  border: 1px solid rgba(147, 197, 253, 0.5);
   border-radius: 9999px;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #0B192C;
-  background: #fff;
+  color: #DBEAFE;
+  background: transparent;
   white-space: nowrap;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
   transition: all 0.2s;
 }
 
 .loginBtn:hover {
   border-color: #2563EB;
-  background: #0B192C;
+  background: #2563EB;
   color: #fff;
+}
+
+/* Tier 2 — kategori */
+.categoryBar {
+  background: #0F2744;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.categoryBarInner {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 16px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.categoryBarInner::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .categoryBarInner {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+.categoryLink {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #CBD5E1;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.categoryLink:hover {
+  color: #fff;
+  border-bottom-color: #2563EB;
 }
 
 .drawerOverlay {
@@ -196,6 +245,16 @@
 
 .drawerNav {
   padding: 16px 20px;
+}
+
+.drawerSectionTitle {
+  display: block;
+  padding: 12px 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #94A3B8;
 }
 
 .drawerLink {

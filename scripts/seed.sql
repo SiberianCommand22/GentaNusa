@@ -6,16 +6,22 @@ create table if not exists categories (
 
 create table if not exists articles (
   id bigint primary key,
+  slug text,
   title text not null,
   category text not null,
   excerpt text not null,
+  lead text,
   content jsonb not null,
   image text,
+  cover_image text,
+  image_caption text,
+  image_credit text,
   tags jsonb not null default '[]'::jsonb,
   author text not null,
   author_slug text,
   author_role text,
-  date date not null
+  date date not null,
+  created_at timestamptz not null default now()
 );
 
 create table if not exists sources (

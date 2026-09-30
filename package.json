@@ -8,6 +8,7 @@
     "build": "next build",
     "build:sync": "node scripts/sync-supabase.mjs && next build",
     "start": "next start",
+    "seed": "node scripts/seed-users.js",
     "lint": "eslint"
   },
   "dependencies": {
