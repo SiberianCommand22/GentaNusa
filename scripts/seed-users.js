@@ -83,7 +83,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
 });
 
 async function seed() {
-  console.log("Mendaftarkan 20 editor resmi GentaNusa...");
+  console.log("Memulai pendaftaran 20 akun redaksi GentaNusa...");
   for (const u of users) {
     const { data, error } = await supabase.auth.admin.createUser({
       email: u.email,
@@ -92,12 +92,12 @@ async function seed() {
       user_metadata: { full_name: u.name, role: 'editor' }
     });
     if (error) {
-      console.warn(`[SKIP / SUDAH ADA] ${u.email}: ${error.message}`);
+      console.warn(`[SKIP / TERDAFTAR] ${u.email}: ${error.message}`);
     } else {
       console.log(`[SUKSES] Akun aktif: ${u.name} (${u.email})`);
     }
   }
-  console.log("Pendaftaran 20 akun redaksi selesai.");
+  console.log("Proses registrasi selesai.");
 }
 
 seed();
