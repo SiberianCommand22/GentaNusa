@@ -91,17 +91,25 @@ export default function NewPostPage() {
     };
   }, [imagePreview]);
 
+  // Unggah sampul via endpoint dedikasi /api/upload (multipart kecil —
+  // tanpa Base64 di JSON). Mengembalikan URL proksi /media/... .
   async function uploadImage(): Promise<string | null> {
     if (!imageFile) return form.image || null;
     const fd = new FormData();
-    fd.append("image", imageFile);
-    const r = await fetch("/api/articles/upload", { method: "POST", body: fd });
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok || !j.path) {
-      setImgErr(j.error || "Gagal mengunggah foto");
+    fd.append("file", imageFile);
+    let r: Response;
+    try {
+      r = await fetch("/api/upload", { method: "POST", body: fd });
+    } catch {
+      setImgErr("Server tidak terjangkau saat mengunggah foto — periksa koneksi lalu coba lagi.");
       return null;
     }
-    return j.path as string;
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.url) {
+      setImgErr(typeof j.error === "string" && j.error ? j.error : `Gagal mengunggah foto (kode ${r.status})`);
+      return null;
+    }
+    return j.url as string;
   }
 
   async function save(status: "draft" | "published") {
@@ -156,28 +164,33 @@ export default function NewPostPage() {
         status,
         tags,
       };
-      const r = editId
-        ? await fetch(`/api/articles/${editId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          })
-        : await fetch("/api/articles", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
+      // Path relatif — tanpa CORS. PUT untuk edit, POST untuk baru.
+      const targetUrl = editId ? `/api/articles/${editId}` : "/api/articles";
+      const method = editId ? "PUT" : "POST";
+      let r: Response;
+      try {
+        r = await fetch(targetUrl, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } catch {
+        setBusy(false);
+        setMsg("Server tidak terjangkau — periksa koneksi / dev server lalu coba lagi.");
+        return;
+      }
       setBusy(false);
       if (r.ok || r.status === 201) {
         setMsg(editId ? "Berita berhasil diperbarui." : "Berita berhasil diterbitkan.");
         window.setTimeout(() => router.push("/admin/posts"), 600);
       } else {
         const j = await r.json().catch(() => ({}));
-        setMsg(`Gagal mempublikasikan: ${j.error || r.status}`);
+        const detail = typeof j.error === "string" && j.error ? j.error : `kode ${r.status}`;
+        setMsg(`Gagal menyimpan artikel: ${detail}`);
       }
     } catch (e) {
       setBusy(false);
-      setMsg(`Gagal mempublikasikan: ${e instanceof Error ? e.message : "kesalahan jaringan"}`);
+      setMsg(`Gagal menyimpan artikel: ${e instanceof Error ? e.message : "kesalahan tak terduga"}`);
     }
   }
 
