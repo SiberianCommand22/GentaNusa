@@ -129,11 +129,28 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const info = VALID_CATEGORIES[slug];
   if (!info) return { title: "Kategori tidak ditemukan" };
   const url = `${SITE_URL}/kategori/${slug}`;
+  const title = `Berita ${info.label} Terkini | GentaNusa`;
+  const banner = `${SITE_URL}/og-default.jpg`;
   return {
-    title: `${info.label} — Berita`,
+    // absolute agar tidak ganda dengan template "%s | GentaNusa" di layout.
+    title: { absolute: title },
     description: info.desc,
     alternates: { canonical: url },
-    openGraph: { url, title: `${info.label} — Berita`, description: info.desc },
+    openGraph: {
+      url,
+      siteName: "GentaNusa",
+      locale: "id_ID",
+      type: "website",
+      title,
+      description: info.desc,
+      images: [{ url: banner, width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: info.desc,
+      images: [banner],
+    },
   };
 }
 

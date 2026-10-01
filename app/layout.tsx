@@ -16,35 +16,37 @@ const inter = Inter({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
-
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.gentanusa.id"),
   title: {
-    default: "GentaNusa - Berita Nusantara Terkini",
+    default: "GentaNusa - Kabar Kedaulatan & Dinamika Nusantara",
     template: "%s | GentaNusa",
   },
-  description: "Berita Nusantara terkini, akurat, dan terpercaya.",
-  metadataBase: new URL(SITE_URL),
+  description:
+    "Portal berita nasional independen menyajikan informasi akurat, berimbang, dan tepercaya.",
   openGraph: {
-    type: "website",
-    locale: "id_ID",
+    title: "GentaNusa",
+    description:
+      "Portal berita nasional independen menyajikan kabar Nusantara terkini.",
+    url: "https://www.gentanusa.id",
     siteName: "GentaNusa",
-    title: "GentaNusa - Berita Nusantara Terkini",
-    description: "Berita Nusantara terkini, akurat, dan terpercaya.",
+    locale: "id_ID",
+    type: "website",
     images: [
       {
-        url: "/logo.png",
+        url: "https://www.gentanusa.id/og-default.jpg",
         width: 1200,
         height: 630,
-        alt: "GentaNusa",
+        alt: "GentaNusa - Kabar Kedaulatan & Dinamika Nusantara",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "GentaNusa - Berita Nusantara Terkini",
-    description: "Berita Nusantara terkini, akurat, dan terpercaya.",
-    images: ["/logo.png"],
+    title: "GentaNusa",
+    description:
+      "Portal berita nasional independen menyajikan kabar Nusantara terkini.",
+    images: ["https://www.gentanusa.id/og-default.jpg"],
   },
   verification: process.env.GOOGLE_SITE_VERIFICATION
     ? { google: process.env.GOOGLE_SITE_VERIFICATION }

@@ -81,8 +81,11 @@ export async function generateMetadata({ params }: Params) {
 
   const siteUrl = "https://www.gentanusa.id";
 
-  // 1. URL gambar absolut HTTPS dan valid (wajib untuk scraper WhatsApp).
-  let imageUrl = article.cover_image || `${siteUrl}/gentanusa.jpeg`;
+  // Resolusi URL gambar WAJIB absolut: scraper medsos (WhatsApp, Telegram,
+  // Facebook, X, LinkedIn) menolak path relatif. Relatif /media/... diberi
+  // host kanonis; URL Supabase penuh dipakai langsung; kosong → fallback.
+  const FALLBACK_IMAGE = `${siteUrl}/og-default.jpg`;
+  let imageUrl = article.cover_image || article.image || FALLBACK_IMAGE;
   if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
     imageUrl = `${siteUrl}${imageUrl.startsWith("/") ? "" : "/"}${imageUrl}`;
   }
@@ -114,7 +117,7 @@ export async function generateMetadata({ params }: Params) {
           width: 1200,
           height: 630,
           type: mimeType,
-          alt: title,
+          alt: article.image_caption || title,
         },
       ],
     },

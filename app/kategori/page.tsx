@@ -6,10 +6,34 @@ import styles from "./[slug]/category.module.css";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Kanal Berita — GentaNusa",
+  title: { absolute: "Berita Terkini | GentaNusa" },
   description:
     "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, dan Dunia.",
   alternates: { canonical: "https://www.gentanusa.id/kategori" },
+  openGraph: {
+    url: "https://www.gentanusa.id/kategori",
+    siteName: "GentaNusa",
+    locale: "id_ID",
+    type: "website",
+    title: "Berita Terkini | GentaNusa",
+    description:
+      "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, dan Dunia.",
+    images: [
+      {
+        url: "https://www.gentanusa.id/og-default.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Kanal Berita GentaNusa",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Berita Terkini | GentaNusa",
+    description:
+      "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, dan Dunia.",
+    images: ["https://www.gentanusa.id/og-default.jpg"],
+  },
 };
 
 const CHANNELS: { slug: string; label: string; desc: string }[] = [
