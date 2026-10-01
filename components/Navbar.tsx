@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { BrandLogo } from "@/components/BrandLogo";
 import styles from "./Navbar.module.css";
 
@@ -23,10 +24,11 @@ const categoryNav = [
 
 export function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <>
-      <header className={`sticky top-0 z-50 w-full bg-white ${styles.header}`}>
+      <header className={`sticky top-0 z-50 w-full bg-[#0B192C] border-b border-white/10 ${styles.header}`}>
         <div className={styles.headerInner}>
           <div style={{ display: "flex", alignItems: "center" }}>
             <button
@@ -55,7 +57,7 @@ export function Navbar() {
           </div>
 
           <div className={styles.logo}>
-            <BrandLogo theme="light" size="lg" href="/" />
+            <BrandLogo theme="dark" size="lg" href="/" />
           </div>
 
           <Link href="/admin/login" className={styles.loginBtn}>
@@ -65,15 +67,20 @@ export function Navbar() {
 
         <nav className={styles.categoryBar} aria-label="Kategori berita">
           <div className={styles.categoryBarInner}>
-            {categoryNav.map((c) => (
-              <Link
-                key={c.slug}
-                href={`/kategori/${c.slug}`}
-                className={styles.categoryLink}
-              >
-                {c.label}
-              </Link>
-            ))}
+            {categoryNav.map((c) => {
+              const href = `/kategori/${c.slug}`;
+              const isActive = pathname === href;
+              return (
+                <Link
+                  key={c.slug}
+                  href={href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`${styles.categoryLink}${isActive ? ` ${styles.categoryLinkActive}` : ""}`}
+                >
+                  {c.label}
+                </Link>
+              );
+            })}
           </div>
         </nav>
       </header>
