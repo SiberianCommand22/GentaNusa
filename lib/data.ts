@@ -16,6 +16,7 @@ export type Article = {
   image_credit?: string;
   lead?: string;
   created_at?: string;
+  status?: string;
   content: string[];
   tags: string[];
 };
@@ -91,6 +92,7 @@ type DbArticle = {
   image_credit?: string;
   lead?: string;
   created_at?: string;
+  status?: string;
   content?: string[];
   tags?: string[];
 };
@@ -112,6 +114,7 @@ function mapRow(a: DbArticle): Article {
     image_credit: a.image_credit ?? undefined,
     lead: a.lead ?? a.excerpt ?? undefined,
     created_at: a.created_at ?? a.date ?? undefined,
+    status: a.status ?? "published",
     content: Array.isArray(a.content) ? a.content : JSON.parse(a.content || "[]"),
     tags: Array.isArray(a.tags) ? a.tags : JSON.parse(a.tags || "[]"),
   };
@@ -120,12 +123,12 @@ function mapRow(a: DbArticle): Article {
 async function fetchArticlesDb(): Promise<Article[] | null> {
   if (!supabaseAnon) return null;
   try {
-    // Exclude rows still awaiting editorial review. Legacy auto-pipeline rows
-    // carry a `staging-` author_slug prefix, so without this filter a draft
-    // would appear on the public site. Publishing is 100% manual via /admin.
+    // Feed publik: HANYA artikel berstatus published. Baris draft dan
+    // baris staging lawas (prefix author_slug staging-) tidak pernah bocor.
     const { data, error } = await supabaseAnon
       .from("articles")
       .select("*")
+      .eq("status", "published")
       .not("author_slug", "like", "staging-%")
       .order("date", { ascending: false })
       .order("id", { ascending: false });
@@ -133,6 +136,25 @@ async function fetchArticlesDb(): Promise<Article[] | null> {
     if (data && data.length > 0) return data.map(mapRow);
   } catch (e) {
     console.warn("Supabase read gagal:", e);
+  }
+  return null;
+}
+
+// Semua baris tanpa filter status — HANYA untuk kebutuhan redaksi
+// (pratinjau draf admin, pencocokan slug sitemap internal). Jangan dipakai
+// untuk render publik.
+async function fetchAllArticlesDb(): Promise<Article[] | null> {
+  if (!supabaseAnon) return null;
+  try {
+    const { data, error } = await supabaseAnon
+      .from("articles")
+      .select("*")
+      .order("date", { ascending: false })
+      .order("id", { ascending: false });
+    if (error) throw error;
+    if (data && data.length > 0) return data.map(mapRow);
+  } catch (e) {
+    console.warn("Supabase read (semua) gagal:", e);
   }
   return null;
 }
@@ -180,6 +202,7 @@ export async function getArticlesByCategory(slug: string): Promise<Article[]> {
         .from("articles")
         .select("*")
         .ilike("category", key)
+        .eq("status", "published")
         .not("author_slug", "like", "staging-%")
         .order("date", { ascending: false })
         .order("id", { ascending: false });
@@ -190,7 +213,7 @@ export async function getArticlesByCategory(slug: string): Promise<Article[]> {
     }
   }
   return (await getArticles()).filter(
-    (a) => a.category.toLowerCase() === key.toLowerCase()
+    (a) => a.category.toLowerCase() === key.toLowerCase() && a.status === "published"
   );
 }
 
@@ -213,6 +236,30 @@ export async function getArticleBySlugOrId(slugOrId: string): Promise<Article | 
   }
   const suffixed = all.find((a) => key === `${a.slug}-${a.id}`);
   return suffixed;
+}
+
+// Varian redaksi: cocokkan slug/ID di SELURUH baris termasuk draft.
+// Dipakai halaman detail untuk pratinjau admin; publik tetap di-gate
+// (draft → notFound bagi non-admin).
+export async function getArticleAnyBySlugOrId(slugOrId: string): Promise<Article | undefined> {
+  const key = String(slugOrId || "").trim();
+  if (!key) return undefined;
+  const cached = cache.get("articles-all");
+  let all: Article[];
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    all = cached.data as Article[];
+  } else {
+    const fromDb = await fetchAllArticlesDb();
+    all = fromDb ?? [];
+    cache.set("articles-all", { data: all, timestamp: Date.now() });
+  }
+  const direct = all.find((a) => a.slug === key);
+  if (direct) return direct;
+  if (!isNaN(Number(key))) {
+    const byId = all.find((a) => a.id === Number(key));
+    if (byId) return byId;
+  }
+  return all.find((a) => key === `${a.slug}-${a.id}`);
 }
 
 export async function getRelated(article: Article, count = 3): Promise<Article[]> {
@@ -239,6 +286,7 @@ async function fetchAuthorRows(): Promise<AuthorRow[]> {
     const { data, error } = await supabaseAnon
       .from("articles")
       .select("author,author_slug")
+      .eq("status", "published")
       .not("author_slug", "like", "staging-%")
       .not("author", "is", null);
     if (error) throw error;

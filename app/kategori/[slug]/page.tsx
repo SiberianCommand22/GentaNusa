@@ -110,6 +110,7 @@ async function fetchByCategory(label: string): Promise<Article[]> {
       .from("articles")
       .select("*")
       .ilike("category", label)
+      .eq("status", "published")
       .order("date", { ascending: false })
       .order("id", { ascending: false });
     if (error) throw error;

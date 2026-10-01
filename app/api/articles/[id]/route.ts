@@ -13,12 +13,9 @@ function ensureClient() {
   return { ok: true as const, client: adminClient };
 }
 
-// Kolom slug/cover_image/status/updated_at BELUM ada di DB produksi
-// (kolom lead/image_caption/image_credit sudah ada). Update dikirim LENGKAP
-// dulu; setiap kolom yang ditolak schema-cache dibuang satu per satu lalu
-// diulang — caption/kredit yang valid TETAP tersimpan (zero data loss).
-// `status`/`updated_at` TIDAK dikirim — kolomnya tidak ada di skema
-// (draft dikodekan via author_slug staging-).
+// Skema resmi mencakup kolom `status` TEXT ('published' | 'draft').
+// Update dikirim lengkap; setiap kolom yang ditolak schema-cache dibuang
+// satu per satu lalu diulang (zero data loss, toleran antar-lingkungan).
 function isMissingColumnError(message: string): { column: string } | null {
   const m = /Could not find the '([^']+)' column/i.exec(message || "");
   return m ? { column: m[1] } : null;
@@ -89,23 +86,19 @@ export async function PUT(
   if (!body) return NextResponse.json({ error: "Body kosong" }, { status: 400 });
 
   // Baris lama dibaca dulu agar author_slug yang sudah mapan (mis. nama
-  // penulis) lestari saat redaksi menerbitkan tanpa nilai eksplisit.
+  // penulis) lestari saat redaksi menyimpan tanpa nilai eksplisit.
   const { data: existing } = await c.client
     .from("articles")
     .select("author_slug")
     .eq("id", id)
     .single();
 
-  // status "draft" → kembalikan ke staging; "published" → terbitkan dengan
-  // slug redaksi. Tanpa status: pertahankan perilaku lama (slug dari body).
-  const isDraft = body.status === "draft";
-  const authorSlug = isDraft
-    ? `staging-${String(body.title || "artikel")
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "")
-        .slice(0, 40)}-${Date.now().toString(36)}`
-    : body.authorSlug ?? existing?.author_slug ?? "redaksi-generic";
+  // FIX transisi draf→publikasi: status ditulis eksplisit apa adanya
+  // ('draft' tetap draft, 'published' terbit) — TANPA pengacakan author_slug
+  // staging. Inilah akar bug lama: update ke published menimpa author_slug
+  // dengan prefix staging- sehingga baris tak pernah lolos filter publik.
+  const status = body.status === "draft" ? "draft" : "published";
+  const authorSlug = body.authorSlug ?? body.author_slug ?? existing?.author_slug ?? "redaksi-generic";
 
   const fullUpdate: Record<string, unknown> = {
     title: body.title,
@@ -121,6 +114,7 @@ export async function PUT(
     image_caption: body.image_caption ?? "",
     image_credit: body.image_credit ?? "",
     lead: body.lead ?? body.excerpt,
+    status,
   };
 
   let { data, error } = await updateTolerant(c.client, id, fullUpdate);

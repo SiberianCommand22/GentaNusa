@@ -11,27 +11,35 @@ type Row = {
   title: string;
   category: string;
   author: string;
+  author_slug?: string;
   date: string;
   image?: string | null;
-  isDraft?: boolean;
+  status?: string;
 };
+
+type Filter = "all" | "published" | "draft";
+
+function isDraftRow(r: Row): boolean {
+  if (r.status === "draft") return true;
+  // Kompatibilitas baris staging lawas (prefix author_slug staging-).
+  if (typeof r.author_slug === "string" && r.author_slug.startsWith("staging-")) return true;
+  return false;
+}
 
 export default function ManagePostsPage() {
   const router = useRouter();
   const [articles, setArticles] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
+  const [filter, setFilter] = useState<Filter>("all");
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [a, d] = await Promise.all([
-        fetch("/api/articles").then((r) => (r.ok ? r.json() : [])),
-        fetch("/api/articles?scope=draft").then((r) => (r.ok ? r.json() : [])),
-      ]);
-      const pub: Row[] = (Array.isArray(a) ? a : []).map((x: Row) => ({ ...x, isDraft: false }));
-      const drafts: Row[] = (Array.isArray(d) ? d : []).map((x: Row) => ({ ...x, isDraft: true }));
-      setArticles([...drafts, ...pub]);
+      const all: Row[] = await fetch("/api/articles?scope=all").then((r) =>
+        r.ok ? r.json() : []
+      );
+      setArticles(Array.isArray(all) ? all : []);
     } catch {
       // tabel tetap tampil kosong
     } finally {
@@ -59,6 +67,12 @@ export default function ManagePostsPage() {
     }
   }
 
+  const visible = articles.filter((a) => {
+    if (filter === "published") return !isDraftRow(a);
+    if (filter === "draft") return isDraftRow(a);
+    return true;
+  });
+
   return (
     <div>
       <div className={styles.pageHead}>
@@ -72,6 +86,19 @@ export default function ManagePostsPage() {
       </div>
 
       {msg && <p className={styles.msg}>{msg}</p>}
+
+      <div className={styles.filterRow} role="group" aria-label="Filter status berita">
+        {(["all", "published", "draft"] as Filter[]).map((f) => (
+          <button
+            key={f}
+            type="button"
+            className={`${styles.filterBtn} ${filter === f ? styles.filterBtnActive : ""}`}
+            onClick={() => setFilter(f)}
+          >
+            {f === "all" ? "Semua" : f === "published" ? "Published" : "Draft"}
+          </button>
+        ))}
+      </div>
 
       <div className={styles.panel}>
         <div className={styles.tableWrap}>
@@ -88,71 +115,89 @@ export default function ManagePostsPage() {
               </tr>
             </thead>
             <tbody>
-              {articles.map((a) => (
-                <tr key={a.id}>
-                  <td className={styles.cellTitle}>{a.title}</td>
-                  <td>
-                    {a.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={a.image} alt="" className={styles.thumb} loading="lazy" />
-                    ) : (
-                      <span className={styles.thumbEmpty} />
-                    )}
-                  </td>
-                  <td className={styles.cellNarrow}>{a.category}</td>
-                  <td className={styles.cellAuthor}>{a.author}</td>
-                  <td className={styles.cellNarrow}>{a.date}</td>
-                  <td className={styles.cellNarrow}>
-                    {a.isDraft ? (
-                      <span className={`${styles.badge} ${styles.badgeAmber}`}>Draft</span>
-                    ) : (
-                      <span className={`${styles.badge} ${styles.badgeGreen}`}>Published</span>
-                    )}
-                  </td>
-                  <td className={styles.cellCenter}>
-                    <div className={styles.rowActions}>
-                      {!a.isDraft && (
-                        <Link
+              {visible.map((a) => {
+                const draft = isDraftRow(a);
+                return (
+                  <tr key={a.id}>
+                    <td className={styles.cellTitle}>{a.title}</td>
+                    <td>
+                      {a.image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={a.image} alt="" className={styles.thumb} loading="lazy" />
+                      ) : (
+                        <span className={styles.thumbEmpty} />
+                      )}
+                    </td>
+                    <td className={styles.cellNarrow}>{a.category}</td>
+                    <td className={styles.cellAuthor}>{a.author}</td>
+                    <td className={styles.cellNarrow}>{a.date}</td>
+                    <td className={styles.cellNarrow}>
+                      {draft ? (
+                        <span className={`${styles.badge} ${styles.badgeAmber}`}>Draft</span>
+                      ) : (
+                        <span className={`${styles.badge} ${styles.badgeGreen}`}>Published</span>
+                      )}
+                    </td>
+                    <td className={styles.cellCenter}>
+                      <div className={styles.rowActions}>
+                        {!draft ? (
+                          <Link
+                            className={styles.iconBtn}
+                            title="Lihat artikel publik"
+                            aria-label={`Lihat ${a.title}`}
+                            href={`/${a.slug || a.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                          </Link>
+                        ) : (
+                          <button
+                            className={styles.iconBtn}
+                            title="Pratinjau draf (belum publik) — buka editor"
+                            aria-label={`Pratinjau draf ${a.title}`}
+                            onClick={() => {
+                              alert("Berita ini masih berstatus draf dan belum tampil publik.");
+                              router.push(`/admin/posts/new?edit=${a.id}`);
+                            }}
+                          >
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                          </button>
+                        )}
+                        <button
                           className={styles.iconBtn}
-                          title="Lihat artikel publik"
-                          aria-label={`Lihat ${a.title}`}
-                          href={`/${a.slug || a.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          title="Edit"
+                          aria-label={`Edit ${a.title}`}
+                          onClick={() => router.push(`/admin/posts/new?edit=${a.id}`)}
                         >
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
+                            <path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z" />
                           </svg>
-                        </Link>
-                      )}
-                      <button
-                        className={styles.iconBtn}
-                        title="Edit"
-                        aria-label={`Edit ${a.title}`}
-                        onClick={() => router.push(`/admin/posts/new?edit=${a.id}`)}
-                      >
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z" />
-                        </svg>
-                      </button>
-                      <button
-                        className={`${styles.iconBtn} ${styles.iconBtnDanger}`}
-                        title="Hapus permanen"
-                        aria-label={`Hapus ${a.title}`}
-                        onClick={() => delArticle(a.id, a.title)}
-                      >
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        </button>
+                        <button
+                          className={`${styles.iconBtn} ${styles.iconBtnDanger}`}
+                          title="Hapus permanen"
+                          aria-label={`Hapus ${a.title}`}
+                          onClick={() => delArticle(a.id, a.title)}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
-          {!loading && articles.length === 0 && (
+          {!loading && visible.length === 0 && (
             <p className={styles.emptyNote}>Belum ada berita. Mulai dengan “Tulis Berita Baru”.</p>
           )}
           {loading && <p className={styles.emptyNote}>Memuat…</p>}

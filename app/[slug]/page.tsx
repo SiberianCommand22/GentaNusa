@@ -1,10 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { Footer } from "@/components/site";
 import {
   getArticles,
-  getArticleBySlugOrId,
+  getArticleAnyBySlugOrId,
   formatDate,
   articleUrl,
   slugifyTitle,
@@ -39,6 +40,15 @@ const RESERVED_SLUGS = [
 
 type Params = { params: Promise<{ slug: string }> };
 
+async function isAdminSession(): Promise<boolean> {
+  try {
+    const store = await cookies();
+    return store.get("genta_admin")?.value === "1";
+  } catch {
+    return false;
+  }
+}
+
 export async function generateStaticParams() {
   return (await getArticles()).map((a) => ({ slug: a.slug }));
 }
@@ -61,8 +71,13 @@ export async function generateMetadata({ params }: Params) {
     return { title: "Halaman Tidak Ditemukan" };
   }
 
-  const article = await getArticleBySlugOrId(slug);
+  const article = await getArticleAnyBySlugOrId(slug);
   if (!article) return { title: "Berita Tidak Ditemukan - GentaNusa" };
+
+  // Draf tidak boleh diintip publik — metadata pun disamarkan bagi non-admin.
+  if (article.status === "draft" && !(await isAdminSession())) {
+    return { title: "Berita Tidak Ditemukan - GentaNusa" };
+  }
 
   const siteUrl = "https://www.gentanusa.id";
 
@@ -142,8 +157,13 @@ export default async function ArticlePage({ params }: Params) {
     notFound();
   }
 
-  const article = await getArticleBySlugOrId(slug);
+  const article = await getArticleAnyBySlugOrId(slug);
   if (!article) notFound();
+
+  // Isolasi draf: pengunjung non-admin langsung 404; admin dapat pratinjau.
+  const isDraft = article.status === "draft";
+  const isAdmin = isDraft ? await isAdminSession() : false;
+  if (isDraft && !isAdmin) notFound();
 
   const readCount = await getArticleReadCount(article.id);
   const related = (await getArticles())
@@ -171,6 +191,11 @@ export default async function ArticlePage({ params }: Params) {
   return (
     <>
       <main className={styles.container}>
+        {isDraft && (
+          <div className={styles.draftBanner} role="status">
+            ⚠️ Mode Pratinjau Draf (Belum Terbit)
+          </div>
+        )}
         {/* 1. Breadcrumb ringkas — hanya sampai kategori, tanpa duplikat judul */}
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
           <Link href="/">Beranda</Link>

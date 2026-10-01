@@ -47,6 +47,8 @@ export default function NewPostPage() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
+  const [okMsg, setOkMsg] = useState("");
+  const [guardMsg, setGuardMsg] = useState("");
   const [imgErr, setImgErr] = useState("");
   const [draftNotice, setDraftNotice] = useState("");
   const [hasStoredDraft, setHasStoredDraft] = useState(false);
@@ -159,22 +161,39 @@ export default function NewPostPage() {
     fetch(`/api/articles/${numId}`).then(async (r) => {
       if (!r.ok) return;
       const a = await r.json();
-      const tags: string[] = Array.isArray(a.tags) ? a.tags : [];
+      // Kolom DB tersimpan sebagai string JSON — parsing defensif.
+      let tags: string[] = [];
+      try {
+        tags = Array.isArray(a.tags) ? a.tags : JSON.parse(String(a.tags ?? "[]"));
+        if (!Array.isArray(tags)) tags = [];
+      } catch {
+        tags = [];
+      }
+      let contentBlocks: string[] = [];
+      try {
+        contentBlocks = Array.isArray(a.content) ? a.content : JSON.parse(String(a.content ?? "[]"));
+        if (!Array.isArray(contentBlocks)) contentBlocks = [String(a.content ?? "")];
+      } catch {
+        contentBlocks = [String(a.content ?? "")];
+      }
       setEditId(numId);
       setForm({
         title: a.title ?? "",
         slug: a.slug ?? "",
         excerpt: a.excerpt ?? a.lead ?? "",
-        content: blocksToHtml(Array.isArray(a.content) ? a.content : [String(a.content ?? "")]),
+        content: blocksToHtml(contentBlocks),
         image: a.image ?? a.cover_image ?? "",
         category: a.category ?? "Nasional",
         tags: tags.filter((t) => t !== HEADLINE_TAG).join(", "),
         author: a.author ?? "",
         image_caption: a.image_caption ?? "",
         image_credit: a.image_credit ?? "",
-        date: a.date ?? new Date().toISOString().split("T")[0],
+        date: a.date ?? todayWIB(),
         headline: tags.includes(HEADLINE_TAG),
       });
+      if (a.status === "draft") {
+        setOkMsg("Tersimpan sebagai draf. Berita ini tidak akan tampil di halaman depan maupun kategori sampai Anda mempublikasikannya.");
+      }
       setLoadedEdit(true);
     });
   }, []);
@@ -215,67 +234,123 @@ export default function NewPostPage() {
   }
 
   async function save(status: "draft" | "published") {
-    setMsg("");
-    setImgErr("");
-    // Tombol "Simpan Draf" menulis snapshot lokal dulu (non-intrusif).
     if (status === "draft") {
-      writeDraftSnapshot(form);
+      await handleSaveDraft();
+    } else {
+      await handlePublish();
     }
+  }
+
+  type MissingField = { label: string; fieldId: string };
+
+  function isPlaceholderImage(src: string): boolean {
+    const s = String(src || "").trim();
+    return (
+      !s ||
+      s.includes("/images/placeholder-article.svg") ||
+      s.includes("placeholder-article")
+    );
+  }
+
+  // Guard publikasi: 10 kolom wajib. Kembalikan daftar yang belum lengkap.
+  function validatePublish(input: {
+    title: string;
+    category: string;
+    excerpt: string;
+    paras: string[];
+    plainText: string;
+    imagePath: string;
+    imageCaption: string;
+    imageCredit: string;
+    author: string;
+    tags: string[];
+  }): MissingField[] {
+    const missing: MissingField[] = [];
+    if (input.title.trim().length < 10) {
+      missing.push({ label: "Judul Berita", fieldId: "field-title" });
+    }
+    if (!CATEGORIES.includes(input.category)) {
+      missing.push({ label: "Kategori", fieldId: "cat" });
+    }
+    if (!input.excerpt.trim()) {
+      missing.push({ label: "Lead Berita", fieldId: "lead" });
+    }
+    if (!input.excerpt.trim()) {
+      missing.push({ label: "Ringkasan", fieldId: "lead" });
+    }
+    if (input.paras.length === 0 || !input.plainText.trim()) {
+      missing.push({ label: "Isi Berita", fieldId: "field-content" });
+    }
+    if (isPlaceholderImage(input.imagePath)) {
+      missing.push({ label: "Foto Sampul", fieldId: "field-image" });
+    }
+    if (!input.imageCaption.trim()) {
+      missing.push({ label: "Keterangan Foto", fieldId: "image_caption" });
+    }
+    if (!input.imageCredit.trim()) {
+      missing.push({ label: "Sumber Foto", fieldId: "image_credit" });
+    }
+    if (!input.author.trim()) {
+      missing.push({ label: "Penulis", fieldId: "author" });
+    }
+    if (input.tags.length === 0) {
+      missing.push({ label: "Tag Berita", fieldId: "tags" });
+    }
+    return missing;
+  }
+
+  function focusFirstMissing(fieldId: string) {
+    window.setTimeout(() => {
+      const el = document.getElementById(fieldId);
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (typeof (el as HTMLElement).focus === "function") {
+        window.setTimeout(() => (el as HTMLElement).focus({ preventScroll: true }), 350);
+      }
+    }, 50);
+  }
+
+  // Handler A — Simpan Draf: validasi minimal (judul), status eksplisit 'draft'.
+  async function handleSaveDraft() {
+    setMsg("");
+    setOkMsg("");
+    setGuardMsg("");
+    setImgErr("");
     const title = form.title.trim();
-    // Konten visual → blok DB yang bersih (satu string per elemen blok).
-    const paras = htmlToBlocks(form.content);
-    const plainText = htmlToText(form.content);
-    // Ringkasan/lead: isi otomatis dari 150 karakter pertama konten bila kosong.
-    const lead = form.excerpt.trim() || plainText.slice(0, 150);
-    // BARU: slug unik dari judul + timestamp. EDIT: PERTAHANKAN slug lama —
-    // jangan regenerasi agar URL publik tidak rusak / tidak kena unique conflict.
-    const slug = editId
-      ? form.slug.trim() || slugifyBase(title)
-      : `${slugifyBase(title)}-${Date.now()}`;
     if (!title) {
-      setMsg("Judul wajib diisi.");
-      return;
-    }
-    if (paras.length === 0) {
-      setMsg("Konten wajib diisi.");
-      return;
-    }
-    if (status === "published" && (lead.length < 20 || lead.length > 600)) {
-      setMsg("Kutipan/lead harus 20–600 karakter untuk publikasi.");
+      setMsg("Judul wajib diisi untuk menyimpan draf.");
+      focusFirstMissing("field-title");
       return;
     }
     setBusy(true);
     try {
+      const paras = htmlToBlocks(form.content);
+      const tags = splitTags(form.tags).filter((t) => t !== HEADLINE_TAG);
+      if (form.headline) tags.unshift(HEADLINE_TAG);
       const uploadedPath = await uploadImage();
       if (imageFile && !uploadedPath) {
         setBusy(false);
         return;
       }
-      const tags = splitTags(form.tags).filter((t) => t !== HEADLINE_TAG);
-      if (form.headline) tags.unshift(HEADLINE_TAG);
-      const imagePath = uploadedPath || "/images/placeholder-article.svg";
-      // Publikasi instan: tanggal otomatis WIB hari ini (YYYY-MM-DD).
-      const publishDate = status === "published" ? todayWIB() : form.date || todayWIB();
-      // Payload transport ke /api/articles — kolom `status` hanya sinyal
-      // draft/published untuk API; API menyusun ulang allowedPayload ketat
-      // (tanpa `status`) sebelum query Supabase.
-      const payload = {
+      const imagePath = uploadedPath || form.image.trim();
+      const draftPayload = {
         title,
-        slug,
-        excerpt: lead,
-        lead,
-        content: paras,
+        category: form.category || "Nasional",
+        excerpt: form.excerpt.trim(),
+        content: JSON.stringify(paras),
         image: imagePath,
-        cover_image: imagePath,
+        tags: JSON.stringify(tags),
+        author: form.author.trim() || "Redaksi GentaNusa",
+        author_slug:
+          form.author.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "") ||
+          "redaksi-generic",
+        author_role: "Redaktur GentaNusa",
+        date: form.date || todayWIB(),
         image_caption: form.image_caption.trim(),
         image_credit: form.image_credit.trim(),
-        category: form.category,
-        author: form.author.trim() || "Redaksi GentaNusa",
-        date: publishDate,
-        status,
-        tags,
+        lead: form.excerpt.trim(),
+        status: "draft",
       };
-      // Path relatif — tanpa CORS. PUT untuk edit, POST untuk baru.
       const targetUrl = editId ? `/api/articles/${editId}` : "/api/articles";
       const method = editId ? "PUT" : "POST";
       let r: Response;
@@ -283,7 +358,7 @@ export default function NewPostPage() {
         r = await fetch(targetUrl, {
           method,
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(draftPayload),
         });
       } catch {
         setBusy(false);
@@ -292,22 +367,116 @@ export default function NewPostPage() {
       }
       setBusy(false);
       if (r.ok || r.status === 201) {
-        if (status === "published") {
-          // Pasca-publikasi: bersihkan draf lokal agar tidak termuat ulang.
-          clearDraft();
-        }
-        setMsg(editId ? "Berita berhasil diperbarui." : "Berita berhasil diterbitkan.");
+        const j = await r.json().catch(() => ({}));
+        if (!editId && j && typeof j.id === "number") setEditId(j.id);
+        writeDraftSnapshot(form);
+        setOkMsg("Tersimpan sebagai draf. Berita ini tidak akan tampil di halaman depan maupun kategori sampai Anda mempublikasikannya.");
+      } else {
+        const j = await r.json().catch(() => ({}));
+        const detail = typeof j.error === "string" && j.error ? j.error : `kode ${r.status}`;
+        setMsg(`Gagal menyimpan draf: ${detail}`);
+      }
+    } catch (e) {
+      setBusy(false);
+      setMsg(`Gagal menyimpan draf: ${e instanceof Error ? e.message : "kesalahan tak terduga"}`);
+    }
+  }
+
+  // Handler B — Publikasikan: guard 10 kolom, tanggal WIB, status 'published'.
+  // Memperbaiki bug fatal draf→publikasi: payload SELALU membawa status
+  // eksplisit 'published' (baru via POST, draf-lama via PUT ke ID yang sama).
+  async function handlePublish() {
+    setMsg("");
+    setOkMsg("");
+    setGuardMsg("");
+    setImgErr("");
+    setBusy(true);
+    try {
+      const uploadedPath = await uploadImage();
+      if (imageFile && !uploadedPath) {
+        setBusy(false);
+        return;
+      }
+      const imagePath = uploadedPath || form.image.trim();
+      const title = form.title.trim();
+      const paras = htmlToBlocks(form.content);
+      const plainText = htmlToText(form.content);
+      const tags = splitTags(form.tags).filter((t) => t !== HEADLINE_TAG);
+      if (form.headline) tags.unshift(HEADLINE_TAG);
+      const userTags = tags.filter((t) => t !== HEADLINE_TAG);
+
+      const missing = validatePublish({
+        title,
+        category: form.category,
+        excerpt: form.excerpt,
+        paras,
+        plainText,
+        imagePath,
+        imageCaption: form.image_caption,
+        imageCredit: form.image_credit,
+        author: form.author,
+        tags: userTags,
+      });
+      if (missing.length > 0) {
+        setBusy(false);
+        const labels = [...new Set(missing.map((m) => m.label))];
+        setGuardMsg(
+          `⚠️ Gagal Publikasi: Seluruh kolom wajib diisi sebelum berita resmi diterbitkan! Kolom yang belum lengkap: ${labels.join(", ")}.`
+        );
+        focusFirstMissing(missing[0].fieldId);
+        return;
+      }
+
+      const today = todayWIB();
+      const lead = form.excerpt.trim();
+      const publishPayload = {
+        title,
+        category: form.category,
+        excerpt: lead,
+        content: JSON.stringify(paras),
+        image: imagePath.trim(),
+        tags: JSON.stringify(tags),
+        author: form.author.trim(),
+        author_slug:
+          form.author.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "") ||
+          "redaksi-generic",
+        author_role: "Redaktur GentaNusa",
+        date: today,
+        image_caption: form.image_caption.trim(),
+        image_credit: form.image_credit.trim(),
+        lead,
+        status: "published",
+      };
+      const targetUrl = editId ? `/api/articles/${editId}` : "/api/articles";
+      const method = editId ? "PUT" : "POST";
+      let r: Response;
+      try {
+        r = await fetch(targetUrl, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(publishPayload),
+        });
+      } catch {
+        setBusy(false);
+        setMsg("Server tidak terjangkau — periksa koneksi / dev server lalu coba lagi.");
+        return;
+      }
+      setBusy(false);
+      if (r.ok || r.status === 201) {
+        clearDraft();
+        setOkMsg("Berita berhasil dipublikasikan!");
         window.setTimeout(() => router.push("/admin/posts"), 600);
       } else {
         const j = await r.json().catch(() => ({}));
         const detail = typeof j.error === "string" && j.error ? j.error : `kode ${r.status}`;
-        setMsg(`Gagal menyimpan artikel: ${detail}`);
+        setMsg(`Gagal memublikasikan artikel: ${detail}`);
       }
     } catch (e) {
       setBusy(false);
-      setMsg(`Gagal menyimpan artikel: ${e instanceof Error ? e.message : "kesalahan tak terduga"}`);
+      setMsg(`Gagal memublikasikan artikel: ${e instanceof Error ? e.message : "kesalahan tak terduga"}`);
     }
   }
+
 
   return (
     <div>
@@ -321,6 +490,16 @@ export default function NewPostPage() {
       </div>
 
       {msg && <p className={styles.msg}>{msg}</p>}
+      {guardMsg && (
+        <div className={styles.guardBanner} role="alert">
+          {guardMsg}
+        </div>
+      )}
+      {okMsg && (
+        <div className={okMsg.startsWith("Tersimpan sebagai draf") ? styles.warnBanner : styles.okBanner} role="status">
+          {okMsg}
+        </div>
+      )}
       {hasStoredDraft && (
         <div className={styles.panel} style={{ marginBottom: 16 }}>
           <p className={styles.pageSub}>Draf tersimpan ditemukan di peramban ini.</p>
@@ -336,6 +515,7 @@ export default function NewPostPage() {
           <div className={styles.panel}>
             <div className={styles.field} style={{ marginBottom: 16 }}>
               <input
+                id="field-title"
                 className={`${styles.input} ${styles.titleInput}`}
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -357,7 +537,7 @@ export default function NewPostPage() {
               />
               <p className={styles.help} style={{ textAlign: "right" }}>{form.excerpt.trim().length}/600 karakter</p>
             </div>
-            <div className={styles.field}>
+            <div className={styles.field} id="field-content">
               <label className={styles.fieldLabel} htmlFor="content">
                 Konten Artikel
               </label>
@@ -371,6 +551,7 @@ export default function NewPostPage() {
 
           <div className={styles.panel}>
             <h3 className={styles.panelTitle}>Foto Sampul</h3>
+            <div id="field-image">
             <input
               ref={fileRef}
               className={styles.dropzoneInput}
@@ -429,6 +610,7 @@ export default function NewPostPage() {
               </div>
             )}
             {imgErr && <p className={styles.err}>{imgErr}</p>}
+            </div>
             <div className={styles.captionGrid}>
               <div className={styles.field}>
                 <label className={styles.fieldLabel} htmlFor="image_caption">Keterangan Gambar / Caption</label>
@@ -518,8 +700,8 @@ export default function NewPostPage() {
           <div className={styles.panel}>
             <div className={styles.actions}>
               {msg && <p className={styles.err}>{msg}</p>}
-              {draftNotice && !msg && <p className={styles.pageSub}>{draftNotice}</p>}
-              <button className={styles.btnSecondary} disabled={busy} onClick={() => save("draft")}>
+              {draftNotice && !msg && !guardMsg && <p className={styles.pageSub}>{draftNotice}</p>}
+              <button className={styles.btnSecondary} disabled={busy} onClick={handleSaveDraft}>
                 {busy ? "Menyimpan…" : "Simpan Draf"}
               </button>
               <button
@@ -531,8 +713,8 @@ export default function NewPostPage() {
               >
                 Hapus Draf
               </button>
-              <button className={styles.btnPrimary} disabled={busy} onClick={() => save("published")}>
-                {busy ? "Memublikasikan..." : editId ? "Simpan Perubahan" : "Publikasikan"}
+              <button className={styles.btnPrimary} disabled={busy} onClick={handlePublish}>
+                {busy ? "Memublikasikan..." : editId ? "Publikasikan" : "Publikasikan"}
               </button>
             </div>
           </div>

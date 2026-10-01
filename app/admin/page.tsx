@@ -10,7 +10,15 @@ type Article = {
   category: string;
   date: string;
   author: string;
+  author_slug?: string;
+  status?: string;
 };
+
+function isDraftRow(a: Article): boolean {
+  if (a.status === "draft") return true;
+  if (typeof a.author_slug === "string" && a.author_slug.startsWith("staging-")) return true;
+  return false;
+}
 
 export default function AdminDashboard() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -20,12 +28,12 @@ export default function AdminDashboard() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [a, d] = await Promise.all([
-        fetch("/api/articles").then((r) => (r.ok ? r.json() : [])),
-        fetch("/api/articles?scope=draft").then((r) => (r.ok ? r.json() : [])),
-      ]);
-      setArticles(Array.isArray(a) ? a : []);
-      setDrafts(Array.isArray(d) ? d : []);
+      const all: Article[] = await fetch("/api/articles?scope=all").then((r) =>
+        r.ok ? r.json() : []
+      );
+      const list = Array.isArray(all) ? all : [];
+      setDrafts(list.filter(isDraftRow));
+      setArticles(list.filter((a) => !isDraftRow(a)));
     } catch {
       // biarkan metrik nol — dashboard tetap tampil
     } finally {

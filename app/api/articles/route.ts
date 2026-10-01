@@ -27,20 +27,24 @@ function draftSlug(title: string): string {
   return `staging-${base}-${Date.now().toString(36)}`;
 }
 
-// GET — daftar artikel (public) — tanpa field sensitif
+// GET — daftar artikel (public, hanya published) — tanpa field sensitif
+// GET ?scope=all — seluruh baris incl. draft (admin saja, untuk CMS)
 // GET ?scope=draft — baris draft (admin saja, untuk metrik CMS)
 export async function GET(req: NextRequest) {
-  if (req.nextUrl.searchParams.get("scope") === "draft") {
+  const scope = req.nextUrl.searchParams.get("scope");
+  if (scope === "draft" || scope === "all") {
     if (!isAdmin(req)) {
       return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
     }
     const c = ensureClient();
     if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
-    const { data, error } = await c.client
+    let query = c.client
       .from("articles")
-      .select("id,title,category,excerpt,date,author,image,tags")
-      .like("author_slug", "staging-%")
-      .order("date", { ascending: false });
+      .select("id,title,category,excerpt,date,author,author_slug,image,tags,status")
+      .order("date", { ascending: false })
+      .order("id", { ascending: false });
+    if (scope === "draft") query = query.eq("status", "draft");
+    const { data, error } = await query;
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json(data ?? []);
   }
@@ -88,12 +92,9 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Sanitizer ketat: tabel public.articles HANYA punya kolom
-  // [id, title, category, excerpt, content, image, tags, author,
-  //  author_slug, author_role, date, image_caption, image_credit, lead].
-  // TIDAK ADA kolom `status` — properti itu tidak pernah dikirim ke Supabase
-  // (status draft hanya dipakai sebagai sinyal transport untuk prefix staging-).
-  const isDraft = body.status === "draft";
+  // Skema resmi: kolom `status` TEXT ('published' | 'draft') ADA di DB.
+  // Nilai divalidasi ketat — selain 'draft' selalu menjadi 'published'.
+  const status = body.status === "draft" ? "draft" : "published";
   const todayWIB = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(new Date());
 
   const allowedPayload: Record<string, unknown> = {
@@ -104,12 +105,13 @@ export async function POST(req: NextRequest) {
     image: body.image ?? body.cover_image ?? null,
     tags: body.tags,
     author: body.author || "Redaksi GentaNusa",
-    author_slug: isDraft ? draftSlug(String(body.title || "")) : body.authorSlug || body.author_slug || "redaksi-generic",
+    author_slug: body.authorSlug || body.author_slug || "redaksi-generic",
     author_role: body.authorRole || body.author_role || "Redaktur GentaNusa",
     date: body.date || todayWIB,
     image_caption: body.image_caption ?? "",
     image_credit: body.image_credit ?? "",
     lead: body.lead ?? body.excerpt,
+    status,
   };
 
   const pending: Record<string, unknown> = { ...allowedPayload };

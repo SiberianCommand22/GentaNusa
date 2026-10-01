@@ -4,6 +4,20 @@
   padding: 0 20px;
 }
 
+/* Banner pratinjau draf — hanya terlihat oleh admin yang login. */
+.draftBanner {
+  margin: 24px auto 0;
+  max-width: 720px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: #FEF9C3;
+  border: 1px solid #FDE047;
+  color: #713F12;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
 .breadcrumb {
   display: flex;
   align-items: center;
