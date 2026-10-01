@@ -9,7 +9,7 @@ export async function GET() {
   const localCategorySlugs = localCategories.map((c) => c.slug);
 
   let dbArticleIds: number[] = [];
-  let dbCategorySlugs: string[] = [];
+  const dbCategorySlugs: string[] = [];
   let dbError: string | null = null;
   let dbSource = "not-connected";
 
@@ -26,16 +26,7 @@ export async function GET() {
     } else {
       dbArticleIds = (dbArticles || []).map((a) => a.id).sort((a: number, b: number) => a - b);
     }
-
-    const { data: dbCats, error: err2 } = await client
-      .from("categories")
-      .select("id, slug, name, color")
-      .order("id", { ascending: true });
-    if (err2) {
-      dbError = dbError ? `${dbError}; categories: ${err2.message}` : `categories: ${err2.message}`;
-    } else {
-      dbCategorySlugs = (dbCats || []).map((c) => c.slug);
-    }
+    // Tidak ada tabel `public.categories` — kategori statis di kode.
   }
 
   const a121 = localArticles.find((a) => a.id === 121);

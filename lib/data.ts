@@ -137,19 +137,16 @@ async function fetchArticlesDb(): Promise<Article[] | null> {
   return null;
 }
 
-async function fetchCategoriesDb(): Promise<Category[] | null> {
-  if (!supabaseAnon) return null;
-  try {
-    const { data, error } = await supabaseAnon
-      .from("categories")
-      .select("slug, name");
-    if (error) throw error;
-    if (data && data.length > 0) return data;
-  } catch (e) {
-    console.warn("Supabase categories gagal:", e);
-  }
-  return null;
-}
+// Kategori resmi GentaNusa — didefinisikan di kode (bukan tabel DB).
+// Tabel `public.categories` tidak ada di Supabase, jadi TIDAK ada query
+// ke tabel itu di mana pun agar tidak menimbulkan log PGRST205.
+const STATIC_CATEGORIES: Category[] = [
+  { slug: "nasional", name: "Nasional" },
+  { slug: "pertahanan", name: "Pertahanan" },
+  { slug: "politik", name: "Politik" },
+  { slug: "ekonomi", name: "Ekonomi" },
+  { slug: "dunia", name: "Dunia" },
+];
 
 // Baca artikel: dari Supabase (cached). Tanpa fallback array — bila database
 // kosong / tidak terjangkau, kembalikan [] agar halaman tampil empty state.
@@ -164,13 +161,7 @@ export async function getArticles(): Promise<Article[]> {
 }
 
 export async function getCategories(): Promise<Category[]> {
-  const cached = cache.get("categories");
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data as Category[];
-
-  const fromDb = await fetchCategoriesDb();
-  const result = fromDb ?? [];
-  cache.set("categories", { data: result, timestamp: Date.now() });
-  return result;
+  return [...STATIC_CATEGORIES];
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {

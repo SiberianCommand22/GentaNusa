@@ -1,28 +1,26 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Footer } from "@/components/site";
+import styles from "./not-found.module.css";
 
 export default function NotFound() {
   return (
     <>
-      <main className="flex min-h-[60vh] flex-col items-center justify-center text-center px-4">
-        <Image
-          src="/images/illustration-404.svg"
-          alt="404 - Halaman tidak ditemukan"
-          width={200}
-          height={200}
-          className="mb-6 opacity-70"
-        />
-        <h1 className="text-5xl font-bold mb-2">404</h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-          Halaman yang kamu cari sudah <strong>bersyuhada</strong>.
+      <main className={styles.wrap}>
+        <span className={styles.badge}>Galat 404</span>
+        <h1 className={styles.title}>Halaman Tidak Ditemukan</h1>
+        <p className={styles.desc}>
+          Tautan yang Anda tuju tidak tersedia, telah dipindahkan, atau mengalami
+          perubahan alamat. Silakan periksa kembali tautan Anda atau kembali ke
+          halaman utama.
         </p>
-        <Link
-          href="/"
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
-        >
-          ← Kembali ke Beranda
-        </Link>
+        <div className={styles.actions}>
+          <Link href="/" className={styles.btnPrimary}>
+            Kembali ke Beranda
+          </Link>
+          <Link href="/kategori/nasional" className={styles.btnSecondary}>
+            Lihat Berita Nasional
+          </Link>
+        </div>
       </main>
       <Footer />
     </>

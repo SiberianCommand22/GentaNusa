@@ -182,10 +182,10 @@ export default async function CategoryPage({ params }: Params) {
                 <path d="M18 14h-8M15 18h-5M10 6H8v4h2" />
               </svg>
             </div>
-            <h2 className={styles.emptyTitle}>Belum Ada Artikel</h2>
+            <h2 className={styles.emptyTitle}>Belum Ada Berita di Kategori {categoryInfo.label}</h2>
             <p className={styles.emptyText}>
-              Belum ada artikel dalam kategori {categoryInfo.label}. Redaksi GentaNusa
-              sedang menyiapkan liputan terkini.
+              Redaksi GentaNusa sedang menyiapkan liputan berita dan laporan mendalam
+              untuk kategori ini. Silakan kunjungi kanal lainnya untuk berita terkini.
             </p>
             <Link href="/" className={styles.emptyButton}>
               Kembali ke Beranda

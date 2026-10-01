@@ -30,19 +30,8 @@ export async function GET() {
       };
     }
 
-    const { data: dbCats, error: err2 } = await client
-      .from("categories")
-      .select("id, slug, name, color")
-      .order("id", { ascending: true });
-
-    if (err2) {
-      result.dbCategories = { error: err2.message };
-    } else {
-      result.dbCategories = {
-        count: (dbCats || []).length,
-        rows: dbCats,
-      };
-    }
+    // Tidak ada tabel `public.categories` di Supabase — kategori statis.
+    result.dbCategories = { source: "static", count: localCategories.length };
   } else {
     result.db = "Supabase tidak terkoneksi (dev mode atau env vars hilang)";
   }

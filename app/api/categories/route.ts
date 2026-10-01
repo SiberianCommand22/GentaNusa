@@ -1,59 +1,42 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { adminClient, isSupabaseReady } from "@/lib/supabase";
 
 function isAdmin(req: NextRequest) {
   return req.cookies.get("genta_admin")?.value === "1";
 }
 
-function ensureClient() {
-  const r = isSupabaseReady();
-  if (!r.ok) return { ok: false as const, error: r.reason };
-  if (!adminClient) return { ok: false as const, error: "Service key belum di-set" };
-  return { ok: true as const, client: adminClient };
-}
+// Kategori resmi GentaNusa — kanonis di kode (tidak ada tabel
+// `public.categories` di Supabase, jadi rute ini tidak menyentuh DB).
+const STATIC_CATEGORIES = [
+  { slug: "nasional", name: "Nasional" },
+  { slug: "pertahanan", name: "Pertahanan" },
+  { slug: "politik", name: "Politik" },
+  { slug: "ekonomi", name: "Ekonomi" },
+  { slug: "dunia", name: "Dunia" },
+];
 
-// GET — daftar kategori (public) — tanpa field color (bukan untuk publik)
+// GET — daftar kategori (public, statis).
 export async function GET() {
-  const c = ensureClient();
-  if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
-  const { data, error } = await c.client
-    .from("categories")
-    .select("slug, name")
-    .order("name");
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
+  return NextResponse.json(STATIC_CATEGORIES);
 }
 
-// POST — tambah kategori (admin)
+// POST — dinonaktifkan: daftar kanal bersifat tetap.
 export async function POST(req: NextRequest) {
   if (!isAdmin(req)) {
     return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
   }
-  const c = ensureClient();
-  if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
-  const body = await req.json().catch(() => null);
-  if (!body?.slug || !body?.name) {
-    return NextResponse.json({ error: "slug, name wajib" }, { status: 400 });
-  }
-  const { data, error } = await c.client
-    .from("categories")
-    .insert([{ slug: body.slug, name: body.name }])
-    .select()
-    .single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data, { status: 201 });
+  return NextResponse.json(
+    { error: "Daftar kategori bersifat tetap dan dikelola di kode." },
+    { status: 410 }
+  );
 }
 
-// DELETE — hapus kategori (admin)
+// DELETE — dinonaktifkan: daftar kanal bersifat tetap.
 export async function DELETE(req: NextRequest) {
   if (!isAdmin(req)) {
     return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
   }
-  const c = ensureClient();
-  if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
-  const slug = req.nextUrl.searchParams.get("slug");
-  if (!slug) return NextResponse.json({ error: "slug wajib" }, { status: 400 });
-  const { error } = await c.client.from("categories").delete().eq("slug", slug);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ ok: true });
+  return NextResponse.json(
+    { error: "Daftar kategori bersifat tetap dan dikelola di kode." },
+    { status: 410 }
+  );
 }
