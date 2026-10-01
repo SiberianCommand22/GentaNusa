@@ -5,10 +5,16 @@
 }
 
 .paragraph {
-  font-size: 1.125rem;
+  font-size: 17px;
   line-height: 1.8;
-  color: var(--text);
-  margin: 0;
+  color: #1f2937;
+  margin: 0 0 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .paragraph {
+    font-size: 18px;
+  }
 }
 
 .paragraph strong {
@@ -65,15 +71,15 @@
 }
 
 .quote {
-  border-left: 4px solid #2563EB;
-  padding: 0.75rem 1.25rem;
-  margin: 0;
+  border-left: 4px solid #171717;
+  padding: 4px 0 4px 16px;
+  margin: 1.5rem 0;
   font-size: 1.125rem;
   line-height: 1.8;
   font-style: italic;
-  color: var(--text-muted);
-  background: var(--hover);
-  border-radius: 0 8px 8px 0;
+  color: #262626;
+  background: rgba(245, 245, 245, 0.5);
+  border-radius: 0 6px 6px 0;
 }
 
 .ulist,

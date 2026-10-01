@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/site";
 import {
@@ -111,6 +112,29 @@ export async function generateMetadata({ params }: Params) {
   };
 }
 
+// Format tanggal redaksi WIB: "Kamis, 1 Oktober 2026 | 08:30 WIB".
+function formatTanggalWIB(dateStr: string): string {
+  const d = new Date(dateStr + "T00:00:00+07:00");
+  if (isNaN(d.getTime())) return formatDate(dateStr);
+  const hari = new Intl.DateTimeFormat("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  }).format(d);
+  return `${hari} | 08:30 WIB`;
+}
+
+// Estimasi waktu baca ~200 kata/menit, minimal 1 menit.
+function estimateReadMinutes(paras: string[], lead: string): number {
+  const words = [...paras, lead]
+    .join(" ")
+    .split(/\s+/)
+    .filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
 export default async function ArticlePage({ params }: Params) {
   const { slug } = await params;
 
@@ -142,6 +166,7 @@ export default async function ArticlePage({ params }: Params) {
   const [firstParagraph, ...body] = paras;
   const lead = stripHtml(article.lead || firstParagraph || "");
   const coverImage = article.cover_image || article.image;
+  const readMinutes = estimateReadMinutes(paras, lead);
 
   return (
     <>
@@ -185,19 +210,26 @@ export default async function ArticlePage({ params }: Params) {
               </span>
             </span>
             <span className={styles.dot}>•</span>
-            <time dateTime={article.date}>{formatDate(article.date)}</time>
+            <time dateTime={article.date}>{formatTanggalWIB(article.date)}</time>
+            <span className={styles.dot}>•</span>
+            <span className={styles.readTime}>{readMinutes} menit membaca</span>
             <span className={styles.dot}>•</span>
             <span className={styles.readCount}>{readCount} kali dibaca</span>
           </div>
 
-          {/* 5. Foto sampul + caption */}
+          {/* 5. Foto sampul + caption — rasio 16:9 presisi, zero layout shift */}
           {coverImage && (
             <figure className={styles.heroFigure}>
-              <CardImage
-                src={coverImage}
-                alt={article.title}
-                className={styles.featuredImage}
-              />
+              <div className={styles.heroImageWrap}>
+                <Image
+                  src={coverImage}
+                  alt={article.title}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, 720px"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
               {/* HANYA tampil bila caption/kredit asli ada di database */}
               {(article.image_caption || article.image_credit) && (
                 <figcaption className={styles.caption}>

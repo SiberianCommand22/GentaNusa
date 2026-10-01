@@ -48,13 +48,114 @@ export default function NewPostPage() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const [imgErr, setImgErr] = useState("");
+  const [draftNotice, setDraftNotice] = useState("");
+  const [hasStoredDraft, setHasStoredDraft] = useState(false);
+  const [loadedEdit, setLoadedEdit] = useState(false);
+
+  const draftKey = `gentanusa_draft_${editId || "new"}`;
+
+  function todayWIB(): string {
+    return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(new Date());
+  }
+
+  function writeDraftSnapshot(next: typeof emptyForm) {
+    try {
+      localStorage.setItem(
+        draftKey,
+        JSON.stringify({
+          title: next.title,
+          category: next.category,
+          excerpt: next.excerpt,
+          content: next.content,
+          image: next.image,
+          image_caption: next.image_caption,
+          image_credit: next.image_credit,
+          tags: next.tags,
+          author: next.author,
+          date: next.date,
+          headline: next.headline,
+          slug: next.slug,
+          savedAt: new Date().toISOString(),
+        })
+      );
+      setDraftNotice("Draf tersimpan di peramban ini");
+    } catch {
+      // storage penuh / mode privat — abaikan diam-diam
+    }
+  }
+
+  function clearDraft() {
+    try {
+      localStorage.removeItem(draftKey);
+    } catch {
+      // abaikan
+    }
+    setDraftNotice("");
+    setHasStoredDraft(false);
+  }
+
+  function loadStoredDraft() {
+    try {
+      const raw = localStorage.getItem(draftKey);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      setForm((f) => ({
+        ...f,
+        title: d.title ?? f.title,
+        category: d.category ?? f.category,
+        excerpt: d.excerpt ?? f.excerpt,
+        content: d.content ?? f.content,
+        image: d.image ?? f.image,
+        image_caption: d.image_caption ?? f.image_caption,
+        image_credit: d.image_credit ?? f.image_credit,
+        tags: d.tags ?? f.tags,
+        author: d.author ?? f.author,
+        date: d.date ?? f.date,
+        headline: Boolean(d.headline),
+        slug: d.slug ?? f.slug,
+      }));
+      setHasStoredDraft(false);
+      setDraftNotice("Draf tersimpan di peramban ini");
+    } catch {
+      // abaikan
+    }
+  }
+
+  // Auto-save halus ke localStorage (debounce 1 detik) setiap kali form berubah.
+  useEffect(() => {
+    if (!loadedEdit && !form.title && !form.excerpt && !form.content) return;
+    const t = window.setTimeout(() => writeDraftSnapshot(form), 1000);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, draftKey, loadedEdit]);
 
   // Mode edit: /admin/posts/new?edit=<id> (dibaca client-side saja)
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get("edit");
-    if (!id) return;
+    // Cek draf tersimpan: tawarkan "Muat Draf Tersimpan" bila form masih kosong.
+    try {
+      const key = `gentanusa_draft_${id || "new"}`;
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const d = JSON.parse(raw);
+        const isEmptyForm =
+          !emptyForm.title && !emptyForm.excerpt && !emptyForm.content;
+        if (d && (d.title || d.excerpt || d.content) && isEmptyForm) {
+          setHasStoredDraft(true);
+        }
+      }
+    } catch {
+      // abaikan
+    }
+    if (!id) {
+      setLoadedEdit(true);
+      return;
+    }
     const numId = Number(id);
-    if (!Number.isFinite(numId)) return;
+    if (!Number.isFinite(numId)) {
+      setLoadedEdit(true);
+      return;
+    }
     fetch(`/api/articles/${numId}`).then(async (r) => {
       if (!r.ok) return;
       const a = await r.json();
@@ -74,6 +175,7 @@ export default function NewPostPage() {
         date: a.date ?? new Date().toISOString().split("T")[0],
         headline: tags.includes(HEADLINE_TAG),
       });
+      setLoadedEdit(true);
     });
   }, []);
 
@@ -115,6 +217,10 @@ export default function NewPostPage() {
   async function save(status: "draft" | "published") {
     setMsg("");
     setImgErr("");
+    // Tombol "Simpan Draf" menulis snapshot lokal dulu (non-intrusif).
+    if (status === "draft") {
+      writeDraftSnapshot(form);
+    }
     const title = form.title.trim();
     // Konten visual → blok DB yang bersih (satu string per elemen blok).
     const paras = htmlToBlocks(form.content);
@@ -148,6 +254,11 @@ export default function NewPostPage() {
       const tags = splitTags(form.tags).filter((t) => t !== HEADLINE_TAG);
       if (form.headline) tags.unshift(HEADLINE_TAG);
       const imagePath = uploadedPath || "/images/placeholder-article.svg";
+      // Publikasi instan: tanggal otomatis WIB hari ini (YYYY-MM-DD).
+      const publishDate = status === "published" ? todayWIB() : form.date || todayWIB();
+      // Payload transport ke /api/articles — kolom `status` hanya sinyal
+      // draft/published untuk API; API menyusun ulang allowedPayload ketat
+      // (tanpa `status`) sebelum query Supabase.
       const payload = {
         title,
         slug,
@@ -160,7 +271,7 @@ export default function NewPostPage() {
         image_credit: form.image_credit.trim(),
         category: form.category,
         author: form.author.trim() || "Redaksi GentaNusa",
-        date: form.date || new Date().toISOString().split("T")[0],
+        date: publishDate,
         status,
         tags,
       };
@@ -181,6 +292,10 @@ export default function NewPostPage() {
       }
       setBusy(false);
       if (r.ok || r.status === 201) {
+        if (status === "published") {
+          // Pasca-publikasi: bersihkan draf lokal agar tidak termuat ulang.
+          clearDraft();
+        }
         setMsg(editId ? "Berita berhasil diperbarui." : "Berita berhasil diterbitkan.");
         window.setTimeout(() => router.push("/admin/posts"), 600);
       } else {
@@ -206,6 +321,14 @@ export default function NewPostPage() {
       </div>
 
       {msg && <p className={styles.msg}>{msg}</p>}
+      {hasStoredDraft && (
+        <div className={styles.panel} style={{ marginBottom: 16 }}>
+          <p className={styles.pageSub}>Draf tersimpan ditemukan di peramban ini.</p>
+          <button type="button" className={styles.btnSecondary} onClick={loadStoredDraft}>
+            Muat Draf Tersimpan
+          </button>
+        </div>
+      )}
 
       <div className={styles.formGrid}>
         {/* Kolom kiri — konten utama */}
@@ -395,8 +518,18 @@ export default function NewPostPage() {
           <div className={styles.panel}>
             <div className={styles.actions}>
               {msg && <p className={styles.err}>{msg}</p>}
+              {draftNotice && !msg && <p className={styles.pageSub}>{draftNotice}</p>}
               <button className={styles.btnSecondary} disabled={busy} onClick={() => save("draft")}>
-                {busy ? "Menyimpan…" : "Simpan Draft"}
+                {busy ? "Menyimpan…" : "Simpan Draf"}
+              </button>
+              <button
+                type="button"
+                className={styles.btnSecondary}
+                disabled={busy}
+                onClick={clearDraft}
+                title="Bersihkan draf tersimpan di peramban ini"
+              >
+                Hapus Draf
               </button>
               <button className={styles.btnPrimary} disabled={busy} onClick={() => save("published")}>
                 {busy ? "Memublikasikan..." : editId ? "Simpan Perubahan" : "Publikasikan"}

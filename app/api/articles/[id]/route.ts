@@ -111,25 +111,24 @@ export async function PUT(
     title: body.title,
     category: body.category,
     excerpt: body.excerpt,
-    lead: body.lead ?? body.excerpt,
     content: body.content,
     image: body.image ?? body.cover_image ?? null,
-    cover_image: body.cover_image ?? body.image ?? null,
-    image_caption: body.image_caption ?? "",
-    image_credit: body.image_credit ?? "",
     tags: body.tags ?? [],
     author: body.author,
     author_slug: authorSlug,
-    author_role: body.authorRole ?? null,
+    author_role: body.authorRole ?? body.author_role ?? null,
     date: body.date,
+    image_caption: body.image_caption ?? "",
+    image_credit: body.image_credit ?? "",
+    lead: body.lead ?? body.excerpt,
   };
-  // Slug lama dipertahankan form; jangan timpa dengan nilai kosong.
-  if (body.slug) fullUpdate.slug = body.slug;
 
   let { data, error } = await updateTolerant(c.client, id, fullUpdate);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
+  revalidatePath("/kategori/[slug]", "page");
+  revalidatePath("/penulis/[slug]", "page");
   revalidatePath("/[slug]", "page");
   revalidatePath("/admin");
   revalidatePath("/admin/posts");

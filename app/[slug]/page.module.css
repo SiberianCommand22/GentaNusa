@@ -22,7 +22,7 @@
 .breadcrumb a {
   color: #64748b;
   text-decoration: none;
-  transition: color 0.15s;
+  transition: color 0.2s;
 }
 
 .breadcrumb a:hover {
@@ -41,7 +41,9 @@
 }
 
 .article {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .categoryBadge {
@@ -60,11 +62,34 @@
 }
 
 .title {
-  font-size: clamp(28px, 4vw, 44px);
-  line-height: 1.2;
+  font-family: var(--font-sans);
+  font-size: 1.5rem;
+  line-height: 1.25;
   font-weight: 800;
-  color: #0F172A;
+  letter-spacing: -0.01em;
+  color: #171717;
   margin: 0 0 16px;
+}
+
+@media (min-width: 640px) {
+  .title {
+    font-size: 1.875rem;
+    line-height: 1.2;
+  }
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: 2.25rem;
+    line-height: 1.2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .title {
+    font-size: 42px;
+    line-height: 1.2;
+  }
 }
 
 .meta {
@@ -104,7 +129,7 @@
   font-weight: 600;
   font-size: 14px;
   color: #0F172A;
-  transition: color 0.15s;
+  transition: color 0.2s;
 }
 
 a.author:hover {
@@ -126,16 +151,24 @@ a.author:hover {
   color: #64748B;
 }
 
-.heroFigure {
-  margin: 32px -20px;
-  position: relative;
+.readTime {
+  font-weight: 500;
+  color: #64748B;
 }
 
-@media (max-width: 640px) {
-  .heroFigure {
-    margin-left: calc(-1 * env(safe-area-inset-left, 20px));
-    margin-right: calc(-1 * env(safe-area-inset-right, 20px));
-  }
+.heroFigure {
+  margin: 24px auto;
+  max-width: 720px;
+}
+
+/* Rasio 16:9 presisi — zero layout shift untuk LCP cover. */
+.heroImageWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f5f5f5;
 }
 
 .featuredImage {
@@ -144,25 +177,15 @@ a.author:hover {
   max-height: 600px;
   object-fit: cover;
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
 .caption {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: 10px;
+  display: block;
+  margin-top: 8px;
   font-size: 12px;
-  color: #64748B;
-  text-align: center;
-}
-
-@media (min-width: 640px) {
-  .caption {
-    flex-direction: row;
-    justify-content: space-between;
-    text-align: left;
-  }
+  line-height: 1.5;
+  color: #737373;
+  font-style: italic;
 }
 
 .credit {
@@ -172,31 +195,39 @@ a.author:hover {
 }
 
 .lead {
-  font-size: 18px;
-  line-height: 1.7;
+  font-size: 1.125rem;
+  line-height: 1.625;
   font-weight: 500;
-  color: #334155;
-  border-left: 4px solid #2563EB;
-  background: rgba(37, 99, 235, 0.06);
-  padding: 16px 20px;
-  border-radius: 0 8px 8px 0;
-  margin: 32px 0;
-  text-align: justify;
-  text-justify: inter-word;
-  hyphens: auto;
+  color: #404040;
+  margin: 0 0 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+@media (min-width: 640px) {
+  .lead {
+    font-size: 1.25rem;
+  }
 }
 
 .content {
   font-size: 17px;
-  line-height: 1.85;
-  color: #1E293B;
+  line-height: 1.8;
+  color: #1f2937;
   margin-bottom: 32px;
-  text-align: justify;
-  text-justify: inter-word;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 640px) {
+  .content {
+    font-size: 18px;
+  }
 }
 
 .content p {
-  margin: 0 0 1.5em;
+  margin: 0 0 1.5rem;
 }
 
 .content h2 {
@@ -229,11 +260,13 @@ a.author:hover {
 }
 
 .content blockquote {
-  border-left: 4px solid #2563EB;
-  padding-left: 16px;
-  margin: 1.5em 0;
+  border-left: 4px solid #171717;
+  padding: 4px 0 4px 16px;
+  margin: 1.5rem 0;
   font-style: italic;
-  color: #475569;
+  color: #262626;
+  background: rgba(245, 245, 245, 0.5);
+  border-radius: 0 6px 6px 0;
 }
 
 .tags {
@@ -297,12 +330,11 @@ a.author:hover {
   border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
-  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
 
 .relatedCard:hover {
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
-  transform: translateY(-4px);
   border-color: #C8C8D2;
 }
 
@@ -316,11 +348,6 @@ a.author:hover {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-.relatedCard:hover .cardImg {
-  transform: scale(1.06);
 }
 
 .relatedCardTitle {

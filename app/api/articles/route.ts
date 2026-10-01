@@ -88,31 +88,31 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // status "draft" → baris staging (tersembunyi dari publik); default terbit.
-  // Skema DB memakai `image` (payload form boleh memakai alias `cover_image`).
-  // Kolom yang belum dimigrasi dibuang satu per satu otomatis — kolom valid
-  // (lead/image_caption/image_credit) TETAP tersimpan.
+  // Sanitizer ketat: tabel public.articles HANYA punya kolom
+  // [id, title, category, excerpt, content, image, tags, author,
+  //  author_slug, author_role, date, image_caption, image_credit, lead].
+  // TIDAK ADA kolom `status` — properti itu tidak pernah dikirim ke Supabase
+  // (status draft hanya dipakai sebagai sinyal transport untuk prefix staging-).
   const isDraft = body.status === "draft";
+  const todayWIB = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(new Date());
 
-  const fullRow: Record<string, unknown> = {
+  const allowedPayload: Record<string, unknown> = {
     title: body.title,
     category: body.category,
     excerpt: body.excerpt,
-    lead: body.lead ?? body.excerpt,
     content: body.content,
-    tags: body.tags,
     image: body.image ?? body.cover_image ?? null,
-    cover_image: body.cover_image ?? body.image ?? null,
+    tags: body.tags,
+    author: body.author || "Redaksi GentaNusa",
+    author_slug: isDraft ? draftSlug(String(body.title || "")) : body.authorSlug || body.author_slug || "redaksi-generic",
+    author_role: body.authorRole || body.author_role || "Redaktur GentaNusa",
+    date: body.date || todayWIB,
     image_caption: body.image_caption ?? "",
     image_credit: body.image_credit ?? "",
-    date: body.date || new Date().toISOString().split("T")[0],
-    author: body.author || "Redaksi GentaNusa",
-    author_slug: isDraft ? draftSlug(body.title) : body.authorSlug || "redaksi-generic",
-    author_role: body.authorRole || "Redaktur GentaNusa",
+    lead: body.lead ?? body.excerpt,
   };
-  if (body.slug) fullRow.slug = body.slug;
 
-  const pending: Record<string, unknown> = { ...fullRow };
+  const pending: Record<string, unknown> = { ...allowedPayload };
   let data = null;
   let error = null;
   for (let attempt = 0; attempt < 8; attempt++) {
@@ -128,6 +128,8 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
+  revalidatePath("/kategori/[slug]", "page");
+  revalidatePath("/penulis/[slug]", "page");
   revalidatePath("/[slug]", "page");
   revalidatePath("/admin");
   revalidatePath("/admin/posts");

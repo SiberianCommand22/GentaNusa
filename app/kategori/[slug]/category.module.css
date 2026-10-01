@@ -4,6 +4,27 @@
   padding: 30px 20px;
 }
 
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.breadcrumb a {
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.breadcrumb a:hover {
+  color: #2563EB;
+}
+
 /* ===== Banner Kategori ===== */
 .banner {
   position: relative;
@@ -60,11 +81,59 @@
 .empty {
   font-size: 15px;
   color: var(--text-muted);
-  padding: 40px;
+  padding: 56px 40px;
   text-align: center;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.emptyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #EFF6FF;
+  color: #2563EB;
+  margin-bottom: 4px;
+}
+
+.emptyTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0;
+}
+
+.emptyText {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  max-width: 460px;
+  margin: 0;
+}
+
+.emptyButton {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 10px 24px;
+  border-radius: 8px;
+  background: #2563EB;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.emptyButton:hover {
+  background: #1D4ED8;
 }
 
 .grid {
@@ -92,12 +161,11 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
 
 .card:hover {
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
-  transform: translateY(-4px);
   border-color: #c8c8d2;
 }
 
@@ -108,11 +176,7 @@
 }
 
 .cardImage img {
-  transition: transform 0.4s ease;
-}
-
-.card:hover .cardImage img {
-  transform: scale(1.06);
+  transition: none;
 }
 
 .cardBody {

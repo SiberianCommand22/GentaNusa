@@ -127,7 +127,8 @@ async function fetchArticlesDb(): Promise<Article[] | null> {
       .from("articles")
       .select("*")
       .not("author_slug", "like", "staging-%")
-      .order("date", { ascending: false });
+      .order("date", { ascending: false })
+      .order("id", { ascending: false });
     if (error) throw error;
     if (data && data.length > 0) return data.map(mapRow);
   } catch (e) {
@@ -189,7 +190,8 @@ export async function getArticlesByCategory(slug: string): Promise<Article[]> {
         .select("*")
         .ilike("category", key)
         .not("author_slug", "like", "staging-%")
-        .order("date", { ascending: false });
+        .order("date", { ascending: false })
+        .order("id", { ascending: false });
       if (!error && data) return data.map(mapRow);
       if (error) throw error;
     } catch (e) {
