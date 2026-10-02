@@ -6,7 +6,7 @@
   top: 0;
   z-index: 50;
   width: 100%;
-  background: #0b192c;
+  background: #0B1727;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
@@ -34,7 +34,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 1;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+/* Sisi kiri/kanan seimbang agar logo tepat di tengah.
+   Akses admin privat via /admin/login/genta — tanpa tombol publik. */
+.headerSideLeft {
+  flex: 1 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+.headerSideRight {
+  flex: 1 0 0;
   min-width: 0;
 }
 
@@ -128,33 +143,11 @@
   }
 }
 
-.loginBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 36px;
-  padding: 6px 16px;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #fff;
-  white-space: nowrap;
-  transition: border-color 0.2s, color 0.2s, background 0.2s;
-}
-
-.loginBtn:hover {
-  border-color: #fff;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
-}
+/* Tombol login publik dihapus — akses admin privat via /admin/login/genta. */
 
 /* Tier 2 — kategori editorial di atas navy: teks putih kontras, rata tengah presisi */
 .categoryBar {
-  background: #0b192c;
+  background: #0B1727;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -398,21 +391,4 @@
 
 .socialLink:hover {
   color: #1E3A8A;
-}
-
-.loginCmsBtn {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  background: #0B192C;
-  color: #fff;
-  text-align: center;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  transition: opacity 0.2s;
-}
-
-.loginCmsBtn:hover {
-  opacity: 0.9;
 }

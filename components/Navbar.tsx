@@ -6,12 +6,11 @@ import { usePathname } from "next/navigation";
 import { BrandLogo } from "@/components/BrandLogo";
 import styles from "./Navbar.module.css";
 
-const mainNav = [
-  { href: "/", label: "Beranda" },
-  { href: "/tentang", label: "Tentang Kami" },
+const corporateNav = [
+  { href: "/tentang-kami", label: "Redaksi & Tentang Kami" },
+  { href: "/pedoman-media-siber", label: "Pedoman Media Siber" },
   { href: "/kebijakan-privasi", label: "Kebijakan Privasi" },
-  { href: "/syarat-ketentuan", label: "Syarat & Ketentuan" },
-  { href: "/kontak", label: "Kontak Redaksi" },
+  { href: "/kontak", label: "Kontak & Kerja Sama" },
 ];
 
 const categoryNav = [
@@ -28,9 +27,9 @@ export function Navbar() {
 
   return (
     <>
-      <header className={`sticky top-0 z-50 w-full bg-[#0B192C] border-b border-white/10 ${styles.header}`}>
+      <header className={`sticky top-0 z-50 w-full bg-[#0B1727] border-b border-white/10 ${styles.header}`}>
         <div className={styles.headerInner}>
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div className={styles.headerSideLeft}>
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
@@ -60,9 +59,9 @@ export function Navbar() {
             <BrandLogo theme="dark" size="lg" href="/" />
           </div>
 
-          <Link href="/admin/login" className={styles.loginBtn}>
-            Login
-          </Link>
+          {/* Spacer kanan agar logo tetap tepat di tengah.
+             Akses admin redaksi privat via /admin/login/genta (tanpa tombol publik). */}
+          <div className={styles.headerSideRight} aria-hidden="true" />
         </div>
 
         <nav className={styles.categoryBar} aria-label="Kategori berita">
@@ -115,19 +114,9 @@ export function Navbar() {
             </form>
 
             <nav className={styles.drawerNav}>
-              <p className={styles.drawerSectionTitle}>KATEGORI</p>
-              {categoryNav.map((c) => (
-                <Link
-                  key={c.slug}
-                  href={`/kategori/${c.slug}`}
-                  className={styles.drawerLink}
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  {c.label}
-                </Link>
-              ))}
+              {/* Kategori hanya di navbar horizontal utama, tidak di drawer. */}
               <p className={styles.drawerSectionTitle}>INFORMASI</p>
-              {mainNav.map((item) => (
+              {corporateNav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -156,9 +145,6 @@ export function Navbar() {
                   <span>TikTok</span>
                 </a>
               </div>
-              <Link href="/admin/login" className={styles.loginCmsBtn} onClick={() => setDrawerOpen(false)}>
-                Login CMS
-              </Link>
             </div>
           </div>
         </div>
