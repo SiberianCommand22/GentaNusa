@@ -24,11 +24,29 @@ export default function AdminDashboard() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [drafts, setDrafts] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState<"admin" | "editor" | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/check")
+      .then(async (r) => {
+        if (!r.ok) return null;
+        const j = await r.json().catch(() => ({}));
+        return j.is_admin ? "admin" : "editor";
+      })
+      .then((r) => {
+        if (r) setRole(r);
+      })
+      .catch(() => {
+        // abaikan — metrik tetap tampil
+      });
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const all: Article[] = await fetch("/api/articles?scope=all").then((r) =>
+      // scope=mine: Administrator melihat seluruh berita, penulis biasa hanya
+      // miliknya sendiri (filter di server).
+      const all: Article[] = await fetch("/api/articles?scope=mine").then((r) =>
         r.ok ? r.json() : []
       );
       const list = Array.isArray(all) ? all : [];
@@ -56,7 +74,10 @@ export default function AdminDashboard() {
       <div className={styles.pageHead}>
         <div>
           <h2 className={styles.pageHeading}>Dashboard GentaNusa</h2>
-          <p className={styles.pageSub}>Selamat datang di ruang kerja redaksi GentaNusa.</p>
+          <p className={styles.pageSub}>
+            Selamat datang di ruang kerja redaksi GentaNusa
+            {role === "admin" ? "." : " — mode penulis, hanya berita Anda yang dihitung."}
+          </p>
         </div>
         <Link href="/admin/posts/new" className={styles.primaryBtn}>
           + Tulis Berita Baru

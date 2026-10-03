@@ -20,8 +20,33 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Publishing (100% manual)
 
 No cron, no GitHub Actions schedule, no auto-generator. All articles are
-created by a logged-in admin in `/admin` (cookie `genta_admin=1`) via
-`POST /api/articles`, which rejects unauthenticated requests with 401.
+created by a logged-in redaksi account in `/admin` via `POST /api/articles`,
+which rejects unauthenticated requests with 401.
+
+## Redaksi auth & RBAC
+
+Login is **private**: the form lives only at `/admin/login/gentanusa`.
+`/admin/login` is sealed (`notFound()`), and no login link exists in the
+public navbar or drawer.
+
+Session cookies (all httpOnly, 7d): `genta_admin` (flag), `genta_session`
+(claims), `genta_token` (Supabase access token).
+
+- `lib/auth.ts` — resolves the session; re-verifies role via
+  `supabase.auth.getUser(token)` when the token cookie exists.
+- Administrator = `user_metadata.role` in `{admin, superadmin, super_admin, administrator}`
+  OR the master admin email (`MASTER_ADMIN_EMAIL` env, defaults to the master account).
+- `lib/editorial-articles.ts` — all CMS reads of `articles`. Admins get every
+  row; regular authors get only their own rows via
+  `.or("user_id.eq.<uuid>,author_slug.eq.<slug>")`.
+- `articles.user_id` is stamped from the session on create and never rewritten
+  on update. Run `scripts/migrate-articles.sql` to add the column; until then the
+  helper transparently falls back to filtering by `author_slug`.
+- `DELETE` on articles is admin-only: non-admins get 403
+  `Hanya Administrator Utama yang berhak menghapus berita.`
+- Editing someone else's article returns 403
+  `Akses Ditolak: Anda tidak memiliki izin mengedit artikel ini.`
+  (see `app/admin/posts/edit/[id]/page.tsx` and `GET /api/articles/[id]?scope=edit`).
 
 ## Data flow
 
@@ -46,14 +71,14 @@ Copy `.env.example` → `.env.local`. Key vars:
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key (client-safe) |
 | `SUPABASE_SERVICE_KEY` | Server-only secret (never expose to client) |
-| `ADMIN_PASSWORD` | Admin panel login (min 12 chars) |
+| `MASTER_ADMIN_EMAIL` | Email Administrator Utama (role admin tetap via `user_metadata.role`) |
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL for SEO/sitemap |
 
 ## Architecture
 
 - **App Router** with SSG + ISR (`revalidate = 60` on homepage)
 - **No database** — JSON files + Supabase (PostgREST, no ORM)
-- **Admin auth**: cookie `genta_admin=1`, set by `/api/admin/login` (rate-limited 5/15min)
+- **Redaksi auth**: `genta_admin` + `genta_session` + `genta_token` cookies set by `/api/admin/login` (rate-limited 5/15min); role re-verified per request via `lib/auth.ts`
 - **Images**: `image.pollinations.ai` and `*.supabase.co` allowed in `next.config.ts`
 - **CSP**: strict, allows `'unsafe-inline'` + `'unsafe-eval'` for scripts
 - **Vercel deploy**: project ID in `.vercel/project.json`; state in `.deploy-state.json`

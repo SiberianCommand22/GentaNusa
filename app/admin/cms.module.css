@@ -762,6 +762,18 @@
   margin-bottom: 16px;
 }
 
+.infoBanner {
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E3A8A;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
 .filterRow {
   display: flex;
   gap: 8px;

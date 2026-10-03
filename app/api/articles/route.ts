@@ -1,54 +1,54 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
-import { adminClient, isSupabaseReady } from "@/lib/supabase";
+import { getEditorialSession } from "@/lib/auth";
 import { getArticles } from "@/lib/data";
+import {
+  ACCESS_DENIED_DELETE,
+  ensureSupabaseServiceClient,
+  fetchArticlesForSession,
+} from "@/lib/editorial-articles";
 
-function isAdmin(req: NextRequest) {
-  return req.cookies.get("genta_admin")?.value === "1";
-}
-
-function ensureClient() {
-  const r = isSupabaseReady();
-  if (!r.ok) return { ok: false as const, error: r.reason };
-  if (!adminClient) return { ok: false as const, error: "Service key belum di-set" };
-  return { ok: true as const, client: adminClient };
-}
-
-// Slug unik untuk draft — prefix `staging-` disembunyikan dari situs publik
-// oleh filter di lib/data.ts hingga redaksi mempublikasikannya.
-function draftSlug(title: string): string {
-  const base =
-    String(title || "")
+function slugify(value: string): string {
+  return (
+    String(value || "")
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "")
-      .slice(0, 40) || "artikel";
-  return `staging-${base}-${Date.now().toString(36)}`;
+      .slice(0, 60) || "penulis"
+  );
 }
 
-// GET — daftar artikel (public, hanya published) — tanpa field sensitif
-// GET ?scope=all — seluruh baris incl. draft (admin saja, untuk CMS)
-// GET ?scope=draft — baris draft (admin saja, untuk metrik CMS)
+// GET — daftar artikel.
+//   (tanpa scope)     : publik, hanya published, tanpa field sensitif.
+//   ?scope=all        : SEMUA baris — KHUSUS Administrator.
+//   ?scope=mine       : baris milik penulis yang sedang login (semua role).
+//   ?scope=draft      : baris draft milik sesi berjalan.
 export async function GET(req: NextRequest) {
   const scope = req.nextUrl.searchParams.get("scope");
-  if (scope === "draft" || scope === "all") {
-    if (!isAdmin(req)) {
-      return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
+
+  if (scope === "all" || scope === "mine" || scope === "draft") {
+    const session = await getEditorialSession();
+    if (!session) {
+      return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
     }
-    const c = ensureClient();
-    if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
-    let query = c.client
-      .from("articles")
-      .select("id,title,category,excerpt,date,author,author_slug,image,tags,status")
-      .order("date", { ascending: false })
-      .order("id", { ascending: false });
-    if (scope === "draft") query = query.eq("status", "draft");
-    const { data, error } = await query;
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json(data ?? []);
+    // Isolasi data: penulis biasa tidak pernah boleh melihat seluruh repo.
+    if (scope === "all" && !session.isAdmin) {
+      return NextResponse.json(
+        { error: "Hanya Administrator yang dapat melihat seluruh berita." },
+        { status: 403 }
+      );
+    }
+    const result = await fetchArticlesForSession(session, {
+      draftsOnly: scope === "draft",
+    });
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: result.status });
+    }
+    return NextResponse.json(result.data);
   }
-  const c = ensureClient();
+
+  const c = ensureSupabaseServiceClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
   try {
     const articles = await getArticles();
@@ -65,22 +65,29 @@ export async function GET(req: NextRequest) {
         tags: a.tags,
       }))
     );
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Gagal memuat artikel" }, { status: 500 });
   }
 }
 
-// POST — tambah artikel (admin)
+// POST — tambah artikel (semua penulis redaksi yang sudah login).
+// Kepemilikan dikunci permanen: user_id diisi dari SESI server, bukan dari
+// payload klien, sehingga artikel tidak bisa "dipinjam" penulis lain.
 export async function POST(req: NextRequest) {
-  if (!isAdmin(req)) {
-    return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
+  const session = await getEditorialSession();
+  if (!session) {
+    return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
   }
-  const c = ensureClient();
+  const c = ensureSupabaseServiceClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
 
-  let body;
+  let body: Record<string, unknown>;
   try {
-    body = await req.json();
+    const parsed: unknown = await req.json();
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return NextResponse.json({ error: "Body JSON tidak valid" }, { status: 400 });
+    }
+    body = parsed as Record<string, unknown>;
   } catch {
     return NextResponse.json({ error: "Body JSON tidak valid" }, { status: 400 });
   }
@@ -97,6 +104,24 @@ export async function POST(req: NextRequest) {
   const status = body.status === "draft" ? "draft" : "published";
   const todayWIB = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(new Date());
 
+  const requestedAuthor = typeof body.author === "string" ? body.author.trim() : "";
+  const requestedSlug =
+    typeof body.author_slug === "string"
+      ? body.author_slug.trim()
+      : typeof body.authorSlug === "string"
+        ? body.authorSlug.trim()
+        : "";
+
+  // Penulis biasa: nama & slug penulis dikunci ke metadata akunnya sehingga
+  // tidak bisa mengarang identitas penulis lain (anti impersonasi).
+  // Administrator tetap bebas menetapkan nama penulis tampilan.
+  const author = session.isAdmin
+    ? requestedAuthor || session.fullName || "Redaksi GentaNusa"
+    : session.fullName || requestedAuthor || "Redaksi GentaNusa";
+  const authorSlug = session.isAdmin
+    ? requestedSlug || slugify(author)
+    : session.authorSlug || requestedSlug || slugify(author);
+
   const allowedPayload: Record<string, unknown> = {
     title: body.title,
     category: body.category,
@@ -104,19 +129,25 @@ export async function POST(req: NextRequest) {
     content: body.content,
     image: body.image ?? body.cover_image ?? null,
     tags: body.tags,
-    author: body.author || "Redaksi GentaNusa",
-    author_slug: body.authorSlug || body.author_slug || "redaksi-generic",
-    author_role: body.authorRole || body.author_role || "Redaktur GentaNusa",
+    author,
+    author_slug: authorSlug,
+    author_role:
+      (typeof body.author_role === "string" && body.author_role) ||
+      (typeof body.authorRole === "string" && body.authorRole) ||
+      "Redaktur GentaNusa",
     date: body.date || todayWIB,
     image_caption: body.image_caption ?? "",
     image_credit: body.image_credit ?? "",
     lead: body.lead ?? body.excerpt,
     status,
+    // Kunci kepemilikan (Pilar 3.4). Null bila migrasi kolom belum jalan —
+    // helper pemBACAan sudah tolerate hal ini via author_slug.
+    user_id: session.userId ?? null,
   };
 
   const pending: Record<string, unknown> = { ...allowedPayload };
   let data = null;
-  let error = null;
+  let error: { message?: string } | null = null;
   for (let attempt = 0; attempt < 8; attempt++) {
     const res = await c.client.from("articles").insert([pending]).select().single();
     data = res.data;
@@ -138,12 +169,17 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(data, { status: 201 });
 }
 
-// DELETE — hapus artikel (admin)
+// DELETE — hapus artikel. HAK EKSKLUSIF ADMINISTRATOR.
+// Penulis biasa: 403 Forbidden, apa pun status sesinya.
 export async function DELETE(req: NextRequest) {
-  if (!isAdmin(req)) {
-    return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
+  const session = await getEditorialSession();
+  if (!session) {
+    return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
   }
-  const c = ensureClient();
+  if (!session.isAdmin) {
+    return NextResponse.json({ error: ACCESS_DENIED_DELETE }, { status: 403 });
+  }
+  const c = ensureSupabaseServiceClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
   const id = req.nextUrl.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id wajib" }, { status: 400 });

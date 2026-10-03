@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: { absolute: "Berita Terkini | GentaNusa" },
   description:
-    "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, dan Dunia.",
+    "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, dan Peduli.",
   alternates: { canonical: "https://www.gentanusa.id/kategori" },
   openGraph: {
     url: "https://www.gentanusa.id/kategori",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     type: "website",
     title: "Berita Terkini | GentaNusa",
     description:
-      "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, dan Dunia.",
+      "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, dan Peduli.",
     images: [
       {
         url: "https://www.gentanusa.id/og-default.jpg",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Berita Terkini | GentaNusa",
     description:
-      "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, dan Dunia.",
+      "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, dan Peduli.",
     images: ["https://www.gentanusa.id/og-default.jpg"],
   },
 };
@@ -61,6 +61,11 @@ const CHANNELS: { slug: string; label: string; desc: string }[] = [
     slug: "dunia",
     label: "Dunia",
     desc: "Kabar internasional, geopolitik kawasan, dan hubungan diplomatik global.",
+  },
+  {
+    slug: "peduli",
+    label: "Peduli",
+    desc: "Dokumentasi kegiatan sosial, aksi kemanusiaan, dan bakti nusantara GentaNusa. Segera hadir.",
   },
 ];
 

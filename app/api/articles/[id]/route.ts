@@ -1,16 +1,23 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
-import { adminClient, isSupabaseReady } from "@/lib/supabase";
+import { getEditorialSession } from "@/lib/auth";
+import {
+  ACCESS_DENIED_DELETE,
+  ARTICLE_COLUMNS_BASE,
+  ARTICLE_COLUMNS_WITH_OWNER,
+  ensureSupabaseServiceClient,
+  fetchArticleForSession,
+  type ArticleRow,
+} from "@/lib/editorial-articles";
 
-function isAdmin(req: NextRequest) {
-  return req.cookies.get("genta_admin")?.value === "1";
-}
-
-function ensureClient() {
-  const r = isSupabaseReady();
-  if (!r.ok) return { ok: false as const, error: r.reason };
-  if (!adminClient) return { ok: false as const, error: "Service key belum di-set" };
-  return { ok: true as const, client: adminClient };
+function slugify(value: string): string {
+  return (
+    String(value || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "")
+      .slice(0, 60) || "penulis"
+  );
 }
 
 // Skema resmi mencakup kolom `status` TEXT ('published' | 'draft').
@@ -44,23 +51,51 @@ async function updateTolerant(
   return { data: null, error: lastError };
 }
 
-async function getArticle(id: string) {
-  const c = ensureClient();
+async function getArticle(id: string): Promise<ArticleRow | null> {
+  const c = ensureSupabaseServiceClient();
   if (!c.ok) return null;
-  const { data } = await c.client.from("articles").select("*").eq("id", id).single();
-  return data;
+  const first = await c.client
+    .from("articles")
+    .select(ARTICLE_COLUMNS_WITH_OWNER)
+    .eq("id", id)
+    .maybeSingle();
+  if (first.error && /user_id/i.test(first.error.message || "")) {
+    const retry = await c.client
+      .from("articles")
+      .select(ARTICLE_COLUMNS_BASE)
+      .eq("id", id)
+      .maybeSingle();
+    return (retry.data as ArticleRow | null) ?? null;
+  }
+  return (first.data as ArticleRow | null) ?? null;
 }
 
-// GET /api/articles/[id] — satu artikel (public).
+// GET /api/articles/[id] — satu artikel (publik).
+// ?scope=edit — mode editor: MENJAGA KEPEMILIKAN (penulis lain → 403).
 // Mendukung slug SEO maupun ID numerik lawas.
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const raw = String(id).trim();
+  const wantsEditScope = req.nextUrl.searchParams.get("scope") === "edit";
+
+  if (wantsEditScope) {
+    const session = await getEditorialSession();
+    if (!session) {
+      return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
+    }
+    const result = await fetchArticleForSession(session, raw);
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: result.status });
+    }
+    return NextResponse.json(result.article);
+  }
+
   // Jalur cepat: ID numerik via service_role.
-  if (/^\d+$/.test(String(id).trim())) {
-    const data = await getArticle(String(Number(id)));
+  if (/^\d+$/.test(raw)) {
+    const data = await getArticle(String(Number(raw)));
     if (data) return NextResponse.json(data);
   }
   // Fallback: cocokkan slug turunan (tanpa perlu kolom slug di DB).
@@ -70,35 +105,57 @@ export async function GET(
   return NextResponse.json({ error: "Tidak ditemukan" }, { status: 404 });
 }
 
-// PUT /api/articles/[id] — update artikel (admin)
+// PUT /api/articles/[id] — update artikel.
+// Administrators: bebas. Penulis biasa: HANYA artikel miliknya sendiri
+// (403 "Akses Ditolak: ..." bila ID milik penulis lain).
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!isAdmin(req)) {
-    return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
+  const session = await getEditorialSession();
+  if (!session) {
+    return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
   }
-  const c = ensureClient();
+  const c = ensureSupabaseServiceClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
 
   const { id } = await params;
-  const body = await req.json().catch(() => null);
-  if (!body) return NextResponse.json({ error: "Body kosong" }, { status: 400 });
 
-  // Baris lama dibaca dulu agar author_slug yang sudah mapan (mis. nama
-  // penulis) lestari saat redaksi menyimpan tanpa nilai eksplisit.
-  const { data: existing } = await c.client
-    .from("articles")
-    .select("author_slug")
-    .eq("id", id)
-    .single();
+  // Penjagaan kepemilikan ditebak SEBELUM menulis apa pun.
+  const owned = await fetchArticleForSession(session, id);
+  if (!owned.ok) {
+    return NextResponse.json({ error: owned.error }, { status: owned.status });
+  }
+  const existing = owned.article;
 
-  // FIX transisi draf→publikasi: status ditulis eksplisit apa adanya
+  const body: Record<string, unknown> = await req.json().catch(() => ({}));
+  if (!body || typeof body !== "object") {
+    return NextResponse.json({ error: "Body kosong" }, { status: 400 });
+  }
+
+  // FIX transisi draf->publikasi: status ditulis eksplisit apa adanya
   // ('draft' tetap draft, 'published' terbit) — TANPA pengacakan author_slug
   // staging. Inilah akar bug lama: update ke published menimpa author_slug
   // dengan prefix staging- sehingga baris tak pernah lolos filter publik.
   const status = body.status === "draft" ? "draft" : "published";
-  const authorSlug = body.authorSlug ?? body.author_slug ?? existing?.author_slug ?? "redaksi-generic";
+  const requestedSlug =
+    typeof body.author_slug === "string"
+      ? body.author_slug.trim()
+      : typeof body.authorSlug === "string"
+        ? body.authorSlug.trim()
+        : "";
+  const requestedAuthor = typeof body.author === "string" ? body.author.trim() : "";
+  const fallbackAuthor =
+    session.fullName || String(existing.author || "").trim() || "Redaksi GentaNusa";
+
+  // Penulis biasa terkunci ke identitas akunnya; administrator tetap bebas
+  // menetapkan nama penulis tampilan.
+  const author = session.isAdmin
+    ? requestedAuthor || fallbackAuthor
+    : fallbackAuthor;
+  const authorSlug = session.isAdmin
+    ? requestedSlug || String(existing.author_slug ?? "") || slugify(author)
+    : session.authorSlug || String(existing.author_slug ?? "") || slugify(author);
 
   const fullUpdate: Record<string, unknown> = {
     title: body.title,
@@ -107,17 +164,24 @@ export async function PUT(
     content: body.content,
     image: body.image ?? body.cover_image ?? null,
     tags: body.tags ?? [],
-    author: body.author,
+    author,
     author_slug: authorSlug,
-    author_role: body.authorRole ?? body.author_role ?? null,
+    author_role:
+      (typeof body.author_role === "string" && body.author_role) ||
+      (typeof body.authorRole === "string" && body.authorRole) ||
+      existing.author_role ||
+      null,
     date: body.date,
     image_caption: body.image_caption ?? "",
     image_credit: body.image_credit ?? "",
     lead: body.lead ?? body.excerpt,
     status,
+    // `user_id` SENGAJA tidak ditulis di sini: kepemilikan artikel bersifat
+    // permanen sejak baris pertama dibuat (tidak bisa dialihkan-ecak oleh
+    // admin saat menyunting, termasuk lewat payload klien).
   };
 
-  let { data, error } = await updateTolerant(c.client, id, fullUpdate);
+  const { data, error } = await updateTolerant(c.client, id, fullUpdate);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
@@ -129,15 +193,20 @@ export async function PUT(
   return NextResponse.json(data);
 }
 
-// DELETE /api/articles/[id] — hapus artikel (admin)
+// DELETE /api/articles/[id] — hapus artikel.
+// HAK EKSKLUSIF ADMINISTRATOR: selain itu 403 Forbidden, tidak ada pengecualian.
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!isAdmin(req)) {
-    return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
+  const session = await getEditorialSession();
+  if (!session) {
+    return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
   }
-  const c = ensureClient();
+  if (!session.isAdmin) {
+    return NextResponse.json({ error: ACCESS_DENIED_DELETE }, { status: 403 });
+  }
+  const c = ensureSupabaseServiceClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
 
   const { id } = await params;

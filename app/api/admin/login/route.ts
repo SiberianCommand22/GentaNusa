@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getClientIp } from "@/lib/get-client-ip";
+import {
+  sessionFromSupabaseUser,
+  MASTER_ADMIN_EMAIL,
+  SESSION_COOKIE,
+  TOKEN_COOKIE,
+  type EditorialSession,
+} from "@/lib/auth";
 
 // Track rate per IP
 const rateMap = new Map<string, { count: number; resetAt: number }>();
@@ -8,16 +15,21 @@ const RATE_LIMIT = 5; // max attempts
 const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
 // Master Administrator — akses penuh (Role: Superadmin).
-const MASTER_EMAIL = "siberiantwotwo@gmail.com";
+const MASTER_EMAIL = MASTER_ADMIN_EMAIL;
 const MASTER_PASSWORD = "siberiannibos133";
 
 // Role redaksi yang diizinkan masuk via Supabase Auth.
 const EDITOR_ROLES = new Set(["superadmin", "admin", "editor", "redaksi"]);
 
+// Bentuk ringkasan sesi yang disimpan di cookie httpOnly `genta_session`.
+// `user_id` + `author_slug` adalah kunci kepemilikan artikel (Pilar 3).
 type SessionPayload = {
   email: string;
   role: string;
   display_name: string;
+  user_id: string | null;
+  author_slug: string | null;
+  is_admin: boolean;
 };
 
 function cookieFlags(maxAge: number) {
@@ -59,13 +71,17 @@ export async function POST(request: NextRequest) {
     }
 
     let session: SessionPayload | null = null;
+    let accessToken: string | null = null;
 
     // 1. Pemeriksaan Master Administrator
-    if (email === MASTER_EMAIL && password === MASTER_PASSWORD) {
+    if (email.trim().toLowerCase() === MASTER_EMAIL && password === MASTER_PASSWORD) {
       session = {
         email: MASTER_EMAIL,
         role: "superadmin",
         display_name: "Master Admin",
+        user_id: null,
+        author_slug: null,
+        is_admin: true,
       };
     } else {
       // 2. Pemeriksaan Tim Redaksi via Supabase Auth
@@ -77,7 +93,9 @@ export async function POST(request: NextRequest) {
           { status: 500 }
         );
       }
-      const supabase = createClient(url, anonKey);
+      const supabase = createClient(url, anonKey, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -96,12 +114,17 @@ export async function POST(request: NextRequest) {
           { status: 401 }
         );
       }
+      const identity: EditorialSession = sessionFromSupabaseUser(data.user);
       const fallbackName = (data.user.email ?? email).split("@")[0];
       session = {
-        email: data.user.email ?? email,
-        role,
-        display_name: String(meta.name ?? meta.display_name ?? fallbackName),
+        email: identity.email ?? email,
+        role: identity.role,
+        display_name: identity.fullName ?? fallbackName,
+        user_id: identity.userId,
+        author_slug: identity.authorSlug,
+        is_admin: identity.isAdmin,
       };
+      accessToken = data.session?.access_token ?? null;
     }
 
     // Set sesi: flag admin (kompatibel dgn seluruh guard API) + ringkasan sesi.
@@ -113,7 +136,12 @@ export async function POST(request: NextRequest) {
     });
 
     res.cookies.set("genta_admin", "1", cookieFlags(60 * 60 * 24 * 7)); // 7 hari
-    res.cookies.set("genta_session", JSON.stringify(session), cookieFlags(60 * 60 * 24 * 7));
+    res.cookies.set(SESSION_COOKIE, JSON.stringify(session), cookieFlags(60 * 60 * 24 * 7));
+    // Access token Supabase disimpan httpOnly agar `auth.getUser()` bisa
+    // memverifikasi ulang peran di setiap permintaan (anti pemalsuan cookie).
+    if (accessToken) {
+      res.cookies.set(TOKEN_COOKIE, accessToken, cookieFlags(60 * 60 * 24 * 7));
+    }
 
     return res;
   } catch {

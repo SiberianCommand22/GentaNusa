@@ -136,6 +136,156 @@
   background: #1D4ED8;
 }
 
+/* ===== Kanal "Peduli" — Coming Soon ===== */
+.comingSoon {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 6px solid #0B192C;
+  border-radius: 12px;
+  padding: 40px 32px 44px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.soonBadge {
+  display: inline-block;
+  background: #0b192c;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  padding: 6px 14px;
+  border-radius: 9999px;
+}
+
+.soonTitle {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #0f172a;
+  margin: 4px 0 0;
+  max-width: 24ch;
+}
+
+.soonText {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text-muted);
+  max-width: 62ch;
+  margin: 0;
+}
+
+.soonCard {
+  width: 100%;
+  max-width: 640px;
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 20px;
+  align-items: center;
+  text-align: left;
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px dashed #cbd5e1;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%);
+}
+
+@media (max-width: 640px) {
+  .soonCard {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+
+.soonCardArt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: #0b192c;
+  color: #ffffff;
+}
+
+.soonCardArt svg {
+  width: 84px;
+  height: 84px;
+}
+
+.soonCardBody {
+  min-width: 0;
+}
+
+.soonCardTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+
+.soonCardText {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-muted);
+  margin: 0 0 10px;
+}
+
+.soonList {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-faint);
+}
+
+.soonStatus {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #b45309;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 9999px;
+  padding: 5px 14px;
+}
+
+.soonActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.soonActions .emptyButton {
+  margin-top: 0;
+}
+
+.soonGhostButton {
+  display: inline-block;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: 1px solid var(--genta-slate-200);
+  background: #fff;
+  color: #0b192c;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.soonGhostButton:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

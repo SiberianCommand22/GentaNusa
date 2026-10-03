@@ -21,8 +21,13 @@ create table if not exists articles (
   author_slug text,
   author_role text,
   date date not null,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  user_id uuid
 );
+
+-- Isolasi data penulis: user_id = UUID akun Supabase Auth pemilik artikel.
+CREATE INDEX IF NOT EXISTS articles_user_id_idx ON articles (user_id);
+CREATE INDEX IF NOT EXISTS articles_author_slug_idx ON articles (author_slug);
 
 create table if not exists sources (
   id text primary key,

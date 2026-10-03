@@ -38,12 +38,19 @@ const NAV = [
 
 const TITLES: Array<[string, string]> = [
   ["/admin/posts/new", "Tulis Berita"],
+  ["/admin/posts/edit", "Edit Berita"],
   ["/admin/posts", "Kelola Berita"],
-  ["/admin/login", "Login CMS"],
+  ["/admin/login/gentanusa", "Login Redaksi"],
+  ["/admin/login", "Login Redaksi"],
   ["/admin", "Dashboard"],
 ];
 
-type Profile = { display_name?: string; role?: string };
+// Rute login privat. `/admin/login` sengaja disegel (notFound) — layout
+// tetap memperlakukannya sebagai "login" supaya guard tidak mengarahkan
+// pengunjung ke sana lewat pengalihan.
+const LOGIN_PATH = "/admin/login/gentanusa";
+
+type Profile = { display_name?: string | null; role?: string | null; is_admin?: boolean };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -51,13 +58,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [authed, setAuthed] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
 
-  const isLogin = pathname === "/admin/login";
+  const isLogin = pathname === LOGIN_PATH || pathname === "/admin/login";
 
   useEffect(() => {
     if (isLogin) return;
     fetch("/api/admin/check").then(async (r) => {
       if (!r.ok) {
-        router.replace("/admin/login");
+        router.replace(LOGIN_PATH);
         return;
       }
       const j = (await r.json().catch(() => ({}))) as Profile;
@@ -68,7 +75,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   async function logout() {
     await fetch("/api/admin/logout");
-    router.replace("/admin/login");
+    router.replace(LOGIN_PATH);
   }
 
   if (isLogin) {
@@ -76,11 +83,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   if (!authed) {
-    return <div className={styles.guard}>Memeriksa sesi…</div>;
+    return <div className={styles.guard}>Memeriksa sesi...</div>;
   }
 
   const title = TITLES.find(([prefix]) => pathname?.startsWith(prefix))?.[1] ?? "Dashboard";
-  const greeting = profile?.display_name ? `Selamat datang, ${profile.display_name}` : "Selamat datang, Administrator";
+  const who = profile?.display_name ? profile.display_name : "Administrator";
+  const greeting = profile?.is_admin
+    ? `Selamat datang, ${who}`
+    : `Selamat datang, ${who} (Penulis)`;
 
   return (
     <div className={styles.shell}>

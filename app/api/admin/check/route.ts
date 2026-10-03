@@ -1,29 +1,26 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { getEditorialSession } from "@/lib/auth";
 
-// GET /api/admin/check — apakah sudah login admin? (cookie valid? hanya admin)
+/**
+ * GET /api/admin/check — apakah sesi redaksi aktif, dan apa perannya?
+ *
+ * Membaca ulang peran dari server (cookie + verifikasi Supabase Auth bila
+ * access token tersedia). Client CMS memakainya untuk decides:
+ *  - merender tombol "Hapus" HANYA ketika is_admin === true,
+ *  - menampilkan banner "mode penulis" ketika is_admin === false.
+ */
 export async function GET() {
-  const store = await cookies();
-  if (store.get("genta_admin")?.value !== "1") {
+  const session = await getEditorialSession();
+  if (!session) {
     return NextResponse.json({ authed: false }, { status: 401 });
   }
-  try {
-    const raw = store.get("genta_session")?.value;
-    if (raw) {
-      const s = JSON.parse(raw) as {
-        email?: unknown;
-        role?: unknown;
-        display_name?: unknown;
-      };
-      return NextResponse.json({
-        authed: true,
-        email: typeof s.email === "string" ? s.email : null,
-        role: typeof s.role === "string" ? s.role : null,
-        display_name: typeof s.display_name === "string" ? s.display_name : null,
-      });
-    }
-  } catch {
-    // cookie sesi rusak — sesi flag masih valid, balas status dasar saja
-  }
-  return NextResponse.json({ authed: true });
+  return NextResponse.json({
+    authed: true,
+    is_admin: session.isAdmin,
+    user_id: session.userId,
+    email: session.email,
+    role: session.role,
+    display_name: session.fullName,
+    author_slug: session.authorSlug,
+  });
 }

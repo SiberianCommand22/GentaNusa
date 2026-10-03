@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { ADMIN_FLAG_COOKIE, SESSION_COOKIE, TOKEN_COOKIE } from "@/lib/auth";
 
 export async function GET() {
   const res = NextResponse.json({ ok: true });
@@ -9,7 +10,8 @@ export async function GET() {
     maxAge: 0,
     path: "/",
   };
-  res.cookies.set("genta_admin", "", clear);
-  res.cookies.set("genta_session", "", clear);
+  res.cookies.set(ADMIN_FLAG_COOKIE, "", clear);
+  res.cookies.set(SESSION_COOKIE, "", clear);
+  res.cookies.set(TOKEN_COOKIE, "", clear);
   return res;
 }

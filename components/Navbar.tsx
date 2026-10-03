@@ -19,6 +19,7 @@ const categoryNav = [
   { slug: "politik", label: "Politik" },
   { slug: "ekonomi", label: "Ekonomi" },
   { slug: "dunia", label: "Dunia" },
+  { slug: "peduli", label: "Peduli" },
 ];
 
 export function Navbar() {
@@ -60,7 +61,8 @@ export function Navbar() {
           </div>
 
           {/* Spacer kanan agar logo tetap tepat di tengah.
-             Akses admin redaksi privat via /admin/login/genta (tanpa tombol publik). */}
+              Akses admin redaksi privat via /admin/login/gentanusa
+              (tanpa tombol atau tautan publik). */}
           <div className={styles.headerSideRight} aria-hidden="true" />
         </div>
 
