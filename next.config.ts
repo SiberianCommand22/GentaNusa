@@ -24,10 +24,36 @@ const nextConfig: NextConfig = {
         destination: "/:slug",
         permanent: true, // 301 Permanent Redirect untuk SEO
       },
+      // Redirect semua /kategori/:slug ke root level /:slug
+      {
+        source: "/kategori/nasional",
+        destination: "/nasional",
+        permanent: true,
+      },
+      {
+        source: "/kategori/pertahanan",
+        destination: "/pertahanan",
+        permanent: true,
+      },
+      {
+        source: "/kategori/politik",
+        destination: "/politik",
+        permanent: true,
+      },
       {
         source: "/kategori/ekonomi",
         destination: "/ekonomi",
-        permanent: true, // 301 Permanent Redirect: Migrasi rute Ekonomi
+        permanent: true,
+      },
+      {
+        source: "/kategori/dunia",
+        destination: "/dunia",
+        permanent: true,
+      },
+      {
+        source: "/kategori/peduli",
+        destination: "/peduli",
+        permanent: true,
       },
     ];
   },

@@ -14,7 +14,7 @@ import styles from "./page.module.css";
 import { getArticleReadCount } from "@/lib/analytics-server";
 import { ArticleContent } from "@/components/article-content";
 import { CardImage } from "@/components/card-image";
-import { AdBanner } from "@/components/AdBanner";
+import { AdSlot } from "@/components/AdSlot";
 import { ShareButtons } from "@/components/share-buttons";
 
 const RESERVED_SLUGS = [
@@ -280,7 +280,7 @@ export default async function ArticlePage({ params }: Params) {
             <ArticleContent content={body.length > 0 ? body : []} />
 
             {/* Rectangle Ad — di tengah naskah (setelah paragraf ke-3) */}
-            <AdBanner slotId="1234567892" format="rectangle" />
+            <AdSlot slotId="1234567892" variant="in-article" />
           </div>
 
           <div className={styles.tags}>
@@ -321,7 +321,7 @@ export default async function ArticlePage({ params }: Params) {
 
             {/* Sticky Half-page Ad — kolom samping kanan (desktop only) */}
             <aside className={styles.relatedSidebar} aria-hidden="true">
-              <AdBanner slotId="1234567893" format="sticky-halfpage" />
+              <AdSlot slotId="1234567893" variant="sticky-sidebar" />
             </aside>
           </div>
         </section>

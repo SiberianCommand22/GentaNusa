@@ -1,0 +1,167 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px;
+  margin: 24px auto;
+  box-sizing: border-box;
+  overflow: hidden;
+  /* Zero CLS: reservasi ruang tetap */
+  contain: layout style;
+}
+
+@media (min-width: 640px) {
+  .wrapper {
+    padding: 16px;
+    margin: 32px auto;
+  }
+}
+
+.adLabel {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  white-space: nowrap;
+}
+
+.labelWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  margin-bottom: 4px;
+  gap: 12px;
+}
+
+.labelError {
+  opacity: 0.6;
+}
+
+.adBlocked {
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.adContainer {
+  width: 100%;
+  display: block;
+  position: relative;
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 8px;
+  overflow: hidden;
+  /* Zero CLS: aspect ratio & min-height */
+  contain: layout style;
+}
+
+/* Top Leaderboard: 970x90 desktop, responsive mobile */
+.ad-top-leaderboard .adContainer {
+  aspect-ratio: 970 / 90;
+  max-width: 970px;
+  min-height: 90px;
+}
+
+@media (max-width: 639px) {
+  .ad-top-leaderboard .adContainer {
+    aspect-ratio: 320 / 50;
+    min-height: 50px;
+  }
+}
+
+/* In-feed: 728x90 desktop, responsive mobile */
+.ad-in-feed .adContainer {
+  aspect-ratio: 728 / 90;
+  max-width: 728px;
+  min-height: 90px;
+}
+
+@media (max-width: 639px) {
+  .ad-in-feed .adContainer {
+    aspect-ratio: 320 / 100;
+    min-height: 100px;
+  }
+}
+
+/* In-article: 300x250 fixed */
+.ad-in-article .adContainer {
+  width: 300px;
+  height: 250px;
+  flex-shrink: 0;
+}
+
+/* Sticky Sidebar: 300x600 */
+.ad-sticky-sidebar {
+  position: sticky;
+  top: 96px; /* offset for header */
+  align-self: flex-start;
+  max-width: 300px;
+}
+
+.ad-sticky-sidebar .adContainer {
+  width: 300px;
+  height: 600px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1023px) {
+  .ad-sticky-sidebar {
+    display: none; /* hide on tablet/mobile */
+  }
+}
+
+/* Placeholder with shimmer animation */
+.placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.placeholderShimmer {
+  width: 100%;
+  height: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 639px) {
+  .wrapper {
+    border-radius: 8px;
+    padding: 8px;
+    margin: 16px auto;
+  }
+
+  .ad-in-article .adContainer {
+    width: 100%;
+    max-width: 300px;
+    height: 250px;
+  }
+}

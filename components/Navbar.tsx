@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BrandLogo } from "@/components/BrandLogo";
 import styles from "./Navbar.module.css";
 
 const corporateNav = [
-  { href: "/tentang-kami", label: "Redaksi & Tentang Kami", icon: "🏛️" },
-  { href: "/pedoman-media-siber", label: "Pedoman Media Siber", icon: "📋" },
-  { href: "/kebijakan-privasi", label: "Kebijakan Privasi", icon: "🔒" },
-  { href: "/kontak", label: "Kontak & Kerja Sama", icon: "📧" },
+  { href: "/tentang-kami", label: "Redaksi & Tentang Kami" },
+  { href: "/pedoman-media-siber", label: "Pedoman Media Siber" },
+  { href: "/kebijakan-privasi", label: "Kebijakan Privasi" },
+  { href: "/kontak", label: "Kontak & Kerja Sama" },
 ];
 
 const categoryNav = [
@@ -22,34 +22,9 @@ const categoryNav = [
   { slug: "peduli", label: "PEDULI" },
 ];
 
-const DAYS_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-const MONTHS_ID = [
-  "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
-  "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
-];
-
-function getCurrentWIB(): string {
-  const now = new Date();
-  // WIB = UTC+7
-  const wib = new Date(now.getTime() + 7 * 60 * 60 * 1000);
-  const day = DAYS_ID[wib.getUTCDay()];
-  const date = wib.getUTCDate();
-  const month = MONTHS_ID[wib.getUTCMonth()];
-  const year = wib.getUTCFullYear();
-  const hours = String(wib.getUTCHours()).padStart(2, "0");
-  const minutes = String(wib.getUTCMinutes()).padStart(2, "0");
-  return `${day}, ${date} ${month} ${year} • ${hours}:${minutes} WIB`;
-}
-
 export function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [currentTime, setCurrentTime] = useState(getCurrentWIB());
   const pathname = usePathname();
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(getCurrentWIB()), 60000);
-    return () => clearInterval(timer);
-  }, []);
 
   const closeDrawer = () => setDrawerOpen(false);
 
@@ -86,20 +61,14 @@ export function Navbar() {
           </div>
 
           <div className={styles.headerSideRight} aria-hidden="true">
-            <div className={styles.timeWidget}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={styles.timeIcon} aria-hidden="true">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 6v6l4 2" />
-              </svg>
-              <span>{currentTime}</span>
-            </div>
+            <div className={styles.spacer} />
           </div>
         </div>
 
         <nav className={styles.categoryBar} aria-label="Kategori berita">
           <div className={styles.categoryBarInner}>
             {categoryNav.map((c) => {
-              const href = c.slug === "ekonomi" ? `/${c.slug}` : `/kategori/${c.slug}`;
+              const href = `/${c.slug}`;
               const isActive = pathname === href;
               return (
                 <Link
@@ -117,7 +86,7 @@ export function Navbar() {
       </header>
 
       {drawerOpen && (
-        <div className={styles.drawerOverlay} onClick={closeDrawer}>
+        <div className={styles.drawerOverlay} onClick={() => setDrawerOpen(false)}>
           <div className={styles.drawer} onClick={(e) => e.stopPropagation()}>
             <div className={styles.drawerHeader}>
               <span className={styles.drawerTitle}>Navigasi</span>
@@ -142,15 +111,15 @@ export function Navbar() {
                   className={styles.drawerLink}
                   onClick={closeDrawer}
                 >
-                  <span className={styles.drawerLinkIcon} aria-hidden="true">{item.icon}</span>
                   <span>{item.label}</span>
                 </Link>
               ))}
             </nav>
 
             <div className={styles.drawerFooter}>
-              <p className={styles.drawerVersion}>GentaNusa v2.0</p>
-              <p className={styles.drawerTagline}>Cepat • Akurat • Terpercaya</p>
+              <div className="pt-6 border-t border-white/10 text-xs text-white/50">
+                © 2026 GentaNusa. Portal Berita Nasional.
+              </div>
             </div>
           </div>
         </div>
