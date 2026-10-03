@@ -1,5 +1,5 @@
-/* Two-tier masthead: navy editorial bar (72px) + category bar (44px).
-   --nav-offset dipakai untuk scroll-padding agar anchor tidak tertutup header. */
+/* Gemini AI style header: navy editorial bar + category bar
+   Minimalist, balanced, dark theme with #0B1727 */
 
 .header {
   position: sticky;
@@ -38,8 +38,7 @@
   min-width: 0;
 }
 
-/* Sisi kiri/kanan seimbang agar logo tepat di tengah.
-   Akses admin privat via /admin/login/genta — tanpa tombol publik. */
+/* Sisi kiri/kanan seimbang agar logo tepat di tengah */
 .headerSideLeft {
   flex: 1 0 0;
   display: flex;
@@ -50,102 +49,75 @@
 
 .headerSideRight {
   flex: 1 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   min-width: 0;
 }
 
-.hamburger {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  font-size: 14px;
-  font-weight: 700;
-  color: #F1F5F9;
-  transition: color 0.15s;
-}
-
-.hamburger:hover {
-  color: #93C5FD;
-}
-
-.hamburgerIcon {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.hamburgerIcon span {
-  display: block;
-  width: 20px;
-  height: 2px;
-  background: #F1F5F9;
-  border-radius: 1px;
-}
-
-.hamburgerText {
-  font-size: 14px;
-  font-weight: 600;
-  color: #F1F5F9;
-}
-
-/* Tombol terpadu Menu + Cari — touch-target h-9 seimbang, putih kontras di navy */
-.menuBtn {
+/* Tombol Hamburger Minimalis - Gemini AI Style */
+.hamburgerBtn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  height: 36px;
-  padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
   background: transparent;
   color: #fff;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  transition: all 0.2s ease;
+  padding: 0;
 }
 
-.menuBtn:hover {
+.hamburgerBtn:hover {
   border-color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
 }
 
-.menuBtn svg {
-  width: 16px;
+.hamburgerBtn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+.hamburgerIcon {
+  width: 20px;
   height: 16px;
-  color: #fff;
-  transition: color 0.15s;
+  color: currentColor;
 }
 
-.menuBtn:hover svg {
-  color: #fff;
-}
-
-.menuBtnLabel {
+/* Widget Jam/Tanggal Dinamis */
+.timeWidget {
   display: none;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: "JetBrains Mono", "Fira Code", "Monospace";
+  font-size: 11px;
+  letter-spacing: 0.05em;
   white-space: nowrap;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.03);
 }
 
 @media (min-width: 640px) {
-  .menuBtnLabel {
-    display: inline;
+  .timeWidget {
+    display: flex;
   }
 }
 
-@media (max-width: 480px) {
-  .hamburgerText {
-    display: none;
-  }
+.timeIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.8;
 }
 
-/* Tombol login publik dihapus — akses admin privat via /admin/login/genta. */
-
-/* Tier 2 — kategori editorial di atas navy: teks putih kontras, rata tengah presisi */
+/* Tier 2 — kategori editorial */
 .categoryBar {
   background: #0B1727;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -155,7 +127,7 @@
   max-width: 80rem;
   margin: 0 auto;
   padding: 0 16px;
-  height: 40px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -167,13 +139,13 @@
 
 @media (min-width: 640px) {
   .categoryBarInner {
-    gap: 48px;
+    gap: 40px;
   }
 }
 
 @media (min-width: 768px) {
   .categoryBarInner {
-    gap: 56px;
+    gap: 48px;
   }
 }
 
@@ -194,9 +166,9 @@
   align-items: center;
   height: 40px;
   padding: 6px 0;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.8);
   white-space: nowrap;
@@ -219,7 +191,7 @@
   border-radius: 9999px;
   background: #fff;
   transform: scaleX(0);
-  transition: transform 0.2s;
+  transition: transform 0.2s ease;
 }
 
 .categoryLink:hover {
@@ -239,13 +211,20 @@
   transform: scaleX(1);
 }
 
+/* ===== DRAWER / SIDEBAR - GEMINI AI STYLE ===== */
 .drawerOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 100;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .drawer {
@@ -253,13 +232,14 @@
   top: 0;
   left: 0;
   bottom: 0;
-  width: 320px;
+  width: 300px;
   max-width: 85vw;
-  background: #fff;
+  background: #0B1727;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
   z-index: 101;
   animation: slideIn 0.3s ease-out;
 }
@@ -277,118 +257,110 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid #E2E8F0;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .drawerTitle {
   font-family: var(--font-serif);
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
-  color: #0F172A;
+  color: #fff;
+  letter-spacing: 0.02em;
 }
 
 .drawerClose {
-  background: none;
-  border: none;
-  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
-  color: #64748B;
-  padding: 4px;
+  transition: all 0.2s ease;
+  padding: 0;
 }
 
-.drawerSearchForm {
-  position: relative;
-  margin: 16px 20px 24px;
+.drawerClose:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
 }
 
-.drawerSearchIcon {
-  width: 16px;
-  height: 16px;
-  color: #94A3B8;
-  position: absolute;
-  left: 14px;
-  top: 14px;
-  pointer-events: none;
-}
-
-.searchInput {
-  width: 100%;
-  padding: 10px 16px 10px 40px;
-  background: #F1F5F9;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #0F172A;
-  outline: none;
-  transition: all 0.15s;
-}
-
-.searchInput::placeholder {
-  color: #94A3B8;
-}
-
-.searchInput:focus {
-  background: #fff;
-  border-color: #0B192C;
-  box-shadow: 0 0 0 1px #0B192C;
+.drawerClose svg {
+  width: 18px;
+  height: 18px;
 }
 
 .drawerNav {
-  padding: 16px 20px;
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
 }
 
 .drawerSectionTitle {
   display: block;
-  padding: 0;
-  margin: 0 0 12px;
-  font-size: 11px;
+  margin: 0 0 16px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: #94A3B8;
-}
-
-.drawerNav .drawerSectionTitle:not(:first-child) {
-  margin-top: 24px;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .drawerLink {
-  display: block;
-  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 4px;
   font-size: 14px;
-  font-weight: 600;
-  color: #334155;
-  border-radius: 8px;
-  transition: color 0.15s, background 0.15s;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  transition: all 0.15s ease;
+  text-decoration: none;
 }
 
 .drawerLink:hover {
-  color: #2563EB;
-  background: rgba(239, 246, 255, 0.6);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.drawerLink:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+.drawerLinkIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+  opacity: 0.9;
 }
 
 .drawerFooter {
-  padding: 16px 20px;
-  border-top: 1px solid #E2E8F0;
-  margin-top: auto;
+  padding: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
 }
 
-.socialLinks {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+.drawerVersion {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 4px;
 }
 
-.socialLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
+.drawerTagline {
+  font-size: 12px;
   font-weight: 500;
-  color: #475569;
-}
-
-.socialLink:hover {
-  color: #1E3A8A;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.02em;
 }

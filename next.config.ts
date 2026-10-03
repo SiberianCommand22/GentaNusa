@@ -24,6 +24,11 @@ const nextConfig: NextConfig = {
         destination: "/:slug",
         permanent: true, // 301 Permanent Redirect untuk SEO
       },
+      {
+        source: "/kategori/ekonomi",
+        destination: "/ekonomi",
+        permanent: true, // 301 Permanent Redirect: Migrasi rute Ekonomi
+      },
     ];
   },
   async headers() {

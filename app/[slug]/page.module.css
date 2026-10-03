@@ -312,6 +312,30 @@ a.author:hover {
   border-top: 1px solid #E2E8F0;
 }
 
+.relatedWrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .relatedWrapper {
+    grid-template-columns: 1fr 300px;
+  }
+}
+
+.relatedMain {
+  min-width: 0;
+}
+
+.relatedSidebar {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+  max-width: 300px;
+}
+
 .relatedTitle {
   font-size: 22px;
   font-weight: 800;

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getArticles, formatDate, sortByDate, articleUrl } from "@/lib/data";
 import { Footer } from "@/components/site";
 import { CardImage } from "@/components/card-image";
+import { AdBanner } from "@/components/AdBanner";
 import styles from "./page.module.css";
 
 const CATEGORY_BADGE_BG = "#2563EB";
@@ -97,13 +98,20 @@ export default async function Home() {
             )}
           </div>
         </div>
-      </section>
+</section>
 
-      {recentArticles.length > 0 && (
-        <section className={styles.section}>
-          <div className={styles.container}>
-            <h2 className={styles.sectionTitle}>Berita Terbaru</h2>
-            <div className={styles.grid}>
+        {/* Billboard Ad — di antara Hero/Kategori dan Berita Terbaru */}
+        <AdBanner slotId="1234567890" format="billboard" />
+
+{recentArticles.length > 0 && (
+          <section className={styles.section}>
+            <div className={styles.container}>
+              <h2 className={styles.sectionTitle}>Berita Terbaru</h2>
+
+              {/* In-feed Ad — sebelum grid berita terbaru */}
+              <AdBanner slotId="1234567891" format="in-feed" />
+
+              <div className={styles.grid}>
               {recentArticles.map((a) => (
                 <Link key={a.id} href={articleUrl(a)} className={styles.card}>
                   <CardImage src={a.image} alt={a.title} className={styles.cardImage} />

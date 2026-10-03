@@ -1,30 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BrandLogo } from "@/components/BrandLogo";
 import styles from "./Navbar.module.css";
 
 const corporateNav = [
-  { href: "/tentang-kami", label: "Redaksi & Tentang Kami" },
-  { href: "/pedoman-media-siber", label: "Pedoman Media Siber" },
-  { href: "/kebijakan-privasi", label: "Kebijakan Privasi" },
-  { href: "/kontak", label: "Kontak & Kerja Sama" },
+  { href: "/tentang-kami", label: "Redaksi & Tentang Kami", icon: "🏛️" },
+  { href: "/pedoman-media-siber", label: "Pedoman Media Siber", icon: "📋" },
+  { href: "/kebijakan-privasi", label: "Kebijakan Privasi", icon: "🔒" },
+  { href: "/kontak", label: "Kontak & Kerja Sama", icon: "📧" },
 ];
 
 const categoryNav = [
-  { slug: "nasional", label: "Nasional" },
-  { slug: "pertahanan", label: "Pertahanan" },
-  { slug: "politik", label: "Politik" },
-  { slug: "ekonomi", label: "Ekonomi" },
-  { slug: "dunia", label: "Dunia" },
-  { slug: "peduli", label: "Peduli" },
+  { slug: "nasional", label: "NASIONAL" },
+  { slug: "pertahanan", label: "PERTAHANAN" },
+  { slug: "politik", label: "POLITIK" },
+  { slug: "ekonomi", label: "EKONOMI" },
+  { slug: "dunia", label: "DUNIA" },
+  { slug: "peduli", label: "PEDULI" },
 ];
+
+const DAYS_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+const MONTHS_ID = [
+  "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+  "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
+];
+
+function getCurrentWIB(): string {
+  const now = new Date();
+  // WIB = UTC+7
+  const wib = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+  const day = DAYS_ID[wib.getUTCDay()];
+  const date = wib.getUTCDate();
+  const month = MONTHS_ID[wib.getUTCMonth()];
+  const year = wib.getUTCFullYear();
+  const hours = String(wib.getUTCHours()).padStart(2, "0");
+  const minutes = String(wib.getUTCMinutes()).padStart(2, "0");
+  return `${day}, ${date} ${month} ${year} • ${hours}:${minutes} WIB`;
+}
 
 export function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(getCurrentWIB());
   const pathname = usePathname();
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(getCurrentWIB()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const closeDrawer = () => setDrawerOpen(false);
 
   return (
     <>
@@ -34,25 +61,23 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
-              className={styles.menuBtn}
-              aria-label="Menu dan Pencarian"
+              className={styles.hamburgerBtn}
+              aria-label="Buka Navigasi"
             >
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2.2"
+                strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden="true"
+                className={styles.hamburgerIcon}
               >
-                <line x1="3" y1="6" x2="14" y2="6" />
-                <line x1="3" y1="12" x2="10" y2="12" />
-                <line x1="3" y1="18" x2="12" y2="18" />
-                <circle cx="16.5" cy="13.5" r="3.5" />
-                <line x1="19" y1="16" x2="22" y2="19" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
               </svg>
-              <span className={styles.menuBtnLabel}>Menu</span>
             </button>
           </div>
 
@@ -60,16 +85,21 @@ export function Navbar() {
             <BrandLogo theme="dark" size="lg" href="/" />
           </div>
 
-          {/* Spacer kanan agar logo tetap tepat di tengah.
-              Akses admin redaksi privat via /admin/login/gentanusa
-              (tanpa tombol atau tautan publik). */}
-          <div className={styles.headerSideRight} aria-hidden="true" />
+          <div className={styles.headerSideRight} aria-hidden="true">
+            <div className={styles.timeWidget}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={styles.timeIcon} aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+              <span>{currentTime}</span>
+            </div>
+          </div>
         </div>
 
         <nav className={styles.categoryBar} aria-label="Kategori berita">
           <div className={styles.categoryBarInner}>
             {categoryNav.map((c) => {
-              const href = `/kategori/${c.slug}`;
+              const href = c.slug === "ekonomi" ? `/${c.slug}` : `/kategori/${c.slug}`;
               const isActive = pathname === href;
               return (
                 <Link
@@ -87,66 +117,40 @@ export function Navbar() {
       </header>
 
       {drawerOpen && (
-        <div className={styles.drawerOverlay} onClick={() => setDrawerOpen(false)}>
+        <div className={styles.drawerOverlay} onClick={closeDrawer}>
           <div className={styles.drawer} onClick={(e) => e.stopPropagation()}>
             <div className={styles.drawerHeader}>
-              <span className={styles.drawerTitle}>Menu</span>
+              <span className={styles.drawerTitle}>Navigasi</span>
               <button
                 className={styles.drawerClose}
-                onClick={() => setDrawerOpen(false)}
-                aria-label="Tutup menu"
+                onClick={closeDrawer}
+                aria-label="Tutup navigasi"
               >
-                ✕
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </button>
             </div>
 
-            <form action="/cari" method="GET" className={styles.drawerSearchForm}>
-              <svg className={styles.drawerSearchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-              <input
-                type="text"
-                name="q"
-                placeholder="Cari berita..."
-                className={styles.searchInput}
-                aria-label="Cari berita"
-                autoFocus
-              />
-            </form>
-
             <nav className={styles.drawerNav}>
-              {/* Kategori hanya di navbar horizontal utama, tidak di drawer. */}
-              <p className={styles.drawerSectionTitle}>INFORMASI</p>
+              <p className={styles.drawerSectionTitle}>REDAKSI</p>
               {corporateNav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={styles.drawerLink}
-                  onClick={() => setDrawerOpen(false)}
+                  onClick={closeDrawer}
                 >
-                  {item.label}
+                  <span className={styles.drawerLinkIcon} aria-hidden="true">{item.icon}</span>
+                  <span>{item.label}</span>
                 </Link>
               ))}
             </nav>
 
             <div className={styles.drawerFooter}>
-              <div className={styles.socialLinks}>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className={styles.socialLink} aria-label="Instagram GentaNusa">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                  </svg>
-                  <span>Instagram</span>
-                </a>
-                <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className={styles.socialLink} aria-label="TikTok GentaNusa">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
-                  </svg>
-                  <span>TikTok</span>
-                </a>
-              </div>
+              <p className={styles.drawerVersion}>GentaNusa v2.0</p>
+              <p className={styles.drawerTagline}>Cepat • Akurat • Terpercaya</p>
             </div>
           </div>
         </div>
