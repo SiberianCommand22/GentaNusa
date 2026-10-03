@@ -175,6 +175,40 @@ a.author:hover {
   max-width: 720px;
 }
 
+/* Foto 2 — Dokumentasi Kedua (Opsional, Adaptif) */
+.secondaryFigure {
+  margin: 32px auto;
+  max-width: 720px;
+}
+
+.secondaryImageWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f5f5f5;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.secondaryCaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding: 8px 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #737373;
+  font-style: italic;
+}
+
+.credit {
+  font-style: italic;
+  color: #94A3B8;
+  font-weight: 600;
+}
+
 /* Rasio 16:9 presisi — zero layout shift untuk LCP cover. */
 .heroImageWrap {
   position: relative;

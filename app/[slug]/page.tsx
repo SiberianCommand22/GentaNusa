@@ -16,6 +16,7 @@ import { ArticleContent } from "@/components/article-content";
 import { CardImage } from "@/components/card-image";
 import { AdSlot } from "@/components/AdSlot";
 import { ShareButtons } from "@/components/share-buttons";
+import { cleanLead, parseArticleContent } from "@/lib/text-formatter";
 
 const RESERVED_SLUGS = [
   "admin",
@@ -187,8 +188,10 @@ export default async function ArticlePage({ params }: Params) {
     ? article.content
     : [String(article.content ?? "")];
   const [firstParagraph, ...body] = paras;
-  const lead = stripHtml(article.lead || firstParagraph || "");
+  const rawLead = article.lead || firstParagraph || "";
+  const lead = cleanLead(rawLead);
   const coverImage = article.cover_image || article.image;
+  const secondaryImage = article.secondary_image;
   const readMinutes = estimateReadMinutes(paras, lead);
 
   return (
@@ -204,7 +207,7 @@ export default async function ArticlePage({ params }: Params) {
           <Link href="/">Beranda</Link>
           <span className={styles.breadcrumbSep}>/</span>
           <Link
-            href={"/kategori/" + slugifyTitle(article.category)}
+            href={"/" + slugifyTitle(article.category)}
             className={styles.breadcrumbCategory}
           >
             {article.category || "Nasional"}
@@ -265,6 +268,58 @@ export default async function ArticlePage({ params }: Params) {
                   {article.image_credit && (
                     <span className={styles.credit}>
                       Foto: {article.image_credit}
+                    </span>
+                  )}
+                </figcaption>
+              )}
+            </figure>
+          )}
+
+          {/* 5. Foto sampul + caption — rasio 16:9 presisi, zero layout shift */}
+          {coverImage && (
+            <figure className={styles.heroFigure}>
+              <div className={styles.heroImageWrap}>
+                <Image
+                  src={coverImage}
+                  alt={article.title}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, 720px"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+              {/* HANYA tampil bila caption/kredit asli ada di database */}
+              {(article.image_caption || article.image_credit) && (
+                <figcaption className={styles.caption}>
+                  <span>{article.image_caption || ""}</span>
+                  {article.image_credit && (
+                    <span className={styles.credit}>
+                      Foto: {article.image_credit}
+                    </span>
+                  )}
+                </figcaption>
+              )}
+            </figure>
+          )}
+
+          {/* Foto 2 — Dokumentasi Kedua (Opsional, Adaptif) */}
+          {secondaryImage && (
+            <figure className={styles.secondaryFigure}>
+              <div className={styles.secondaryImageWrap}>
+                <Image
+                  src={secondaryImage}
+                  alt={article.title + " - Dokumentasi Kedua"}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 720px"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+              {(article.secondary_image_caption || article.secondary_image_credit) && (
+                <figcaption className={styles.secondaryCaption}>
+                  <span>{article.secondary_image_caption || ""}</span>
+                  {article.secondary_image_credit && (
+                    <span className={styles.credit}>
+                      Foto: {article.secondary_image_credit}
                     </span>
                   )}
                 </figcaption>

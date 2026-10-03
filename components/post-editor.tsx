@@ -34,6 +34,9 @@ const emptyForm = {
   author: "",
   image_caption: "",
   image_credit: "",
+  secondary_image: "",
+  secondary_image_caption: "",
+  secondary_image_credit: "",
   date: new Date().toISOString().split("T")[0],
   headline: false,
 };
@@ -48,8 +51,11 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
   const [activeId, setActiveId] = useState<number | null>(editId);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [secondaryImageFile, setSecondaryImageFile] = useState<File | null>(null);
+  const [secondaryImagePreview, setSecondaryImagePreview] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const secondaryFileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const [okMsg, setOkMsg] = useState("");
@@ -200,11 +206,14 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         excerpt: a.excerpt ?? a.lead ?? "",
         content: blocksToHtml(contentBlocks),
         image: a.image ?? a.cover_image ?? "",
+        secondary_image: a.secondary_image ?? "",
         category: a.category ?? "Nasional",
         tags: tags.filter((t) => t !== HEADLINE_TAG).join(", "),
         author: a.author ?? "",
         image_caption: a.image_caption ?? "",
         image_credit: a.image_credit ?? "",
+        secondary_image_caption: a.secondary_image_caption ?? "",
+        secondary_image_credit: a.secondary_image_credit ?? "",
         date: a.date ?? todayWIB(),
         headline: tags.includes(HEADLINE_TAG),
       });
@@ -223,11 +232,20 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
     if (!file) setForm((f) => ({ ...f, image: "" }));
   }
 
+  function pickSecondaryFile(file: File | null) {
+    if (secondaryImagePreview) URL.revokeObjectURL(secondaryImagePreview);
+    setSecondaryImageFile(file);
+    setSecondaryImagePreview(file ? URL.createObjectURL(file) : null);
+    setImgErr("");
+    if (!file) setForm((f) => ({ ...f, secondary_image: "" }));
+  }
+
   useEffect(() => {
     return () => {
       if (imagePreview) URL.revokeObjectURL(imagePreview);
+      if (secondaryImagePreview) URL.revokeObjectURL(secondaryImagePreview);
     };
-  }, [imagePreview]);
+  }, [imagePreview, secondaryImagePreview]);
 
   // Unggah sampul via endpoint dedikasi /api/upload (multipart kecil —
   // tanpa Base64 di JSON). Mengembalikan URL proksi /media/... .
@@ -245,6 +263,26 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !j.url) {
       setImgErr(typeof j.error === "string" && j.error ? j.error : `Gagal mengunggah foto (kode ${r.status})`);
+      return null;
+    }
+    return j.url as string;
+  }
+
+  // Unggah Foto 2 (Dokumentasi Kedua - Opsional)
+  async function uploadSecondaryImage(): Promise<string | null> {
+    if (!secondaryImageFile) return form.secondary_image || null;
+    const fd = new FormData();
+    fd.append("file", secondaryImageFile);
+    let r: Response;
+    try {
+      r = await fetch("/api/upload", { method: "POST", body: fd });
+    } catch {
+      setImgErr("Server tidak terjangkau saat mengunggah foto kedua — periksa koneksi lalu coba lagi.");
+      return null;
+    }
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.url) {
+      setImgErr(typeof j.error === "string" && j.error ? j.error : `Gagal mengunggah foto kedua (kode ${r.status})`);
       return null;
     }
     return j.url as string;
@@ -341,13 +379,20 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         setBusy(false);
         return;
       }
+      const secondaryUploadedPath = await uploadSecondaryImage();
+      if (secondaryImageFile && !secondaryUploadedPath) {
+        setBusy(false);
+        return;
+      }
       const imagePath = uploadedPath || form.image.trim();
+      const secondaryImagePath = secondaryUploadedPath || form.secondary_image.trim();
       const draftPayload = {
         title,
         category: form.category || "Nasional",
         excerpt: form.excerpt.trim(),
         content: JSON.stringify(paras),
         image: imagePath,
+        secondary_image: secondaryImagePath,
         tags: JSON.stringify(tags),
         author: form.author.trim() || "Redaksi GentaNusa",
         author_slug:
@@ -357,6 +402,8 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         date: form.date || todayWIB(),
         image_caption: form.image_caption.trim(),
         image_credit: form.image_credit.trim(),
+        secondary_image_caption: form.secondary_image_caption.trim(),
+        secondary_image_credit: form.secondary_image_credit.trim(),
         lead: form.excerpt.trim(),
         status: "draft",
       };
@@ -406,7 +453,13 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         setBusy(false);
         return;
       }
+      const secondaryUploadedPath = await uploadSecondaryImage();
+      if (secondaryImageFile && !secondaryUploadedPath) {
+        setBusy(false);
+        return;
+      }
       const imagePath = uploadedPath || form.image.trim();
+      const secondaryImagePath = secondaryUploadedPath || form.secondary_image.trim();
       const title = form.title.trim();
       const paras = htmlToBlocks(form.content);
       const plainText = htmlToText(form.content);
@@ -444,6 +497,7 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         excerpt: lead,
         content: JSON.stringify(paras),
         image: imagePath.trim(),
+        secondary_image: secondaryImagePath.trim(),
         tags: JSON.stringify(tags),
         author: form.author.trim(),
         author_slug:
@@ -453,6 +507,8 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         date: today,
         image_caption: form.image_caption.trim(),
         image_credit: form.image_credit.trim(),
+        secondary_image_caption: form.secondary_image_caption.trim(),
+        secondary_image_credit: form.secondary_image_credit.trim(),
         lead,
         status: "published",
       };
@@ -641,6 +697,95 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
                   onChange={(e) => setForm({ ...form, image_credit: e.target.value })}
                   placeholder="Contoh: Antara Foto / Hafidz Mubarak"
                 />
+              </div>
+            </div>
+
+            {/* Foto 2 — Dokumentasi Kedua (Opsional) */}
+            <div className={styles.panel}>
+              <h3 className={styles.panelTitle}>Foto Tambahan / Dokumentasi Kedua (Opsional)</h3>
+              <div id="field-secondary-image">
+              <input
+                ref={secondaryFileRef}
+                className={styles.dropzoneInput}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => {
+                  pickSecondaryFile(e.target.files?.[0] ?? null);
+                  e.target.value = "";
+                }}
+              />
+              {!secondaryImagePreview && !form.secondary_image ? (
+                <div
+                  className={`${styles.dropzone} ${dragActive ? styles.dropzoneActive : ""}`}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Unggah foto dokumentasi kedua"
+                  onClick={() => secondaryFileRef.current?.click()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") secondaryFileRef.current?.click();
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragActive(true);
+                  }}
+                  onDragLeave={() => setDragActive(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragActive(false);
+                    pickSecondaryFile(e.dataTransfer.files?.[0] ?? null);
+                  }}
+                >
+                  <span className={styles.dropzoneIcon}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                      <circle cx="12" cy="13" r="4" />
+                    </svg>
+                  </span>
+                  <p className={styles.dropzoneText}>Seret dan lepas foto dokumentasi kedua di sini, atau klik untuk memilih</p>
+                  <p className={styles.dropzoneHint}>JPG, PNG, WebP maks 5MB — Maksimal 2 foto per artikel</p>
+                </div>
+              ) : (
+                <div>
+                  <Image
+                    src={secondaryImagePreview || form.secondary_image}
+                    alt="Pratinjau foto dokumentasi kedua"
+                    width={640}
+                    height={360}
+                    unoptimized
+                    className={styles.previewImg}
+                  />
+                  <div style={{ marginTop: 12 }}>
+                    <button type="button" className={styles.btnSecondary} onClick={() => secondaryFileRef.current?.click()}>
+                      Ganti Foto
+                    </button>
+                  </div>
+                </div>
+              )}
+              {imgErr && <p className={styles.err}>{imgErr}</p>}
+              </div>
+              <div className={styles.captionGrid}>
+                <div className={styles.field}>
+                  <label className={styles.fieldLabel} htmlFor="secondary_image_caption">Keterangan Foto 2 / Caption</label>
+                  <input
+                    id="secondary_image_caption"
+                    name="secondary_image_caption"
+                    className={styles.input}
+                    value={form.secondary_image_caption}
+                    onChange={(e) => setForm({ ...form, secondary_image_caption: e.target.value })}
+                    placeholder="Contoh: Dokumentasi bantuan logistik di daerah terdampak..."
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.fieldLabel} htmlFor="secondary_image_credit">Kredit Sumber Foto 2 / Fotografer</label>
+                  <input
+                    id="secondary_image_credit"
+                    name="secondary_image_credit"
+                    className={styles.input}
+                    value={form.secondary_image_credit}
+                    onChange={(e) => setForm({ ...form, secondary_image_credit: e.target.value })}
+                    placeholder="Contoh: Humas BPBD Provinsi..."
+                  />
+                </div>
               </div>
             </div>
           </div>

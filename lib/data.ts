@@ -14,6 +14,9 @@ export type Article = {
   cover_image?: string;
   image_caption?: string;
   image_credit?: string;
+  secondary_image?: string;
+  secondary_image_caption?: string;
+  secondary_image_credit?: string;
   lead?: string;
   created_at?: string;
   status?: string;
@@ -90,6 +93,9 @@ type DbArticle = {
   cover_image?: string;
   image_caption?: string;
   image_credit?: string;
+  secondary_image?: string;
+  secondary_image_caption?: string;
+  secondary_image_credit?: string;
   lead?: string;
   created_at?: string;
   status?: string;
@@ -112,6 +118,9 @@ function mapRow(a: DbArticle): Article {
     cover_image: a.cover_image ?? a.image ?? undefined,
     image_caption: a.image_caption ?? undefined,
     image_credit: a.image_credit ?? undefined,
+    secondary_image: a.secondary_image ?? undefined,
+    secondary_image_caption: a.secondary_image_caption ?? undefined,
+    secondary_image_credit: a.secondary_image_credit ?? undefined,
     lead: a.lead ?? a.excerpt ?? undefined,
     created_at: a.created_at ?? a.date ?? undefined,
     status: a.status ?? "published",
