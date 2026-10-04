@@ -1,10 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getArticles, formatDate, sortByDate, articleUrl } from "@/lib/data";
 import { Footer } from "@/components/site";
-import { CardImage } from "@/components/card-image";
 import styles from "./page.module.css";
-
-const CATEGORY_BADGE_BG = "#2563EB";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -56,72 +54,81 @@ export default async function Home() {
     <main className={styles.main}>
       <section className={styles.hero}>
         <div className={styles.container}>
-          <div className={showPopular ? styles.heroGrid : styles.heroGridFull}>
-            <article className={styles.heroMain}>
-              <Link href={articleUrl(headlineArticle)} className={styles.heroCard}>
-                <div className={styles.heroImage}>
-                  <img
-                    src={headlineArticle.image || "/images/placeholder-article.svg"}
+          <div className={showPopular ? styles.splitGrid : styles.splitGridFull}>
+            <article className={styles.headline}>
+              <Link href={articleUrl(headlineArticle)} className={styles.headlineCard}>
+                <div className={styles.headlineThumb}>
+                  <Image
+                    src={
+                      headlineArticle.image || "/images/placeholder-article.svg"
+                    }
                     alt={headlineArticle.title}
                     width={1200}
-                    height={630}
-                    loading="eager"
+                    height={675}
+                    priority
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   />
                 </div>
-                <div className={styles.heroGradient} aria-hidden="true" />
-                <span className={styles.badge}>{headlineArticle.category}</span>
-                <div className={styles.heroText}>
-                  <h1 className={styles.heroTitle}>{headlineArticle.title}</h1>
-                  <p className={styles.heroExcerpt}>{headlineArticle.excerpt}</p>
-                  <div className={styles.meta}>
-                    <span>{headlineArticle.author}</span>
-                    <span aria-hidden="true"> • </span>
-                    <span>{formatDate(headlineArticle.date)}</span>
-                  </div>
+                <h1 className={styles.headlineTitle}>{headlineArticle.title}</h1>
+                <p className={styles.headlineLead}>{headlineArticle.excerpt}</p>
+                <div className={styles.headlineMeta}>
+                  <span>{headlineArticle.category}</span>
+                  <span aria-hidden="true">•</span>
+                  <span>{formatDate(headlineArticle.date)}</span>
                 </div>
               </Link>
             </article>
             {showPopular && (
-              <aside className={styles.heroSide} aria-label="Berita terpopuler">
+              <aside className={styles.sideGrid} aria-label="Berita terpopuler">
                 <h3 className={styles.sideHeading}>Terpopuler</h3>
-                {popularList.slice(0, 4).map((a, i) => (
-                  <Link key={a.id} href={articleUrl(a)} className={styles.sideItem}>
-                    <span className={styles.sideNum}>{String(i + 1).padStart(2, "0")}</span>
-                    <span>
-                      <span className={styles.sideCat}>{a.category}</span>
-                      <p className={styles.sideTitle}>{a.title}</p>
-                    </span>
-                  </Link>
-                ))}
+                <div className={styles.sideCards}>
+                  {popularList.slice(0, 4).map((a) => (
+                    <Link
+                      key={a.id}
+                      href={articleUrl(a)}
+                      className={styles.compactCard}
+                    >
+                      <div className={styles.compactThumb}>
+                        <Image
+                          src={a.image || "/images/placeholder-article.svg"}
+                          alt={a.title}
+                          width={640}
+                          height={360}
+                          loading="lazy"
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      </div>
+                      <h4 className={styles.compactTitle}>{a.title}</h4>
+                      <div className={styles.compactCat}>{a.category}</div>
+                    </Link>
+                  ))}
+                </div>
               </aside>
             )}
           </div>
         </div>
-</section>
+      </section>
 
-{recentArticles.length > 0 && (
-          <section className={styles.section}>
-            <div className={styles.container}>
-              <h2 className={styles.sectionTitle}>Berita Terbaru</h2>
+      {recentArticles.length > 0 && (
+        <section className={styles.section}>
+          <div className={styles.container}>
+            <h2 className={styles.sectionTitle}>Berita Terbaru</h2>
 
-              <div className={styles.grid}>
+            <div className={styles.grid}>
               {recentArticles.map((a) => (
-                <Link key={a.id} href={articleUrl(a)} className={styles.card}>
-                  <CardImage src={a.image} alt={a.title} className={styles.cardImage} />
-                  <div className={styles.cardBody}>
-                    <div
-                      className={styles.cardBadge}
-                      style={{ background: CATEGORY_BADGE_BG }}
-                    >
-                      {a.category}
-                    </div>
-                    <h3 className={styles.cardTitle}>{a.title}</h3>
-                    <div className={styles.cardMeta}>
-                      <span>{a.author}</span>
-                      <span> · </span>
-                      <span>{formatDate(a.date)}</span>
-                    </div>
+                <Link key={a.id} href={articleUrl(a)} className={styles.compactCard}>
+                  <div className={styles.compactThumb}>
+                    <Image
+                      src={a.image || "/images/placeholder-article.svg"}
+                      alt={a.title}
+                      width={640}
+                      height={360}
+                      loading="lazy"
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
                   </div>
+                  <h3 className={styles.compactTitle}>{a.title}</h3>
+                  <div className={styles.compactCat}>{a.category}</div>
                 </Link>
               ))}
             </div>

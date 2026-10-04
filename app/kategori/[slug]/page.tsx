@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/site";
 import { supabaseAnon } from "@/lib/supabase";
-import { formatDate, articleUrl, type Article } from "@/lib/data";
+import { articleUrl, type Article } from "@/lib/data";
 import styles from "./category.module.css";
 
 export const dynamic = "force-dynamic";
@@ -299,30 +299,20 @@ export default async function CategoryPage({ params }: Params) {
             </Link>
           </div>
         ) : (
-          <div className={styles.grid}>
+          <div className={styles.compactGrid}>
             {articles.map((a) => (
-              <a key={a.id} href={articleUrl(a)} className={styles.card}>
-                {a.image && (
-                  <div className={styles.cardImage}>
-                    <Image
-                      src={a.image}
-                      alt={a.title}
-                      width={1200}
-                      height={630}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  </div>
-                )}
-                <div className={styles.cardBody}>
-                  <div className={styles.cardBadge}>{a.category}</div>
-                  <h2 className={styles.cardTitle}>{a.title}</h2>
-                  <p className={styles.cardExcerpt}>{a.excerpt}</p>
-                  <div className={styles.meta}>
-                    <span>{a.author}</span>
-                    <span>•</span>
-                    <span>{formatDate(a.date)}</span>
-                  </div>
+              <a key={a.id} href={articleUrl(a)} className={styles.compactCard}>
+                <div className={styles.compactThumb}>
+                  <Image
+                    src={a.image || "/images/placeholder-article.svg"}
+                    alt={a.title}
+                    width={1200}
+                    height={630}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
                 </div>
+                <h2 className={styles.compactTitle}>{a.title}</h2>
+                <div className={styles.compactCat}>{a.category}</div>
               </a>
             ))}
           </div>
