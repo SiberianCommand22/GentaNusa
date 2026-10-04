@@ -17,9 +17,9 @@ const IG_URL =
   "https://www.instagram.com/gentanusa_id?stkn=MXEzZXVlYWZyZnE4Zw==";
 
 const labelCls =
-  "block text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2";
+  "block text-xs uppercase tracking-wider text-slate-700 font-bold mb-1.5";
 const inputCls =
-  "w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-sm transition-all focus:outline-none";
+  "w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all mb-4";
 
 export default function KontakPage() {
   const [form, setForm] = useState({
@@ -70,7 +70,7 @@ export default function KontakPage() {
 
   return (
     <>
-      <div className="bg-[#F8FAFC] py-12 px-4 sm:px-6">
+      <div className="bg-[#F8FAFC] min-h-[80vh] py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <nav
             aria-label="Breadcrumb"
@@ -102,8 +102,8 @@ export default function KontakPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Kolom Kiri: Saluran Resmi */}
             <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-5">
-              <h2 className="text-xl font-bold text-slate-900">
-                Saluran Resmi
+              <h2 className="text-xl font-bold text-slate-900 border-b border-slate-100 pb-3">
+                Saluran Langsung
               </h2>
 
               <div className="space-y-4 text-sm">
@@ -115,7 +115,7 @@ export default function KontakPage() {
                     href={WA_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block text-emerald-600 font-bold hover:underline text-base font-mono"
+                    className="block text-emerald-700 font-bold hover:underline text-base font-mono"
                   >
                     +62 851-3497-7073
                   </a>
@@ -180,9 +180,13 @@ export default function KontakPage() {
 
             {/* Kolom Kanan: Formulir Pesan Redaksi */}
             <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
-              <h2 className="text-xl font-bold text-slate-900 mb-6">
+              <h2 className="text-xl font-bold text-slate-900 mb-1">
                 Kirim Pesan ke Redaksi
               </h2>
+              <p className="text-xs text-slate-500 mb-6">
+                Respons maksimal 1–2 hari kerja untuk kemitraan, hak jawab, dan
+                kerja sama.
+              </p>
 
               {status === "success" && (
                 <div
@@ -285,7 +289,7 @@ export default function KontakPage() {
                 <button
                   type="submit"
                   disabled={status === "submitting"}
-                  className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full py-3.5 bg-[#041d56] hover:bg-[#021236] text-white font-bold rounded-lg transition-colors text-sm uppercase tracking-wider shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {status === "submitting"
                     ? "Mengirim..."

@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
+@config "../tailwind.config.js";
+
 :root {
-  --genta-navy: #0B192C;
-  --genta-blue: #2563EB;
+  --genta-navy: #041d56;
+  --genta-blue: #1d4ed8;
   --genta-slate: #0F172A;
   --genta-slate-50: #F1F5F9;
   --genta-slate-100: #E2E8F0;

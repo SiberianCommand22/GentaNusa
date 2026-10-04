@@ -55,7 +55,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className={`sticky top-0 z-50 w-full bg-[#0B1727] border-b border-white/10 ${styles.header}`}>
+      <header className={`sticky top-0 z-50 w-full bg-[#041d56] border-b border-white/10 ${styles.header}`}>
         <div className={styles.headerInner}>
           <div className={styles.headerSideLeft}>
             <button
@@ -87,7 +87,7 @@ export function Navbar() {
               aria-label="GentaNusa — Beranda"
               className="flex items-center justify-center gap-2.5"
             >
-              <div className="w-10 h-10 rounded-full overflow-hidden bg-[#0B1727] border border-white/20 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#041d56] border border-white/20 flex items-center justify-center shrink-0">
                 <Image
                   src="/logo.png"
                   alt="GentaNusa Logo"

@@ -9,7 +9,7 @@ export function Footer() {
       <div className={styles.container}>
         <div className={styles.footerGrid}>
           <div className={styles.brandCol}>
-            <div className="w-12 h-12 rounded-full overflow-hidden bg-[#0B1727] border border-white/20 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-xl overflow-hidden bg-[#041d56] border border-white/20 flex items-center justify-center shrink-0">
               <Image
                 src="/logo.png"
                 alt="GentaNusa Logo"
