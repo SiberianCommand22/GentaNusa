@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Footer } from "@/components/site";
-import styles from "./kontak.module.css";
 
 const SUBJECTS = [
   { value: "redaksi", label: "Redaksi & Pengiriman Naskah Opini" },
@@ -12,6 +12,15 @@ const SUBJECTS = [
   { value: "lainnya", label: "Lainnya" },
 ];
 
+const WA_URL = "https://wa.me/6285134977073";
+const IG_URL =
+  "https://www.instagram.com/gentanusa_id?stkn=MXEzZXVlYWZyZnE4Zw==";
+
+const labelCls =
+  "text-xs uppercase tracking-wider text-neutral-300 font-semibold mb-2 block";
+const inputCls =
+  "w-full bg-[#070e1b] border border-white/20 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500";
+
 export default function KontakPage() {
   const [form, setForm] = useState({
     name: "",
@@ -19,10 +28,16 @@ export default function KontakPage() {
     subject: "redaksi",
     message: "",
   });
-  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+  function handleChange(
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   }
@@ -55,177 +70,258 @@ export default function KontakPage() {
 
   return (
     <>
-      <main className={styles.container}>
-        <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
-          <a href="/">Beranda</a>
+      <main className="max-w-5xl mx-auto px-4 py-10">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center gap-2 text-xs font-semibold text-white/60 mb-6"
+        >
+          <Link href="/" className="hover:text-white transition-colors">
+            Beranda
+          </Link>
           <span aria-hidden="true"> {" > "} </span>
-          <span aria-current="page">Kontak</span>
+          <span aria-current="page" className="text-white">
+            Kontak
+          </span>
         </nav>
 
-        <header className={styles.header}>
-          <h1 className={styles.title}>Kontak & Hubungi Kami</h1>
-          <p className={styles.lead}>
-            Kami terbuka untuk masukan, pertanyaan, aduan jurnalistik, dan kerja sama.
-            Pilih kategori yang paling sesuai agar kami dapat merespons dengan cepat.
+        <div className="bg-[#0B1727] text-white border border-white/10 rounded-2xl p-6 sm:p-10 shadow-xl">
+          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-3">
+            Kontak &amp; Hubungi Kami
+          </h1>
+          <p className="text-neutral-300 text-sm sm:text-base leading-relaxed mb-8">
+            Kami terbuka untuk masukan, pertanyaan, aduan jurnalistik, dan
+            kerja sama kemitraan. Pilih kategori yang paling sesuai agar kami
+            dapat merespons dengan cepat — maksimal 1–2 hari kerja.
           </p>
-        </header>
 
-        <div className={styles.grid}>
-          <section className={styles.infoCard} aria-labelledby="info-heading">
-            <h2 id="info-heading" className={styles.infoTitle}>Saluran Resmi</h2>
-            <ul className={styles.infoList}>
-              <li>
-                <strong>Redaksi & Naskah Opini:</strong>
-                <a href="mailto:redaksi@gentanusa.id">redaksi@gentanusa.id</a>
-              </li>
-              <li>
-                <strong>Iklan, Kemitraan & Media Partner:</strong>
-                <a href="mailto:bisnis@gentanusa.id">bisnis@gentanusa.id</a>
-              </li>
-              <li>
-                <strong>Aduan Jurnalistik & Hak Jawab:</strong>
-                <a href="mailto:aduan@gentanusa.id">aduan@gentanusa.id</a>
-              </li>
-              <li>
-                <strong>Privasi & Perlindungan Data:</strong>
-                <a href="mailto:privasi@gentanusa.id">privasi@gentanusa.id</a>
-              </li>
-            </ul>
+          <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-8 items-start">
+            {/* Detail kontak resmi */}
+            <section
+              aria-labelledby="info-heading"
+              className="border border-white/10 rounded-xl p-6 bg-white/[0.02]"
+            >
+              <h2
+                id="info-heading"
+                className="text-lg font-bold text-white mb-5"
+              >
+                Saluran Resmi
+              </h2>
+              <ul className="flex flex-col gap-4 text-sm leading-relaxed">
+                <li>
+                  <span className={labelCls}>WhatsApp Kemitraan</span>
+                  <a
+                    href={WA_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-300 hover:text-white transition-colors font-semibold"
+                  >
+                    WhatsApp: +62 851-3497-7073
+                  </a>
+                </li>
+                <li>
+                  <span className={labelCls}>Surel Redaksi</span>
+                  <a
+                    href="mailto:redaksi@gentanusa.id"
+                    className="text-blue-300 hover:text-white transition-colors"
+                  >
+                    redaksi@gentanusa.id
+                  </a>
+                </li>
+                <li>
+                  <span className={labelCls}>Bisnis / Iklan</span>
+                  <a
+                    href="mailto:bisnis@gentanusa.id"
+                    className="text-blue-300 hover:text-white transition-colors"
+                  >
+                    bisnis@gentanusa.id
+                  </a>
+                </li>
+                <li>
+                  <span className={labelCls}>Alamat</span>
+                  <span className="text-neutral-200 not-italic">
+                    Jakarta, Indonesia
+                  </span>
+                </li>
+              </ul>
 
-            <div className={styles.divider} />
+              <div className="h-px bg-white/10 my-6" />
 
-            <h3 className={styles.infoSubtitle}>Alamat Kantor</h3>
-            <address className={styles.address}>
-              GentaNusa — Jakarta, Indonesia
-            </address>
+              <h3 className="text-xs uppercase tracking-wider text-neutral-400 font-bold mb-3">
+                Media Sosial Resmi
+              </h3>
+              <ul className="flex flex-col gap-2 text-sm">
+                <li>
+                  <a
+                    href={WA_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-neutral-200 hover:text-white transition-colors"
+                  >
+                    WhatsApp (+62 851-3497-7073)
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={IG_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-neutral-200 hover:text-white transition-colors"
+                  >
+                    @gentanusa_id
+                  </a>
+                </li>
+              </ul>
 
-            <div className={styles.divider} />
+              <div className="h-px bg-white/10 my-6" />
 
-            <h3 className={styles.infoSubtitle}>Landasan Hukum Aduan</h3>
-            <p className={styles.infoText}>
-              Aduan jurnalistik diproses sesuai <strong>UU Pers No. 40 Tahun 1999</strong>,
-              <strong>Kode Etik Jurnalistik</strong>, dan <strong>Pedoman Media Siber Dewan Pers</strong>.
-              Hak jawab dipenuhi dalam 1×24 jam setelah pengajuan lengkap diterima.
-            </p>
-          </section>
+              <h3 className="text-xs uppercase tracking-wider text-neutral-400 font-bold mb-3">
+                Landasan Hukum Aduan
+              </h3>
+              <p className="text-[13px] leading-relaxed text-neutral-300">
+                Aduan jurnalistik diproses sesuai{" "}
+                <strong className="text-white">
+                  UU Pers No. 40 Tahun 1999
+                </strong>
+                , <strong className="text-white">Kode Etik Jurnalistik</strong>,
+                dan{" "}
+                <strong className="text-white">
+                  Pedoman Media Siber Dewan Pers
+                </strong>
+                . Hak jawab dipenuhi dalam 1×24 jam setelah pengajuan lengkap
+                diterima.
+              </p>
+            </section>
 
-          <section className={styles.formCard} aria-labelledby="form-heading">
-            <h2 id="form-heading" className={styles.formTitle}>Kirim Pesan ke Redaksi</h2>
+            {/* Formulir */}
+            <section aria-labelledby="form-heading">
+              <h2
+                id="form-heading"
+                className="text-xl font-bold text-white mb-5"
+              >
+                Kirim Pesan ke Redaksi
+              </h2>
 
-            {status === "success" && (
-              <div className={styles.alertSuccess} role="status">
-                ✅ Pesan Anda telah terkirim. Tim redaksi akan merespons dalam 1–2 hari kerja.
-              </div>
-            )}
+              {status === "success" && (
+                <div
+                  className="bg-green-500/15 border border-green-500/30 text-green-300 px-4 py-3 rounded-lg text-sm font-medium mb-6"
+                  role="status"
+                >
+                  Pesan Anda telah terkirim. Tim redaksi akan merespons dalam
+                  1–2 hari kerja.
+                </div>
+              )}
 
-            {status === "error" && (
-              <div className={styles.alertError} role="alert">
-                ⚠️ {errorMsg}
-              </div>
-            )}
+              {status === "error" && (
+                <div
+                  className="bg-red-500/15 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg text-sm font-medium mb-6"
+                  role="alert"
+                >
+                  {errorMsg}
+                </div>
+              )}
 
-            <form onSubmit={handleSubmit} className={styles.form} noValidate>
-              <div className={styles.field}>
-                <label htmlFor="name" className={styles.label}>
-                  Nama Lengkap <span aria-hidden="true">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Nama lengkap Anda"
-                  className={styles.input}
-                  required
-                  autoComplete="name"
-                  disabled={status === "submitting"}
-                />
-              </div>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
+                <div>
+                  <label htmlFor="name" className={labelCls}>
+                    Nama Lengkap *
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    placeholder="Nama lengkap Anda"
+                    className={inputCls}
+                    required
+                    autoComplete="name"
+                    disabled={status === "submitting"}
+                  />
+                </div>
 
-              <div className={styles.field}>
-                <label htmlFor="email" className={styles.label}>
-                  Alamat Surel <span aria-hidden="true">*</span>
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="nama@domain.com"
-                  className={styles.input}
-                  required
-                  autoComplete="email"
-                  disabled={status === "submitting"}
-                />
-              </div>
+                <div>
+                  <label htmlFor="email" className={labelCls}>
+                    Alamat Surel *
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="nama@domain.com"
+                    className={inputCls}
+                    required
+                    autoComplete="email"
+                    disabled={status === "submitting"}
+                  />
+                </div>
 
-              <div className={styles.field}>
-                <label htmlFor="subject" className={styles.label}>
-                  Kategori <span aria-hidden="true">*</span>
-                </label>
-                <select
-                  id="subject"
-                  name="subject"
-                  value={form.subject}
-                  onChange={handleChange}
-                  className={styles.select}
-                  required
+                <div>
+                  <label htmlFor="subject" className={labelCls}>
+                    Kategori *
+                  </label>
+                  <select
+                    id="subject"
+                    name="subject"
+                    value={form.subject}
+                    onChange={handleChange}
+                    className={`${inputCls} cursor-pointer`}
+                    required
+                    disabled={status === "submitting"}
+                  >
+                    {SUBJECTS.map((s) => (
+                      <option
+                        key={s.value}
+                        value={s.value}
+                        className="bg-[#0B1727] text-white"
+                      >
+                        {s.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="message" className={labelCls}>
+                    Isi Pesan *
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={form.message}
+                    onChange={handleChange}
+                    placeholder="Tulis pesan Anda di sini... (minimal 20 karakter)"
+                    className={`${inputCls} resize-y min-h-[140px] leading-relaxed`}
+                    rows={6}
+                    required
+                    minLength={20}
+                    disabled={status === "submitting"}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   disabled={status === "submitting"}
                 >
-                  {SUBJECTS.map((s) => (
-                    <option key={s.value} value={s.value}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  {status === "submitting" ? "Mengirim..." : "Kirim Pesan"}
+                </button>
+              </form>
 
-              <div className={styles.field}>
-                <label htmlFor="message" className={styles.label}>
-                  Isi Pesan <span aria-hidden="true">*</span>
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={form.message}
-                  onChange={handleChange}
-                  placeholder="Tulis pesan Anda di sini... (minimal 20 karakter)"
-                  className={styles.textarea}
-                  rows={6}
-                  required
-                  minLength={20}
-                  disabled={status === "submitting"}
-                />
-              </div>
-
-              <button
-                type="submit"
-                className={styles.submitBtn}
-                disabled={status === "submitting"}
-              >
-                {status === "submitting" ? (
-                  <>
-                    <svg className={styles.spinner} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                      <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round">
-                        <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
-                      </path>
-                    </svg>
-                    Mengirim...
-                  </>
-                ) : (
-                  "Kirim Pesan"
-                )}
-              </button>
-            </form>
-
-            <p className={styles.formNote}>
-              Dengan mengirim formulir ini, Anda menyetujui pengolahan data sesuai
-              <a href="/kebijakan-privasi">Kebijakan Privasi GentaNusa</a>.
-            </p>
-          </section>
+              <p className="mt-5 text-xs leading-relaxed text-neutral-400 text-center">
+                Dengan mengirim formulir ini, Anda menyetujui pengolahan data
+                sesuai{" "}
+                <Link
+                  href="/kebijakan-privasi"
+                  className="text-blue-300 hover:text-white transition-colors"
+                >
+                  Kebijakan Privasi GentaNusa
+                </Link>
+                .
+              </p>
+            </section>
+          </div>
         </div>
       </main>
       <Footer />

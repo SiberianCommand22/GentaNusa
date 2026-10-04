@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { BrandLogo } from "@/components/BrandLogo";
 import styles from "./Navbar.module.css";
+
+export const OFFICIAL_WA_URL = "https://wa.me/6285134977073";
+export const OFFICIAL_IG_URL =
+  "https://www.instagram.com/gentanusa_id?stkn=MXEzZXVlYWZyZnE4Zw==";
 
 const corporateNav = [
   { href: "/tentang-kami", label: "Redaksi & Tentang Kami" },
@@ -78,7 +82,23 @@ export function Navbar() {
           </div>
 
           <div className={styles.logo}>
-            <BrandLogo theme="dark" size="lg" href="/" />
+            <Link
+              href="/"
+              aria-label="GentaNusa — Beranda"
+              className="flex items-center justify-center gap-2.5"
+            >
+              <Image
+                src="/logo.png"
+                alt="GentaNusa"
+                width={34}
+                height={34}
+                className="object-contain"
+                priority
+              />
+              <span className="text-white font-bold text-xl tracking-tight leading-none">
+                GentaNusa
+              </span>
+            </Link>
           </div>
 
           <div className={styles.headerSideRight} aria-hidden="true">
@@ -159,6 +179,27 @@ export function Navbar() {
             </nav>
 
             <div className={styles.drawerFooter}>
+              <p className={styles.drawerSectionTitle}>IKUTI KAMI</p>
+              <div className="flex flex-col gap-2 mb-4 text-sm">
+                <a
+                  href={OFFICIAL_WA_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-neutral-200 hover:text-white transition-colors"
+                  onClick={closeDrawer}
+                >
+                  WhatsApp (+62 851-3497-7073)
+                </a>
+                <a
+                  href={OFFICIAL_IG_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-neutral-200 hover:text-white transition-colors"
+                  onClick={closeDrawer}
+                >
+                  @gentanusa_id
+                </a>
+              </div>
               <div className="pt-6 border-t border-white/10 text-xs text-white/50">
                 © 2026 GentaNusa. Portal Berita Nasional.
               </div>

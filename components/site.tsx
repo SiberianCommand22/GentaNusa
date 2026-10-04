@@ -18,12 +18,27 @@ export function Footer() {
             <h4>Redaksi</h4>
             <span>redaksi@gentanusa.id</span>
             <span>Jakarta, Indonesia</span>
+            <a
+              href="https://wa.me/6285134977073"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              WhatsApp (+62 851-3497-7073)
+            </a>
+            <a
+              href="https://www.instagram.com/gentanusa_id?stkn=MXEzZXVlYWZyZnE4Zw=="
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              @gentanusa_id
+            </a>
           </div>
           <div className={styles.footerCol}>
             <h4>Informasi</h4>
-            <Link href="/tentang">Tentang Kami</Link>
+            <Link href="/tentang-kami">Tentang Kami</Link>
+            <Link href="/pedoman-media-siber">Pedoman Media Siber</Link>
             <Link href="/kebijakan-privasi">Kebijakan Privasi</Link>
-            <Link href="/syarat-ketentuan">Syarat & Ketentuan</Link>
+            <Link href="/kontak">Kontak &amp; Kerja Sama</Link>
           </div>
         </div>
         <div className={styles.footerBottom}>
