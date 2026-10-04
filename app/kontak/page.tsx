@@ -17,9 +17,9 @@ const IG_URL =
   "https://www.instagram.com/gentanusa_id?stkn=MXEzZXVlYWZyZnE4Zw==";
 
 const labelCls =
-  "block text-xs uppercase tracking-wider text-neutral-300 font-semibold mb-1.5";
+  "block text-xs uppercase tracking-wider text-neutral-300 font-semibold mb-2";
 const inputCls =
-  "w-full bg-[#070e1b] border border-white/20 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 text-sm";
+  "w-full bg-[#060b14] border border-white/15 rounded-lg px-4 py-3 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all";
 
 export default function KontakPage() {
   const [form, setForm] = useState({
@@ -70,8 +70,8 @@ export default function KontakPage() {
 
   return (
     <>
-      <main className="min-h-screen bg-neutral-900 text-neutral-100 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto space-y-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="space-y-8">
           <nav
             aria-label="Breadcrumb"
             className="flex items-center gap-2 text-xs font-semibold text-white/60"
@@ -85,14 +85,14 @@ export default function KontakPage() {
             </span>
           </nav>
 
-          <div className="border-b border-white/10 pb-6 text-center sm:text-left">
-            <span className="inline-block px-3 py-1 rounded bg-blue-950/80 text-blue-400 border border-blue-500/20 text-xs font-bold uppercase tracking-wider mb-3">
+          <div className="text-center sm:text-left">
+            <span className="px-3 py-1 rounded bg-blue-950/80 text-blue-400 border border-blue-500/20 text-xs font-bold uppercase tracking-wider">
               Komunikasi Resmi
             </span>
-            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-2">
-              Kontak &amp; Kerja Sama Redaksi
+            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-white mt-3 mb-2">
+              Kontak &amp; Hubungi Redaksi
             </h1>
-            <p className="text-neutral-400 text-sm sm:text-base">
+            <p className="text-neutral-400 text-sm max-w-2xl mb-10">
               Hubungi redaksi untuk hak jawab, pengiriman naskah opini,
               kemitraan media, maupun periklanan. Respons maksimal 1–2 hari
               kerja.
@@ -101,7 +101,7 @@ export default function KontakPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Kolom Kiri: Saluran Resmi */}
-            <div className="lg:col-span-5 bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6">
+            <div className="lg:col-span-5 bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
               <h2 className="text-xl font-bold text-white">Saluran Langsung</h2>
 
               <div className="space-y-4 text-sm">
@@ -157,8 +157,13 @@ export default function KontakPage() {
                   </a>
                 </div>
 
-                <div className="pt-2 text-xs text-neutral-400">
-                  Alamat Redaksi: Jakarta, Indonesia.
+                <div className="bg-white/[0.03] border border-white/5 p-4 rounded-xl space-y-1">
+                  <span className="text-xs text-neutral-400 font-medium">
+                    Alamat Kantor:
+                  </span>
+                  <p className="text-white font-semibold">
+                    Jakarta, Indonesia
+                  </p>
                 </div>
 
                 <div className="pt-2 border-t border-white/10 text-xs text-neutral-400 leading-relaxed">
@@ -172,7 +177,7 @@ export default function KontakPage() {
             </div>
 
             {/* Kolom Kanan: Form Pesan */}
-            <div className="lg:col-span-7 bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8">
+            <div className="lg:col-span-7 bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl">
               <h2 className="text-xl font-bold text-white mb-6">
                 Kirim Pesan ke Redaksi
               </h2>

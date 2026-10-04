@@ -72,8 +72,7 @@ const linkCls = "text-blue-300 hover:text-white transition-colors";
 export default function TentangKamiPage() {
   return (
     <>
-      <main className="min-h-screen bg-neutral-900 text-neutral-100 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto space-y-10">
+      <main className="max-w-4xl mx-auto px-4 py-12 space-y-8">
           <nav
             aria-label="Breadcrumb"
             className="flex items-center gap-2 text-xs font-semibold text-white/60"
@@ -177,7 +176,7 @@ export default function TentangKamiPage() {
               {leaders.map((l) => (
                 <div
                   key={l.role}
-                  className="p-5 rounded-xl bg-white/[0.03] border border-white/10"
+                  className="p-5 rounded-xl bg-white/[0.02] border border-white/10"
                 >
                   <span className="text-xs text-neutral-400 uppercase">
                     {l.role}
@@ -252,7 +251,6 @@ export default function TentangKamiPage() {
               </ol>
             </div>
           </div>
-        </div>
       </main>
       <Footer />
     </>

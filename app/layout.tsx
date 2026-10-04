@@ -62,9 +62,10 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${sourceSerif.variable} ${inter.variable}`}>
       <head>
-        <link rel="icon" href="/favicon.jpg" type="image/jpeg" />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
       </head>
-      <body>
+      <body className="bg-[#060b14] text-neutral-100 antialiased min-h-screen flex flex-col justify-between">
         <AnalyticsTracker />
         <SiteChrome>{children}</SiteChrome>
       </body>

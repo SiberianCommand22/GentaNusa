@@ -99,8 +99,7 @@ const pasals = [
 export default function PedomanMediaSiberPage() {
   return (
     <>
-      <main className="min-h-screen bg-neutral-900 text-neutral-100 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto space-y-8">
+      <main className="max-w-4xl mx-auto px-4 py-12 space-y-6">
           <nav
             aria-label="Breadcrumb"
             className="flex items-center gap-2 text-xs font-semibold text-white/60"
@@ -132,15 +131,15 @@ export default function PedomanMediaSiberPage() {
             {pasals.map((p) => (
               <div
                 key={p.nomor}
-                className="bg-[#0B1727] border border-white/10 rounded-2xl p-6 transition-all hover:border-white/20"
+                className="bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-3"
               >
-                <div className="flex items-center gap-3 mb-2 flex-wrap">
-                  <span className="text-xs font-bold text-blue-400 uppercase tracking-widest bg-blue-950/60 px-2.5 py-1 rounded border border-blue-500/20">
+                <div className="mb-2">
+                  <span className="text-xs font-bold text-blue-400 uppercase tracking-widest bg-blue-950/80 px-2.5 py-1 rounded border border-blue-500/20">
                     {p.nomor}
                   </span>
-                  <h2 className="text-lg font-bold text-white">{p.judul}</h2>
+                  <h2 className="text-lg font-bold text-white inline-block ml-3">{p.judul}</h2>
                 </div>
-                <p className="text-neutral-300 text-sm sm:text-base leading-relaxed mt-3">
+                <p className="text-neutral-300 text-sm sm:text-base leading-relaxed">
                   {p.intro}
                 </p>
                 <ul className="list-disc pl-6 mt-3 space-y-1.5 text-neutral-400 text-sm leading-relaxed">
@@ -152,7 +151,7 @@ export default function PedomanMediaSiberPage() {
             ))}
           </div>
 
-          <div className="bg-[#0B1727] border border-white/10 rounded-2xl p-6">
+          <div className="bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8">
             <h2 className="text-lg font-bold text-white mb-3">Penutup</h2>
             <p className="text-neutral-300 text-sm sm:text-base leading-relaxed mb-3">
               Pedoman ini berlaku efektif sejak diterbitkan dan dapat diperbarui
@@ -168,7 +167,6 @@ export default function PedomanMediaSiberPage() {
               </em>
             </p>
           </div>
-        </div>
       </main>
       <Footer />
     </>

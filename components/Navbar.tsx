@@ -90,12 +90,12 @@ export function Navbar() {
               <Image
                 src="/logo.png"
                 alt="GentaNusa"
-                width={34}
-                height={34}
+                width={38}
+                height={38}
                 className="object-contain"
                 priority
               />
-              <span className="text-white font-bold text-xl tracking-tight leading-none">
+              <span className="text-white font-serif font-bold text-xl tracking-tight leading-none">
                 GentaNusa
               </span>
             </Link>

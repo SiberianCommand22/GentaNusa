@@ -36,21 +36,20 @@ export const metadata: Metadata = {
 };
 
 const linkCls = "text-blue-300 hover:text-white transition-colors";
-const card = "bg-[#0B1727] border border-white/10 rounded-2xl p-6 space-y-3";
+const card = "bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-3";
 const h2 = "text-lg font-bold text-white";
 const p = "text-neutral-300 text-sm leading-relaxed";
 const listCls =
   "list-disc pl-6 space-y-1.5 text-neutral-300 text-sm leading-relaxed";
 const thCls =
-  "text-left text-xs uppercase tracking-wider font-bold text-neutral-300 p-3 border border-white/10 bg-white/5";
+  "text-left text-xs uppercase tracking-wider font-bold text-white p-3 border border-white/10 bg-white/[0.05]";
 const tdCls =
   "text-neutral-300 p-3 border border-white/10 text-sm leading-relaxed align-top";
 
 export default function KebijakanPrivasiPage() {
   return (
     <>
-      <main className="min-h-screen bg-neutral-900 text-neutral-100 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto space-y-8">
+      <main className="max-w-4xl mx-auto px-4 py-12 space-y-6">
           <nav
             aria-label="Breadcrumb"
             className="flex items-center gap-2 text-xs font-semibold text-white/60"
@@ -230,7 +229,6 @@ export default function KebijakanPrivasiPage() {
               </p>
             </div>
           </div>
-        </div>
       </main>
       <Footer />
     </>
