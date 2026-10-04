@@ -14,7 +14,6 @@ import styles from "./page.module.css";
 import { getArticleReadCount } from "@/lib/analytics-server";
 import { ArticleContent } from "@/components/article-content";
 import { CardImage } from "@/components/card-image";
-import { AdSlot } from "@/components/AdSlot";
 import { ShareButtons } from "@/components/share-buttons";
 import { cleanLead, parseArticleContent } from "@/lib/text-formatter";
 
@@ -333,9 +332,6 @@ export default async function ArticlePage({ params }: Params) {
           {/* 7. Isi artikel — render HTML toolbar via sanitasi, justify inter-word */}
           <div className={styles.content}>
             <ArticleContent content={body.length > 0 ? body : []} />
-
-            {/* Rectangle Ad — di tengah naskah (setelah paragraf ke-3) */}
-            <AdSlot slotId="1234567892" variant="in-article" />
           </div>
 
           <div className={styles.tags}>
@@ -355,32 +351,28 @@ export default async function ArticlePage({ params }: Params) {
           />
         </article>
 
-        {related.length > 0 && (
+{related.length > 0 && (
           <section className={styles.related}>
             <div className={styles.relatedWrapper}>
               <div className={styles.relatedMain}>
                 <h2 className={styles.relatedTitle}>Berita Terkait</h2>
                 <div className={styles.relatedGrid}>
-                {related.map((a) => (
-                  <Link key={a.id} href={articleUrl(a)} className={styles.relatedCard}>
-                    {a.image && (
-                      <div className={styles.relatedImage}>
-                        <CardImage src={a.image} alt={a.title} className={styles.cardImg} />
-                      </div>
-                    )}
-                    <h3 className={styles.relatedCardTitle}>{a.title}</h3>
-                  </Link>
-                ))}
+                  {related.map((a) => (
+                    <Link key={a.id} href={articleUrl(a)} className={styles.relatedCard}>
+                      {a.image && (
+                        <div className={styles.relatedImage}>
+                          <CardImage src={a.image} alt={a.title} className={styles.cardImg} />
+                        </div>
+                      )}
+                      <h3 className={styles.relatedCardTitle}>{a.title}</h3>
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
+          </section>
+        )}
 
-            {/* Sticky Half-page Ad — kolom samping kanan (desktop only) */}
-            <aside className={styles.relatedSidebar} aria-hidden="true">
-              <AdSlot slotId="1234567893" variant="sticky-sidebar" />
-            </aside>
-          </div>
-        </section>
-      )}
       </main>
       <Footer />
     </>

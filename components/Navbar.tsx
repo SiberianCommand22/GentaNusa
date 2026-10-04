@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { BrandLogo } from "@/components/BrandLogo";
 import styles from "./Navbar.module.css";
@@ -24,9 +25,29 @@ const categoryNav = [
 
 export function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
 
   const closeDrawer = () => setDrawerOpen(false);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/cari?q=${encodeURIComponent(searchQuery.trim())}`);
+      closeDrawer();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (searchQuery.trim()) {
+        router.push(`/cari?q=${encodeURIComponent(searchQuery.trim())}`);
+        closeDrawer();
+      }
+    }
+  };
 
   return (
     <>
@@ -101,6 +122,27 @@ export function Navbar() {
                 </svg>
               </button>
             </div>
+
+            {/* Search Form in Sidebar */}
+            <form onSubmit={handleSearch} className={styles.drawerSearchForm} role="search">
+              <label htmlFor="sidebar-search" className="sr-only">Telusuri berita</label>
+              <div className={styles.searchWrapper}>
+                <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input
+                  id="sidebar-search"
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Telusuri berita..."
+                  className={styles.searchInput}
+                  autoFocus
+                />
+              </div>
+            </form>
 
             <nav className={styles.drawerNav}>
               <p className={styles.drawerSectionTitle}>REDAKSI</p>

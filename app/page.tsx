@@ -2,7 +2,6 @@ import Link from "next/link";
 import { getArticles, formatDate, sortByDate, articleUrl } from "@/lib/data";
 import { Footer } from "@/components/site";
 import { CardImage } from "@/components/card-image";
-import { AdSlot } from "@/components/AdSlot";
 import styles from "./page.module.css";
 
 const CATEGORY_BADGE_BG = "#2563EB";
@@ -100,16 +99,10 @@ export default async function Home() {
         </div>
 </section>
 
-        {/* Billboard Ad — di antara Hero/Kategori dan Berita Terbaru */}
-        <AdSlot slotId="1234567890" variant="top-leaderboard" />
-
 {recentArticles.length > 0 && (
           <section className={styles.section}>
             <div className={styles.container}>
               <h2 className={styles.sectionTitle}>Berita Terbaru</h2>
-
-              {/* In-feed Ad — sebelum grid berita terbaru */}
-              <AdSlot slotId="1234567891" variant="in-feed" />
 
               <div className={styles.grid}>
               {recentArticles.map((a) => (
