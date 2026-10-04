@@ -73,8 +73,8 @@
   width: 160px;
   height: 160px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(37,99,235,0.25), transparent 70%);
-  opacity: 1;
+  background: #2563EB;
+  opacity: 0.06;
 }
 
 /* ===== Daftar Berita ===== */
@@ -190,7 +190,7 @@
   padding: 20px;
   border-radius: 14px;
   border: 1px dashed #cbd5e1;
-  background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%);
+  background: #F8FAFC;
 }
 
 @media (max-width: 640px) {
@@ -311,12 +311,11 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition: border-color 0.2s;
 }
 
 .card:hover {
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
-  border-color: #c8c8d2;
+  border-color: #94a3b8;
 }
 
 .cardImage {
@@ -347,7 +346,6 @@
   letter-spacing: 0.08em;
   color: #fff;
   background: #2563EB;
-  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.35);
 }
 
 .cardTitle {

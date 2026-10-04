@@ -91,7 +91,6 @@
   letter-spacing: 0.08em;
   color: #fff;
   background: #2563EB;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .heroCard {
@@ -104,7 +103,6 @@
   min-height: 420px;
   max-height: 500px;
   background: #0F172A;
-  box-shadow: 0 12px 32px rgba(11, 25, 44, 0.25);
   border: 1px solid rgba(191, 219, 254, 0.2);
 }
 
@@ -319,13 +317,11 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition: border-color 0.2s;
 }
 
 .card:hover {
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
-  transform: translateY(-4px);
-  border-color: #C8C8D2;
+  border-color: #94a3b8;
 }
 
 .cardImage {
@@ -365,7 +361,6 @@
   letter-spacing: 0.08em;
   color: #fff;
   background: #2563EB;
-  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.35);
   font-family: var(--font-sans);
 }
 

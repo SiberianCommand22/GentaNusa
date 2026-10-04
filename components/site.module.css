@@ -1,7 +1,8 @@
 /* ===== Footer editorial navy ===== */
 .footer {
-  background: #0b192c;
-  color: #cbd5e1;
+  background: #0B1727;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #a3a3a3;
   padding: 64px 0 48px;
   margin-top: 40px;
 }
@@ -33,7 +34,7 @@
 .footerText {
   font-size: 14px;
   line-height: 1.7;
-  color: #94a3b8;
+  color: #a3a3a3;
   margin-top: 16px;
   max-width: 24rem;
 }
@@ -56,7 +57,7 @@
 .footerCol a,
 .footerCol span {
   font-size: 14px;
-  color: #cbd5e1;
+  color: #a3a3a3;
 }
 
 .footerCol a {
@@ -68,7 +69,7 @@
 }
 
 .footerBottom {
-  border-top: 1px solid rgba(51, 65, 85, 0.8);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: 48px;
   padding-top: 32px;
   display: flex;
@@ -76,7 +77,7 @@
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #94a3b8;
+  color: #a3a3a3;
   text-align: center;
 }
 

@@ -402,12 +402,11 @@ a.author:hover {
   border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition: border-color 0.2s;
 }
 
 .relatedCard:hover {
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
-  border-color: #C8C8D2;
+  border-color: #94a3b8;
 }
 
 .relatedImage {

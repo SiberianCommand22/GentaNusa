@@ -14,7 +14,6 @@
   background: #fff;
   border-radius: 16px;
   border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   padding: 40px;
   text-align: center;
 }
@@ -139,13 +138,11 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   cursor: pointer;
-  box-shadow: 0 4px 6px rgba(11, 25, 44, 0.15);
-  transition: all 0.15s;
+  transition: background 0.15s;
 }
 
 .submitBtn:hover {
   background: #1e3e62;
-  box-shadow: 0 8px 16px rgba(11, 25, 44, 0.2);
 }
 
 .submitBtn:active {
