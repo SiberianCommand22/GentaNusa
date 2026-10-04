@@ -2,9 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { WhatsappIcon } from "@/components/WhatsappIcon";
 import {
+  OFFICIAL_EMAIL_REDAKSI,
   OFFICIAL_IG_LABEL,
   OFFICIAL_IG_URL,
-  OFFICIAL_WA_LABEL,
+  OFFICIAL_WA_DISPLAY,
   OFFICIAL_WA_URL,
 } from "@/lib/social";
 import styles from "./site.module.css";
@@ -45,8 +46,15 @@ export function Footer() {
 
           <div className={styles.footerCol}>
             <h4>Redaksi</h4>
-            <span>redaksi@gentanusa.id</span>
+            <a
+              href={`mailto:${OFFICIAL_EMAIL_REDAKSI}`}
+              className={styles.footerPlain}
+            >
+              {OFFICIAL_EMAIL_REDAKSI}
+            </a>
             <span>Jakarta, Indonesia</span>
+            {/* min-w-0 + whitespace-nowrap pada nilai menjaga nomor tetap satu
+                baris di ponsel; area klik setinggi 44px untuk jari. */}
             <a
               href={OFFICIAL_WA_URL}
               target="_blank"
@@ -56,7 +64,9 @@ export function Footer() {
               <span className={styles.footerWaBadge}>
                 <WhatsappIcon className={styles.footerWaGlyph} />
               </span>
-              <span>{OFFICIAL_WA_LABEL}</span>
+              <span className={styles.footerSocialValue}>
+                {OFFICIAL_WA_DISPLAY}
+              </span>
             </a>
             <a
               href={OFFICIAL_IG_URL}
@@ -81,7 +91,9 @@ export function Footer() {
                   <circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none" />
                 </svg>
               </span>
-              <span>{OFFICIAL_IG_LABEL}</span>
+              <span className={styles.footerSocialValue}>
+                {OFFICIAL_IG_LABEL}
+              </span>
             </a>
           </div>
 
@@ -94,9 +106,15 @@ export function Footer() {
           </div>
         </div>
 
-        <div className={styles.footerBottom}>
-          <span>© 2026 GentaNusa. Seluruh hak cipta dilindungi.</span>
-          <span>Edisi Digital Nasional</span>
+        {/* Baris bawah dipisah dari tombol Back-to-Top yang melayang di pojok
+            kanan bawah. Padding kanan (pr-16 / sm:pr-20) menyisakan ruang
+            selebar tombol + jaraknya, sehingga "Edisi Digital Nasional" tidak
+            pernah tertabrak atau terpotong. */}
+        <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50 pr-16 sm:pr-20">
+          <p>© 2026 GentaNusa. Seluruh hak cipta dilindungi.</p>
+          <span className="font-medium tracking-wide text-white/40">
+            Edisi Digital Nasional
+          </span>
         </div>
       </div>
     </footer>

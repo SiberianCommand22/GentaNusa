@@ -1,23 +1,39 @@
+/* Posisi, ukuran, dan z-index diambil dari utility Tailwind di
+   back-to-top.tsx. Kelas modul ini hanya menangani warna & state interaksi. */
 .button {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
   background: var(--accent);
   color: #fff;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: opacity 0.3s, background 0.2s;
-  z-index: 1000;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
+  transition: background-color 0.2s, transform 0.2s;
 }
 
 .button:hover {
   background: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+}
+
+@media (min-width: 640px) {
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
 }

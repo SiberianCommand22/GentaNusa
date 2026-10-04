@@ -9,7 +9,7 @@ import { WhatsappIcon } from "@/components/WhatsappIcon";
 import {
   OFFICIAL_IG_LABEL,
   OFFICIAL_IG_URL,
-  OFFICIAL_WA_LABEL,
+  OFFICIAL_WA_DISPLAY,
   OFFICIAL_WA_URL,
 } from "@/lib/social";
 import styles from "./Navbar.module.css";
@@ -169,13 +169,14 @@ export function Navbar() {
               </div>
             </form>
 
-            <nav className={styles.drawerNav}>
+            <nav className={`${styles.drawerNav} space-y-1`} aria-label="Menu redaksi">
               <p className={styles.drawerSectionTitle}>REDAKSI</p>
               {corporateNav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={styles.drawerLink}
+                  aria-current={pathname === item.href ? "page" : undefined}
+                  className={`block py-2.5 px-4 rounded-xl text-white/90 hover:text-white hover:bg-white/10 text-sm font-medium transition-colors ${styles.drawerLink}`}
                   onClick={closeDrawer}
                 >
                   <span>{item.label}</span>
@@ -186,23 +187,34 @@ export function Navbar() {
             <div className={styles.drawerFooter}>
               <p className={styles.drawerSectionTitle}>IKUTI KAMI</p>
               <div className="flex flex-col gap-2 mb-4">
+                {/* Label + nilai dipisah dua baris (flex-col + min-w-0 + nowrap)
+                    agar nomor WhatsApp tidak pernah patah menjadi dua baris. */}
                 <a
                   href={OFFICIAL_WA_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={styles.drawerSocial}
+                  className={`group ${styles.drawerSocial}`}
                   onClick={closeDrawer}
                 >
                   <span className={styles.drawerWaBadge}>
                     <WhatsappIcon className={styles.drawerWaGlyph} />
                   </span>
-                  <span>{OFFICIAL_WA_LABEL}</span>
+                  <span className={styles.drawerSocialText}>
+                    <span className={styles.drawerSocialLabel}>
+                      WhatsApp Redaksi
+                    </span>
+                    <span
+                      className={`${styles.drawerSocialValue} font-mono`}
+                    >
+                      {OFFICIAL_WA_DISPLAY}
+                    </span>
+                  </span>
                 </a>
                 <a
                   href={OFFICIAL_IG_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={styles.drawerSocial}
+                  className={`group ${styles.drawerSocial}`}
                   onClick={closeDrawer}
                 >
                   <span className={styles.drawerIgBadge}>
@@ -228,10 +240,17 @@ export function Navbar() {
                       />
                     </svg>
                   </span>
-                  <span>{OFFICIAL_IG_LABEL}</span>
+                  <span className={styles.drawerSocialText}>
+                    <span className={styles.drawerSocialLabel}>
+                      Instagram Redaksi
+                    </span>
+                    <span className={styles.drawerSocialValue}>
+                      {OFFICIAL_IG_LABEL}
+                    </span>
+                  </span>
                 </a>
               </div>
-              <div className="pt-6 border-t border-white/10 text-xs text-white/50">
+              <div className="pt-5 border-t border-white/10 text-xs text-white/50">
                 © 2026 GentaNusa. Portal Berita Nasional.
               </div>
             </div>

@@ -12,8 +12,6 @@ export const OFFICIAL_WA_URL = `https://wa.me/${OFFICIAL_WA_NUMBER}?text=${encod
   OFFICIAL_WA_PREFILL
 )}`;
 
-export const OFFICIAL_WA_LABEL = `WhatsApp (${OFFICIAL_WA_DISPLAY})`;
-
 export const OFFICIAL_IG_URL =
   "https://www.instagram.com/gentanusa_id?stkn=MXEzZXVlYWZyZnE4Zw==";
 

@@ -2,9 +2,17 @@
 .footer {
   background: #041d56;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.70);
+  color: rgba(255, 255, 255, 0.7);
   padding: 64px 0 48px;
   margin-top: 40px;
+}
+
+/* Padding bawah ekstra di ponsel agar baris copyright tidak pernah berada
+   di jalur tombol Back-to-Top yang melayang (fixed bottom-6 right-6). */
+@media (max-width: 639px) {
+  .footer {
+    padding-bottom: 72px;
+  }
 }
 
 .container {
@@ -13,17 +21,30 @@
   padding: 0 24px;
 }
 
-.footerGrid {
-  display: grid;
-  grid-template-columns: 5fr 3fr 3fr;
-  gap: 48px;
-  padding-bottom: 0;
+@media (min-width: 640px) {
+  .container {
+    padding: 0 40px;
+  }
 }
 
-@media (max-width: 768px) {
+/* Mobile: satu kolom dengan ritme vertikal lega (space-y-6). Desktop: tiga
+   kolom dengan jarak antar-kolom penuh. */
+.footerGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
   .footerGrid {
-    grid-template-columns: 1fr;
-    gap: 32px;
+    grid-template-columns: 5fr 3fr 3fr;
+    gap: 48px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .footerGrid {
+    gap: 64px;
   }
 }
 
@@ -69,16 +90,70 @@
 }
 
 /* Tautan sosial: kelas modul (unlayered) dipakai agar warna badge & hover
-   tidak kalah oleh utility Tailwind yang berada di @layer utilities. */
+   tidak kalah oleh utility Tailwind yang berada di @layer utilities.
+   min-height 44px + width 100% memberi target area klik selebar baris —
+   nyaman untuk jari di ponsel (accessible touch target). */
 .footerSocial {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 10px;
-  width: fit-content;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px;
+  border-radius: 12px;
   font-size: 14px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
-  transition: color 0.15s;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.footerSocial:hover {
+  color: #34d399;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* `.footerCol span` (0,1,1) lebih spesifik daripada `.footerSocial` (0,1,0),
+   sehingga warna nomor/handle di dalam tautan sosial perlu ditimpa agar ikut
+   state hover dan tidak tetap redup. */
+.footerCol .footerSocial,
+.footerCol .footerSocial span {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.footerCol .footerSocial:hover,
+.footerCol .footerSocial:hover span {
+  color: #34d399;
+}
+
+.footerSocial:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* Tautan non-sosial (surel): target klik minimal 44px seperti tautan sosial. */
+.footerPlain {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 44px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+@media (min-width: 640px) {
+  .footerPlain {
+    min-height: 0;
+    font-size: 14px;
+  }
+}
+
+/* Nilai kontak (nomor/handle) tidak boleh membelah baris di layar sempit. */
+.footerSocialValue {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-mono);
 }
 
 .footerSocial:hover {
@@ -87,8 +162,8 @@
 
 .footerWaBadge,
 .footerIgBadge {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
@@ -98,11 +173,11 @@
 }
 
 .footerWaBadge {
-  background: rgba(16, 185, 129, 0.2);
+  background: rgba(5, 150, 105, 0.2);
 }
 
 .footerSocial:hover .footerWaBadge {
-  background: rgba(16, 185, 129, 0.32);
+  background: rgba(5, 150, 105, 0.32);
 }
 
 .footerIgBadge {
@@ -116,32 +191,11 @@
 .footerWaGlyph {
   width: 16px;
   height: 16px;
-  fill: #10b981;
+  fill: #34d399;
 }
 
 .footerIgGlyph {
   width: 15px;
   height: 15px;
   color: #ec4899;
-}
-
-.footerBottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  margin-top: 48px;
-  padding-top: 32px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.70);
-  text-align: center;
-}
-
-@media (min-width: 640px) {
-  .footerBottom {
-    flex-direction: row;
-    justify-content: space-between;
-    text-align: left;
-  }
 }
