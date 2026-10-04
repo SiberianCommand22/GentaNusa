@@ -17,9 +17,9 @@ const IG_URL =
   "https://www.instagram.com/gentanusa_id?stkn=MXEzZXVlYWZyZnE4Zw==";
 
 const labelCls =
-  "text-xs uppercase tracking-wider text-neutral-300 font-semibold mb-2 block";
+  "block text-xs uppercase tracking-wider text-neutral-300 font-semibold mb-1.5";
 const inputCls =
-  "w-full bg-[#070e1b] border border-white/20 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500";
+  "w-full bg-[#070e1b] border border-white/20 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 text-sm";
 
 export default function KontakPage() {
   const [form, setForm] = useState({
@@ -70,134 +70,110 @@ export default function KontakPage() {
 
   return (
     <>
-      <main className="max-w-5xl mx-auto px-4 py-10">
-        <nav
-          aria-label="Breadcrumb"
-          className="flex items-center gap-2 text-xs font-semibold text-white/60 mb-6"
-        >
-          <Link href="/" className="hover:text-white transition-colors">
-            Beranda
-          </Link>
-          <span aria-hidden="true"> {" > "} </span>
-          <span aria-current="page" className="text-white">
-            Kontak
-          </span>
-        </nav>
+      <main className="min-h-screen bg-neutral-900 text-neutral-100 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto space-y-8">
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-2 text-xs font-semibold text-white/60"
+          >
+            <Link href="/" className="hover:text-white transition-colors">
+              Beranda
+            </Link>
+            <span aria-hidden="true"> {" > "} </span>
+            <span aria-current="page" className="text-white">
+              Kontak
+            </span>
+          </nav>
 
-        <div className="bg-[#0B1727] text-white border border-white/10 rounded-2xl p-6 sm:p-10 shadow-xl">
-          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-3">
-            Kontak &amp; Hubungi Kami
-          </h1>
-          <p className="text-neutral-300 text-sm sm:text-base leading-relaxed mb-8">
-            Kami terbuka untuk masukan, pertanyaan, aduan jurnalistik, dan
-            kerja sama kemitraan. Pilih kategori yang paling sesuai agar kami
-            dapat merespons dengan cepat — maksimal 1–2 hari kerja.
-          </p>
+          <div className="border-b border-white/10 pb-6 text-center sm:text-left">
+            <span className="inline-block px-3 py-1 rounded bg-blue-950/80 text-blue-400 border border-blue-500/20 text-xs font-bold uppercase tracking-wider mb-3">
+              Komunikasi Resmi
+            </span>
+            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-2">
+              Kontak &amp; Kerja Sama Redaksi
+            </h1>
+            <p className="text-neutral-400 text-sm sm:text-base">
+              Hubungi redaksi untuk hak jawab, pengiriman naskah opini,
+              kemitraan media, maupun periklanan. Respons maksimal 1–2 hari
+              kerja.
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-8 items-start">
-            {/* Detail kontak resmi */}
-            <section
-              aria-labelledby="info-heading"
-              className="border border-white/10 rounded-xl p-6 bg-white/[0.02]"
-            >
-              <h2
-                id="info-heading"
-                className="text-lg font-bold text-white mb-5"
-              >
-                Saluran Resmi
-              </h2>
-              <ul className="flex flex-col gap-4 text-sm leading-relaxed">
-                <li>
-                  <span className={labelCls}>WhatsApp Kemitraan</span>
-                  <a
-                    href={WA_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-300 hover:text-white transition-colors font-semibold"
-                  >
-                    WhatsApp: +62 851-3497-7073
-                  </a>
-                </li>
-                <li>
-                  <span className={labelCls}>Surel Redaksi</span>
-                  <a
-                    href="mailto:redaksi@gentanusa.id"
-                    className="text-blue-300 hover:text-white transition-colors"
-                  >
-                    redaksi@gentanusa.id
-                  </a>
-                </li>
-                <li>
-                  <span className={labelCls}>Bisnis / Iklan</span>
-                  <a
-                    href="mailto:bisnis@gentanusa.id"
-                    className="text-blue-300 hover:text-white transition-colors"
-                  >
-                    bisnis@gentanusa.id
-                  </a>
-                </li>
-                <li>
-                  <span className={labelCls}>Alamat</span>
-                  <span className="text-neutral-200 not-italic">
-                    Jakarta, Indonesia
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Kolom Kiri: Saluran Resmi */}
+            <div className="lg:col-span-5 bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6">
+              <h2 className="text-xl font-bold text-white">Saluran Langsung</h2>
+
+              <div className="space-y-4 text-sm">
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
+                  <span className="text-xs text-neutral-400 font-medium">
+                    WhatsApp Kemitraan &amp; Redaksi:
                   </span>
-                </li>
-              </ul>
-
-              <div className="h-px bg-white/10 my-6" />
-
-              <h3 className="text-xs uppercase tracking-wider text-neutral-400 font-bold mb-3">
-                Media Sosial Resmi
-              </h3>
-              <ul className="flex flex-col gap-2 text-sm">
-                <li>
                   <a
                     href={WA_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-neutral-200 hover:text-white transition-colors"
+                    className="block text-green-400 font-bold hover:underline text-base font-mono"
                   >
-                    WhatsApp (+62 851-3497-7073)
+                    +62 851-3497-7073
                   </a>
-                </li>
-                <li>
+                </div>
+
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
+                  <span className="text-xs text-neutral-400 font-medium">
+                    Instagram Resmi:
+                  </span>
                   <a
                     href={IG_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-neutral-200 hover:text-white transition-colors"
+                    className="block text-pink-400 font-bold hover:underline text-base font-mono"
                   >
                     @gentanusa_id
                   </a>
-                </li>
-              </ul>
+                </div>
 
-              <div className="h-px bg-white/10 my-6" />
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
+                  <span className="text-xs text-neutral-400 font-medium">
+                    Surel Redaksi &amp; Aduan:
+                  </span>
+                  <a
+                    href="mailto:redaksi@gentanusa.id"
+                    className="text-white font-mono font-semibold hover:underline block"
+                  >
+                    redaksi@gentanusa.id
+                  </a>
+                </div>
 
-              <h3 className="text-xs uppercase tracking-wider text-neutral-400 font-bold mb-3">
-                Landasan Hukum Aduan
-              </h3>
-              <p className="text-[13px] leading-relaxed text-neutral-300">
-                Aduan jurnalistik diproses sesuai{" "}
-                <strong className="text-white">
-                  UU Pers No. 40 Tahun 1999
-                </strong>
-                , <strong className="text-white">Kode Etik Jurnalistik</strong>,
-                dan{" "}
-                <strong className="text-white">
-                  Pedoman Media Siber Dewan Pers
-                </strong>
-                . Hak jawab dipenuhi dalam 1×24 jam setelah pengajuan lengkap
-                diterima.
-              </p>
-            </section>
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
+                  <span className="text-xs text-neutral-400 font-medium">
+                    Surel Kemitraan &amp; Iklan:
+                  </span>
+                  <a
+                    href="mailto:bisnis@gentanusa.id"
+                    className="text-white font-mono font-semibold hover:underline block"
+                  >
+                    bisnis@gentanusa.id
+                  </a>
+                </div>
 
-            {/* Formulir */}
-            <section aria-labelledby="form-heading">
-              <h2
-                id="form-heading"
-                className="text-xl font-bold text-white mb-5"
-              >
+                <div className="pt-2 text-xs text-neutral-400">
+                  Alamat Redaksi: Jakarta, Indonesia.
+                </div>
+
+                <div className="pt-2 border-t border-white/10 text-xs text-neutral-400 leading-relaxed">
+                  Aduan jurnalistik diproses sesuai{" "}
+                  <strong className="text-white">
+                    UU Pers No. 40 Tahun 1999
+                  </strong>
+                  , Kode Etik Jurnalistik, dan Pedoman Media Siber Dewan Pers.
+                </div>
+              </div>
+            </div>
+
+            {/* Kolom Kanan: Form Pesan */}
+            <div className="lg:col-span-7 bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8">
+              <h2 className="text-xl font-bold text-white mb-6">
                 Kirim Pesan ke Redaksi
               </h2>
 
@@ -220,10 +196,10 @@ export default function KontakPage() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
+              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <div>
                   <label htmlFor="name" className={labelCls}>
-                    Nama Lengkap *
+                    Nama Lengkap
                   </label>
                   <input
                     type="text"
@@ -231,17 +207,17 @@ export default function KontakPage() {
                     name="name"
                     value={form.name}
                     onChange={handleChange}
-                    placeholder="Nama lengkap Anda"
-                    className={inputCls}
                     required
+                    placeholder="Nama Anda..."
                     autoComplete="name"
                     disabled={status === "submitting"}
+                    className={inputCls}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="email" className={labelCls}>
-                    Alamat Surel *
+                    Alamat Surel (Email)
                   </label>
                   <input
                     type="email"
@@ -249,26 +225,25 @@ export default function KontakPage() {
                     name="email"
                     value={form.email}
                     onChange={handleChange}
-                    placeholder="nama@domain.com"
-                    className={inputCls}
                     required
+                    placeholder="alamat@email.com"
                     autoComplete="email"
                     disabled={status === "submitting"}
+                    className={inputCls}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="subject" className={labelCls}>
-                    Kategori *
+                    Kategori Kepentingan
                   </label>
                   <select
                     id="subject"
                     name="subject"
                     value={form.subject}
                     onChange={handleChange}
-                    className={`${inputCls} cursor-pointer`}
-                    required
                     disabled={status === "submitting"}
+                    className={`${inputCls} cursor-pointer`}
                   >
                     {SUBJECTS.map((s) => (
                       <option
@@ -284,28 +259,30 @@ export default function KontakPage() {
 
                 <div>
                   <label htmlFor="message" className={labelCls}>
-                    Isi Pesan *
+                    Pesan Anda
                   </label>
                   <textarea
                     id="message"
                     name="message"
                     value={form.message}
                     onChange={handleChange}
-                    placeholder="Tulis pesan Anda di sini... (minimal 20 karakter)"
-                    className={`${inputCls} resize-y min-h-[140px] leading-relaxed`}
-                    rows={6}
+                    rows={4}
                     required
                     minLength={20}
+                    placeholder="Tuliskan pesan atau klarifikasi secara detail... (minimal 20 karakter)"
                     disabled={status === "submitting"}
+                    className={`${inputCls} resize-y min-h-[140px] leading-relaxed`}
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   disabled={status === "submitting"}
+                  className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors text-sm uppercase tracking-wider shadow-lg shadow-blue-600/30 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {status === "submitting" ? "Mengirim..." : "Kirim Pesan"}
+                  {status === "submitting"
+                    ? "Mengirim..."
+                    : "Kirim Pesan Sekarang"}
                 </button>
               </form>
 
@@ -320,7 +297,7 @@ export default function KontakPage() {
                 </Link>
                 .
               </p>
-            </section>
+            </div>
           </div>
         </div>
       </main>
