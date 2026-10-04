@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Source_Serif_4, Inter } from "next/font/google";
+import { Source_Serif_4, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { AnalyticsTracker } from "@/components/analytics-tracker";
 import { SiteChrome } from "@/components/site-chrome";
 import "./globals.css";
@@ -13,6 +13,13 @@ const sourceSerif = Source_Serif_4({
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-jakarta",
   display: "swap",
 });
 
@@ -60,12 +67,12 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="id" className={`${sourceSerif.variable} ${inter.variable}`}>
+    <html lang="id" className={`${sourceSerif.variable} ${inter.variable} ${jakarta.variable}`}>
       <head>
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
       </head>
-      <body className="bg-[#060b14] text-neutral-100 antialiased min-h-screen flex flex-col justify-between">
+      <body className={`${jakarta.className} bg-[#F8FAFC] text-slate-900 antialiased min-h-screen flex flex-col justify-between`}>
         <AnalyticsTracker />
         <SiteChrome>{children}</SiteChrome>
       </body>

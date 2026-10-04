@@ -99,50 +99,53 @@ const pasals = [
 export default function PedomanMediaSiberPage() {
   return (
     <>
-      <main className="max-w-4xl mx-auto px-4 py-12 space-y-6">
+      <div className="bg-[#F8FAFC] py-12 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
           <nav
             aria-label="Breadcrumb"
-            className="flex items-center gap-2 text-xs font-semibold text-white/60"
+            className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-6"
           >
-            <Link href="/" className="hover:text-white transition-colors">
+            <Link href="/" className="hover:text-slate-700 transition-colors">
               Beranda
             </Link>
             <span aria-hidden="true"> {" > "} </span>
-            <span aria-current="page" className="text-white">
+            <span aria-current="page" className="text-slate-700">
               Pedoman Media Siber
             </span>
           </nav>
 
-          <div className="border-b border-white/10 pb-6">
-            <span className="inline-block px-3 py-1 rounded bg-blue-950/80 text-blue-400 border border-blue-500/20 text-xs font-bold uppercase tracking-wider mb-3">
+          <div className="mb-6">
+            <span className="inline-block px-3 py-1 rounded bg-blue-50 text-blue-700 border border-blue-100 text-xs font-bold uppercase tracking-wider mb-3">
               Standar Dewan Pers
             </span>
-            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-3">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
               Pedoman Pemberitaan Media Siber
             </h1>
-            <p className="text-neutral-400 text-sm sm:text-base leading-relaxed">
+            <p className="text-slate-600 text-base leading-relaxed">
               Sesuai UU Pers No. 40 Tahun 1999 dan Keputusan Dewan Pers,
               seluruh produk naskah GentaNusa tunduk pada pedoman operasional
               siber berikut.
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div>
             {pasals.map((p) => (
               <div
                 key={p.nomor}
-                className="bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-3"
+                className="bg-white rounded-xl border border-slate-200/80 p-6 sm:p-8 shadow-sm mb-6"
               >
                 <div className="mb-2">
-                  <span className="text-xs font-bold text-blue-400 uppercase tracking-widest bg-blue-950/80 px-2.5 py-1 rounded border border-blue-500/20">
+                  <span className="px-3 py-1 rounded bg-blue-50 text-blue-700 font-bold text-xs uppercase tracking-wider">
                     {p.nomor}
                   </span>
-                  <h2 className="text-lg font-bold text-white inline-block ml-3">{p.judul}</h2>
+                  <h2 className="text-lg font-bold text-slate-900 inline-block ml-3">
+                    {p.judul}
+                  </h2>
                 </div>
-                <p className="text-neutral-300 text-sm sm:text-base leading-relaxed">
+                <p className="text-slate-700 text-base leading-relaxed mt-3">
                   {p.intro}
                 </p>
-                <ul className="list-disc pl-6 mt-3 space-y-1.5 text-neutral-400 text-sm leading-relaxed">
+                <ul className="list-disc pl-6 mt-3 space-y-1.5 text-slate-600 text-sm leading-relaxed">
                   {p.points.map((pt, i) => (
                     <li key={i}>{pt}</li>
                   ))}
@@ -151,15 +154,15 @@ export default function PedomanMediaSiberPage() {
             ))}
           </div>
 
-          <div className="bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8">
-            <h2 className="text-lg font-bold text-white mb-3">Penutup</h2>
-            <p className="text-neutral-300 text-sm sm:text-base leading-relaxed mb-3">
+          <div className="bg-white rounded-xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-900 mb-3">Penutup</h2>
+            <p className="text-slate-700 text-base leading-relaxed mb-3">
               Pedoman ini berlaku efektif sejak diterbitkan dan dapat diperbarui
               sewaktu-waktu oleh Dewan Redaksi GentaNusa. Setiap redaktur dan
               jurnalis wajib memahami dan mengamalkan pedoman ini dalam setiap
               proses pemberitaan.
             </p>
-            <p className="text-neutral-400 text-sm">
+            <p className="text-slate-500 text-sm">
               <em>
                 Jakarta, Oktober 2026
                 <br />
@@ -167,7 +170,8 @@ export default function PedomanMediaSiberPage() {
               </em>
             </p>
           </div>
-      </main>
+        </div>
+      </div>
       <Footer />
     </>
   );

@@ -35,42 +35,43 @@ export const metadata: Metadata = {
   },
 };
 
-const linkCls = "text-blue-300 hover:text-white transition-colors";
-const card = "bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-3";
-const h2 = "text-lg font-bold text-white";
-const p = "text-neutral-300 text-sm leading-relaxed";
+const linkCls = "text-blue-700 hover:text-blue-900 font-medium transition-colors";
+const card = "bg-slate-50 border border-slate-200/60 rounded-xl p-6 space-y-3";
+const h2 = "text-lg font-bold text-slate-900";
+const p = "text-slate-600 text-sm leading-relaxed";
 const listCls =
-  "list-disc pl-6 space-y-1.5 text-neutral-300 text-sm leading-relaxed";
+  "list-disc pl-6 space-y-1.5 text-slate-600 text-sm leading-relaxed";
 const thCls =
-  "text-left text-xs uppercase tracking-wider font-bold text-white p-3 border border-white/10 bg-white/[0.05]";
+  "text-left text-xs uppercase tracking-wider font-bold text-slate-900 p-3 border border-slate-200 bg-slate-100";
 const tdCls =
-  "text-neutral-300 p-3 border border-white/10 text-sm leading-relaxed align-top";
+  "text-slate-600 p-3 border border-slate-200 text-sm leading-relaxed align-top";
 
 export default function KebijakanPrivasiPage() {
   return (
     <>
-      <main className="max-w-4xl mx-auto px-4 py-12 space-y-6">
+      <div className="bg-[#F8FAFC] py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto bg-white rounded-2xl border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-6 my-10">
           <nav
             aria-label="Breadcrumb"
-            className="flex items-center gap-2 text-xs font-semibold text-white/60"
+            className="flex items-center gap-2 text-xs font-semibold text-slate-400"
           >
-            <Link href="/" className="hover:text-white transition-colors">
+            <Link href="/" className="hover:text-slate-700 transition-colors">
               Beranda
             </Link>
             <span aria-hidden="true"> {" > "} </span>
-            <span aria-current="page" className="text-white">
+            <span aria-current="page" className="text-slate-700">
               Kebijakan Privasi
             </span>
           </nav>
 
-          <div className="border-b border-white/10 pb-6">
-            <span className="inline-block px-3 py-1 rounded bg-blue-950/80 text-blue-400 border border-blue-500/20 text-xs font-bold uppercase tracking-wider mb-3">
+          <div>
+            <span className="inline-block px-3 py-1 rounded bg-blue-50 text-blue-700 border border-blue-100 text-xs font-bold uppercase tracking-wider mb-3">
               Kepatuhan UU PDP
             </span>
-            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-3">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
               Kebijakan Privasi
             </h1>
-            <p className="text-neutral-400 text-sm sm:text-base">
+            <p className="text-slate-600 text-base leading-relaxed">
               Perlindungan data pribadi pembaca sesuai UU No. 27 Tahun 2022
               tentang Perlindungan Data Pribadi (UU PDP). Terakhir diperbarui:
               Oktober 2026.
@@ -84,28 +85,29 @@ export default function KebijakanPrivasiPage() {
                 Pengendali data situs ini adalah Redaksi GentaNusa,
                 berkedudukan di Jakarta, Indonesia.
               </p>
-              <div className="text-sm text-neutral-300 space-y-1 pt-2 border-t border-white/10">
+              <div className="text-sm text-slate-600 space-y-1 pt-2 border-t border-slate-200">
                 <p>
                   • Surel Redaksi:{" "}
                   <a href="mailto:redaksi@gentanusa.id" className={linkCls}>
-                    <span className="text-white font-mono">
-                      redaksi@gentanusa.id
-                    </span>
+                    <span className="font-mono">redaksi@gentanusa.id</span>
                   </a>
                 </p>
                 <p>
                   • Privasi &amp; Hak Subjek Data:{" "}
                   <a href="mailto:privasi@gentanusa.id" className={linkCls}>
-                    <span className="text-white font-mono">
-                      privasi@gentanusa.id
-                    </span>
+                    <span className="font-mono">privasi@gentanusa.id</span>
                   </a>
                 </p>
                 <p>
                   • WhatsApp Kemitraan:{" "}
-                  <span className="text-white font-mono">
-                    +62 851-3497-7073
-                  </span>
+                  <a
+                    href="https://wa.me/6285134977073"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={linkCls}
+                  >
+                    <span className="font-mono">+62 851-3497-7073</span>
+                  </a>
                 </p>
               </div>
             </div>
@@ -120,19 +122,19 @@ export default function KebijakanPrivasiPage() {
               </p>
               <ul className={listCls}>
                 <li>
-                  <strong className="text-white">Formulir Kontak:</strong> nama,
-                  surel, subjek, dan isi pesan.
+                  <strong className="text-slate-900">Formulir Kontak:</strong>{" "}
+                  nama, surel, subjek, dan isi pesan.
                 </li>
                 <li>
-                  <strong className="text-white">Buletin:</strong> alamat surel
-                  dengan persetujuan eksplisit (double opt-in).
+                  <strong className="text-slate-900">Buletin:</strong> alamat
+                  surel dengan persetujuan eksplisit (double opt-in).
                 </li>
                 <li>
-                  <strong className="text-white">Data Otomatis:</strong> IP
+                  <strong className="text-slate-900">Data Otomatis:</strong> IP
                   dianonimkan, tipe peramban, halaman dikunjungi, referrer.
                 </li>
                 <li>
-                  <strong className="text-white">Cookie:</strong> fungsional
+                  <strong className="text-slate-900">Cookie:</strong> fungsional
                   (bahasa, tema) dan analitik anonim — tanpa cross-site
                   tracking.
                 </li>
@@ -141,7 +143,7 @@ export default function KebijakanPrivasiPage() {
 
             <div className={card}>
               <h2 className={h2}>3. Tujuan &amp; Dasar Hukum Penggunaan</h2>
-              <div className="overflow-x-auto rounded-xl border border-white/10">
+              <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
                 <table className="w-full border-collapse min-w-[640px]">
                   <thead>
                     <tr>
@@ -181,15 +183,17 @@ export default function KebijakanPrivasiPage() {
               <h2 className={h2}>4. Retensi &amp; Keamanan Data</h2>
               <ul className={listCls}>
                 <li>
-                  Data kontak/aduan: <strong className="text-white">24 bulan</strong>{" "}
-                  setelah kasus selesai.
+                  Data kontak/aduan:{" "}
+                  <strong className="text-slate-900">24 bulan</strong> setelah
+                  kasus selesai.
                 </li>
                 <li>
                   Data buletin: selama langganan aktif +{" "}
-                  <strong className="text-white">30 hari</strong>.
+                  <strong className="text-slate-900">30 hari</strong>.
                 </li>
                 <li>
-                  Log akses anonim: <strong className="text-white">90 hari</strong>.
+                  Log akses anonim:{" "}
+                  <strong className="text-slate-900">90 hari</strong>.
                 </li>
                 <li>Enkripsi TLS 1.3, pembatasan akses internal, audit berkala.</li>
               </ul>
@@ -203,16 +207,16 @@ export default function KebijakanPrivasiPage() {
                 akses, koreksi, penghapusan, pembatasan, keberatan,
                 portabilitas, dan penarikan persetujuan.
               </p>
-              <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-4">
-                <p className="text-neutral-200 text-sm leading-relaxed">
-                  <strong className="text-white">Cara Mengajukan:</strong> kirim
-                  surel ke{" "}
+              <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+                <p className="text-slate-700 text-sm leading-relaxed">
+                  <strong className="text-slate-900">Cara Mengajukan:</strong>{" "}
+                  kirim surel ke{" "}
                   <a href="mailto:privasi@gentanusa.id" className={linkCls}>
                     privasi@gentanusa.id
                   </a>{" "}
                   dengan subjek &ldquo;HAK SUBJEK DATA — [Nama Lengkap]&rdquo;.
                   Direspons dalam{" "}
-                  <strong className="text-white">14 hari kerja</strong>.
+                  <strong className="text-slate-900">14 hari kerja</strong>.
                 </p>
               </div>
             </div>
@@ -220,7 +224,7 @@ export default function KebijakanPrivasiPage() {
             <div className={card}>
               <h2 className={h2}>6. Pihak Ketiga, Anak &amp; Perubahan</h2>
               <p className={p}>
-                GentaNusa <strong className="text-white">TIDAK PERNAH</strong>{" "}
+                GentaNusa <strong className="text-slate-900">TIDAK PERNAH</strong>{" "}
                 menjual data. Berbagi terbatas pada pemroses terpercaya
                 (hosting/CDN, analitik anonim, email transaksional) dengan DPA
                 yang sah. Tidak ada pengumpulan sengaja dari anak di bawah 13
@@ -229,7 +233,8 @@ export default function KebijakanPrivasiPage() {
               </p>
             </div>
           </div>
-      </main>
+        </div>
+      </div>
       <Footer />
     </>
   );

@@ -87,15 +87,17 @@ export function Navbar() {
               aria-label="GentaNusa — Beranda"
               className="flex items-center justify-center gap-2.5"
             >
-              <Image
-                src="/logo.png"
-                alt="GentaNusa"
-                width={38}
-                height={38}
-                className="object-contain"
-                priority
-              />
-              <span className="text-white font-serif font-bold text-xl tracking-tight leading-none">
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-[#0B1727] border border-white/20 flex items-center justify-center shrink-0">
+                <Image
+                  src="/logo.png"
+                  alt="GentaNusa Logo"
+                  width={40}
+                  height={40}
+                  className="object-cover scale-105"
+                  priority
+                />
+              </div>
+              <span className="text-white font-extrabold text-xl tracking-tight ml-2.5 font-sans">
                 GentaNusa
               </span>
             </Link>

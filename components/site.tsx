@@ -9,13 +9,15 @@ export function Footer() {
       <div className={styles.container}>
         <div className={styles.footerGrid}>
           <div className={styles.brandCol}>
-            <Image
-              src="/logo.png"
-              alt="GentaNusa"
-              width={48}
-              height={48}
-              className="object-contain"
-            />
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-[#0B1727] border border-white/20 flex items-center justify-center shrink-0">
+              <Image
+                src="/logo.png"
+                alt="GentaNusa Logo"
+                width={48}
+                height={48}
+                className="object-cover scale-105"
+              />
+            </div>
             <BrandLogo theme="dark" size="md" href="/" />
             <p className={styles.footerText}>
               Portal berita nasional independen menyajikan informasi akurat,

@@ -17,9 +17,9 @@ const IG_URL =
   "https://www.instagram.com/gentanusa_id?stkn=MXEzZXVlYWZyZnE4Zw==";
 
 const labelCls =
-  "block text-xs uppercase tracking-wider text-neutral-300 font-semibold mb-2";
+  "block text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2";
 const inputCls =
-  "w-full bg-[#060b14] border border-white/15 rounded-lg px-4 py-3 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all";
+  "w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-sm transition-all focus:outline-none";
 
 export default function KontakPage() {
   const [form, setForm] = useState({
@@ -70,29 +70,29 @@ export default function KontakPage() {
 
   return (
     <>
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="space-y-8">
+      <div className="bg-[#F8FAFC] py-12 px-4 sm:px-6">
+        <div className="max-w-5xl mx-auto">
           <nav
             aria-label="Breadcrumb"
-            className="flex items-center gap-2 text-xs font-semibold text-white/60"
+            className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-6"
           >
-            <Link href="/" className="hover:text-white transition-colors">
+            <Link href="/" className="hover:text-slate-700 transition-colors">
               Beranda
             </Link>
             <span aria-hidden="true"> {" > "} </span>
-            <span aria-current="page" className="text-white">
+            <span aria-current="page" className="text-slate-700">
               Kontak
             </span>
           </nav>
 
-          <div className="text-center sm:text-left">
-            <span className="px-3 py-1 rounded bg-blue-950/80 text-blue-400 border border-blue-500/20 text-xs font-bold uppercase tracking-wider">
+          <div className="mb-8">
+            <span className="inline-block px-3 py-1 rounded bg-blue-50 text-blue-700 border border-blue-100 text-xs font-bold uppercase tracking-wider mb-3">
               Komunikasi Resmi
             </span>
-            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-white mt-3 mb-2">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
               Kontak &amp; Hubungi Redaksi
             </h1>
-            <p className="text-neutral-400 text-sm max-w-2xl mb-10">
+            <p className="text-slate-600 text-base leading-relaxed max-w-2xl">
               Hubungi redaksi untuk hak jawab, pengiriman naskah opini,
               kemitraan media, maupun periklanan. Respons maksimal 1–2 hari
               kerja.
@@ -101,74 +101,76 @@ export default function KontakPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Kolom Kiri: Saluran Resmi */}
-            <div className="lg:col-span-5 bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
-              <h2 className="text-xl font-bold text-white">Saluran Langsung</h2>
+            <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-5">
+              <h2 className="text-xl font-bold text-slate-900">
+                Saluran Resmi
+              </h2>
 
               <div className="space-y-4 text-sm">
-                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
-                  <span className="text-xs text-neutral-400 font-medium">
+                <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-xl space-y-1">
+                  <span className="text-xs text-slate-500 font-medium">
                     WhatsApp Kemitraan &amp; Redaksi:
                   </span>
                   <a
                     href={WA_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block text-green-400 font-bold hover:underline text-base font-mono"
+                    className="block text-emerald-600 font-bold hover:underline text-base font-mono"
                   >
                     +62 851-3497-7073
                   </a>
                 </div>
 
-                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
-                  <span className="text-xs text-neutral-400 font-medium">
+                <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-xl space-y-1">
+                  <span className="text-xs text-slate-500 font-medium">
                     Instagram Resmi:
                   </span>
                   <a
                     href={IG_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block text-pink-400 font-bold hover:underline text-base font-mono"
+                    className="block text-pink-600 font-bold hover:underline text-base font-mono"
                   >
                     @gentanusa_id
                   </a>
                 </div>
 
-                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
-                  <span className="text-xs text-neutral-400 font-medium">
+                <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-xl space-y-1">
+                  <span className="text-xs text-slate-500 font-medium">
                     Surel Redaksi &amp; Aduan:
                   </span>
                   <a
                     href="mailto:redaksi@gentanusa.id"
-                    className="text-white font-mono font-semibold hover:underline block"
+                    className="block text-slate-900 font-mono font-semibold hover:underline"
                   >
                     redaksi@gentanusa.id
                   </a>
                 </div>
 
-                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
-                  <span className="text-xs text-neutral-400 font-medium">
+                <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-xl space-y-1">
+                  <span className="text-xs text-slate-500 font-medium">
                     Surel Kemitraan &amp; Iklan:
                   </span>
                   <a
                     href="mailto:bisnis@gentanusa.id"
-                    className="text-white font-mono font-semibold hover:underline block"
+                    className="block text-slate-900 font-mono font-semibold hover:underline"
                   >
                     bisnis@gentanusa.id
                   </a>
                 </div>
 
-                <div className="bg-white/[0.03] border border-white/5 p-4 rounded-xl space-y-1">
-                  <span className="text-xs text-neutral-400 font-medium">
+                <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-xl space-y-1">
+                  <span className="text-xs text-slate-500 font-medium">
                     Alamat Kantor:
                   </span>
-                  <p className="text-white font-semibold">
+                  <p className="text-slate-900 font-semibold">
                     Jakarta, Indonesia
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-white/10 text-xs text-neutral-400 leading-relaxed">
+                <div className="pt-2 border-t border-slate-200 text-xs text-slate-500 leading-relaxed">
                   Aduan jurnalistik diproses sesuai{" "}
-                  <strong className="text-white">
+                  <strong className="text-slate-900">
                     UU Pers No. 40 Tahun 1999
                   </strong>
                   , Kode Etik Jurnalistik, dan Pedoman Media Siber Dewan Pers.
@@ -176,15 +178,15 @@ export default function KontakPage() {
               </div>
             </div>
 
-            {/* Kolom Kanan: Form Pesan */}
-            <div className="lg:col-span-7 bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl">
-              <h2 className="text-xl font-bold text-white mb-6">
+            {/* Kolom Kanan: Formulir Pesan Redaksi */}
+            <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
+              <h2 className="text-xl font-bold text-slate-900 mb-6">
                 Kirim Pesan ke Redaksi
               </h2>
 
               {status === "success" && (
                 <div
-                  className="bg-green-500/15 border border-green-500/30 text-green-300 px-4 py-3 rounded-lg text-sm font-medium mb-6"
+                  className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg text-sm font-medium mb-6"
                   role="status"
                 >
                   Pesan Anda telah terkirim. Tim redaksi akan merespons dalam
@@ -194,7 +196,7 @@ export default function KontakPage() {
 
               {status === "error" && (
                 <div
-                  className="bg-red-500/15 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg text-sm font-medium mb-6"
+                  className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm font-medium mb-6"
                   role="alert"
                 >
                   {errorMsg}
@@ -254,7 +256,7 @@ export default function KontakPage() {
                       <option
                         key={s.value}
                         value={s.value}
-                        className="bg-[#0B1727] text-white"
+                        className="bg-white text-slate-900"
                       >
                         {s.label}
                       </option>
@@ -283,7 +285,7 @@ export default function KontakPage() {
                 <button
                   type="submit"
                   disabled={status === "submitting"}
-                  className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors text-sm uppercase tracking-wider shadow-lg shadow-blue-600/30 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {status === "submitting"
                     ? "Mengirim..."
@@ -291,12 +293,12 @@ export default function KontakPage() {
                 </button>
               </form>
 
-              <p className="mt-5 text-xs leading-relaxed text-neutral-400 text-center">
+              <p className="mt-5 text-xs leading-relaxed text-slate-500 text-center">
                 Dengan mengirim formulir ini, Anda menyetujui pengolahan data
                 sesuai{" "}
                 <Link
                   href="/kebijakan-privasi"
-                  className="text-blue-300 hover:text-white transition-colors"
+                  className="text-blue-700 hover:text-blue-900 font-medium transition-colors"
                 >
                   Kebijakan Privasi GentaNusa
                 </Link>
@@ -305,7 +307,7 @@ export default function KontakPage() {
             </div>
           </div>
         </div>
-      </main>
+      </div>
       <Footer />
     </>
   );

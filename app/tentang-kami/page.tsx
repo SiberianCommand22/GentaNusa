@@ -67,132 +67,134 @@ const desks = [
   "Desk Peduli (Kemanusiaan & Sosial)",
 ];
 
-const linkCls = "text-blue-300 hover:text-white transition-colors";
+const linkCls = "text-blue-700 hover:text-blue-900 font-medium transition-colors";
 
 export default function TentangKamiPage() {
   return (
     <>
-      <main className="max-w-4xl mx-auto px-4 py-12 space-y-8">
+      <div className="bg-[#F8FAFC] py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto bg-white rounded-2xl border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-8">
           <nav
             aria-label="Breadcrumb"
-            className="flex items-center gap-2 text-xs font-semibold text-white/60"
+            className="flex items-center gap-2 text-xs font-semibold text-slate-400"
           >
-            <Link href="/" className="hover:text-white transition-colors">
+            <Link href="/" className="hover:text-slate-700 transition-colors">
               Beranda
             </Link>
             <span aria-hidden="true"> {" > "} </span>
-            <span aria-current="page" className="text-white">
+            <span aria-current="page" className="text-slate-700">
               Tentang Kami
             </span>
           </nav>
 
-          {/* Header */}
-          <div className="border-b border-white/10 pb-8 text-center sm:text-left">
-            <span className="inline-block px-3 py-1 rounded bg-blue-950/80 text-blue-400 border border-blue-500/20 text-xs font-bold uppercase tracking-wider mb-3">
+          <header>
+            <span className="inline-block px-3 py-1 rounded bg-blue-50 text-blue-700 border border-blue-100 text-xs font-bold uppercase tracking-wider mb-3">
               Kelembagaan Redaksi
             </span>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-white tracking-tight mb-4">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
               Tentang Kami &amp; Struktur Redaksi
             </h1>
-            <p className="text-neutral-400 text-base sm:text-lg leading-relaxed max-w-2xl">
+            <p className="text-slate-600 text-base leading-relaxed max-w-2xl">
               GentaNusa — <em>&ldquo;Lonceng Nusantara&rdquo;</em> — hadir
               sebagai lonceng informasi nusantara: memukul tanda bahaya,
               memberikan kepastian berita di tengah keriuhan informasi palsu,
               dan menyuarakan kabar akurat, independen, dan berimbang bagi
               kedaulatan bangsa.
             </p>
-          </div>
+          </header>
 
-          {/* Filosofi & Komitmen */}
-          <div className="bg-[#0B1727] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-4">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-500"></span> Filosofi
+          <section className="bg-slate-50 border border-slate-200/60 rounded-xl p-6 sm:p-8 space-y-4">
+            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-blue-600"></span> Filosofi
               GentaNusa
             </h2>
-            <p className="text-neutral-300 leading-relaxed text-sm sm:text-base">
+            <p className="text-slate-600 text-base leading-relaxed">
               Mengambil simbol{" "}
-              <strong className="text-white">Genta (Lonceng)</strong>, media ini
-              berperan memukul tanda bahaya, memberikan kepastian berita di
+              <strong className="text-slate-900">Genta (Lonceng)</strong>, media
+              ini berperan memukul tanda bahaya, memberikan kepastian berita di
               tengah keriuhan informasi palsu, dan menjadi penyambung aspirasi
               publik yang berwibawa dari Sabang sampai Merauke.
             </p>
-            <ul className="list-disc pl-6 space-y-2 text-neutral-300 text-sm sm:text-base leading-relaxed">
+            <ul className="list-disc pl-6 space-y-2 text-slate-600 text-base leading-relaxed">
               <li>
-                <strong className="text-white">
+                <strong className="text-slate-900">
                   Verifikasi dulu, baru tayang.
                 </strong>{" "}
                 Setiap berita diperiksa faktanya melalui multi-sumber sebelum
                 dipublikasikan.
               </li>
               <li>
-                <strong className="text-white">Bahasa rakyat.</strong> Ditulis
-                sederhana, tanpa jargon berat, agar seluruh lapisan masyarakat
-                memahami.
+                <strong className="text-slate-900">Bahasa rakyat.</strong>{" "}
+                Ditulis sederhana, tanpa jargon berat, agar seluruh lapisan
+                masyarakat memahami.
               </li>
               <li>
-                <strong className="text-white">Transparan &amp; Berimbang.</strong>{" "}
+                <strong className="text-slate-900">
+                  Transparan &amp; Berimbang.
+                </strong>{" "}
                 Koreksi dicantumkan terbuka; hak jawab dipenuhi sesuai UU Pers
                 No. 40 Tahun 1999.
               </li>
               <li>
-                <strong className="text-white">Peduli Nusantara.</strong> Kanal{" "}
-                <strong className="text-white">Peduli</strong> mendokumentasikan
-                aksi sosial, bakti masyarakat, dan kemanusiaan.
+                <strong className="text-slate-900">Peduli Nusantara.</strong>{" "}
+                Kanal <strong className="text-slate-900">Peduli</strong>{" "}
+                mendokumentasikan aksi sosial, bakti masyarakat, dan
+                kemanusiaan.
               </li>
             </ul>
-          </div>
+          </section>
 
-          {/* Visi & Misi Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-[#0B1727] border border-white/10 rounded-2xl p-6">
-              <h3 className="text-blue-400 uppercase tracking-wider text-xs font-bold mb-3">
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-6">
+              <h3 className="text-blue-700 uppercase tracking-wider text-xs font-bold mb-3">
                 Visi
               </h3>
-              <p className="text-white font-medium text-base sm:text-lg leading-snug">
+              <p className="text-slate-900 font-medium text-base sm:text-lg leading-snug">
                 Menjadi pilar utama jurnalisme siber nasional yang kredibel,
                 berani mengungkap kebenaran, dan mencerdaskan kehidupan
                 berbangsa.
               </p>
             </div>
-            <div className="bg-[#0B1727] border border-white/10 rounded-2xl p-6">
-              <h3 className="text-blue-400 uppercase tracking-wider text-xs font-bold mb-3">
+            <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-6">
+              <h3 className="text-blue-700 uppercase tracking-wider text-xs font-bold mb-3">
                 Misi Utama
               </h3>
-              <ul className="text-neutral-300 text-sm space-y-2 list-disc list-inside">
+              <ul className="text-slate-600 text-sm space-y-2 list-disc list-inside">
                 <li>Menyajikan jurnalisme berbasis verifikasi berlapis sebelum tayang.</li>
                 <li>Menolak intervensi kepentingan politik praktis dan konglomerasi.</li>
                 <li>Mendokumentasikan aksi kemanusiaan melalui program bakti sosial.</li>
                 <li>Terbuka terhadap koreksi, klarifikasi, dan masukan pembaca.</li>
               </ul>
             </div>
-          </div>
+          </section>
 
-          {/* Struktur Redaksi Cards */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-white">
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold text-slate-900">
               Dewan &amp; Pengelola Redaksi
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {leaders.map((l) => (
                 <div
                   key={l.role}
-                  className="p-5 rounded-xl bg-white/[0.02] border border-white/10"
+                  className="bg-slate-50 border border-slate-200/60 rounded-xl p-5"
                 >
-                  <span className="text-xs text-neutral-400 uppercase">
+                  <span className="text-xs text-slate-500 uppercase font-medium">
                     {l.role}
                   </span>
-                  <p className="text-white font-bold text-lg mt-1">{l.name}</p>
-                  <p className="text-neutral-400 text-sm leading-relaxed mt-2">
+                  <p className="text-slate-900 font-bold text-lg mt-1">
+                    {l.name}
+                  </p>
+                  <p className="text-slate-600 text-sm leading-relaxed mt-2">
                     {l.desc}
                   </p>
                 </div>
               ))}
             </div>
-            <div className="bg-[#0B1727] border border-white/10 rounded-2xl p-6">
-              <h3 className="text-base font-bold text-white mb-3">
+            <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-6">
+              <h3 className="text-base font-bold text-slate-900 mb-3">
                 Redaktur Desk
               </h3>
-              <ol className="list-decimal pl-6 space-y-1.5 text-neutral-300 text-sm sm:text-base leading-relaxed">
+              <ol className="list-decimal pl-6 space-y-1.5 text-slate-600 text-sm sm:text-base leading-relaxed">
                 {desks.map((d) => (
                   <li key={d} className="pl-1">
                     {d}
@@ -200,15 +202,14 @@ export default function TentangKamiPage() {
                 ))}
               </ol>
             </div>
-          </div>
+          </section>
 
-          {/* Alamat & Landasan Hukum */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-[#0B1727] border border-white/10 rounded-2xl p-6 space-y-3">
-              <h2 className="text-lg font-bold text-white">
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-6 space-y-3">
+              <h2 className="text-lg font-bold text-slate-900">
                 Alamat &amp; Kontak Redaksi
               </h2>
-              <address className="not-italic text-sm text-neutral-300 space-y-1.5 leading-relaxed">
+              <address className="not-italic text-sm text-slate-600 space-y-1.5 leading-relaxed">
                 <p>GentaNusa — Jakarta, Indonesia</p>
                 <p>
                   Surel Resmi:{" "}
@@ -239,9 +240,11 @@ export default function TentangKamiPage() {
                 </p>
               </address>
             </div>
-            <div className="bg-[#0B1727] border border-white/10 rounded-2xl p-6 space-y-3">
-              <h2 className="text-lg font-bold text-white">Landasan Hukum</h2>
-              <ol className="list-decimal pl-6 space-y-1.5 text-neutral-300 text-sm leading-relaxed">
+            <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-6 space-y-3">
+              <h2 className="text-lg font-bold text-slate-900">
+                Landasan Hukum
+              </h2>
+              <ol className="list-decimal pl-6 space-y-1.5 text-slate-600 text-sm leading-relaxed">
                 <li className="pl-1">UU No. 40 Tahun 1999 tentang Pers</li>
                 <li className="pl-1">Kode Etik Jurnalistik (Dewan Pers)</li>
                 <li className="pl-1">
@@ -250,8 +253,9 @@ export default function TentangKamiPage() {
                 <li className="pl-1">UU Perlindungan Data Pribadi (UU PDP)</li>
               </ol>
             </div>
-          </div>
-      </main>
+          </section>
+        </div>
+      </div>
       <Footer />
     </>
   );

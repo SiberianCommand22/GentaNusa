@@ -49,15 +49,13 @@ export default function PeduliPage() {
           <span aria-current="page">Peduli</span>
         </nav>
 
-        <div className={styles.banner}>
-          <div className={styles.bannerInner}>
-            <span className={styles.bannerLabel}>Kategori</span>
-            <h1 className={styles.title}>Peduli</h1>
-            <p className={styles.subtitle}>
-              Dokumentasi kegiatan sosial, aksi kemanusiaan, dan bakti nusantara GentaNusa.
-            </p>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-4 mb-6 border-b border-slate-200">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
+            <span className="text-xs uppercase tracking-widest text-blue-600 font-bold">Kanal Liputan</span>
           </div>
-          <div className={styles.bannerAccent} />
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Peduli</h1>
+          <p className="text-sm text-slate-500 mt-1 max-w-2xl">Dokumentasi kegiatan sosial, aksi kemanusiaan, dan bakti nusantara GentaNusa.</p>
         </div>
 
         <section className={styles.comingSoon} aria-labelledby="peduli-title">
