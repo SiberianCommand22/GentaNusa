@@ -356,3 +356,67 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
 }
+
+/* Tautan sosial drawer: kelas modul (unlayered) menjaga warna agar tidak
+   kalah oleh utility Tailwind di @layer utilities. */
+.drawerSocial {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.drawerSocial:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.drawerSocial:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+.drawerWaBadge,
+.drawerIgBadge {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.drawerWaBadge {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.drawerSocial:hover .drawerWaBadge {
+  background: rgba(16, 185, 129, 0.32);
+}
+
+.drawerIgBadge {
+  background: rgba(236, 72, 153, 0.2);
+}
+
+.drawerSocial:hover .drawerIgBadge {
+  background: rgba(236, 72, 153, 0.32);
+}
+
+.drawerWaGlyph {
+  width: 16px;
+  height: 16px;
+  fill: #10b981;
+}
+
+.drawerIgGlyph {
+  width: 15px;
+  height: 15px;
+  color: #ec4899;
+}

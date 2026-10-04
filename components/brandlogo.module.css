@@ -6,9 +6,23 @@
   user-select: none;
 }
 
+/* Chip bundar pembungkus logo resmi /logo.png (bukan SVG lonceng lama). */
 .emblem {
-  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  border-radius: 9999px;
+  overflow: hidden;
+  background: #041d56;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.emblemImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.05);
 }
 
 .word {
@@ -17,19 +31,6 @@
   line-height: 1;
   letter-spacing: -0.02em;
   white-space: nowrap;
-}
-
-/* Ukuran emblem */
-.sm .emblem {
-  height: 28px;
-}
-
-.md .emblem {
-  height: 36px;
-}
-
-.lg .emblem {
-  height: 36px;
 }
 
 /* Ukuran teks */
@@ -54,28 +55,16 @@
 }
 
 /* Tema terang: navy pekat */
-.onLight .emblem {
-  color: #0b192c;
-}
-
 .onLight .word {
   color: #0b192c;
 }
 
 /* Tema gelap: putih bersih */
-.onDark .emblem {
-  color: #fff;
-}
-
 .onDark .word {
   color: #fff;
 }
 
 @media (max-width: 480px) {
-  .md .emblem {
-    height: 30px;
-  }
-
   .md .word {
     font-size: 19px;
   }

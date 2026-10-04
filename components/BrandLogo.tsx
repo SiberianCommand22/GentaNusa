@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import styles from "./brandlogo.module.css";
 
@@ -7,29 +8,37 @@ type BrandLogoProps = {
   href?: string;
 };
 
-// Emblem lonceng geometris GentaNusa — vektor currentColor yang presisi,
-// tanpa latar kotak. "light" = permukaan terang (navy), "dark" = gelap (putih).
-function BellEmblem({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <circle cx="12" cy="2.6" r="1.4" />
-      <path d="M12 5.4c-3.7 0-6.2 2.8-6.2 6.4v2.5l-1.9 2.9h16.2l-1.9-2.9v-2.5c0-3.6-2.5-6.4-6.2-6.4Z" />
-      <circle cx="12" cy="19.4" r="2.1" />
-    </svg>
-  );
-}
-
+const emblemPx = { sm: 28, md: 36, lg: 44 } as const;
 const sizeClass = { sm: styles.sm, md: styles.md, lg: styles.lg } as const;
 
-export function BrandLogo({ theme = "light", size = "md", href = "/" }: BrandLogoProps) {
+// Lockup merek GentaNusa. SATU-SATUNYA emblem resmi adalah /logo.png.
+// Emblem vektor lonceng lama (BellEmblem) sudah dihapus total dari repo.
+export function BrandLogo({
+  theme = "light",
+  size = "md",
+  href = "/",
+}: BrandLogoProps) {
+  const box = emblemPx[size];
+
   return (
     <Link
       href={href}
       className={`${styles.lockup} ${theme === "dark" ? styles.onDark : styles.onLight} ${sizeClass[size]}`}
       aria-label="GentaNusa — Beranda"
     >
-      <BellEmblem className={styles.emblem} />
+      <span className={styles.emblem} style={{ width: box, height: box }}>
+        <Image
+          src="/logo.png"
+          alt=""
+          width={box}
+          height={box}
+          priority
+          className={styles.emblemImg}
+        />
+      </span>
       <span className={styles.word}>GentaNusa</span>
     </Link>
   );
 }
+
+export default BrandLogo;

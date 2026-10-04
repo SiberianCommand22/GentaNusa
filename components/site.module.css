@@ -68,6 +68,63 @@
   color: #fff;
 }
 
+/* Tautan sosial: kelas modul (unlayered) dipakai agar warna badge & hover
+   tidak kalah oleh utility Tailwind yang berada di @layer utilities. */
+.footerSocial {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  transition: color 0.15s;
+}
+
+.footerSocial:hover {
+  color: #34d399;
+}
+
+.footerWaBadge,
+.footerIgBadge {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 0.15s;
+}
+
+.footerWaBadge {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.footerSocial:hover .footerWaBadge {
+  background: rgba(16, 185, 129, 0.32);
+}
+
+.footerIgBadge {
+  background: rgba(236, 72, 153, 0.2);
+}
+
+.footerSocial:hover .footerIgBadge {
+  background: rgba(236, 72, 153, 0.32);
+}
+
+.footerWaGlyph {
+  width: 16px;
+  height: 16px;
+  fill: #10b981;
+}
+
+.footerIgGlyph {
+  width: 15px;
+  height: 15px;
+  color: #ec4899;
+}
+
 .footerBottom {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: 48px;

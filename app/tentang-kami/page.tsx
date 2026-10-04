@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/site";
+import { OFFICIAL_WA_DISPLAY, OFFICIAL_WA_URL } from "@/lib/social";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
 
@@ -230,12 +231,12 @@ export default function TentangKamiPage() {
                   </a>{" "}
                   /{" "}
                   <a
-                    href="https://wa.me/6285134977073"
+                    href={OFFICIAL_WA_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={linkCls}
                   >
-                    +62 851-3497-7073
+                    {OFFICIAL_WA_DISPLAY}
                   </a>
                 </p>
               </address>

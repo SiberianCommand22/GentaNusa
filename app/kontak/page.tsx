@@ -3,6 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Footer } from "@/components/site";
+import { WhatsappIcon } from "@/components/WhatsappIcon";
+import {
+  OFFICIAL_EMAIL_BISNIS,
+  OFFICIAL_EMAIL_REDAKSI,
+  OFFICIAL_IG_LABEL,
+  OFFICIAL_IG_URL,
+  OFFICIAL_WA_DISPLAY,
+  OFFICIAL_WA_URL,
+} from "@/lib/social";
 
 const SUBJECTS = [
   { value: "redaksi", label: "Redaksi & Pengiriman Naskah Opini" },
@@ -12,14 +21,17 @@ const SUBJECTS = [
   { value: "lainnya", label: "Lainnya" },
 ];
 
-const WA_URL = "https://wa.me/6285134977073";
-const IG_URL =
-  "https://www.instagram.com/gentanusa_id?stkn=MXEzZXVlYWZyZnE4Zw==";
-
 const labelCls =
   "block text-xs uppercase tracking-wider text-slate-700 font-bold mb-1.5";
-const inputCls =
-  "w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all mb-4";
+
+// Reset total kontrol formulir: tidak boleh ada gaya bawaan browser/Windows.
+const fieldBase =
+  "w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
+const inputCls = `${fieldBase} mb-4`;
+const selectCls = `${fieldBase} mb-4 appearance-none pr-11 cursor-pointer`;
+const textareaCls = `${fieldBase} mb-4 min-h-[140px] resize-y leading-relaxed`;
+const submitCls =
+  "w-full py-4 bg-[#041d56] hover:bg-[#021236] text-white font-bold rounded-xl transition-all shadow-md text-sm uppercase tracking-wider cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed";
 
 export default function KontakPage() {
   const [form, setForm] = useState({
@@ -107,17 +119,28 @@ export default function KontakPage() {
               </h2>
 
               <div className="space-y-4 text-sm">
+                <a
+                  href={OFFICIAL_WA_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-3 w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-md transition-all text-sm"
+                >
+                  <WhatsappIcon className="w-5 h-5 fill-current shrink-0" />
+                  <span>Chat WhatsApp Redaksi</span>
+                </a>
+
                 <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-xl space-y-1">
                   <span className="text-xs text-slate-500 font-medium">
-                    WhatsApp Kemitraan &amp; Redaksi:
+                    Nomor WhatsApp Redaksi:
                   </span>
                   <a
-                    href={WA_URL}
+                    href={OFFICIAL_WA_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block text-emerald-700 font-bold hover:underline text-base font-mono"
+                    className="inline-flex items-center gap-2 text-emerald-700 font-bold hover:text-emerald-800 hover:underline text-base"
                   >
-                    +62 851-3497-7073
+                    <WhatsappIcon className="w-4 h-4 fill-current shrink-0" />
+                    {OFFICIAL_WA_DISPLAY}
                   </a>
                 </div>
 
@@ -126,12 +149,12 @@ export default function KontakPage() {
                     Instagram Resmi:
                   </span>
                   <a
-                    href={IG_URL}
+                    href={OFFICIAL_IG_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block text-pink-600 font-bold hover:underline text-base font-mono"
                   >
-                    @gentanusa_id
+                    {OFFICIAL_IG_LABEL}
                   </a>
                 </div>
 
@@ -140,10 +163,10 @@ export default function KontakPage() {
                     Surel Redaksi &amp; Aduan:
                   </span>
                   <a
-                    href="mailto:redaksi@gentanusa.id"
+                    href={`mailto:${OFFICIAL_EMAIL_REDAKSI}`}
                     className="block text-slate-900 font-mono font-semibold hover:underline"
                   >
-                    redaksi@gentanusa.id
+                    {OFFICIAL_EMAIL_REDAKSI}
                   </a>
                 </div>
 
@@ -152,10 +175,10 @@ export default function KontakPage() {
                     Surel Kemitraan &amp; Iklan:
                   </span>
                   <a
-                    href="mailto:bisnis@gentanusa.id"
+                    href={`mailto:${OFFICIAL_EMAIL_BISNIS}`}
                     className="block text-slate-900 font-mono font-semibold hover:underline"
                   >
-                    bisnis@gentanusa.id
+                    {OFFICIAL_EMAIL_BISNIS}
                   </a>
                 </div>
 
@@ -207,54 +230,50 @@ export default function KontakPage() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-                <div>
-                  <label htmlFor="name" className={labelCls}>
-                    Nama Lengkap
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    required
-                    placeholder="Nama Anda..."
-                    autoComplete="name"
-                    disabled={status === "submitting"}
-                    className={inputCls}
-                  />
-                </div>
+              <form onSubmit={handleSubmit} className="w-full" noValidate>
+                <label htmlFor="name" className={labelCls}>
+                  Nama Lengkap
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="Nama Anda..."
+                  autoComplete="name"
+                  disabled={status === "submitting"}
+                  className={inputCls}
+                />
 
-                <div>
-                  <label htmlFor="email" className={labelCls}>
-                    Alamat Surel (Email)
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                    placeholder="alamat@email.com"
-                    autoComplete="email"
-                    disabled={status === "submitting"}
-                    className={inputCls}
-                  />
-                </div>
+                <label htmlFor="email" className={labelCls}>
+                  Alamat Surel (Email)
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="alamat@email.com"
+                  autoComplete="email"
+                  disabled={status === "submitting"}
+                  className={inputCls}
+                />
 
-                <div>
-                  <label htmlFor="subject" className={labelCls}>
-                    Kategori Kepentingan
-                  </label>
+                <label htmlFor="subject" className={labelCls}>
+                  Kategori Kepentingan
+                </label>
+                <div className="relative mb-4">
                   <select
                     id="subject"
                     name="subject"
                     value={form.subject}
                     onChange={handleChange}
                     disabled={status === "submitting"}
-                    className={`${inputCls} cursor-pointer`}
+                    className={selectCls}
                   >
                     {SUBJECTS.map((s) => (
                       <option
@@ -266,30 +285,41 @@ export default function KontakPage() {
                       </option>
                     ))}
                   </select>
+                  <svg
+                    className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
                 </div>
 
-                <div>
-                  <label htmlFor="message" className={labelCls}>
-                    Pesan Anda
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={form.message}
-                    onChange={handleChange}
-                    rows={4}
-                    required
-                    minLength={20}
-                    placeholder="Tuliskan pesan atau klarifikasi secara detail... (minimal 20 karakter)"
-                    disabled={status === "submitting"}
-                    className={`${inputCls} resize-y min-h-[140px] leading-relaxed`}
-                  />
-                </div>
+                <label htmlFor="message" className={labelCls}>
+                  Pesan Anda
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={form.message}
+                  onChange={handleChange}
+                  rows={5}
+                  required
+                  minLength={20}
+                  placeholder="Tuliskan pesan atau klarifikasi secara detail... (minimal 20 karakter)"
+                  disabled={status === "submitting"}
+                  className={textareaCls}
+                />
 
                 <button
                   type="submit"
                   disabled={status === "submitting"}
-                  className="w-full py-3.5 bg-[#041d56] hover:bg-[#021236] text-white font-bold rounded-lg transition-colors text-sm uppercase tracking-wider shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                  className={submitCls}
                 >
                   {status === "submitting"
                     ? "Mengirim..."

@@ -5,11 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { WhatsappIcon } from "@/components/WhatsappIcon";
+import {
+  OFFICIAL_IG_LABEL,
+  OFFICIAL_IG_URL,
+  OFFICIAL_WA_LABEL,
+  OFFICIAL_WA_URL,
+} from "@/lib/social";
 import styles from "./Navbar.module.css";
-
-export const OFFICIAL_WA_URL = "https://wa.me/6285134977073";
-export const OFFICIAL_IG_URL =
-  "https://www.instagram.com/gentanusa_id?stkn=MXEzZXVlYWZyZnE4Zw==";
 
 const corporateNav = [
   { href: "/tentang-kami", label: "Redaksi & Tentang Kami" },
@@ -182,24 +185,50 @@ export function Navbar() {
 
             <div className={styles.drawerFooter}>
               <p className={styles.drawerSectionTitle}>IKUTI KAMI</p>
-              <div className="flex flex-col gap-2 mb-4 text-sm">
+              <div className="flex flex-col gap-2 mb-4">
                 <a
                   href={OFFICIAL_WA_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-neutral-200 hover:text-white transition-colors"
+                  className={styles.drawerSocial}
                   onClick={closeDrawer}
                 >
-                  WhatsApp (+62 851-3497-7073)
+                  <span className={styles.drawerWaBadge}>
+                    <WhatsappIcon className={styles.drawerWaGlyph} />
+                  </span>
+                  <span>{OFFICIAL_WA_LABEL}</span>
                 </a>
                 <a
                   href={OFFICIAL_IG_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-neutral-200 hover:text-white transition-colors"
+                  className={styles.drawerSocial}
                   onClick={closeDrawer}
                 >
-                  @gentanusa_id
+                  <span className={styles.drawerIgBadge}>
+                    <svg
+                      className={styles.drawerIgGlyph}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <rect x="2" y="2" width="20" height="20" rx="5" />
+                      <circle cx="12" cy="12" r="4.2" />
+                      <circle
+                        cx="17.4"
+                        cy="6.6"
+                        r="1"
+                        fill="currentColor"
+                        stroke="none"
+                      />
+                    </svg>
+                  </span>
+                  <span>{OFFICIAL_IG_LABEL}</span>
                 </a>
               </div>
               <div className="pt-6 border-t border-white/10 text-xs text-white/50">

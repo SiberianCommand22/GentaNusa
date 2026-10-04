@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/site";
+import { OFFICIAL_WA_DISPLAY, OFFICIAL_WA_URL } from "@/lib/social";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
 
@@ -101,12 +102,12 @@ export default function KebijakanPrivasiPage() {
                 <p>
                   • WhatsApp Kemitraan:{" "}
                   <a
-                    href="https://wa.me/6285134977073"
+                    href={OFFICIAL_WA_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={linkCls}
                   >
-                    <span className="font-mono">+62 851-3497-7073</span>
+                    <span className="font-mono">{OFFICIAL_WA_DISPLAY}</span>
                   </a>
                 </p>
               </div>

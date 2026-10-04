@@ -1,48 +1,90 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BrandLogo } from "@/components/BrandLogo";
+import { WhatsappIcon } from "@/components/WhatsappIcon";
+import {
+  OFFICIAL_IG_LABEL,
+  OFFICIAL_IG_URL,
+  OFFICIAL_WA_LABEL,
+  OFFICIAL_WA_URL,
+} from "@/lib/social";
 import styles from "./site.module.css";
 
+// Footer editorial navy.
+// Logo: SATU-SATUNYA emblem resmi /logo.png. Emblem vektor lonceng lama
+// (BellEmblem) sudah dihapus — tidak ada lagi logo ganda di kolom brand.
 export function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
         <div className={styles.footerGrid}>
           <div className={styles.brandCol}>
-            <div className="w-12 h-12 rounded-xl overflow-hidden bg-[#041d56] border border-white/20 flex items-center justify-center shrink-0">
-              <Image
-                src="/logo.png"
-                alt="GentaNusa Logo"
-                width={48}
-                height={48}
-                className="object-cover scale-105"
-              />
-            </div>
-            <BrandLogo theme="dark" size="md" href="/" />
+            <Link
+              href="/"
+              aria-label="GentaNusa — Beranda"
+              className="inline-flex items-center gap-3 mb-4 w-fit"
+            >
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-[#041d56] border border-white/20 flex items-center justify-center shrink-0">
+                <Image
+                  src="/logo.png"
+                  alt="GentaNusa"
+                  width={40}
+                  height={40}
+                  priority
+                  className="object-cover scale-105"
+                />
+              </div>
+              <span className="text-white font-extrabold text-2xl tracking-tight font-sans">
+                GentaNusa
+              </span>
+            </Link>
             <p className={styles.footerText}>
               Portal berita nasional independen menyajikan informasi akurat,
               berimbang, dan tepercaya dari seluruh penjuru Nusantara.
             </p>
           </div>
+
           <div className={styles.footerCol}>
             <h4>Redaksi</h4>
             <span>redaksi@gentanusa.id</span>
             <span>Jakarta, Indonesia</span>
             <a
-              href="https://wa.me/6285134977073"
+              href={OFFICIAL_WA_URL}
               target="_blank"
               rel="noopener noreferrer"
+              className={`${styles.footerSocial} group`}
             >
-              WhatsApp (+62 851-3497-7073)
+              <span className={styles.footerWaBadge}>
+                <WhatsappIcon className={styles.footerWaGlyph} />
+              </span>
+              <span>{OFFICIAL_WA_LABEL}</span>
             </a>
             <a
-              href="https://www.instagram.com/gentanusa_id?stkn=MXEzZXVlYWZyZnE4Zw=="
+              href={OFFICIAL_IG_URL}
               target="_blank"
               rel="noopener noreferrer"
+              className={`${styles.footerSocial} group`}
             >
-              @gentanusa_id
+              <span className={styles.footerIgBadge}>
+                <svg
+                  className={styles.footerIgGlyph}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <rect x="2" y="2" width="20" height="20" rx="5" />
+                  <circle cx="12" cy="12" r="4.2" />
+                  <circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none" />
+                </svg>
+              </span>
+              <span>{OFFICIAL_IG_LABEL}</span>
             </a>
           </div>
+
           <div className={styles.footerCol}>
             <h4>Informasi</h4>
             <Link href="/tentang-kami">Tentang Kami</Link>
@@ -51,6 +93,7 @@ export function Footer() {
             <Link href="/kontak">Kontak &amp; Kerja Sama</Link>
           </div>
         </div>
+
         <div className={styles.footerBottom}>
           <span>© 2026 GentaNusa. Seluruh hak cipta dilindungi.</span>
           <span>Edisi Digital Nasional</span>
@@ -59,3 +102,5 @@ export function Footer() {
     </footer>
   );
 }
+
+export default Footer;
