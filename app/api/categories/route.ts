@@ -1,7 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { getEditorialSession } from "@/lib/auth";
 
-function isAdmin(req: NextRequest) {
-  return req.cookies.get("genta_admin")?.value === "1";
+async function requireAdmin() {
+  const session = await getEditorialSession();
+  if (!session) {
+    return { error: NextResponse.json({ error: "Akses ditolak. Wajib login." }, { status: 401 }) };
+  }
+  if (!session.isAdmin) {
+    return { error: NextResponse.json({ error: "Hanya Administrator." }, { status: 403 }) };
+  }
+  return { session };
 }
 
 // Kategori resmi GentaNusa — kanonis di kode (tidak ada tabel
@@ -21,9 +29,8 @@ export async function GET() {
 
 // POST — dinonaktifkan: daftar kanal bersifat tetap.
 export async function POST(req: NextRequest) {
-  if (!isAdmin(req)) {
-    return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
-  }
+  const gate = await requireAdmin();
+  if ("error" in gate) return gate.error;
   return NextResponse.json(
     { error: "Daftar kategori bersifat tetap dan dikelola di kode." },
     { status: 410 }
@@ -32,9 +39,8 @@ export async function POST(req: NextRequest) {
 
 // DELETE — dinonaktifkan: daftar kanal bersifat tetap.
 export async function DELETE(req: NextRequest) {
-  if (!isAdmin(req)) {
-    return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
-  }
+  const gate = await requireAdmin();
+  if ("error" in gate) return gate.error;
   return NextResponse.json(
     { error: "Daftar kategori bersifat tetap dan dikelola di kode." },
     { status: 410 }

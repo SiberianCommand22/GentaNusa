@@ -1,9 +1,19 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
+import { getEditorialSession } from "@/lib/auth";
 import { apiError } from "../error-handler";
 
-function isAdmin(req: NextRequest) {
-  return req.cookies.get("genta_admin")?.value === "1";
+// Penulis endpoint ini: administrator saja — diverifikasi lewat sesi
+// Supabase Auth, bukan flag cookie mentah.
+async function requireAdmin() {
+  const session = await getEditorialSession();
+  if (!session) {
+    return { error: NextResponse.json({ error: "Akses ditolak. Wajib login." }, { status: 401 }) };
+  }
+  if (!session.isAdmin) {
+    return { error: NextResponse.json({ error: "Hanya Administrator." }, { status: 403 }) };
+  }
+  return { session };
 }
 
 function ensureClient() {
@@ -29,9 +39,8 @@ export async function GET() {
 // POST — tambah sumber (admin)
 export async function POST(req: NextRequest) {
   try {
-    if (!isAdmin(req)) {
-      return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
-    }
+    const gate = await requireAdmin();
+    if ("error" in gate) return gate.error;
     const c = ensureClient();
     if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
     const body = await req.json().catch(() => null);
@@ -53,9 +62,8 @@ export async function POST(req: NextRequest) {
 // DELETE — hapus sumber (admin)
 export async function DELETE(req: NextRequest) {
   try {
-    if (!isAdmin(req)) {
-      return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
-    }
+    const gate = await requireAdmin();
+    if ("error" in gate) return gate.error;
     const c = ensureClient();
     if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
     const id = req.nextUrl.searchParams.get("id");

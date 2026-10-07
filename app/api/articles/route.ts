@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
-import { getEditorialSession } from "@/lib/auth";
+import { getEditorialSession, resolveAuthorName } from "@/lib/auth";
 import { getArticles } from "@/lib/data";
 import {
   ACCESS_DENIED_DELETE,
@@ -112,12 +112,10 @@ export async function POST(req: NextRequest) {
         ? body.authorSlug.trim()
         : "";
 
-  // Penulis biasa: nama & slug penulis dikunci ke metadata akunnya sehingga
-  // tidak bisa mengarang identitas penulis lain (anti impersonasi).
-  // Administrator tetap bebas menetapkan nama penulis tampilan.
-  const author = session.isAdmin
-    ? requestedAuthor || session.fullName || "Redaksi GentaNusa"
-    : session.fullName || requestedAuthor || "Redaksi GentaNusa";
+  // Penulis biasa: nama dikunci ke identitas sesi login (auth.getUser()),
+  // bukan input klien dan bukan nama bot. Administrator tetap bebas
+  // menetapkan nama penulis tampilan (kecuali nama bot).
+  const author = resolveAuthorName(session, requestedAuthor);
   const authorSlug = session.isAdmin
     ? requestedSlug || slugify(author)
     : session.authorSlug || requestedSlug || slugify(author);

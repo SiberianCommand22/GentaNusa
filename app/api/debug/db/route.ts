@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
+import { getEditorialSession } from "@/lib/auth";
 import { getArticles, getCategories } from "@/lib/data";
 
-// Debug: cek koneksi DB dan data
+// Debug: cek koneksi DB dan data — administrator saja.
 export async function GET() {
+  const session = await getEditorialSession();
+  if (!session) {
+    return NextResponse.json({ error: "Akses ditolak. Wajib login." }, { status: 401 });
+  }
+  if (!session.isAdmin) {
+    return NextResponse.json({ error: "Hanya Administrator." }, { status: 403 });
+  }
   const localArticles = await getArticles();
   const localCategories = await getCategories();
 

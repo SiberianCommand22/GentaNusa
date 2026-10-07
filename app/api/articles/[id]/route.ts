@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
-import { getEditorialSession } from "@/lib/auth";
+import { getEditorialSession, resolveAuthorName } from "@/lib/auth";
 import {
   ACCESS_DENIED_DELETE,
   ARTICLE_COLUMNS_BASE,
@@ -148,11 +148,10 @@ export async function PUT(
   const fallbackAuthor =
     session.fullName || String(existing.author || "").trim() || "Redaksi GentaNusa";
 
-  // Penulis biasa terkunci ke identitas akunnya; administrator tetap bebas
-  // menetapkan nama penulis tampilan.
-  const author = session.isAdmin
-    ? requestedAuthor || fallbackAuthor
-    : fallbackAuthor;
+  // Penulis biasa terkunci ke identitas sesi loginnya (auth.getUser());
+  // administrator tetap bebas menetapkan nama penulis tampilan.
+  // Nama bot otomatisasi selalu dinetralkan di kedua peran.
+  const author = resolveAuthorName(session, requestedAuthor, fallbackAuthor);
   const authorSlug = session.isAdmin
     ? requestedSlug || String(existing.author_slug ?? "") || slugify(author)
     : session.authorSlug || String(existing.author_slug ?? "") || slugify(author);

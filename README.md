@@ -16,7 +16,7 @@ Web otomatis hidup saat laptop nyala (auto-start `gentanusa_dev.bat`).
 
 - **PRD.md** → visi, fitur, roadmap, keputusan (baca dulu sebelum kerja)
 - **lib/data/** → konten (articles.json, categories.json, sources.json, syndicated.json)
-- **scripts/fetch_rss.py** → bot sindikasi RSS
+- **Publikasi 100% manual** → via `/admin` oleh akun redaksi yang login (tidak ada bot/cron)
 
 ## Struktur
 
@@ -26,7 +26,7 @@ components/   → UI dipakai ulang (header, kartu, share, TTS, dark mode, reveal
 lib/data/     → konten JSON
 lib/data.ts   → helper baca data (getArticles, getCategories, dll)
 public/       → gambar, favicon
-scripts/      → bot fetch RSS
+scripts/      → utilitas manual satu-kali (seed, sinkronisasi build, verifikasi)
 ```
 
 ## Perintah
@@ -37,7 +37,7 @@ scripts/      → bot fetch RSS
 | `npm run build` | Build produksi |
 | `npm start` | Jalankan build produksi |
 | `npm run lint` | Cek kode |
-| `python3 scripts/fetch_rss.py` | Tarik berita sindikasi terbaru |
+| `/admin` (browser) | Tulis & terbitkan berita — wajib login, tanpa bot/cron |
 
 ## Deploy
 

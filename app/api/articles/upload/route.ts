@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
+import { getEditorialSession } from "@/lib/auth";
 import { rateLimit } from "@/app/api/rate-limit";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -40,8 +41,11 @@ export async function POST(req: NextRequest) {
   const limited = rateLimit(req);
   if (!limited.ok) return limited.response;
 
-  if (req.cookies.get("genta_admin")?.value !== "1") {
-    return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
+  // Wajib sesi redaksi terverifikasi (Supabase Auth) — flag cookie mentah
+  // tidak pernah cukup untuk endpoint tulis.
+  const session = await getEditorialSession();
+  if (!session) {
+    return NextResponse.json({ error: "Akses ditolak. Wajib login." }, { status: 401 });
   }
 
   const client = ensureClient();

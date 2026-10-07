@@ -149,3 +149,42 @@ export async function getEditorialSession(): Promise<EditorialSession | null> {
     authorSlug: readString(claims.author_slug),
   };
 }
+
+// Nama byline otomatisasi/bot yang dilarang tampil sebagai penulis artikel.
+// Dinormalisasi (huruf kecil, alfanumerik saja) sebelum dibandingkan.
+const BLOCKED_AUTHOR_NAMES = new Set([
+  "redaksigenta",
+  "hermes",
+  "bot",
+  "autobot",
+  "scraper",
+  "autopost",
+  "autoposter",
+]);
+
+function normalizeAuthorName(value: unknown): string {
+  const s = String(value ?? "").trim();
+  if (!s) return "";
+  const key = s.toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (BLOCKED_AUTHOR_NAMES.has(key)) return "";
+  return s;
+}
+
+/**
+ * Nama penulis tampilan untuk tulis/update artikel.
+ *
+ * - Penulis biasa: SELALU identitas sesi login (`auth.getUser()`), tidak
+ *   pernah input klien mentah dan tidak pernah nama bot.
+ * - Administrator: boleh menetapkan nama tampilan, kecuali nama bot.
+ */
+export function resolveAuthorName(
+  session: EditorialSession,
+  requested: unknown,
+  fallback = "Redaksi GentaNusa"
+): string {
+  const clean = normalizeAuthorName(requested);
+  if (session.isAdmin) {
+    return clean || session.fullName || fallback;
+  }
+  return session.fullName || clean || fallback;
+}

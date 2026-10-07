@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
+import { getEditorialSession } from "@/lib/auth";
 import { getArticles, getCategories } from "@/lib/data";
 
 export async function GET() {
+  // Diagnostik internal — administrator saja.
+  const session = await getEditorialSession();
+  if (!session) {
+    return NextResponse.json({ error: "Akses ditolak. Wajib login." }, { status: 401 });
+  }
+  if (!session.isAdmin) {
+    return NextResponse.json({ error: "Hanya Administrator." }, { status: 403 });
+  }
   const localArticles = await getArticles();
   const localCategories = await getCategories();
   const localArticleIds = localArticles.map((a) => a.id).sort((a, b) => a - b);

@@ -224,6 +224,30 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
     });
   }, [editId]);
 
+  // Prefill kolom Penulis dari sesi login (/api/admin/check terverifikasi
+  // Supabase Auth) agar byline mencerminkan pengguna yang sedang login,
+  // bukan teks bebas. Hanya untuk tulisan baru dengan kolom masih kosong.
+  useEffect(() => {
+    if (editId) return;
+    let cancelled = false;
+    fetch("/api/admin/check")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (cancelled) return;
+        const name =
+          j && typeof j.display_name === "string" ? j.display_name.trim() : "";
+        if (name) {
+          setForm((f) => (f.author.trim() ? f : { ...f, author: name }));
+        }
+      })
+      .catch(() => {
+        // abaikan — validasi server tetap mengunci identitas penulis
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [editId]);
+
   function pickFile(file: File | null) {
     if (imagePreview) URL.revokeObjectURL(imagePreview);
     setImageFile(file);

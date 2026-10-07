@@ -1,13 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getAnalyticsReport } from "@/lib/analytics-server";
-
-function isAdmin(req: NextRequest) {
-  return req.cookies.get("genta_admin")?.value === "1";
-}
+import { getEditorialSession } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
-  if (!isAdmin(req)) {
-    return NextResponse.json({ error: "Butuh login admin" }, { status: 401 });
+  const session = await getEditorialSession();
+  if (!session) {
+    return NextResponse.json({ error: "Akses ditolak. Wajib login." }, { status: 401 });
+  }
+  if (!session.isAdmin) {
+    return NextResponse.json({ error: "Hanya Administrator." }, { status: 403 });
   }
 
   try {
