@@ -102,6 +102,7 @@ export function Footer() {
             <Link href="/tentang-kami">Tentang Kami</Link>
             <Link href="/pedoman-media-siber">Pedoman Media Siber</Link>
             <Link href="/kebijakan-privasi">Kebijakan Privasi</Link>
+            <Link href="/syarat-ketentuan">Syarat &amp; Ketentuan</Link>
             <Link href="/kontak">Kontak &amp; Kerja Sama</Link>
           </div>
         </div>

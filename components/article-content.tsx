@@ -16,9 +16,21 @@ const SAFE_CLASSES = new Set([
   "text-justify",
   "leading-relaxed",
   "border-l-4",
+  "border-[#041d56]",
   "pl-4",
-  "italic",
+  "pl-5",
+  "pr-4",
+  "py-3",
   "my-2",
+  "my-6",
+  "rounded-r-xl",
+  "bg-blue-50/50",
+  "text-base",
+  "text-lg",
+  "sm:text-lg",
+  "text-slate-800",
+  "font-serif",
+  "italic",
   "text-blue-600",
   "underline",
 ]);
@@ -118,16 +130,65 @@ function legacyToHtml(block: string): string {
 
 const BLOCK_TAG = /^\s*<(p|h2|h3|blockquote|ul|ol)\b/i;
 
+// Kutipan narasumber: paragraf polos yang diawali tanda kutip atau markdown `>`.
+const QUOTE_START = /^([">“‘»]|&gt;|&quot;|&#39;|—\s)/;
+
+function isQuoteParagraph(raw: string): boolean {
+  const t = raw.trimStart();
+  return (
+    t.startsWith('"') ||
+    t.startsWith("“") ||
+    t.startsWith("‘") ||
+    t.startsWith(">") ||
+    t.startsWith("»") ||
+    /^—\s/.test(t)
+  );
+}
+
+function stripQuoteMarkers(text: string): string {
+  let t = text.trim();
+  // Buang penanda markdown `>` di awal.
+  t = t.replace(/^>\s?/, "").trim();
+  // Buang sepasang tanda kutip luar bila mengapit seluruh paragraf.
+  const pairs: Array<[string, string]> = [
+    ['"', '"'],
+    ["“", "”"],
+    ["‘", "’"],
+    ["»", "«"],
+  ];
+  for (const [open, close] of pairs) {
+    if (t.startsWith(open) && t.endsWith(close) && t.length > 2) {
+      t = t.slice(open.length, t.length - close.length).trim();
+      break;
+    }
+  }
+  return t;
+}
+
 export function ArticleContent({ content }: { content: ContentBlock[] }) {
   return (
     <div className={`${styles.articleContent} richtext article-body article-content`}>
       {content.map((raw, i) => {
+        // Kutipan narasumber polos → Executive Blockquote langsung,
+        // tanpa menunggu tag <blockquote> dari CMS.
+        if (isQuoteParagraph(raw) && !/<[a-z][\s\S]*>/i.test(raw)) {
+          const quoteText = stripQuoteMarkers(raw);
+          const html = sanitizeHtml(parseInline(quoteText));
+          return <blockquote key={i} className={styles.quote} dangerouslySetInnerHTML={{ __html: html }} />;
+        }
         // Dekode entitas escape dulu, lalu sanitasi. Render SELALU via
         // dangerouslySetInnerHTML — jangan pernah `{p}` teks biasa.
         const decoded = decodeEscapedHtml(raw);
         const html = sanitizeHtml(decoded.includes("<") ? decoded : parseInline(legacyToHtml(decoded)));
         if (BLOCK_TAG.test(html)) {
           return <div key={i} className={styles.rawBlock} dangerouslySetInnerHTML={{ __html: html }} />;
+        }
+        // Fallback: paragraf hasil sanitasi yang ternyata diawali kutip
+        // (mis. lolos dari toolbar) tetap diangkat jadi blockquote.
+        const textOnly = html.replace(/<[^>]*>/g, "").trim();
+        if (QUOTE_START.test(html.trimStart()) || isQuoteParagraph(textOnly)) {
+          const inner = sanitizeHtml(parseInline(stripQuoteMarkers(textOnly)));
+          return <blockquote key={i} className={styles.quote} dangerouslySetInnerHTML={{ __html: inner }} />;
         }
         return (
           <p key={i} className={styles.paragraph} dangerouslySetInnerHTML={{ __html: html }} />

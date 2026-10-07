@@ -94,7 +94,8 @@
   aspect-ratio: 16 / 9;
   border-radius: 12px;
   overflow: hidden;
-  background: #171717;
+  background: #e2e8f0;
+  animation: thumbPulse 1.6s ease-in-out infinite;
 }
 
 .headlineThumb img {
@@ -192,8 +193,9 @@
   aspect-ratio: 16 / 9;
   border-radius: 12px;
   overflow: hidden;
-  background: #171717;
+  background: #e2e8f0;
   margin-bottom: 10px;
+  animation: thumbPulse 1.6s ease-in-out infinite;
 }
 
 .compactThumb img {
@@ -206,6 +208,11 @@
 
 .compactCard:hover .compactThumb img {
   transform: scale(1.05);
+}
+
+@keyframes thumbPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
 }
 
 .compactTitle {

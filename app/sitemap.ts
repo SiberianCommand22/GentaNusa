@@ -18,6 +18,7 @@ const INSTITUTIONAL_ROUTES = [
   "/tentang-kami",
   "/pedoman-media-siber",
   "/kebijakan-privasi",
+  "/syarat-ketentuan",
   "/kontak",
 ];
 

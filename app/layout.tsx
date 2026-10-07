@@ -26,11 +26,20 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.gentanusa.id"),
   title: {
-    default: "GentaNusa - Kabar Kedaulatan & Dinamika Nusantara",
+    default: "GentaNusa - Berita Terkini & Kabar Kedaulatan Nasional",
     template: "%s | GentaNusa",
   },
   description:
-    "Portal berita nasional independen menyajikan informasi akurat, berimbang, dan tepercaya.",
+    "Portal berita nasional independen menyajikan informasi akurat, berimbang, dan terpercaya dari seluruh penjuru Nusantara.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "48x48" },
+      { url: "/icon.png", type: "image/png", sizes: "96x96" },
+      { url: "/icon.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     title: "GentaNusa",
     description:
@@ -68,10 +77,6 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="id" className={`${sourceSerif.variable} ${inter.variable} ${jakarta.variable}`}>
-      <head>
-        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-        <link rel="apple-touch-icon" href="/apple-icon.png" />
-      </head>
       <body className={`${jakarta.className} bg-[#F8FAFC] text-slate-900 antialiased min-h-screen flex flex-col justify-between`}>
         <AnalyticsTracker />
         <SiteChrome>{children}</SiteChrome>

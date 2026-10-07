@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/syarat",
+        destination: "/syarat-ketentuan",
+        permanent: true,
+      },
+      {
         source: "/artikel/:slug",
         destination: "/:slug",
         permanent: true, // 301 Permanent Redirect untuk SEO

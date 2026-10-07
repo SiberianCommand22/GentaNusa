@@ -11,11 +11,10 @@ import {
   slugifyTitle,
 } from "@/lib/data";
 import styles from "./page.module.css";
-import { getArticleReadCount } from "@/lib/analytics-server";
 import { ArticleContent } from "@/components/article-content";
 import { CardImage } from "@/components/card-image";
 import { ShareButtons } from "@/components/share-buttons";
-import { cleanLead, parseArticleContent } from "@/lib/text-formatter";
+import { cleanLead } from "@/lib/text-formatter";
 
 const RESERVED_SLUGS = [
   "admin",
@@ -72,11 +71,11 @@ export async function generateMetadata({ params }: Params) {
   }
 
   const article = await getArticleAnyBySlugOrId(slug);
-  if (!article) return { title: "Berita Tidak Ditemukan - GentaNusa" };
+  if (!article) return { title: "Berita Tidak Ditemukan" };
 
   // Draf tidak boleh diintip publik — metadata pun disamarkan bagi non-admin.
   if (article.status === "draft" && !(await isAdminSession())) {
-    return { title: "Berita Tidak Ditemukan - GentaNusa" };
+    return { title: "Berita Tidak Ditemukan" };
   }
 
   const siteUrl = "https://www.gentanusa.id";
@@ -97,7 +96,7 @@ export async function generateMetadata({ params }: Params) {
   const mimeType = imageUrl.toLowerCase().endsWith(".png") ? "image/png" : "image/jpeg";
 
   return {
-    title: `${title} - GentaNusa`,
+    title: title,
     description: description,
     metadataBase: new URL(siteUrl),
     alternates: { canonical: articleUrl },
@@ -168,7 +167,6 @@ export default async function ArticlePage({ params }: Params) {
   const isAdmin = isDraft ? await isAdminSession() : false;
   if (isDraft && !isAdmin) notFound();
 
-  const readCount = await getArticleReadCount(article.id);
   const related = (await getArticles())
     .filter((a) => {
       if (a.id === article.id) return false;
@@ -243,36 +241,7 @@ export default async function ArticlePage({ params }: Params) {
             <time dateTime={article.date}>{formatTanggalWIB(article.date)}</time>
             <span className={styles.dot}>•</span>
             <span className={styles.readTime}>{readMinutes} menit membaca</span>
-            <span className={styles.dot}>•</span>
-            <span className={styles.readCount}>{readCount} kali dibaca</span>
           </div>
-
-          {/* 5. Foto sampul + caption — rasio 16:9 presisi, zero layout shift */}
-          {coverImage && (
-            <figure className={styles.heroFigure}>
-              <div className={styles.heroImageWrap}>
-                <Image
-                  src={coverImage}
-                  alt={article.title}
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 100vw, 720px"
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-              {/* HANYA tampil bila caption/kredit asli ada di database */}
-              {(article.image_caption || article.image_credit) && (
-                <figcaption className={styles.caption}>
-                  <span>{article.image_caption || ""}</span>
-                  {article.image_credit && (
-                    <span className={styles.credit}>
-                      Foto: {article.image_credit}
-                    </span>
-                  )}
-                </figcaption>
-              )}
-            </figure>
-          )}
 
           {/* 5. Foto sampul + caption — rasio 16:9 presisi, zero layout shift */}
           {coverImage && (
