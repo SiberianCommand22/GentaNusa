@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/tentang",
+        destination: "/tentang-kami",
+        permanent: true,
+      },
+      {
         source: "/syarat",
         destination: "/syarat-ketentuan",
         permanent: true,

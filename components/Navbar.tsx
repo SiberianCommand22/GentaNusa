@@ -7,9 +7,7 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { WhatsappIcon } from "@/components/WhatsappIcon";
 import {
-  OFFICIAL_IG_LABEL,
   OFFICIAL_IG_URL,
-  OFFICIAL_WA_DISPLAY,
   OFFICIAL_WA_URL,
 } from "@/lib/social";
 import styles from "./Navbar.module.css";
@@ -88,19 +86,19 @@ export function Navbar() {
             <Link
               href="/"
               aria-label="GentaNusa — Beranda"
-              className="flex items-center justify-center gap-2.5"
+              className="flex items-center gap-2.5 shrink-0 group"
             >
-              <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#041d56] border border-white/20 flex items-center justify-center shrink-0">
+              <div className="relative w-9 h-9 flex items-center justify-center shrink-0">
                 <Image
                   src="/logo.png"
-                  alt="GentaNusa Logo"
-                  width={40}
-                  height={40}
-                  className="object-cover scale-105"
+                  alt="GentaNusa"
+                  width={38}
+                  height={38}
+                  className="object-contain w-full h-full mix-blend-screen"
                   priority
                 />
               </div>
-              <span className="text-white font-extrabold text-xl tracking-tight ml-2.5 font-sans">
+              <span className="text-white font-extrabold text-xl sm:text-2xl tracking-tight font-sans">
                 GentaNusa
               </span>
             </Link>
@@ -187,8 +185,6 @@ export function Navbar() {
             <div className={styles.drawerFooter}>
               <p className={styles.drawerSectionTitle}>IKUTI KAMI</p>
               <div className="flex flex-col gap-2 mb-4">
-                {/* Label + nilai dipisah dua baris (flex-col + min-w-0 + nowrap)
-                    agar nomor WhatsApp tidak pernah patah menjadi dua baris. */}
                 <a
                   href={OFFICIAL_WA_URL}
                   target="_blank"
@@ -199,14 +195,9 @@ export function Navbar() {
                   <span className={styles.drawerWaBadge}>
                     <WhatsappIcon className={styles.drawerWaGlyph} />
                   </span>
-                  <span className={styles.drawerSocialText}>
+                  <span className={`${styles.drawerSocialText} whitespace-nowrap`}>
                     <span className={styles.drawerSocialLabel}>
-                      WhatsApp Redaksi
-                    </span>
-                    <span
-                      className={`${styles.drawerSocialValue} font-mono`}
-                    >
-                      {OFFICIAL_WA_DISPLAY}
+                      WhatsApp
                     </span>
                   </span>
                 </a>
@@ -240,12 +231,9 @@ export function Navbar() {
                       />
                     </svg>
                   </span>
-                  <span className={styles.drawerSocialText}>
+                  <span className={`${styles.drawerSocialText} whitespace-nowrap`}>
                     <span className={styles.drawerSocialLabel}>
-                      Instagram Redaksi
-                    </span>
-                    <span className={styles.drawerSocialValue}>
-                      {OFFICIAL_IG_LABEL}
+                      Instagram
                     </span>
                   </span>
                 </a>

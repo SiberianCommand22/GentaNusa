@@ -3,9 +3,7 @@ import Link from "next/link";
 import { WhatsappIcon } from "@/components/WhatsappIcon";
 import {
   OFFICIAL_EMAIL_REDAKSI,
-  OFFICIAL_IG_LABEL,
   OFFICIAL_IG_URL,
-  OFFICIAL_WA_DISPLAY,
   OFFICIAL_WA_URL,
 } from "@/lib/social";
 import styles from "./site.module.css";
@@ -22,16 +20,16 @@ export function Footer() {
             <Link
               href="/"
               aria-label="GentaNusa — Beranda"
-              className="inline-flex items-center gap-3 mb-4 w-fit"
+              className="flex items-center gap-2.5 shrink-0 group mb-4 w-fit"
             >
-              <div className="w-10 h-10 rounded-full overflow-hidden bg-[#041d56] border border-white/20 flex items-center justify-center shrink-0">
+              <div className="relative w-9 h-9 flex items-center justify-center shrink-0">
                 <Image
                   src="/logo.png"
                   alt="GentaNusa"
-                  width={40}
-                  height={40}
+                  width={38}
+                  height={38}
                   priority
-                  className="object-cover scale-105"
+                  className="object-contain w-full h-full mix-blend-screen"
                 />
               </div>
               <span className="text-white font-extrabold text-2xl tracking-tight font-sans">
@@ -65,7 +63,7 @@ export function Footer() {
                 <WhatsappIcon className={styles.footerWaGlyph} />
               </span>
               <span className={styles.footerSocialValue}>
-                {OFFICIAL_WA_DISPLAY}
+                WhatsApp
               </span>
             </a>
             <a
@@ -92,7 +90,7 @@ export function Footer() {
                 </svg>
               </span>
               <span className={styles.footerSocialValue}>
-                {OFFICIAL_IG_LABEL}
+                Instagram
               </span>
             </a>
           </div>

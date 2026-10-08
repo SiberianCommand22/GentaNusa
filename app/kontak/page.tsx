@@ -7,9 +7,7 @@ import { WhatsappIcon } from "@/components/WhatsappIcon";
 import {
   OFFICIAL_EMAIL_BISNIS,
   OFFICIAL_EMAIL_REDAKSI,
-  OFFICIAL_IG_LABEL,
   OFFICIAL_IG_URL,
-  OFFICIAL_WA_DISPLAY,
   OFFICIAL_WA_URL,
 } from "@/lib/social";
 
@@ -131,7 +129,7 @@ export default function KontakPage() {
 
                 <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-xl space-y-1">
                   <span className="text-xs text-slate-500 font-medium">
-                    Nomor WhatsApp Redaksi:
+                    WhatsApp Redaksi:
                   </span>
                   <a
                     href={OFFICIAL_WA_URL}
@@ -140,7 +138,7 @@ export default function KontakPage() {
                     className="inline-flex items-center gap-2 text-emerald-700 font-bold hover:text-emerald-800 hover:underline text-base"
                   >
                     <WhatsappIcon className="w-4 h-4 fill-current shrink-0" />
-                    {OFFICIAL_WA_DISPLAY}
+                    WhatsApp
                   </a>
                 </div>
 
@@ -152,9 +150,9 @@ export default function KontakPage() {
                     href={OFFICIAL_IG_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block text-pink-600 font-bold hover:underline text-base font-mono"
+                    className="block text-pink-600 font-bold hover:underline text-base"
                   >
-                    {OFFICIAL_IG_LABEL}
+                    Instagram
                   </a>
                 </div>
 

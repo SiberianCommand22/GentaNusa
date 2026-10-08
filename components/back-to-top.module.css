@@ -1,7 +1,7 @@
 /* Posisi, ukuran, dan z-index diambil dari utility Tailwind di
    back-to-top.tsx. Kelas modul ini hanya menangani warna & state interaksi. */
 .button {
-  background: var(--accent);
+  background: #041d56;
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
@@ -13,7 +13,7 @@
 }
 
 .button:hover {
-  background: var(--accent-hover);
+  background: #021236;
   transform: translateY(-2px);
 }
 

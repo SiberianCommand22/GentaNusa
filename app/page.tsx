@@ -48,7 +48,7 @@ export default async function Home() {
   const showPopular = popularList.length > 0;
   const recentArticles = latest
     .filter((a) => a.slug !== headlineArticle.slug && a.id !== headlineArticle.id)
-    .slice(0, 6);
+    .slice(0, 8);
 
   return (
     <main className={styles.main}>
