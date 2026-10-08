@@ -211,7 +211,11 @@ export default async function ArticlePage({ params }: Params) {
           </Link>
         </nav>
 
-        <article className={styles.article}>
+        <article
+          className={styles.article}
+          data-article-id={article.id}
+          data-article-slug={article.slug}
+        >
           {/* 2. Badge kategori */}
           <span className={styles.categoryBadge}>{article.category}</span>
 

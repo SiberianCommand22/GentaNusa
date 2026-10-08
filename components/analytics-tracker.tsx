@@ -8,7 +8,9 @@ const RESERVED_SLUGS = [
   "api",
   "cari",
   "tentang",
+  "tentang-kami",
   "kebijakan-privasi",
+  "pedoman-media-siber",
   "syarat-ketentuan",
   "robots.txt",
   "sitemap.xml",
@@ -48,10 +50,22 @@ function isArticlePath(pathname: string): boolean {
   return !RESERVED_SLUGS.includes(slug);
 }
 
+// Identitas artikel dibaca dari atribut data-* yang dirender halaman
+// detail artikel — tracker global tidak punya akses ke data server.
+function readArticleIdentity(): { articleId?: number; slug?: string } {
+  const el = document.querySelector("[data-article-id]");
+  const out: { articleId?: number; slug?: string } = {};
+  const idAttr = el?.getAttribute("data-article-id");
+  if (idAttr && /^\d+$/.test(idAttr)) out.articleId = Number(idAttr);
+  const slugAttr = el?.getAttribute("data-article-slug");
+  if (slugAttr) out.slug = slugAttr;
+  return out;
+}
+
 function sendEvent(
   kind: "site" | "article",
   pathname: string,
-  articleId?: number,
+  extra?: { articleId?: number; slug?: string },
 ) {
   const visitorId = getVisitorId();
   void fetch("/api/analytics/record", {
@@ -60,7 +74,8 @@ function sendEvent(
     body: JSON.stringify({
       kind,
       path: pathname,
-      ...(articleId ? { articleId } : {}),
+      ...(extra?.articleId ? { articleId: extra.articleId } : {}),
+      ...(extra?.slug ? { slug: extra.slug } : {}),
       visitorId,
     }),
     keepalive: true,
@@ -78,13 +93,17 @@ export function AnalyticsTracker() {
     // Match old /artikel/<id> pattern
     const legacyMatch = pathname.match(/^\/artikel\/(\d+)\/?$/);
     if (legacyMatch) {
-      sendEvent("article", pathname, Number(legacyMatch[1]));
+      sendEvent("article", pathname, { articleId: Number(legacyMatch[1]) });
       return;
     }
 
     // Match new root-level /<slug> pattern for articles
     if (isArticlePath(pathname)) {
-      sendEvent("article", pathname);
+      const identity = readArticleIdentity();
+      sendEvent("article", pathname, {
+        articleId: identity.articleId,
+        slug: identity.slug ?? pathname.replace(/^\//, ""),
+      });
     }
   }, [pathname]);
 
