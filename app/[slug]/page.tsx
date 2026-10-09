@@ -14,7 +14,7 @@ import styles from "./page.module.css";
 import { ArticleContent } from "@/components/article-content";
 import { CardImage } from "@/components/card-image";
 import { ShareButtons } from "@/components/share-buttons";
-import { cleanLead } from "@/lib/text-formatter";
+import { cleanLead, sanitizeEditorialText } from "@/lib/text-formatter";
 
 const RESERVED_SLUGS = [
   "admin",
@@ -179,14 +179,16 @@ export default async function ArticlePage({ params }: Params) {
     .slice(0, 3);
 
   const SITE_URL = "https://www.gentanusa.id";
-  // Lead HARUS teks polos: blok mentah toolbar (<p class="...">) atau lead
-  // yang mengandung tag dilucuti agar tidak tampil mentah di layar.
-  const paras = Array.isArray(article.content)
+  // MODUL 2 — Sanitasi naskah lama SEBELUM dipecah menjadi paragraf:
+  // spasi tak terlihat, spasi ganda, dan spasi liar tanda baca otomatis
+  // rapi saat ditampilkan tanpa mengubah data mentah di database.
+  const rawParas = Array.isArray(article.content)
     ? article.content
     : [String(article.content ?? "")];
+  const paras = rawParas.map((b) => sanitizeEditorialText(String(b ?? "")));
   const [firstParagraph, ...body] = paras;
   const rawLead = article.lead || firstParagraph || "";
-  const lead = cleanLead(rawLead);
+  const lead = cleanLead(sanitizeEditorialText(rawLead));
   const coverImage = article.cover_image || article.image;
   // MODUL 2.1 — Query Supabase (via lib/data select("*")) WAJIB menyertakan:
   // image, image_caption, optional_image, optional_image_caption.
@@ -266,7 +268,9 @@ export default async function ArticlePage({ params }: Params) {
           </div>
 
           {/* 5. Foto sampul (Hero) — TIPE 1 & TIPE 2 identik di paling atas.
-              Rasio aspect-video w-full, zero layout shift via fill. */}
+              Rasio aspect-video w-full, zero layout shift via fill.
+              MODUL 3: `sizes` presisi agar preload `priority` cocok dengan
+              permintaan akhir browser (eliminasi galat preload console). */}
           {coverImage && (
             <figure className="max-w-3xl mx-auto w-full">
               <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 max-sm:rounded-xl">
@@ -275,7 +279,7 @@ export default async function ArticlePage({ params }: Params) {
                   alt={article.image_caption || article.title}
                   fill
                   priority
-                  sizes="(max-width: 768px) 100vw, 720px"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 768px, 800px"
                   className="object-cover"
                 />
               </div>
@@ -291,22 +295,22 @@ export default async function ArticlePage({ params }: Params) {
             </figure>
           )}
 
-          {/* 6. Lead pembuka */}
-          {lead && <p className={styles.lead}>{lead}</p>}
+          {/* 6. Lead pembuka — MODUL 1: rata kanan-kiri editorial. */}
+          {lead && (
+            <p className="text-justify [text-align-last:left] [hyphens:auto] font-medium text-slate-700 text-lg sm:text-xl leading-relaxed sm:leading-loose mb-6 border-b border-slate-100 pb-6">
+              {lead}
+            </p>
+          )}
 
-          {/* 7. Isi artikel — DUAL-MODE:
-              TIPE 1 (!optional_image): seluruh paragraf berurutan, tanpa
-              ruang/placeholder kosong.
-              TIPE 2 (optional_image ada): Foto Kedua disisipkan di antara
-              paragraf (setelah paragraf ke-2/ke-3) sebagai editorial flow. */}
+          {/* 7. Isi artikel — DUAL-MODE + MODUL 1: kontainer body justify. */}
           {!hasSecondPhoto ? (
-            <div className={styles.content}>
+            <div className="text-justify [text-align-last:left] [hyphens:auto] text-slate-800 text-base sm:text-lg leading-relaxed sm:leading-loose font-normal tracking-normal space-y-6 sm:space-y-7">
               <ArticleContent content={body.length > 0 ? body : []} />
             </div>
           ) : (
             <>
               {headParas.length > 0 && (
-                <div className={styles.content}>
+                <div className="text-justify [text-align-last:left] [hyphens:auto] text-slate-800 text-base sm:text-lg leading-relaxed sm:leading-loose font-normal tracking-normal space-y-6 sm:space-y-7">
                   <ArticleContent content={headParas} />
                 </div>
               )}
@@ -336,7 +340,7 @@ export default async function ArticlePage({ params }: Params) {
                 </figure>
               )}
               {tailParas.length > 0 && (
-                <div className={styles.content}>
+                <div className="text-justify [text-align-last:left] [hyphens:auto] text-slate-800 text-base sm:text-lg leading-relaxed sm:leading-loose font-normal tracking-normal space-y-6 sm:space-y-7">
                   <ArticleContent content={tailParas} />
                 </div>
               )}

@@ -111,6 +111,29 @@ export function cleanTitle(raw: string): string {
 }
 
 /**
+ * MODUL 2 — Sanitasi editorial naskah lama (pembersihan spasi & jarak kata).
+ * Dipakai di app/[slug]/page.tsx SEBELUM naskah dipecah menjadi paragraf,
+ * sehingga artikel lama dengan spasi berantakan otomatis rapi saat tampil.
+ */
+export function sanitizeEditorialText(rawText: string): string {
+  if (!rawText) return "";
+
+  return rawText
+    // Normalisasi karakter spasi tak terlihat & non-breaking spaces
+    .replace(/[  ᠎ -   　﻿]/g, ' ')
+    // Hapus tab dan spasi ganda berulang di tengah kalimat
+    .replace(/[ \t]+/g, " ")
+    // Hapus spasi liar sebelum tanda baca (contoh: "pemerintah , kata" -> "pemerintah, kata")
+    .replace(/ +([,\.!?:;])/g, "$1")
+    // Pastikan ada spasi tunggal setelah tanda baca jika langsung diikuti huruf/angka
+    .replace(/([,\.!?:;])([A-Za-z0-9])/g, "$1 $2")
+    // Normalisasi pemisah baris baru antar-paragraf
+    .replace(/\r\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+/**
  * Membersihkan excerpt/ringkasan
  */
 export function cleanExcerpt(raw: string): string {

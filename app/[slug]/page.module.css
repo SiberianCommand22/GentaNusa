@@ -271,6 +271,11 @@ a.author:hover {
   margin: 0 0 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #f5f5f5;
+  /* MODUL 1 fallback: lead rata kanan-kiri + hyphenation. */
+  text-align: justify;
+  text-align-last: left;
+  hyphens: auto;
+  -webkit-hyphens: auto;
 }
 
 @media (min-width: 640px) {
@@ -297,6 +302,10 @@ a.author:hover {
 
 .content p {
   margin: 0 0 1.5rem;
+  text-align: justify;
+  text-align-last: left;
+  hyphens: auto;
+  -webkit-hyphens: auto;
 }
 
 .content h2 {
@@ -329,16 +338,21 @@ a.author:hover {
 }
 
 .content blockquote {
-  margin: 1.5rem 0;
-  padding: 0.75rem 1rem 0.75rem 1.25rem;
+  margin: 1.75rem 0;
+  padding: 1rem 1rem 1rem 1.25rem;
   border-left: 4px solid #041d56;
-  background: rgba(239, 246, 255, 0.5);
-  border-radius: 0 12px 12px 0;
+  background: rgba(239, 246, 255, 0.6);
+  border-radius: 0 16px 16px 0;
   font-style: italic;
   font-family: var(--font-serif);
   font-size: 1rem;
   line-height: 1.8;
   color: #1e293b;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  text-align: justify;
+  text-align-last: left;
+  hyphens: auto;
+  -webkit-hyphens: auto;
 }
 
 @media (min-width: 640px) {

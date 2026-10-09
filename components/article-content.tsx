@@ -166,6 +166,11 @@ function stripQuoteMarkers(text: string): string {
 }
 
 export function ArticleContent({ content }: { content: ContentBlock[] }) {
+  // MODUL 1: setiap <p> mempertahankan text-justify + hyphens:auto +
+  // [text-align-last:left] agar baris terakhir tidak tertarik renggang.
+  const JUSTIFY = "text-justify [text-align-last:left] [hyphens:auto]";
+  const QUOTE_TW =
+    "my-7 pl-5 pr-4 py-4 border-l-4 border-[#041d56] bg-blue-50/60 rounded-r-2xl text-justify [text-align-last:left] [hyphens:auto] italic text-slate-800 text-base sm:text-lg leading-relaxed font-serif shadow-sm";
   return (
     <div className={`${styles.articleContent} richtext article-body article-content`}>
       {content.map((raw, i) => {
@@ -174,24 +179,24 @@ export function ArticleContent({ content }: { content: ContentBlock[] }) {
         if (isQuoteParagraph(raw) && !/<[a-z][\s\S]*>/i.test(raw)) {
           const quoteText = stripQuoteMarkers(raw);
           const html = sanitizeHtml(parseInline(quoteText));
-          return <blockquote key={i} className={styles.quote} dangerouslySetInnerHTML={{ __html: html }} />;
+          return <blockquote key={i} className={`${styles.quote} ${QUOTE_TW}`} dangerouslySetInnerHTML={{ __html: html }} />;
         }
         // Dekode entitas escape dulu, lalu sanitasi. Render SELALU via
         // dangerouslySetInnerHTML — jangan pernah `{p}` teks biasa.
         const decoded = decodeEscapedHtml(raw);
         const html = sanitizeHtml(decoded.includes("<") ? decoded : parseInline(legacyToHtml(decoded)));
         if (BLOCK_TAG.test(html)) {
-          return <div key={i} className={styles.rawBlock} dangerouslySetInnerHTML={{ __html: html }} />;
+          return <div key={i} className={`${styles.rawBlock} ${JUSTIFY}`} dangerouslySetInnerHTML={{ __html: html }} />;
         }
         // Fallback: paragraf hasil sanitasi yang ternyata diawali kutip
         // (mis. lolos dari toolbar) tetap diangkat jadi blockquote.
         const textOnly = html.replace(/<[^>]*>/g, "").trim();
         if (QUOTE_START.test(html.trimStart()) || isQuoteParagraph(textOnly)) {
           const inner = sanitizeHtml(parseInline(stripQuoteMarkers(textOnly)));
-          return <blockquote key={i} className={styles.quote} dangerouslySetInnerHTML={{ __html: inner }} />;
+          return <blockquote key={i} className={`${styles.quote} ${QUOTE_TW}`} dangerouslySetInnerHTML={{ __html: inner }} />;
         }
         return (
-          <p key={i} className={styles.paragraph} dangerouslySetInnerHTML={{ __html: html }} />
+          <p key={i} className={`${styles.paragraph} ${JUSTIFY}`} dangerouslySetInnerHTML={{ __html: html }} />
         );
       })}
     </div>
