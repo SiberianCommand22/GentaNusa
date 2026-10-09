@@ -172,13 +172,20 @@ a.author:hover {
 
 .heroFigure {
   margin: 24px auto;
-  max-width: 720px;
+  max-width: 768px;
+  width: 100%;
 }
 
-/* Foto 2 — Dokumentasi Kedua (Opsional, Adaptif) */
+/* Foto 2 — Dokumentasi Kedua (Opsional, Adaptif) — editorial in-article flow */
 .secondaryFigure {
   margin: 32px auto;
-  max-width: 720px;
+  max-width: 768px;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f8fafc;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
 .secondaryImageWrap {
@@ -186,20 +193,32 @@ a.author:hover {
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: 12px;
-  background: #f5f5f5;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+  background: #f1f5f9;
+}
+
+@media (max-width: 640px) {
+  .heroFigure,
+  .secondaryFigure {
+    border-radius: 12px;
+  }
+  .heroImageWrap,
+  .secondaryImageWrap {
+    border-radius: 12px;
+  }
 }
 
 .secondaryCaption {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-  padding: 8px 4px;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px;
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
   font-size: 12px;
   line-height: 1.5;
-  color: #737373;
+  color: #475569;
   font-style: italic;
 }
 
@@ -209,14 +228,16 @@ a.author:hover {
   font-weight: 600;
 }
 
-/* Rasio 16:9 presisi — zero layout shift untuk LCP cover. */
+/* Rasio 16:9 presisi — zero layout shift untuk LCP cover.
+   Mobile: w-full aspect-video rounded-xl; Desktop: max-w-3xl mx-auto. */
 .heroImageWrap {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: 12px;
-  background: #f5f5f5;
+  border-radius: 16px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
 }
 
 .featuredImage {
@@ -232,7 +253,7 @@ a.author:hover {
   margin-top: 8px;
   font-size: 12px;
   line-height: 1.5;
-  color: #737373;
+  color: #64748b;
   font-style: italic;
 }
 

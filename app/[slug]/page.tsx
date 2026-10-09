@@ -188,7 +188,25 @@ export default async function ArticlePage({ params }: Params) {
   const rawLead = article.lead || firstParagraph || "";
   const lead = cleanLead(rawLead);
   const coverImage = article.cover_image || article.image;
-  const secondaryImage = article.secondary_image;
+  // MODUL 2.1 — Query Supabase (via lib/data select("*")) WAJIB menyertakan:
+  // image, image_caption, optional_image, optional_image_caption.
+  // Resolusi dual-mode: kanonis `optional_image*` + alias `secondary_image*`.
+  const optionalImage =
+    article.optional_image || article.secondary_image || null;
+  const optionalCaption =
+    article.optional_image_caption ||
+    article.secondary_image_caption ||
+    "";
+  const optionalCredit =
+    article.optional_image_credit || article.secondary_image_credit || "";
+  const hasSecondPhoto = Boolean(
+    optionalImage && String(optionalImage).trim()
+  );
+  // TIPE 2: sisipkan Foto Kedua setelah paragraf ke-2/ke-3 isi
+  // (body = content minus paragraf pertama yang dipakai lead fallback).
+  const insertAt = body.length >= 4 ? 3 : 2;
+  const headParas = hasSecondPhoto ? body.slice(0, insertAt) : body;
+  const tailParas = hasSecondPhoto ? body.slice(insertAt) : [];
   const readMinutes = estimateReadMinutes(paras, lead);
 
   return (
@@ -247,52 +265,26 @@ export default async function ArticlePage({ params }: Params) {
             <span className={styles.readTime}>{readMinutes} menit membaca</span>
           </div>
 
-          {/* 5. Foto sampul + caption — rasio 16:9 presisi, zero layout shift */}
+          {/* 5. Foto sampul (Hero) — TIPE 1 & TIPE 2 identik di paling atas.
+              Rasio aspect-video w-full, zero layout shift via fill. */}
           {coverImage && (
-            <figure className={styles.heroFigure}>
-              <div className={styles.heroImageWrap}>
+            <figure className="max-w-3xl mx-auto w-full">
+              <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 max-sm:rounded-xl">
                 <Image
                   src={coverImage}
-                  alt={article.title}
+                  alt={article.image_caption || article.title}
                   fill
                   priority
                   sizes="(max-width: 768px) 100vw, 720px"
-                  style={{ objectFit: "cover" }}
+                  className="object-cover"
                 />
               </div>
               {/* HANYA tampil bila caption/kredit asli ada di database */}
               {(article.image_caption || article.image_credit) && (
-                <figcaption className={styles.caption}>
+                <figcaption className="text-xs text-slate-500 italic mt-2 leading-normal">
                   <span>{article.image_caption || ""}</span>
                   {article.image_credit && (
-                    <span className={styles.credit}>
-                      Foto: {article.image_credit}
-                    </span>
-                  )}
-                </figcaption>
-              )}
-            </figure>
-          )}
-
-          {/* Foto 2 — Dokumentasi Kedua (Opsional, Adaptif) */}
-          {secondaryImage && (
-            <figure className={styles.secondaryFigure}>
-              <div className={styles.secondaryImageWrap}>
-                <Image
-                  src={secondaryImage}
-                  alt={article.title + " - Dokumentasi Kedua"}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 720px"
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-              {(article.secondary_image_caption || article.secondary_image_credit) && (
-                <figcaption className={styles.secondaryCaption}>
-                  <span>{article.secondary_image_caption || ""}</span>
-                  {article.secondary_image_credit && (
-                    <span className={styles.credit}>
-                      Foto: {article.secondary_image_credit}
-                    </span>
+                    <span> Foto: {article.image_credit}</span>
                   )}
                 </figcaption>
               )}
@@ -302,10 +294,54 @@ export default async function ArticlePage({ params }: Params) {
           {/* 6. Lead pembuka */}
           {lead && <p className={styles.lead}>{lead}</p>}
 
-          {/* 7. Isi artikel — render HTML toolbar via sanitasi, justify inter-word */}
-          <div className={styles.content}>
-            <ArticleContent content={body.length > 0 ? body : []} />
-          </div>
+          {/* 7. Isi artikel — DUAL-MODE:
+              TIPE 1 (!optional_image): seluruh paragraf berurutan, tanpa
+              ruang/placeholder kosong.
+              TIPE 2 (optional_image ada): Foto Kedua disisipkan di antara
+              paragraf (setelah paragraf ke-2/ke-3) sebagai editorial flow. */}
+          {!hasSecondPhoto ? (
+            <div className={styles.content}>
+              <ArticleContent content={body.length > 0 ? body : []} />
+            </div>
+          ) : (
+            <>
+              {headParas.length > 0 && (
+                <div className={styles.content}>
+                  <ArticleContent content={headParas} />
+                </div>
+              )}
+              {/* Komponen Foto Kedua di Tengah Naskah */}
+              {optionalImage && (
+                <figure className="my-8 rounded-2xl overflow-hidden bg-slate-50 border border-slate-200/80 shadow-sm max-w-3xl mx-auto w-full max-sm:rounded-xl">
+                  <div className="relative aspect-video w-full bg-slate-100">
+                    <Image
+                      src={optionalImage}
+                      alt={optionalCaption || article.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 720px"
+                      className="object-cover"
+                    />
+                  </div>
+                  {(optionalCaption || optionalCredit) && (
+                    <figcaption className="p-3.5 bg-slate-50 border-t border-slate-100 flex items-start justify-between gap-4 text-xs text-slate-600 leading-normal">
+                      <span className="italic leading-relaxed">
+                        {optionalCaption}
+                        {optionalCredit ? ` Foto: ${optionalCredit}` : ""}
+                      </span>
+                      <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">
+                        Dokumentasi Tambahan
+                      </span>
+                    </figcaption>
+                  )}
+                </figure>
+              )}
+              {tailParas.length > 0 && (
+                <div className={styles.content}>
+                  <ArticleContent content={tailParas} />
+                </div>
+              )}
+            </>
+          )}
 
           <div className={styles.tags}>
             {article.tags

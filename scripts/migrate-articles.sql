@@ -1,10 +1,20 @@
 -- Migrasi kolom tambahan tabel articles (jalankan via Supabase SQL Editor).
 -- Idempotent: aman dijalankan ulang bila kolom sudah ada.
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS slug TEXT;
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS image TEXT;
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS cover_image TEXT;
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS image_caption TEXT;
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS image_credit TEXT;
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS lead TEXT;
+-- Foto Tambahan / Foto Kedua (Tipe 2: dual-mode editorial).
+-- `optional_image` = nama kanonis spesifikasi CMS; `secondary_image*` =
+-- alias kompatibel-mundur yang sudah dipakai editor & halaman pembaca.
+-- Kedua nama dipertahankan agar baris lama tidak rusak.
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS optional_image TEXT;
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS optional_image_caption TEXT;
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS secondary_image TEXT;
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS secondary_image_caption TEXT;
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS secondary_image_credit TEXT;
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();
 
 -- Isolasi data penulis (multi-author isolation).

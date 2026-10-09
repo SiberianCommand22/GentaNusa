@@ -32,13 +32,19 @@ export type ArticleRow = {
   cover_image?: string | null;
   image_caption?: string | null;
   image_credit?: string | null;
+  secondary_image?: string | null;
+  secondary_image_caption?: string | null;
+  secondary_image_credit?: string | null;
+  optional_image?: string | null;
+  optional_image_caption?: string | null;
+  optional_image_credit?: string | null;
   tags?: string[] | string | null;
   status?: string | null;
   user_id?: string | null;
 };
 
 export const ARTICLE_COLUMNS_BASE =
-  "id,title,category,excerpt,content,lead,date,author,author_slug,author_role,image,image_caption,image_credit,tags,status";
+  "id,slug,title,category,excerpt,content,lead,date,author,author_slug,author_role,image,cover_image,image_caption,image_credit,secondary_image,secondary_image_caption,secondary_image_credit,optional_image,optional_image_caption,tags,status,created_at";
 
 export const ARTICLE_COLUMNS_WITH_OWNER = `${ARTICLE_COLUMNS_BASE},user_id`;
 
@@ -68,6 +74,11 @@ export function ensureSupabaseServiceClient():
 function isMissingOwnerColumn(error: { code?: string; message?: string } | null): boolean {
   if (!error) return false;
   return error.code === "42703" || /user_id/i.test(error.message || "");
+}
+
+function extractMissingColumn(error: { message?: string } | null): string | null {
+  const m = /Could not find the '([^']+)' column/i.exec(error?.message || "");
+  return m ? m[1] : null;
 }
 
 /** Baris dianggap milik sesi bila UUID atau author_slug cocok. */
@@ -110,10 +121,10 @@ export async function fetchArticlesForSession(
 
   const authorSlug = String(session.authorSlug ?? "").trim();
 
-  const run = async (withOwner: boolean) => {
+  const run = async (withOwner: boolean, columns: string) => {
     let query = c.client
       .from("articles")
-      .select(withOwner ? ARTICLE_COLUMNS_WITH_OWNER : ARTICLE_COLUMNS_BASE)
+      .select(columns)
       .order("date", { ascending: false })
       .order("id", { ascending: false });
 
@@ -135,19 +146,33 @@ export async function fetchArticlesForSession(
   };
 
   const withOwner = ownerColumnAvailable !== false;
-  const first = await run(withOwner);
+  let columns = withOwner ? ARTICLE_COLUMNS_WITH_OWNER : ARTICLE_COLUMNS_BASE;
+  let useOwner = withOwner;
+  let first = await run(useOwner, columns);
   let data = first.data as ArticleRow[] | null;
   let error = first.error as { code?: string; message?: string } | null;
 
-  if (error && withOwner && isMissingOwnerColumn(error)) {
-    // Skema belum punya kolom user_id — mundur permanen ke author_slug.
-    ownerColumnAvailable = false;
-    const retry = await run(false);
+  // Toleran skema: kupas kolom yang belum ada satu per satu (mis.
+  // optional_image / secondary_image di DB lama) lalu ulangi query.
+  for (let attempt = 0; attempt < 8 && error; attempt++) {
+    const missing = extractMissingColumn(error);
+    if (!missing) break;
+    if (/^user_id$/i.test(missing)) {
+      ownerColumnAvailable = false;
+      useOwner = false;
+      columns = ARTICLE_COLUMNS_BASE;
+    } else {
+      // Buang kolom hilang dari daftar select (cocok persis / substring).
+      const parts = columns.split(",").map((s) => s.trim()).filter(Boolean);
+      const kept = parts.filter((p) => p !== missing);
+      if (kept.length === parts.length) break;
+      columns = kept.join(",");
+    }
+    const retry = await run(useOwner, columns);
     data = retry.data as ArticleRow[] | null;
     error = retry.error as { code?: string; message?: string } | null;
-  } else if (!error && withOwner) {
-    ownerColumnAvailable = true;
   }
+  if (!error && useOwner) ownerColumnAvailable = true;
 
   if (error) return { ok: false, status: 500, error: error.message ?? "Gagal memuat artikel" };
   return { ok: true, data: data ?? [] };
@@ -174,28 +199,40 @@ export async function fetchArticleForSession(
   }
 
   const withOwner = ownerColumnAvailable !== false;
-  const read = async (useOwner: boolean) => {
+  let selColumns = withOwner ? ARTICLE_COLUMNS_WITH_OWNER : ARTICLE_COLUMNS_BASE;
+  let selOwner = withOwner;
+  const read = async (useOwner: boolean, columns: string) => {
     const { data, error } = await c.client
       .from("articles")
-      .select(useOwner ? ARTICLE_COLUMNS_WITH_OWNER : ARTICLE_COLUMNS_BASE)
+      .select(columns)
       .eq("id", Number(id))
       .limit(1)
       .maybeSingle();
     return { data, error };
   };
 
-  const first = await read(withOwner);
+  const first = await read(selOwner, selColumns);
   let article = first.data as ArticleRow | null;
   let error = first.error as { code?: string; message?: string } | null;
 
-  if (error && withOwner && isMissingOwnerColumn(error)) {
-    ownerColumnAvailable = false;
-    const retry = await read(false);
+  for (let attempt = 0; attempt < 8 && error; attempt++) {
+    const missing = extractMissingColumn(error);
+    if (!missing) break;
+    if (/^user_id$/i.test(missing)) {
+      ownerColumnAvailable = false;
+      selOwner = false;
+      selColumns = ARTICLE_COLUMNS_BASE;
+    } else {
+      const parts = selColumns.split(",").map((s) => s.trim()).filter(Boolean);
+      const kept = parts.filter((p) => p !== missing);
+      if (kept.length === parts.length) break;
+      selColumns = kept.join(",");
+    }
+    const retry = await read(selOwner, selColumns);
     article = retry.data as ArticleRow | null;
     error = retry.error as { code?: string; message?: string } | null;
-  } else if (!error && withOwner) {
-    ownerColumnAvailable = true;
   }
+  if (!error && selOwner) ownerColumnAvailable = true;
 
   if (error) return { ok: false, status: 500, error: error.message ?? "Gagal memuat artikel" };
   if (!article) return { ok: false, status: 404, error: "Artikel tidak ditemukan" };

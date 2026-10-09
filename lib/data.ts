@@ -17,6 +17,9 @@ export type Article = {
   secondary_image?: string;
   secondary_image_caption?: string;
   secondary_image_credit?: string;
+  optional_image?: string;
+  optional_image_caption?: string;
+  optional_image_credit?: string;
   lead?: string;
   created_at?: string;
   status?: string;
@@ -96,6 +99,9 @@ type DbArticle = {
   secondary_image?: string;
   secondary_image_caption?: string;
   secondary_image_credit?: string;
+  optional_image?: string;
+  optional_image_caption?: string;
+  optional_image_credit?: string;
   lead?: string;
   created_at?: string;
   status?: string;
@@ -118,9 +124,19 @@ function mapRow(a: DbArticle): Article {
     cover_image: a.cover_image ?? a.image ?? undefined,
     image_caption: a.image_caption ?? undefined,
     image_credit: a.image_credit ?? undefined,
-    secondary_image: a.secondary_image ?? undefined,
-    secondary_image_caption: a.secondary_image_caption ?? undefined,
-    secondary_image_credit: a.secondary_image_credit ?? undefined,
+    // Dual-mode: `optional_image*` = nama kanonis spesifikasi CMS,
+    // `secondary_image*` = alias kompatibel-mundur. Keduanya dibaca
+    // silang agar Tipe 1/2 terdeteksi apa pun kolom yang ada di DB.
+    secondary_image: a.secondary_image ?? a.optional_image ?? undefined,
+    secondary_image_caption:
+      a.secondary_image_caption ?? a.optional_image_caption ?? undefined,
+    secondary_image_credit:
+      a.secondary_image_credit ?? a.optional_image_credit ?? undefined,
+    optional_image: a.optional_image ?? a.secondary_image ?? undefined,
+    optional_image_caption:
+      a.optional_image_caption ?? a.secondary_image_caption ?? undefined,
+    optional_image_credit:
+      a.optional_image_credit ?? a.secondary_image_credit ?? undefined,
     lead: a.lead ?? a.excerpt ?? undefined,
     created_at: a.created_at ?? a.date ?? undefined,
     status: a.status ?? "published",

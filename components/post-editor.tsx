@@ -206,14 +206,16 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         excerpt: a.excerpt ?? a.lead ?? "",
         content: blocksToHtml(contentBlocks),
         image: a.image ?? a.cover_image ?? "",
-        secondary_image: a.secondary_image ?? "",
+        secondary_image: a.secondary_image ?? a.optional_image ?? "",
         category: a.category ?? "Nasional",
         tags: tags.filter((t) => t !== HEADLINE_TAG).join(", "),
         author: a.author ?? "",
         image_caption: a.image_caption ?? "",
         image_credit: a.image_credit ?? "",
-        secondary_image_caption: a.secondary_image_caption ?? "",
-        secondary_image_credit: a.secondary_image_credit ?? "",
+        secondary_image_caption:
+          a.secondary_image_caption ?? a.optional_image_caption ?? "",
+        secondary_image_credit:
+          a.secondary_image_credit ?? a.optional_image_credit ?? "",
         date: a.date ?? todayWIB(),
         headline: tags.includes(HEADLINE_TAG),
       });
@@ -409,13 +411,21 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         return;
       }
       const imagePath = uploadedPath || form.image.trim();
-      const secondaryImagePath = secondaryUploadedPath || form.secondary_image.trim();
+      const secondaryRaw = (secondaryUploadedPath || form.secondary_image.trim()).trim();
+      // MODUL 1.2: kosong → null (jangan string kosong / error); kirim
+      // NAMA KANONIK `optional_image*` + alias `secondary_image*` agar
+      // API + halaman pembaca mengenali Tipe 1 vs Tipe 2.
+      const secondaryImagePath = secondaryRaw ? secondaryRaw : null;
+      const secondaryCaptionRaw = form.secondary_image_caption.trim();
+      const secondaryCreditRaw = form.secondary_image_credit.trim();
       const draftPayload = {
         title,
         category: form.category || "Nasional",
         excerpt: form.excerpt.trim(),
         content: JSON.stringify(paras),
         image: imagePath,
+        optional_image: secondaryImagePath,
+        optional_image_caption: secondaryCaptionRaw ? secondaryCaptionRaw : null,
         secondary_image: secondaryImagePath,
         tags: JSON.stringify(tags),
         author: form.author.trim() || "Redaksi GentaNusa",
@@ -426,8 +436,8 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         date: form.date || todayWIB(),
         image_caption: form.image_caption.trim(),
         image_credit: form.image_credit.trim(),
-        secondary_image_caption: form.secondary_image_caption.trim(),
-        secondary_image_credit: form.secondary_image_credit.trim(),
+        secondary_image_caption: secondaryCaptionRaw ? secondaryCaptionRaw : null,
+        secondary_image_credit: secondaryCreditRaw ? secondaryCreditRaw : null,
         lead: form.excerpt.trim(),
         status: "draft",
       };
@@ -483,7 +493,10 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         return;
       }
       const imagePath = uploadedPath || form.image.trim();
-      const secondaryImagePath = secondaryUploadedPath || form.secondary_image.trim();
+      const secondaryRawPub = (secondaryUploadedPath || form.secondary_image.trim()).trim();
+      const secondaryImagePathPub = secondaryRawPub ? secondaryRawPub : null;
+      const secondaryCaptionPub = form.secondary_image_caption.trim();
+      const secondaryCreditPub = form.secondary_image_credit.trim();
       const title = form.title.trim();
       const paras = htmlToBlocks(form.content);
       const plainText = htmlToText(form.content);
@@ -521,7 +534,9 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         excerpt: lead,
         content: JSON.stringify(paras),
         image: imagePath.trim(),
-        secondary_image: secondaryImagePath.trim(),
+        optional_image: secondaryImagePathPub,
+        optional_image_caption: secondaryCaptionPub ? secondaryCaptionPub : null,
+        secondary_image: secondaryImagePathPub,
         tags: JSON.stringify(tags),
         author: form.author.trim(),
         author_slug:
@@ -531,8 +546,8 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         date: today,
         image_caption: form.image_caption.trim(),
         image_credit: form.image_credit.trim(),
-        secondary_image_caption: form.secondary_image_caption.trim(),
-        secondary_image_credit: form.secondary_image_credit.trim(),
+        secondary_image_caption: secondaryCaptionPub ? secondaryCaptionPub : null,
+        secondary_image_credit: secondaryCreditPub ? secondaryCreditPub : null,
         lead,
         status: "published",
       };

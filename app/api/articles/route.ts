@@ -143,6 +143,39 @@ export async function POST(req: NextRequest) {
     user_id: session.userId ?? null,
   };
 
+  // MODUL 1 — Foto Tambahan / Foto Kedua (dual-mode editorial).
+  // Terima NAMA KANONIK `optional_image*` maupun alias lawas
+  // `secondary_image*`; kosong → null (jangan string kosong / error).
+  // Loop insert toleran di bawah otomatis membuang kolom yang belum ada
+  // di skema Supabase (zero data loss antar-lingkungan).
+  const normImg = (v: unknown): string | null => {
+    const s = typeof v === "string" ? v.trim() : "";
+    return s ? s : null;
+  };
+  const optionalImage = normImg(
+    body.optional_image ?? body.secondary_image ?? null
+  );
+  const optionalCaption = normImg(
+    body.optional_image_caption ?? body.secondary_image_caption ?? null
+  );
+  const secondaryImage = normImg(
+    body.secondary_image ?? body.optional_image ?? null
+  );
+  const secondaryCaption = normImg(
+    body.secondary_image_caption ?? body.optional_image_caption ?? null
+  );
+  const secondaryCredit = normImg(
+    body.secondary_image_credit ??
+      (typeof body.optional_image_credit === "string"
+        ? body.optional_image_credit
+        : null)
+  );
+  allowedPayload.optional_image = optionalImage;
+  allowedPayload.optional_image_caption = optionalCaption;
+  allowedPayload.secondary_image = secondaryImage;
+  allowedPayload.secondary_image_caption = secondaryCaption;
+  allowedPayload.secondary_image_credit = secondaryCredit;
+
   const pending: Record<string, unknown> = { ...allowedPayload };
   let data = null;
   let error: { message?: string } | null = null;

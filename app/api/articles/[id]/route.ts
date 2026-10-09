@@ -54,20 +54,22 @@ async function updateTolerant(
 async function getArticle(id: string): Promise<ArticleRow | null> {
   const c = ensureSupabaseServiceClient();
   if (!c.ok) return null;
-  const first = await c.client
-    .from("articles")
-    .select(ARTICLE_COLUMNS_WITH_OWNER)
-    .eq("id", id)
-    .maybeSingle();
-  if (first.error && /user_id/i.test(first.error.message || "")) {
-    const retry = await c.client
+  let columns = ARTICLE_COLUMNS_WITH_OWNER;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const res = await c.client
       .from("articles")
-      .select(ARTICLE_COLUMNS_BASE)
+      .select(columns)
       .eq("id", id)
       .maybeSingle();
-    return (retry.data as ArticleRow | null) ?? null;
+    if (!res.error) return (res.data as ArticleRow | null) ?? null;
+    const m = /Could not find the '([^']+)' column/i.exec(res.error.message || "");
+    if (!m) return null;
+    const parts = columns.split(",").map((s) => s.trim()).filter(Boolean);
+    const kept = parts.filter((p) => p !== m[1]);
+    if (kept.length === parts.length) return null;
+    columns = kept.join(",");
   }
-  return (first.data as ArticleRow | null) ?? null;
+  return null;
 }
 
 // GET /api/articles/[id] — satu artikel (publik).
@@ -179,6 +181,33 @@ export async function PUT(
     // permanen sejak baris pertama dibuat (tidak bisa dialihkan-ecak oleh
     // admin saat menyunting, termasuk lewat payload klien).
   };
+
+  // MODUL 1 — Foto Tambahan dual-mode (kanonis `optional_image*` +
+  // alias `secondary_image*`); kosong → null.
+  const normImg = (v: unknown): string | null => {
+    const s = typeof v === "string" ? v.trim() : "";
+    return s ? s : null;
+  };
+  const optionalImage = normImg(
+    body.optional_image ?? body.secondary_image ?? null
+  );
+  const optionalCaption = normImg(
+    body.optional_image_caption ?? body.secondary_image_caption ?? null
+  );
+  fullUpdate.optional_image = optionalImage;
+  fullUpdate.optional_image_caption = optionalCaption;
+  fullUpdate.secondary_image = normImg(
+    body.secondary_image ?? body.optional_image ?? null
+  );
+  fullUpdate.secondary_image_caption = normImg(
+    body.secondary_image_caption ?? body.optional_image_caption ?? null
+  );
+  fullUpdate.secondary_image_credit = normImg(
+    body.secondary_image_credit ??
+      (typeof body.optional_image_credit === "string"
+        ? body.optional_image_credit
+        : null)
+  );
 
   const { data, error } = await updateTolerant(c.client, id, fullUpdate);
 
