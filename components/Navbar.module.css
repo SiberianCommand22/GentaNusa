@@ -1,31 +1,33 @@
 /* Gemini AI style header: navy editorial bar + category bar
    Minimalist, balanced, dark theme with #041d56 */
 
+/* Slim editorial header: brand bar ~50px + category strip ~38px.
+   Navy #0A192F, border 1px hairline, tanpa bayangan tebal. */
+
 .header {
   position: sticky;
   top: 0;
   z-index: 50;
   width: 100%;
-  background: #041d56;
+  background: #0A192F;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .headerInner {
   max-width: 80rem;
   margin: 0 auto;
-  padding: 0 24px;
-  height: 72px;
+  padding: 0 16px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 12px;
 }
 
 @media (min-width: 640px) {
   .headerInner {
-    padding-left: 40px;
-    padding-right: 40px;
+    padding-left: 24px;
+    padding-right: 24px;
   }
 }
 
@@ -54,18 +56,33 @@
   min-width: 0;
 }
 
-/* Tanggal edisi masthead (desktop saja) + tombol ikon pencarian. */
+/* Tanggal edisi masthead (desktop) + penanda edisi + tombol ikon. */
 .mastDate {
   display: none;
   font-size: 12px;
-  letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.65);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #D4D4D4;
   white-space: nowrap;
-  margin-right: 4px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .mastDate {
+    display: block;
+  }
+}
+
+.editionTag {
+  display: none;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .editionTag {
     display: block;
   }
 }
@@ -129,9 +146,9 @@
   outline-offset: 2px;
 }
 
-/* Drawer hanya untuk mobile/tablet: di desktop navigasi murni bilah
+/* Drawer hanya untuk <1024px: di desktop navigasi murni bilah
    kategori horizontal. Unlayered agar menang atas utilitas Tailwind. */
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .hamburgerBtn {
     display: none;
   }
@@ -143,24 +160,21 @@
   color: currentColor;
 }
 
-/* Tier 2 — kategori editorial */
+/* Tier 2 — strip kategori ~38px, swipeable di bawah lg. */
 .categoryBar {
-  background: #021236;
+  background: #071224;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Mobile-first: bilah kategori digulir horizontal (overflow-x-auto + no-scrollbar
-   + scroll-smooth + whitespace-nowrap). `safe center` membuat kategori tetap
-   terpusat saat muat, tetapi otomatis jatuh ke alignment start saat melebar —
-   penting agar menu pertama tidak terpotong di layar ponsel. */
+/* Mobile/tablet: gulir horizontal mulus tanpa scrollbar terlihat. */
 .categoryBarInner {
   max-width: 80rem;
   margin: 0 auto;
-  padding: 10px 16px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   gap: 20px;
-  justify-content: safe center;
+  justify-content: flex-start;
   white-space: nowrap;
   overflow-x: auto;
   overflow-y: hidden;
@@ -169,18 +183,14 @@
   scrollbar-width: none;
 }
 
-/* Desktop: bar terpusat simetris, jarak lega, tanpa gulir. */
-@media (min-width: 768px) {
+/* Desktop lg: terpusat simetris, tanpa gulir. */
+@media (min-width: 1024px) {
   .categoryBarInner {
     justify-content: center;
     gap: 32px;
-    padding: 12px 32px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .categoryBarInner {
-    gap: 48px;
+    padding-left: 24px;
+    padding-right: 24px;
+    overflow-x: visible;
   }
 }
 
@@ -192,21 +202,14 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  height: 40px;
-  padding: 6px 0;
-  font-size: 11px;
+  height: 38px;
+  padding: 8px 0;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.06em;
+  color: #D4D4D4;
   white-space: nowrap;
   transition: color 0.15s;
-}
-
-@media (min-width: 640px) {
-  .categoryLink {
-    font-size: 12px;
-  }
 }
 
 .categoryLink::after {
@@ -214,10 +217,10 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 4px;
   height: 2px;
   border-radius: 9999px;
-  background: #fff;
+  background: #F59E0B;
   transform: scaleX(0);
   transition: transform 0.2s ease;
 }
@@ -237,6 +240,62 @@
 
 .categoryLinkActive::after {
   transform: scaleX(1);
+}
+
+/* Strip pencarian expandable di bawah header. */
+.searchStrip {
+  background: #071224;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.searchStripForm {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 10px 16px;
+  display: flex;
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .searchStripForm {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+.searchStripInput {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  font-size: 14px;
+  color: #fff;
+  outline: none;
+}
+
+.searchStripInput::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.searchStripInput:focus {
+  border-color: #F59E0B;
+}
+
+.searchStripBtn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  background: #F59E0B;
+  color: #0A192F;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.searchStripBtn:hover {
+  background: #FBBF24;
 }
 
 /* ===== DRAWER / SIDEBAR - GEMINI AI STYLE ===== */
