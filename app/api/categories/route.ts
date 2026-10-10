@@ -20,6 +20,10 @@ const STATIC_CATEGORIES = [
   { slug: "politik", name: "Politik" },
   { slug: "ekonomi", name: "Ekonomi" },
   { slug: "dunia", name: "Dunia" },
+  { slug: "sosial-budaya", name: "Sosial Budaya" },
+  { slug: "kesehatan", name: "Kesehatan" },
+  { slug: "olahraga", name: "Olahraga" },
+  { slug: "keamanan", name: "Keamanan" },
 ];
 
 // GET — daftar kategori (public, statis).

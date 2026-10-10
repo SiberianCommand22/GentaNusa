@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: { absolute: "Berita Terkini | GentaNusa" },
   description:
-    "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, dan Peduli.",
+    "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, Peduli, Sosial Budaya, Kesehatan, Olahraga, dan Keamanan.",
   alternates: { canonical: "https://www.gentanusa.id/kategori" },
   openGraph: {
     url: "https://www.gentanusa.id/kategori",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     type: "website",
     title: "Berita Terkini | GentaNusa",
     description:
-      "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, dan Peduli.",
+      "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, Peduli, Sosial Budaya, Kesehatan, Olahraga, dan Keamanan.",
     images: [
       {
         url: "https://www.gentanusa.id/og-default.jpg",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Berita Terkini | GentaNusa",
     description:
-      "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, dan Peduli.",
+      "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, Peduli, Sosial Budaya, Kesehatan, Olahraga, dan Keamanan.",
     images: ["https://www.gentanusa.id/og-default.jpg"],
   },
 };
@@ -61,6 +61,26 @@ const CHANNELS: { slug: string; label: string; desc: string }[] = [
     slug: "dunia",
     label: "Dunia",
     desc: "Kabar internasional, geopolitik kawasan, dan hubungan diplomatik global.",
+  },
+  {
+    slug: "sosial-budaya",
+    label: "Sosial Budaya",
+    desc: "Kehidupan masyarakat, tradisi, seni budaya, dan dinamika sosial nusantara.",
+  },
+  {
+    slug: "kesehatan",
+    label: "Kesehatan",
+    desc: "Layanan kesehatan, kebijakan publik bidang kesehatan, dan gaya hidup sehat.",
+  },
+  {
+    slug: "olahraga",
+    label: "Olahraga",
+    desc: "Prestasi atlet, kompetisi, dan pembinaan olahraga Indonesia.",
+  },
+  {
+    slug: "keamanan",
+    label: "Keamanan",
+    desc: "Ketertiban umum, penegakan hukum, dan keamanan masyarakat.",
   },
   {
     slug: "peduli",

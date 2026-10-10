@@ -29,17 +29,20 @@ const WRITE = "M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z";
 const POSTS = "M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0V9M18 14h-8M15 18h-5M10 6H8v4h2";
 const EXTERNAL = "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3";
 const LOGOUT = "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9";
+const SETTINGS = "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z";
 
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: DASHBOARD, exact: true },
   { href: "/admin/posts/new", label: "Tulis Berita", icon: WRITE, exact: false },
   { href: "/admin/posts", label: "Kelola Berita", icon: POSTS, exact: true },
+  { href: "/admin/settings", label: "Pengaturan", icon: SETTINGS, exact: true },
 ];
 
 const TITLES: Array<[string, string]> = [
   ["/admin/posts/new", "Tulis Berita"],
   ["/admin/posts/edit", "Edit Berita"],
   ["/admin/posts", "Kelola Berita"],
+  ["/admin/settings", "Pengaturan"],
   ["/admin/login/gentanusa", "Login Redaksi"],
   ["/admin/login", "Login Redaksi"],
   ["/admin", "Dashboard"],

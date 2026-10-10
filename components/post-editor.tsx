@@ -15,7 +15,7 @@ import styles from "@/app/admin/cms.module.css";
  * Supabase Auth; kolom di bawah tidak pernah dipercaya untuk itu.
  */
 
-const CATEGORIES = ["Nasional", "Pertahanan", "Politik", "Ekonomi", "Dunia", "Peduli"];
+const CATEGORIES = ["Nasional", "Pertahanan", "Politik", "Ekonomi", "Dunia", "Peduli", "Sosial Budaya", "Kesehatan", "Olahraga", "Keamanan"];
 
 // Penanda headline disimpan sebagai tag khusus (difilter dari tampilan publik).
 const HEADLINE_TAG = "headline";

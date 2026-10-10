@@ -25,6 +25,10 @@ const categoryNav = [
   { slug: "politik", label: "POLITIK" },
   { slug: "ekonomi", label: "EKONOMI" },
   { slug: "dunia", label: "DUNIA" },
+  { slug: "sosial-budaya", label: "SOSIAL BUDAYA" },
+  { slug: "kesehatan", label: "KESEHATAN" },
+  { slug: "olahraga", label: "OLAHRAGA" },
+  { slug: "keamanan", label: "KEAMANAN" },
   { slug: "peduli", label: "PEDULI" },
 ];
 

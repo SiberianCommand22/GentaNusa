@@ -32,6 +32,22 @@ const VALID_CATEGORIES: Record<string, { label: string; desc: string }> = {
     label: "Dunia",
     desc: "Kabar internasional, geopolitik kawasan, dan hubungan diplomatik global.",
   },
+  "sosial-budaya": {
+    label: "Sosial Budaya",
+    desc: "Kehidupan masyarakat, tradisi, seni budaya, dan dinamika sosial nusantara.",
+  },
+  kesehatan: {
+    label: "Kesehatan",
+    desc: "Layanan kesehatan, kebijakan publik bidang kesehatan, dan gaya hidup sehat.",
+  },
+  olahraga: {
+    label: "Olahraga",
+    desc: "Prestasi atlet, kompetisi, dan pembinaan olahraga Indonesia.",
+  },
+  keamanan: {
+    label: "Keamanan",
+    desc: "Ketertiban umum, penegakan hukum, dan keamanan masyarakat.",
+  },
   peduli: {
     label: "Peduli",
     desc: "Dokumentasi kegiatan sosial, aksi kemanusiaan, dan bakti nusantara GentaNusa.",

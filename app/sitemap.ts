@@ -13,6 +13,14 @@ const CATEGORY_ROUTES = [
   "/peduli",
 ];
 
+// Kanal tanpa halaman root — diakses via /kategori/<slug>.
+const CHANNEL_ROUTES = [
+  "/kategori/sosial-budaya",
+  "/kategori/kesehatan",
+  "/kategori/olahraga",
+  "/kategori/keamanan",
+];
+
 // Halaman kelembagaan resmi.
 const INSTITUTIONAL_ROUTES = [
   "/tentang-kami",
@@ -37,6 +45,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "daily" as const,
       priority: 0.8,
+    })),
+    ...CHANNEL_ROUTES.map((r) => ({
+      url: `${SITE_URL}${r}`,
+      lastModified: now,
+      changeFrequency: "daily" as const,
+      priority: 0.7,
     })),
     ...INSTITUTIONAL_ROUTES.map((r) => ({
       url: `${SITE_URL}${r}`,
