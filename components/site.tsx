@@ -17,8 +17,6 @@ const QUICK_CHANNELS = [
   { slug: "kesehatan", label: "Kesehatan" },
   { slug: "olahraga", label: "Olahraga" },
   { slug: "keamanan", label: "Keamanan" },
-  { slug: "ekonomi", label: "Ekonomi" },
-  { slug: "dunia", label: "Dunia" },
 ];
 
 export function Footer() {
@@ -63,9 +61,8 @@ export function Footer() {
 
           <div className={styles.footerCol}>
             <h4>Redaksi</h4>
-            <Link href="/susunan-redaksi">Susunan Redaksi</Link>
             <Link href="/pedoman-media-siber">Pedoman Media Siber</Link>
-            <Link href="/kontak">Kontak Kami</Link>
+            <Link href="/kontak">Kontak Redaksi</Link>
             <a
               href={`mailto:${OFFICIAL_EMAIL_REDAKSI}`}
               className={styles.footerPlain}

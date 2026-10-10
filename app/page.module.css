@@ -332,34 +332,40 @@
   object-fit: cover;
 }
 
-/* ===== Terpopuler bernomor + Opini ===== */
-.popGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 32px;
-}
-
-@media (min-width: 1024px) {
-  .popGrid {
-    grid-template-columns: 7fr 5fr;
-  }
-}
-
-.popList {
+/* ===== Terpopuler horizontal kompak: 1 kolom ponsel, 5 kolom desktop ===== */
+.popGridFlat {
   list-style: none;
   margin: 0;
   padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 24px;
 }
 
-.popRow {
+@media (min-width: 1024px) {
+  .popGridFlat {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.popCell {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   align-items: flex-start;
   padding: 14px 0;
+  border-top: 1px solid #E2E8F0;
+  min-width: 0;
 }
 
-.popRow + .popRow {
-  border-top: 1px solid #E2E8F0;
+@media (min-width: 1024px) {
+  .popCell {
+    border-top: 3px solid #0F172A;
+    padding-top: 12px;
+  }
+}
+
+.opiniStrip {
+  margin-top: 28px;
 }
 
 .popNum {

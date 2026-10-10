@@ -26,13 +26,9 @@ const categoryNav = [
   { slug: "keamanan", label: "KEAMANAN" },
 ];
 
-// Daftar kanal lengkap untuk laci navigasi (termasuk kanal tanpa bilah utama).
-const drawerChannels = [
-  ...categoryNav,
-  { slug: "ekonomi", label: "EKONOMI" },
-  { slug: "dunia", label: "DUNIA" },
-  { slug: "peduli", label: "PEDULI" },
-];
+// Daftar kanal lengkap = 7 kanal resmi (Navbar, Drawer, Footer memakai
+// daftar yang sama — tak ada kanal ghost).
+const drawerChannels = categoryNav;
 
 export function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);

@@ -54,18 +54,19 @@ const leaders = [
   },
   {
     role: "Kanal Peliputan Berita",
-    name: "Desk Nasional, Pertahanan, Politik, Ekonomi, Dunia, Peduli",
+    name: "Desk Nasional, Politik, Pertahanan, Sosial Budaya, Kesehatan, Olahraga, Keamanan",
     desc: "Jurnalis lapangan dan kontributor daerah dari Sabang sampai Merauke.",
   },
 ];
 
 const desks = [
   "Desk Nasional",
-  "Desk Pertahanan",
   "Desk Politik",
-  "Desk Ekonomi",
-  "Desk Dunia",
-  "Desk Peduli (Kemanusiaan & Sosial)",
+  "Desk Pertahanan",
+  "Desk Sosial Budaya",
+  "Desk Kesehatan",
+  "Desk Olahraga",
+  "Desk Keamanan",
 ];
 
 const linkCls = "text-blue-700 hover:text-blue-900 font-medium transition-colors";
@@ -136,12 +137,11 @@ export default function TentangKamiPage() {
                 Koreksi dicantumkan terbuka; hak jawab dipenuhi sesuai UU Pers
                 No. 40 Tahun 1999.
               </li>
-              <li>
-                <strong className="text-slate-900">Peduli Nusantara.</strong>{" "}
-                Kanal <strong className="text-slate-900">Peduli</strong>{" "}
-                mendokumentasikan aksi sosial, bakti masyarakat, dan
-                kemanusiaan.
-              </li>
+                <li>
+                  <strong className="text-slate-900">Peduli Nusantara.</strong>{" "}
+                  Liputan sosial, bakti masyarakat, dan kemanusiaan dari
+                  seluruh penjuru negeri.
+                </li>
             </ul>
           </section>
 

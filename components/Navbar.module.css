@@ -129,6 +129,14 @@
   outline-offset: 2px;
 }
 
+/* Drawer hanya untuk mobile/tablet: di desktop navigasi murni bilah
+   kategori horizontal. Unlayered agar menang atas utilitas Tailwind. */
+@media (min-width: 768px) {
+  .hamburgerBtn {
+    display: none;
+  }
+}
+
 .hamburgerIcon {
   width: 20px;
   height: 16px;

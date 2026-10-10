@@ -163,42 +163,38 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ===== TERPOPULER bernomor + OPINI ===== */}
+      {/* ===== TERPOPULER horizontal kompak + OPINI ===== */}
       {popular.length > 0 && (
         <section className={styles.section} aria-label="Terpopuler">
           <div className={styles.container}>
-            <div className={styles.popGrid}>
-              <div>
-                <h2 className={styles.sectionTitle}>Terpopuler</h2>
-                <ol className={styles.popList}>
-                  {popular.map((a, i) => (
-                    <li key={a.id} className={styles.popRow}>
-                      <span className={styles.popNum} aria-hidden="true">
-                        {i + 1}
-                      </span>
-                      <Link href={articleUrl(a)} className={styles.popLink}>
-                        <span className={styles.popTitle}>{a.title}</span>
-                        <Meta a={a} />
-                      </Link>
-                    </li>
+            <h2 className={styles.sectionTitle}>Terpopuler</h2>
+            <ol className={styles.popGridFlat}>
+              {popular.map((a, i) => (
+                <li key={a.id} className={styles.popCell}>
+                  <span className={styles.popNum} aria-hidden="true">
+                    {i + 1}
+                  </span>
+                  <Link href={articleUrl(a)} className={styles.popLink}>
+                    <span className={styles.popTitle}>{a.title}</span>
+                    <Meta a={a} />
+                  </Link>
+                </li>
+              ))}
+            </ol>
+            {opinions.length > 0 && (
+              <div className={styles.opiniStrip}>
+                <h2 className={styles.sectionTitle}>Opini &amp; Analisis</h2>
+                <div className={styles.opiniStack}>
+                  {opinions.map((a) => (
+                    <Link key={a.id} href={articleUrl(a)} className={styles.opiniCard}>
+                      <span className={styles.opiniBadge}>OPINI</span>
+                      <span className={styles.opiniTitle}>{a.title}</span>
+                      <Meta a={a} />
+                    </Link>
                   ))}
-                </ol>
-              </div>
-              {opinions.length > 0 && (
-                <div>
-                  <h2 className={styles.sectionTitle}>Opini &amp; Analisis</h2>
-                  <div className={styles.opiniStack}>
-                    {opinions.map((a) => (
-                      <Link key={a.id} href={articleUrl(a)} className={styles.opiniCard}>
-                        <span className={styles.opiniBadge}>OPINI</span>
-                        <span className={styles.opiniTitle}>{a.title}</span>
-                        <Meta a={a} />
-                      </Link>
-                    ))}
-                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </section>
       )}
