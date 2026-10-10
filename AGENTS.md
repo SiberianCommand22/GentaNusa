@@ -44,11 +44,13 @@ token, the sole session proof).
   OR the master admin email on the VERIFIED identity. `user_metadata.role`
   never grants admin (user-mutable via client SDK).
 - `lib/editorial-articles.ts` — all CMS reads of `articles`. Admins get every
-  row; regular authors get only their own rows via
-  `.or("user_id.eq.<uuid>,author_slug.eq.<slug>")`.
+  row; regular authors get only rows with their server-side `user_id` UUID
+  (single `.eq()` filter — no slug claims, no raw `.or()` interpolation).
+  Legacy rows without `user_id` are admin-visible only until backfilled.
 - `articles.user_id` is stamped from the session on create and never rewritten
-  on update. Run `scripts/migrate-articles.sql` to add the column; until then the
-  helper transparently falls back to filtering by `author_slug`.
+  on update (ownership ignores non-admin slug claims; `author_slug` is a
+  display hint, never an ownership proof). Run `scripts/migrate-articles.sql`
+  to add the column, then backfill legacy rows (template at file bottom).
 - `DELETE` on articles is admin-only: non-admins get 403
   `Hanya Administrator Utama yang berhak menghapus berita.`
 - Editing someone else's article returns 403

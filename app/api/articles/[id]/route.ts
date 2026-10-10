@@ -7,8 +7,10 @@ import {
   ARTICLE_COLUMNS_WITH_OWNER,
   ensureSupabaseServiceClient,
   fetchArticleForSession,
+  sanitizeSlug,
   type ArticleRow,
 } from "@/lib/editorial-articles";
+import { sanitizeContentInput } from "@/lib/sanitize-html";
 
 function slugify(value: string): string {
   return (
@@ -51,19 +53,30 @@ async function updateTolerant(
   return { data: null, error: lastError };
 }
 
-async function getArticle(id: string): Promise<ArticleRow | null> {
+async function getArticle(id: string, publishedOnly: boolean): Promise<ArticleRow | null> {
   const c = ensureSupabaseServiceClient();
   if (!c.ok) return null;
   let columns = ARTICLE_COLUMNS_WITH_OWNER;
   for (let attempt = 0; attempt < 8; attempt++) {
-    const res = await c.client
+    let query = c.client
       .from("articles")
       .select(columns)
-      .eq("id", id)
-      .maybeSingle();
+      .eq("id", id);
+    // HIGH-1: pemanggil tanpa sesi admin TIDAK BOLEH menerima draf —
+    // filter di sisi query, bukan di JS pasca-baca.
+    if (publishedOnly) query = query.eq("status", "published");
+    const res = await query.maybeSingle();
     if (!res.error) return (res.data as ArticleRow | null) ?? null;
     const m = /Could not find the '([^']+)' column/i.exec(res.error.message || "");
-    if (!m) return null;
+    if (!m) {
+      // Skema tanpa kolom `status`: ambil tanpa filter lalu tegakkan di JS
+      // (fail-closed — baris non-published tetap ditolak).
+      if (publishedOnly) {
+        const fallback = await getArticle(id, false);
+        return fallback && fallback.status === "published" ? fallback : null;
+      }
+      return null;
+    }
     const parts = columns.split(",").map((s) => s.trim()).filter(Boolean);
     const kept = parts.filter((p) => p !== m[1]);
     if (kept.length === parts.length) return null;
@@ -95,10 +108,18 @@ export async function GET(
     return NextResponse.json(result.article);
   }
 
-  // Jalur cepat: ID numerik via service_role.
+  // Jalur cepat: ID numerik. Anonim/non-admin HANYA boleh menerima baris
+  // published; draf/archived wajib sesi admin terverifikasi. Non-admin
+  // mendapat 404 (bukan 403) agar keberadaan draf tidak terkonfirmasi.
   if (/^\d+$/.test(raw)) {
-    const data = await getArticle(String(Number(raw)));
-    if (data) return NextResponse.json(data);
+    const pub = await getArticle(String(Number(raw)), true);
+    if (pub) return NextResponse.json(pub);
+    const session = await getEditorialSession();
+    if (session?.isAdmin) {
+      const data = await getArticle(String(Number(raw)), false);
+      if (data) return NextResponse.json(data);
+    }
+    return NextResponse.json({ error: "Tidak ditemukan" }, { status: 404 });
   }
   // Fallback: cocokkan slug turunan (tanpa perlu kolom slug di DB).
   const { getArticleBySlugOrId } = await import("@/lib/data");
@@ -153,16 +174,21 @@ export async function PUT(
   // Penulis biasa terkunci ke identitas sesi loginnya (auth.getUser());
   // administrator tetap bebas menetapkan nama penulis tampilan.
   // Nama bot otomatisasi selalu dinetralkan di kedua peran.
+  // Slug non-admin DIABAIKAN dari payload: dipertahankan dari baris
+  // existing (kontinuitas arsip) atau diturunkan server dari nama —
+  // tidak pernah dari klaim klien, agar tak bisa pindah arsip orang lain.
   const author = resolveAuthorName(session, requestedAuthor, fallbackAuthor);
+  const cleanRequestedSlug = sanitizeSlug(requestedSlug);
+  const existingSlug = sanitizeSlug(existing.author_slug ?? "");
   const authorSlug = session.isAdmin
-    ? requestedSlug || String(existing.author_slug ?? "") || slugify(author)
-    : session.authorSlug || String(existing.author_slug ?? "") || slugify(author);
+    ? cleanRequestedSlug || existingSlug || slugify(author)
+    : existingSlug || slugify(author);
 
   const fullUpdate: Record<string, unknown> = {
     title: body.title,
     category: body.category,
     excerpt: body.excerpt,
-    content: body.content,
+    content: sanitizeContentInput(body.content) ?? [],
     image: body.image ?? body.cover_image ?? null,
     tags: body.tags ?? [],
     author,

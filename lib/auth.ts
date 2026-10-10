@@ -50,6 +50,9 @@ export type EditorialSession = {
 type SupaUserLike = {
   id: string;
   email?: string | null;
+  /** Wajib terisi untuk jalur admin via kecocokan email master. */
+  email_confirmed_at?: string | null;
+  confirmed_at?: string | null;
   /** Hanya backend (Service Role) yang boleh menulis bagian ini. */
   app_metadata?: Record<string, unknown> | null;
   user_metadata?: Record<string, unknown> | null;
@@ -96,11 +99,15 @@ export function sessionFromSupabaseUser(user: SupaUserLike): EditorialSession {
   const displayRole =
     adminRole || String(userMeta.role ?? "").trim().toLowerCase() || "editor";
   const email = readString(user.email);
+  // Jalur email master HANYA untuk identitas TERVERIFIKASI: tanpa
+  // email_confirmed_at, kecocokan email tidak memberi hak admin.
+  // (Jalur app_metadata.role tidak terpengaruh — ditulis backend.)
+  const emailVerified = Boolean(user.email_confirmed_at || user.confirmed_at);
   return {
     userId: user.id || null,
     email,
     role: displayRole,
-    isAdmin: isAdminIdentity({ role: adminRole, email }),
+    isAdmin: isAdminIdentity({ role: adminRole, email: emailVerified ? email : null }),
     fullName:
       readString(userMeta.full_name) ??
       readString(userMeta.name) ??

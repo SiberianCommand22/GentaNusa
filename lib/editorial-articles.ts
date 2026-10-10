@@ -5,15 +5,14 @@ import type { EditorialSession } from "@/lib/auth";
 /**
  * Isolasi data penulis (multi-author isolation).
  *
- * Semua pembacaan tabel `articles` untuk keperluan redaksi harus lewat helper
- * di berkas ini supaya aturan kepemilikan tidak bisa dilewati oleh rute baru:
+ * Kepemilikan artikel ditentukan HANYA oleh `user_id` — UUID Supabase Auth
+ * yang dicap server saat artikel dibuat dan tidak pernah ditulis ulang.
+ * `author_slug` dari `user_metadata` (dapat diubah user via client SDK)
+ * TIDAK PERNAH dipakai untuk otorisasi: tidak untuk filter baca, tidak
+ * untuk penjagaan edit, tidak untuk atribusi create/update non-admin.
  *
- *  - Administrator  -> seluruh baris (lihat semua berita).
- *  - Penulis biasa   -> HANYA baris miliknya sendiri, difilter di sisi server
- *                      lewat `.or("user_id.eq.<uuid>,author_slug.eq.<slug>")`.
- *
- * Kolom `user_id` bersifat opsional: bila migrasi SQL belum dijalankan,
- * helper otomatis mundur ke filter `author_slug` (lihat OWNER COLUMN cache).
+ * Baris lawas tanpa `user_id` (pra-migrasi) hanya terlihat admin; jalankan
+ * backfill di `scripts/migrate-articles.sql` untuk memulihkan akses penulis.
  */
 
 export type ArticleRow = {
@@ -81,21 +80,34 @@ function extractMissingColumn(error: { message?: string } | null): string | null
   return m ? m[1] : null;
 }
 
-/** Baris dianggap milik sesi bila UUID atau author_slug cocok. */
+/**
+ * Sanitasi slug ketat untuk nilai apa pun yang menyentuh query PostgREST.
+ * Whitelist: huruf kecil, angka, tanda hubung. Mencegah injeksi grammar
+ * filter (`,`, `(`, `)`, `.`, `*`) lewat interpolasi string `.or()`/`.eq()`.
+ */
+export function sanitizeSlug(value: unknown, maxLen = 80): string {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, maxLen);
+}
+
+/** Baris dianggap milik sesi bila UUID server cocok. TIDAK ADA fallback slug. */
 export function ownsArticle(
-  article: { user_id?: string | null; author_slug?: string | null } | null,
+  article: { user_id?: string | null } | null,
   session: EditorialSession | null
 ): boolean {
   if (!article || !session) return false;
-  if (article.user_id && session.userId && article.user_id === session.userId) return true;
-  const slug = String(article.author_slug ?? "").trim();
-  const mine = String(session.authorSlug ?? "").trim();
-  return Boolean(slug && mine && slug === mine);
+  if (!article.user_id || !session.userId) return false;
+  return article.user_id === session.userId;
 }
 
 /** Administrator boleh mengedit apa pun; selain itu harus pemilik artikel. */
 export function canEditArticle(
-  article: { user_id?: string | null; author_slug?: string | null } | null,
+  article: { user_id?: string | null } | null,
   session: EditorialSession | null
 ): boolean {
   if (!session) return false;
@@ -110,7 +122,8 @@ export type ArticleListResult =
 /**
  * Daftar artikel untuk ruang kerja redaksi.
  * - Administrator: seluruh baris.
- * - Penulis biasa: hanya baris miliknya.
+ * - Penulis biasa: hanya baris dengan `user_id` miliknya (filter `.eq()`
+ *   tunggal — tanpa interpolasi `.or()` mentah, tanpa klaim slug).
  */
 export async function fetchArticlesForSession(
   session: EditorialSession,
@@ -118,8 +131,6 @@ export async function fetchArticlesForSession(
 ): Promise<ArticleListResult> {
   const c = ensureSupabaseServiceClient();
   if (!c.ok) return { ok: false, status: 503, error: c.error };
-
-  const authorSlug = String(session.authorSlug ?? "").trim();
 
   const run = async (withOwner: boolean, columns: string) => {
     let query = c.client
@@ -131,15 +142,11 @@ export async function fetchArticlesForSession(
     if (options.draftsOnly) query = query.eq("status", "draft");
 
     if (!session.isAdmin) {
-      const filters: string[] = [];
-      if (withOwner && session.userId) filters.push(`user_id.eq.${session.userId}`);
-      if (authorSlug) filters.push(`author_slug.eq.${authorSlug}`);
-      // Tanpa identitasApa pun yang bisa difilter — jangan bocorkan baris
-      // siapa pun; kembalikan kosong.
-      if (filters.length === 0) {
+      // Tanpa UUID server — tidak ada baris yang boleh bocor.
+      if (!withOwner || !session.userId) {
         return { data: [] as ArticleRow[], error: null };
       }
-      query = query.or(filters.join(","));
+      query = query.eq("user_id", session.userId);
     }
 
     return query;

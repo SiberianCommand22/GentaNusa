@@ -2,12 +2,50 @@ import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 import path from "path";
 import { promises as fs } from "fs";
+import { rateLimit } from "@/app/api/rate-limit";
 
 export const runtime = "nodejs";
 
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
 const BANNER_HEIGHT = 120;
+// MEDIUM: pipeline fetch+sharp ini mahal per request — batasi ukuran sumber
+// dan waktu fetch agar tak jadi pusat pembakaran CPU/memori/egress.
+const MAX_SOURCE_BYTES = 8 * 1024 * 1024;
+const FETCH_TIMEOUT_MS = 12_000;
+
+/** Fetch dengan anggaran byte + timeout; throw bila sumber terlalu besar. */
+async function fetchImageBudgeted(url: string): Promise<Buffer> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, { signal: ctrl.signal });
+    if (!res.ok) throw new Error("Failed to fetch article image");
+    const declared = Number(res.headers.get("content-length") || "0");
+    if (declared > MAX_SOURCE_BYTES) throw new Error("Source image too large");
+    if (!res.body) {
+      const buf = await res.arrayBuffer();
+      if (buf.byteLength > MAX_SOURCE_BYTES) throw new Error("Source image too large");
+      return Buffer.from(buf);
+    }
+    const reader = res.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let total = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > MAX_SOURCE_BYTES) {
+        await reader.cancel().catch(() => {});
+        throw new Error("Source image too large");
+      }
+      chunks.push(value);
+    }
+    return Buffer.concat(chunks);
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 // Batas anti-SSRF: hanya host ini yang boleh di-fetch server-side.
 // Path lokal absolut selalu diizinkan; selain itu wajib https + allowlist.
@@ -69,6 +107,10 @@ function isAllowedImageUrl(urlStr: string): boolean {
 }
 
 export async function GET(req: NextRequest) {
+  // Pembatas laju agar endpoint publik ini tak dipompa untuk compute abuse.
+  const limited = rateLimit(req);
+  if (!limited.ok) return limited.response;
+
   const { searchParams } = new URL(req.url);
   const articleImage = searchParams.get("image");
   const title = searchParams.get("title") || "";
@@ -96,11 +138,8 @@ export async function GET(req: NextRequest) {
   const logoPath = path.join(process.cwd(), "public/images/logo-gentanusa-white.png");
 
   try {
-    // Fetch article image
-    const imgRes = await fetch(baseImage);
-    if (!imgRes.ok) throw new Error("Failed to fetch article image");
-    const imgBuffer = await imgRes.arrayBuffer();
-    const imgInput = Buffer.from(imgBuffer);
+    // Fetch article image (beranggaran byte + timeout anti-bloat).
+    const imgInput = await fetchImageBudgeted(baseImage);
 
     // Load white logo
     const logoBuffer = await fs.readFile(logoPath);

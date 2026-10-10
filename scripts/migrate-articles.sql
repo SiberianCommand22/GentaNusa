@@ -24,8 +24,13 @@ ALTER TABLE articles ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DE
 -- sehingga penulis tidak pernah melihat berita penulis lain.
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS user_id UUID;
 
--- Backfill-tetap: baris lama yang sudah punya author_slug tetap dapat diakses
--- lewat filter author_slug, jadi tidak ada data yang hilang.
+-- BACKFILL KEPEMILIKAN (wajib pasca-remediasi HIGH-2): CMS hanya mengakui
+-- `user_id` sebagai bukti milik. Baris lawas dengan user_id NULL hanya
+-- terlihat admin sampai di-backfill. Untuk tiap penulis, isi UUID akun
+-- Supabase Auth-nya (Dashboard > Authentication > Users) per author_slug:
+--   UPDATE articles SET user_id = '<uuid-penulis-1>' WHERE author_slug = '<slug-penulis-1>' AND user_id IS NULL;
+--   UPDATE articles SET user_id = '<uuid-penulis-2>' WHERE author_slug = '<slug-penulis-2>' AND user_id IS NULL;
+-- Verifikasi sisa yatim: SELECT id, author_slug FROM articles WHERE user_id IS NULL;
 CREATE INDEX IF NOT EXISTS articles_user_id_idx ON articles (user_id);
 CREATE INDEX IF NOT EXISTS articles_author_slug_idx ON articles (author_slug);
 CREATE INDEX IF NOT EXISTS articles_status_idx ON articles (status);

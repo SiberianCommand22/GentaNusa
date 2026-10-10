@@ -7,7 +7,9 @@ import {
   ACCESS_DENIED_DELETE,
   ensureSupabaseServiceClient,
   fetchArticlesForSession,
+  sanitizeSlug,
 } from "@/lib/editorial-articles";
+import { sanitizeContentInput } from "@/lib/sanitize-html";
 
 function slugify(value: string): string {
   return (
@@ -113,18 +115,21 @@ export async function POST(req: NextRequest) {
         : "";
 
   // Penulis biasa: nama dikunci ke identitas sesi login (auth.getUser()),
-  // bukan input klien dan bukan nama bot. Administrator tetap bebas
-  // menetapkan nama penulis tampilan (kecuali nama bot).
+  // bukan input klien dan bukan nama bot. Slug atribusi diturunkan server
+  // dari nama terverifikasi — klaim slug kustom non-admin DIABAIKAN agar
+  // artikel tidak bisa disusupkan ke arsip penulis lain. Administrator
+  // tetap bebas menetapkan nama penulis tampilan (kecuali nama bot).
   const author = resolveAuthorName(session, requestedAuthor);
+  const cleanRequestedSlug = sanitizeSlug(requestedSlug);
   const authorSlug = session.isAdmin
-    ? requestedSlug || slugify(author)
-    : session.authorSlug || requestedSlug || slugify(author);
+    ? cleanRequestedSlug || slugify(author)
+    : slugify(author);
 
   const allowedPayload: Record<string, unknown> = {
     title: body.title,
     category: body.category,
     excerpt: body.excerpt,
-    content: body.content,
+    content: sanitizeContentInput(body.content) ?? [],
     image: body.image ?? body.cover_image ?? null,
     tags: body.tags,
     author,

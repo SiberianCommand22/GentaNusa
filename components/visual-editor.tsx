@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import styles from "./visual-editor.module.css";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 type VisualEditorProps = {
   value: string;
@@ -89,13 +90,17 @@ export function VisualEditor({ value, onChange, placeholder }: VisualEditorProps
 
   // Sinkronisasi SATU ARAH: HTML luar → kanvas hanya saat kanvas tidak fokus,
   // sehingga mengetik tidak pernah tertimpa (termasuk saat prefill mode edit).
+  // HIGH-3: HTML dari DB (milik penulis mana pun) DISANITASI sebelum masuk
+  // innerHTML agar payload tersimpan tak dieksekusi di browser admin.
+  // Server (POST/PUT) tetap menjadi titik kepercayaan terakhir.
   useEffect(() => {
     const el = editorRef.current;
     if (!el) return;
     const next = value || "";
     if (next !== lastHtml.current && document.activeElement !== el) {
-      el.innerHTML = next;
-      lastHtml.current = next;
+      const safe = next.includes("<") ? sanitizeHtml(next) : next;
+      el.innerHTML = safe;
+      lastHtml.current = safe;
     }
   }, [value]);
 

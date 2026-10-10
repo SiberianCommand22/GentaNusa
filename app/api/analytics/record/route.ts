@@ -7,10 +7,41 @@ import { rateLimit } from "@/app/api/rate-limit";
 // Payload tracker yang belum lengkap (mis. tanpa articleId) atau kegagalan
 // penyimpanan dijawab 200 `{ ok: false }` agar konsol browser bersih;
 // kegagalan nyata tetap dicatat di log server.
+function siteHosts(): Set<string> {
+  const hosts = new Set<string>();
+  const raw = process.env.NEXT_PUBLIC_SITE_URL || "";
+  try {
+    if (raw) hosts.add(new URL(raw).hostname.toLowerCase());
+  } catch {
+    /* abaikan SITE_URL malformed */
+  }
+  hosts.add("gentanusa.id");
+  hosts.add("www.gentanusa.id");
+  hosts.add("gentanusa.vercel.app");
+  hosts.add("localhost");
+  return hosts;
+}
+
+// MEDIUM: endpoint publik tanpa auth — tolak penulisan lintas-origin agar
+// tidak dipakai membanjiri bucket storage dari situs mana pun. Header
+// Origin/Referer absen (curl, beacon tertentu) tetap lolos ke rate limit.
+function isAllowedOrigin(req: NextRequest): boolean {
+  const origin = req.headers.get("origin") || req.headers.get("referer") || "";
+  if (!origin) return true;
+  try {
+    return siteHosts().has(new URL(origin).hostname.toLowerCase());
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(req: NextRequest) {
   const limited = rateLimit(req);
   if (!limited.ok) {
     return NextResponse.json({ ok: false, rateLimited: true }, { status: 200 });
+  }
+  if (!isAllowedOrigin(req)) {
+    return NextResponse.json({ ok: false }, { status: 200 });
   }
 
   // Robust parser: dukung JSON standar maupun text/plain
@@ -34,14 +65,17 @@ export async function POST(req: NextRequest) {
   }
 
   const kind = body.kind;
-  const path = typeof body.path === "string" ? body.path : "";
+  // Batas panjang anti-abuse: path/visitorId tak wajar ditolak sebelum
+  // menyentuh storage (satu event = satu objek JSON di bucket).
+  const rawPath = typeof body.path === "string" ? body.path : "";
+  const path = rawPath.length > 500 ? "" : rawPath;
   const rawId = body.articleId;
   const slug =
     typeof body.slug === "string" && body.slug.trim().length > 0
-      ? body.slug.trim()
+      ? body.slug.trim().slice(0, 200)
       : null;
-  const visitorId =
-    typeof body.visitorId === "string" ? body.visitorId : undefined;
+  const rawVisitor = typeof body.visitorId === "string" ? body.visitorId : undefined;
+  const visitorId = rawVisitor ? rawVisitor.slice(0, 100) : undefined;
 
   if ((kind !== "site" && kind !== "article") || !path) {
     return NextResponse.json({ ok: false }, { status: 200 });

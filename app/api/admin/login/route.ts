@@ -17,8 +17,8 @@ const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
 // Bentuk ringkasan sesi yang disimpan di cookie httpOnly `genta_session`.
 // PERINGATAN: cookie ini hanya petunjuk tampilan — lib/auth.ts TIDAK PERNAH
-// memakainya untuk otentikasi. `user_id` + `author_slug` adalah kunci
-// kepemilikan artikel (Pilar 3).
+// memakainya untuk otentikasi. `user_id` adalah kunci kepemilikan artikel
+// (Pilar 3); `author_slug` hanya petunjuk tampilan, bukan bukti milik.
 type SessionPayload = {
   email: string;
   role: string;
