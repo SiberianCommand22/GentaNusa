@@ -2,17 +2,23 @@ import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 
 /**
- * Lapisan RBAC redaksi GentaNusa.
+ * Lapisan RBAC redaksi GentaNusa (pasca-remediasi keamanan Okt 2026).
  *
- * Sesi redaksi tersusun atas tiga cookie httpOnly:
- *   - genta_admin    : flag "sudah masuk ruang kerja" (guard waris kompatibilitas)
- *   - genta_session  : ringkasan klaim (role, email, user_id, author_slug)
- *   - genta_token    : access token Supabase Auth (verifikasi ulang ke IdP)
+ * Aturan keras:
+ *  1. Sesi HANYA valid bila access token di cookie `genta_token` berhasil
+ *     diverifikasi langsung ke Supabase Auth (`auth.getUser(token)`).
+ *  2. Cookie `genta_session` TIDAK PERNAH dipercaya untuk otentikasi — isinya
+ *     hanya petunjuk tampilan (display hints) yang ditulis saat login.
+ *     Tidak ada fallback ke klaim cookie bila token hilang/tidak valid.
+ *  3. Status administrator HANYA dibaca dari `app_metadata.role` (yang hanya
+ *     bisa dimutasi backend via Service Role Key) atau dari kecocokan email
+ *     Administrator Utama pada identitas TERVERIFIKASI. `user_metadata`
+ *     tidak pernah menentukan hak admin karena bisa diubah user via client SDK.
  *
- * Bila `genta_token` ada, identitas SEJAHRAJA diambil ulang lewat
- * `supabase.auth.getUser(token)` sehingga role/user_id di cookie tidak pernah
- * dipercaya buta. Bila token sudah kedaluwarsa, klaim cookie tetap dipakai
- * (fallback) supaya sesi redaksi tidak terlempar keluar saat token rotasi.
+ * Cookie httpOnly (7 hari):
+ *   - genta_admin : flag "sudah masuk ruang kerja" (early-exit murah).
+ *   - genta_session : ringkasan tampilan, TIDAK DIAKUI sebagai bukti sesi.
+ *   - genta_token : access token Supabase Auth (sumber kebenaran sesi).
  */
 
 // Email Administrator Utama. Dapat dioverride lewat env untuk staging/offline.
@@ -26,6 +32,7 @@ export const MASTER_ADMIN_EMAIL = (
 const ADMIN_ROLES = new Set(["admin", "superadmin", "super_admin", "administrator"]);
 
 export const ADMIN_FLAG_COOKIE = "genta_admin";
+/** @deprecated Hanya petunjuk tampilan — jangan pernah dipakai untuk otorisasi. */
 export const SESSION_COOKIE = "genta_session";
 export const TOKEN_COOKIE = "genta_token";
 
@@ -43,6 +50,8 @@ export type EditorialSession = {
 type SupaUserLike = {
   id: string;
   email?: string | null;
+  /** Hanya backend (Service Role) yang boleh menulis bagian ini. */
+  app_metadata?: Record<string, unknown> | null;
   user_metadata?: Record<string, unknown> | null;
 };
 
@@ -54,7 +63,10 @@ function readString(value: unknown): string | null {
 
 /**
  * Satu-satunya sumber kebenaran "apakah ini Administrator?".
- * Genesis: `user_metadata.role === 'admin'` ATAU email Administrator Utama.
+ *
+ * `role` WAJIB berasal dari `app_metadata` (atau email master yang sudah
+ * terverifikasi via Supabase Auth). Meneruskan nilai dari `user_metadata`
+ * ke parameter ini adalah pelanggaran keamanan.
  */
 export function isAdminIdentity(input: {
   role?: unknown;
@@ -70,23 +82,30 @@ export function isAdminIdentity(input: {
   return email.length > 0 && email === MASTER_ADMIN_EMAIL;
 }
 
-/** Bangun EditorialSession dari user Supabase Auth (metadata = sumber role). */
+/**
+ * Bangun EditorialSession dari user Supabase Auth TERVERIFIKASI.
+ * Role admin diambil dari `app_metadata`; `user_metadata` hanya dipakai
+ * untuk atribut tampilan (nama, author_slug) — tidak pernah untuk hak akses.
+ */
 export function sessionFromSupabaseUser(user: SupaUserLike): EditorialSession {
-  const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
-  const role = String(meta.role ?? "")
+  const appMeta = (user.app_metadata ?? {}) as Record<string, unknown>;
+  const userMeta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const adminRole = String(appMeta.role ?? "")
     .trim()
     .toLowerCase();
+  const displayRole =
+    adminRole || String(userMeta.role ?? "").trim().toLowerCase() || "editor";
   const email = readString(user.email);
   return {
     userId: user.id || null,
     email,
-    role: role || "editor",
-    isAdmin: isAdminIdentity({ role, email }),
+    role: displayRole,
+    isAdmin: isAdminIdentity({ role: adminRole, email }),
     fullName:
-      readString(meta.full_name) ??
-      readString(meta.name) ??
-      readString(meta.display_name),
-    authorSlug: readString(meta.author_slug),
+      readString(userMeta.full_name) ??
+      readString(userMeta.name) ??
+      readString(userMeta.display_name),
+    authorSlug: readString(userMeta.author_slug),
   };
 }
 
@@ -109,45 +128,19 @@ async function verifySupabaseToken(token: string): Promise<EditorialSession | nu
 /**
  * Sesi redaksi aktif, atau null bila belum login.
  * AMAN dipanggil dari route handler, Server Component, dan server action.
+ *
+ * Tidak ada jalur pintas: tanpa token Supabase yang valid, hasilnya null —
+ * cookie `genta_session` yang tidak ditandatangani tidak pernah diterima.
  */
 export async function getEditorialSession(): Promise<EditorialSession | null> {
   const store = await cookies();
   if (store.get(ADMIN_FLAG_COOKIE)?.value !== "1") return null;
 
-  let claims: Record<string, unknown> = {};
-  const rawSession = store.get(SESSION_COOKIE)?.value;
-  if (rawSession) {
-    try {
-      const parsed: unknown = JSON.parse(rawSession);
-      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-        claims = parsed as Record<string, unknown>;
-      }
-    } catch {
-      claims = {};
-    }
-  }
-
   const token = store.get(TOKEN_COOKIE)?.value;
-  if (token) {
-    const verified = await verifySupabaseToken(token);
-    if (verified) return verified;
-    // Token basi/tidak valid — jatuh ke klaim cookie (fallback kompatibilitas).
-  }
+  if (!token) return null;
 
-  const role = String(claims.role ?? "")
-    .trim()
-    .toLowerCase();
-  const email = readString(claims.email);
-  if (!role && !email) return null;
-
-  return {
-    userId: readString(claims.user_id),
-    email,
-    role: role || "editor",
-    isAdmin: isAdminIdentity({ role, email }),
-    fullName: readString(claims.display_name),
-    authorSlug: readString(claims.author_slug),
-  };
+  // Satu-satunya jalan: verifikasi ke Supabase Auth. Gagal = tidak login.
+  return verifySupabaseToken(token);
 }
 
 // Nama byline otomatisasi/bot yang dilarang tampil sebagai penulis artikel.

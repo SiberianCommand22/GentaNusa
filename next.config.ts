@@ -1,5 +1,29 @@
 import type { NextConfig } from "next";
 
+// CSP diperketat pasca-remediasi Okt 2026: 'unsafe-eval' HILANG di produksi
+// (Next.js production tidak membutuhkannya; dev HMR masih boleh via kondisi
+// di bawah). 'unsafe-inline' untuk script dipertahankan karena Next.js
+// menyuntik inline bootstrap + (opsional) AdSense; style inline dibutuhkan
+// Tailwind/Next. Tambahkan host AdSense/Analytics agar skrip iklan tidak pecah.
+const isDev = process.env.NODE_ENV !== "production";
+const cspHeader = `
+  default-src 'self';
+  script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://pagead2.googlesyndication.com https://*.google.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  img-src 'self' blob: data: https:;
+  font-src 'self' https://fonts.gstatic.com;
+  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://pagead2.googlesyndication.com https://*.google-analytics.com;
+  frame-src 'self' https://googleads.g.doubleclick.net https://*.google.com;
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+  frame-ancestors 'none';
+  block-all-mixed-content;
+  upgrade-insecure-requests;
+`
+  .replace(/\s{2,}/g, " ")
+  .trim();
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   generateEtags: true,
@@ -74,8 +98,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value:
-              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';",
+            value: cspHeader,
           },
           {
             key: "X-Frame-Options",

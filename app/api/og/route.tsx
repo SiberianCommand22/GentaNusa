@@ -3,12 +3,63 @@ import { NextRequest } from 'next/server';
 
 export const runtime = 'edge';
 
+// Batas anti-SSRF (duplikat edge-safe dari logika di app/api/og-image/route.ts):
+// hanya path lokal atau https ke host allowlist yang boleh dirender satori.
+// Satori me-fetch `src` dari sisi server, jadi URL mentah = SSRF.
+function isAllowedImageUrl(urlStr: string): boolean {
+  try {
+    if (
+      urlStr.startsWith('/media/') ||
+      urlStr.startsWith('/images/') ||
+      urlStr.startsWith('/logo.png')
+    ) {
+      return true;
+    }
+    const parsed = new URL(urlStr);
+    if (parsed.protocol !== 'https:') return false;
+    const host = parsed.hostname.toLowerCase();
+    if (
+      host === 'localhost' ||
+      host === '[::1]' ||
+      host === '::1' ||
+      /^(127|10|169\.254|192\.168)\./.test(host) ||
+      /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
+      (/^[\d.]+$/.test(host) && /^[0-9]+$/.test(host.replaceAll('.', '')))
+    ) {
+      return false;
+    }
+    const supabaseHost = (() => {
+      try {
+        const raw = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+        return raw ? new URL(raw).hostname.toLowerCase() : '';
+      } catch {
+        return '';
+      }
+    })();
+    const allowed = new Set(
+      [
+        'gentanusa.id',
+        'www.gentanusa.id',
+        'gentanusa.vercel.app',
+        'image.pollinations.ai',
+        supabaseHost,
+      ].filter(Boolean)
+    );
+    return allowed.has(host);
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const title = searchParams.get('title') || 'GentaNusa — Berita Nusantara Terkini';
-    const category = searchParams.get('category') || 'Nasional';
-    const imageUrl = searchParams.get('image');
+    // Batasi panjang agar render satori tidak bisa dipaksa mahal (DoS ringan).
+    const title = (searchParams.get('title') || 'GentaNusa — Berita Nusantara Terkini').slice(0, 160);
+    const category = (searchParams.get('category') || 'Nasional').slice(0, 40);
+    const rawImage = (searchParams.get('image') || '').trim();
+    // URL tak tervalidasi tidak pernah diteruskan ke ImageResponse.
+    const imageUrl = rawImage && isAllowedImageUrl(rawImage) ? rawImage : null;
 
     return new ImageResponse(
       (

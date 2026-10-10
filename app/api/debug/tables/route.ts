@@ -3,6 +3,9 @@ import { getEditorialSession } from "@/lib/auth";
 import { getCategories } from "@/lib/data";
 
 export async function GET() {
+  if (process.env.NODE_ENV === "production") {
+    return new NextResponse(null, { status: 404 });
+  }
   const session = await getEditorialSession();
   if (!session) {
     return NextResponse.json({ error: "Akses ditolak. Wajib login." }, { status: 401 });

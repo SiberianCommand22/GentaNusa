@@ -3,8 +3,11 @@ import { adminClient, isSupabaseReady } from "@/lib/supabase";
 import { getEditorialSession } from "@/lib/auth";
 import { getArticles, getCategories } from "@/lib/data";
 
-// Debug: cek koneksi DB dan data — administrator saja.
+// Debug: cek koneksi DB dan data — administrator saja, non-produksi saja.
 export async function GET() {
+  if (process.env.NODE_ENV === "production") {
+    return new NextResponse(null, { status: 404 });
+  }
   const session = await getEditorialSession();
   if (!session) {
     return NextResponse.json({ error: "Akses ditolak. Wajib login." }, { status: 401 });

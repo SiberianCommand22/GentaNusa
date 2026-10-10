@@ -49,6 +49,8 @@
 3. CNAME record: `www` → `gentanusa.vercel.app`
 4. Vercel: add alias `gentanusa.id` dan `www.gentanusa.id`
 5. Update email kontak, alamat, dan link sosial di footer (jika ada)
-6. Set `ADMIN_PASSWORD` kuat untuk production baru
+6. Buat akun Supabase Auth untuk Administrator Utama, tetapkan
+   `app_metadata.role = "admin"` via `scripts/assign-admin-role.ts`, dan
+   terapkan `scripts/enable-rls.sql` di SQL Editor Supabase
 7. Uji ulang semua route production
 8. Luncurkan! 🚀

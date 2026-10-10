@@ -9,6 +9,65 @@ const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
 const BANNER_HEIGHT = 120;
 
+// Batas anti-SSRF: hanya host ini yang boleh di-fetch server-side.
+// Path lokal absolut selalu diizinkan; selain itu wajib https + allowlist.
+function supabaseHostname(): string | null {
+  try {
+    const raw = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    if (!raw) return null;
+    return new URL(raw).hostname || null;
+  } catch {
+    return null;
+  }
+}
+
+function isAllowedImageUrl(urlStr: string): boolean {
+  try {
+    // Izinkan path lokal absolut milik situs sendiri.
+    if (
+      urlStr.startsWith("/media/") ||
+      urlStr.startsWith("/images/") ||
+      urlStr.startsWith("/logo.png")
+    ) {
+      return true;
+    }
+
+    const parsed = new URL(urlStr);
+
+    // Tolak skema selain https (termasuk http, file, gopher, dll).
+    if (parsed.protocol !== "https:") return false;
+
+    const host = parsed.hostname.toLowerCase();
+
+    // Tolak localhost, IP literal privat/link-local, dan decimal/octal tricks.
+    if (
+      host === "localhost" ||
+      host === "[::1]" ||
+      host === "::1" ||
+      /^(127|10|169\.254|192\.168)\./.test(host) ||
+      /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
+      /^[0-9]+$/.test(host.replaceAll(".", "")) && /^[\d.]+$/.test(host)
+    ) {
+      return false;
+    }
+
+    // Allowlist domain resmi.
+    const allowedHostnames = new Set(
+      [
+        "gentanusa.id",
+        "www.gentanusa.id",
+        "gentanusa.vercel.app",
+        "image.pollinations.ai",
+        supabaseHostname(),
+      ].filter((h): h is string => Boolean(h))
+    );
+
+    return allowedHostnames.has(host);
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const articleImage = searchParams.get("image");
@@ -20,11 +79,19 @@ export async function GET(req: NextRequest) {
   // /media/... path. Prefixing SITE_URL onto an absolute URL produced
   // "https://gentanusa.idhttps://..." which 404s, dropping every share preview
   // into the logo-only fallback.
-  const baseImage = articleImage
-    ? /^https?:\/\//i.test(articleImage)
-      ? articleImage
-      : `${SITE_URL}${articleImage}`
+  const rawImage = (articleImage || "").trim();
+  const candidate = rawImage
+    ? /^https?:\/\//i.test(rawImage)
+      ? rawImage
+      : rawImage.startsWith("/")
+        ? `${SITE_URL}${rawImage}`
+        : null
     : `${SITE_URL}/images/placeholder-article.svg`;
+  // Tolak URL yang tidak lolos allowlist anti-SSRF — jangan pernah fetch().
+  const baseImage =
+    candidate && isAllowedImageUrl(candidate)
+      ? candidate
+      : `${SITE_URL}/images/placeholder-article.svg`;
 
   const logoPath = path.join(process.cwd(), "public/images/logo-gentanusa-white.png");
 

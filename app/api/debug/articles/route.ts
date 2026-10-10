@@ -4,6 +4,9 @@ import { getEditorialSession } from "@/lib/auth";
 import { getArticles, getCategories } from "@/lib/data";
 
 export async function GET() {
+  if (process.env.NODE_ENV === "production") {
+    return new NextResponse(null, { status: 404 });
+  }
   // Diagnostik internal — administrator saja.
   const session = await getEditorialSession();
   if (!session) {

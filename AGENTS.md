@@ -30,12 +30,19 @@ Login is **private**: the form lives only at `/admin/login/gentanusa`.
 public navbar or drawer.
 
 Session cookies (all httpOnly, 7d): `genta_admin` (flag), `genta_session`
-(claims), `genta_token` (Supabase access token).
+(display hints only — NEVER trusted for auth), `genta_token` (Supabase access
+token, the sole session proof).
 
-- `lib/auth.ts` — resolves the session; re-verifies role via
-  `supabase.auth.getUser(token)` when the token cookie exists.
-- Administrator = `user_metadata.role` in `{admin, superadmin, super_admin, administrator}`
-  OR the master admin email (`MASTER_ADMIN_EMAIL` env, defaults to the master account).
+- `lib/auth.ts` — resolves the session ONLY via
+  `supabase.auth.getUser(token)`. No token / invalid token = null; there is
+  no cookie-claims fallback.
+- Login (`POST /api/admin/login`) is Supabase-Auth-only; no hardcoded master
+  password exists. The master admin must own a Supabase Auth user with the
+  `MASTER_ADMIN_EMAIL` address.
+- Administrator = `app_metadata.role` in `{admin, superadmin, super_admin, administrator}`
+  (set server-side via `scripts/assign-admin-role.ts`)
+  OR the master admin email on the VERIFIED identity. `user_metadata.role`
+  never grants admin (user-mutable via client SDK).
 - `lib/editorial-articles.ts` — all CMS reads of `articles`. Admins get every
   row; regular authors get only their own rows via
   `.or("user_id.eq.<uuid>,author_slug.eq.<slug>")`.
@@ -71,16 +78,16 @@ Copy `.env.example` → `.env.local`. Key vars:
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key (client-safe) |
 | `SUPABASE_SERVICE_KEY` | Server-only secret (never expose to client) |
-| `MASTER_ADMIN_EMAIL` | Email Administrator Utama (role admin tetap via `user_metadata.role`) |
+| `MASTER_ADMIN_EMAIL` | Email Administrator Utama (wajib punya akun Supabase Auth; admin via email terverifikasi atau `app_metadata.role`) |
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL for SEO/sitemap |
 
 ## Architecture
 
 - **App Router** with SSG + ISR (`revalidate = 60` on homepage)
 - **No database** — JSON files + Supabase (PostgREST, no ORM)
-- **Redaksi auth**: `genta_admin` + `genta_session` + `genta_token` cookies set by `/api/admin/login` (rate-limited 5/15min); role re-verified per request via `lib/auth.ts`
+- **Redaksi auth**: Supabase-Auth-only login (`/api/admin/login`, rate-limited 5/15min); session resolved per request via `lib/auth.ts` (`getUser` on `genta_token`); admin via `app_metadata.role` — see `scripts/assign-admin-role.ts` + `scripts/enable-rls.sql`
 - **Images**: `image.pollinations.ai` and `*.supabase.co` allowed in `next.config.ts`
-- **CSP**: strict, allows `'unsafe-inline'` + `'unsafe-eval'` for scripts
+- **CSP**: strict, allows `'unsafe-inline'` for scripts (prod has NO `'unsafe-eval'`); `/api/debug/*` returns 404 in production
 - **Vercel deploy**: project ID in `.vercel/project.json`; state in `.deploy-state.json`
 
 ## CI

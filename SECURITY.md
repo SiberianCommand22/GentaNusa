@@ -5,7 +5,7 @@
 | No | Checklist | Status | Bukti |
 |----|-----------|--------|-------|
 | 1 | API key aman (env var, .gitignore) | ✅ | `.env.local` di-gitignore, 4+1 env var di Vercel |
-| 2 | No hardcode secret | ✅ | Semua kunci via `process.env` |
+| 2 | No hardcode secret | ✅ | Semua kunci via `process.env`; tidak ada password master di kode |
 | 3 | Debug mode OFF | ✅ | `poweredByHeader: false`, `generateEtags: true` |
 | 4 | Error jangan bocor | ✅ | `apiError()` — detail hanya di dev |
 | 5 | Validasi input | ✅ | `/api/articles/[id]` ID numerik → 400 jika bukan |
@@ -38,12 +38,36 @@
 | 5 | DB connection pooler | Supabase Pooler mode |
 | 6 | CSP relaksasi | Jika font.googleapis.com diperlukan, tambahkan `font-src` |
 
+## Remediasi Okt 2026 (sudah diterapkan di kode)
+
+- Auth tanpa fallback: `getEditorialSession()` hanya mengakui token Supabase
+  yang lolos `auth.getUser()`; cookie `genta_session` tak dipercaya.
+- Tanpa kredensial hardcoded: login 100% Supabase Auth. Administrator Utama
+  wajib punya akun Supabase Auth beremail `MASTER_ADMIN_EMAIL`.
+- RBAC via `app_metadata.role` (set dengan `scripts/assign-admin-role.ts`);
+  `user_metadata.role` tidak memberi hak admin. Kebijakan DB di
+  `scripts/enable-rls.sql` — jalankan di SQL Editor Supabase.
+- Anti-SSRF di `/api/og` (edge, `@vercel/og`) dan `/api/og-image` (sharp):
+  allowlist host + tolak IP privat/localhost + skema non-https.
+- CSP produksi tanpa `'unsafe-eval'`; `/api/debug/*` → 404 di produksi.
+
+## Cloudflare WAF — aturan rate limiting wajib (lapis pertahanan utama,
+## karena rate-limit in-memory tidak lintas instance serverless)
+
+| Endpoint | Batas | Aksi |
+|----------|-------|------|
+| `/api/admin/login` | 5 req/menit/IP | Block 10 menit |
+| `/api/upload` | 20 req/menit/IP | Block 5 menit |
+| `/api/articles/*` (POST/PUT/DELETE) | 30 req/menit/IP | Challenge/Block |
+
 ## Langkah berikutnya
 
 1. Deploy selesai ✅ → production sudah berjalan
 2. Beli domain (contoh: gentanusa.id)
 3. Update `NEXT_PUBLIC_SITE_URL` di Vercel dengan domain baru
 4. Update CNAME/record DNS ke Vercel
-5. Set `ADMIN_PASSWORD` kuat untuk production baru
+5. Buat akun Supabase Auth untuk Administrator Utama + jalankan
+   `scripts/assign-admin-role.ts` untuk setiap admin, lalu terapkan
+   `scripts/enable-rls.sql` di SQL Editor Supabase
 6. Uji ulang semua route production
 7. Luncurkan ke publik 🚀

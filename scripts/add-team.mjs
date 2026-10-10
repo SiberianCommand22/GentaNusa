@@ -5,7 +5,9 @@
 // Membaca NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_KEY dari environment
 // (fallback: .env.local). Untuk setiap nama di TEAM: buat email resmi
 // (mis. "Aldiansar" -> "aldiansar@gentanusa.id"), password awal default,
-// dan user_metadata { name, role: "editor" } agar lolos login CMS.
+// dan user_metadata { name, role: "editor" } sebagai atribut tampilan.
+// (Hak admin TIDAK PERNAH dari user_metadata — lihat scripts/assign-admin-role.ts;
+// login CMS menerima semua user Supabase Auth terverifikasi.)
 // Menampilkan rekap akun (Nama, Email, Password) di console.
 //
 // Tambah/ubah nama di array TEAM, lalu jalankan ulang. Akun yang email-nya
