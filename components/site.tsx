@@ -8,9 +8,19 @@ import {
 } from "@/lib/social";
 import styles from "./site.module.css";
 
-// Footer editorial navy.
-// Logo: SATU-SATUNYA emblem resmi /logo.png. Emblem vektor lonceng lama
-// (BellEmblem) sudah dihapus — tidak ada lagi logo ganda di kolom brand.
+// Footer editorial navy — 4 kolom: profil, kanal, redaksi, legalitas.
+const QUICK_CHANNELS = [
+  { slug: "nasional", label: "Nasional" },
+  { slug: "politik", label: "Politik" },
+  { slug: "pertahanan", label: "Pertahanan" },
+  { slug: "sosial-budaya", label: "Sosial Budaya" },
+  { slug: "kesehatan", label: "Kesehatan" },
+  { slug: "olahraga", label: "Olahraga" },
+  { slug: "keamanan", label: "Keamanan" },
+  { slug: "ekonomi", label: "Ekonomi" },
+  { slug: "dunia", label: "Dunia" },
+];
+
 export function Footer() {
   return (
     <footer className={styles.footer}>
@@ -42,8 +52,20 @@ export function Footer() {
             </p>
           </div>
 
+          <nav className={styles.footerCol} aria-label="Kanal berita">
+            <h4>Kanal</h4>
+            {QUICK_CHANNELS.map((c) => (
+              <Link key={c.slug} href={`/kategori/${c.slug}`}>
+                {c.label}
+              </Link>
+            ))}
+          </nav>
+
           <div className={styles.footerCol}>
             <h4>Redaksi</h4>
+            <Link href="/susunan-redaksi">Susunan Redaksi</Link>
+            <Link href="/pedoman-media-siber">Pedoman Media Siber</Link>
+            <Link href="/kontak">Kontak Kami</Link>
             <a
               href={`mailto:${OFFICIAL_EMAIL_REDAKSI}`}
               className={styles.footerPlain}
@@ -51,8 +73,6 @@ export function Footer() {
               {OFFICIAL_EMAIL_REDAKSI}
             </a>
             <span>Jakarta, Indonesia</span>
-            {/* min-w-0 + whitespace-nowrap pada nilai menjaga nomor tetap satu
-                baris di ponsel; area klik setinggi 44px untuk jari. */}
             <a
               href={OFFICIAL_WA_URL}
               target="_blank"
@@ -96,12 +116,14 @@ export function Footer() {
           </div>
 
           <div className={styles.footerCol}>
-            <h4>Informasi</h4>
+            <h4>Legalitas</h4>
             <Link href="/tentang-kami">Tentang Kami</Link>
-            <Link href="/pedoman-media-siber">Pedoman Media Siber</Link>
             <Link href="/kebijakan-privasi">Kebijakan Privasi</Link>
             <Link href="/syarat-ketentuan">Syarat &amp; Ketentuan</Link>
-            <Link href="/kontak">Kontak &amp; Kerja Sama</Link>
+            <p className={styles.footerNote}>
+              Seluruh isi tunduk pada UU Pers No. 40/1999, UU ITE, dan Kode
+              Etik Jurnalistik. Dilarang mengutip tanpa atribusi.
+            </p>
           </div>
         </div>
 

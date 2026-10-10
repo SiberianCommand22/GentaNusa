@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,29 +12,48 @@ import {
 } from "@/lib/social";
 import styles from "./Navbar.module.css";
 
-const corporateNav = [
-  { href: "/tentang-kami", label: "Redaksi & Tentang Kami" },
-  { href: "/pedoman-media-siber", label: "Pedoman Media Siber" },
-  { href: "/kebijakan-privasi", label: "Kebijakan Privasi" },
-  { href: "/kontak", label: "Kontak & Kerja Sama" },
-];
-
+// Navigasi utama 100% editorial. Tautan korporat (Tentang, Pedoman,
+// Kontak) TIDAK ada di navbar — semuanya tinggal di footer.
+// Link login redaksi SENGAJA tidak ditampilkan (kebijakan keamanan:
+// jalur /admin/login/gentanusa privat, tanpa tautan publik).
 const categoryNav = [
   { slug: "nasional", label: "NASIONAL" },
-  { slug: "pertahanan", label: "PERTAHANAN" },
   { slug: "politik", label: "POLITIK" },
-  { slug: "ekonomi", label: "EKONOMI" },
-  { slug: "dunia", label: "DUNIA" },
+  { slug: "pertahanan", label: "PERTAHANAN" },
   { slug: "sosial-budaya", label: "SOSIAL BUDAYA" },
   { slug: "kesehatan", label: "KESEHATAN" },
   { slug: "olahraga", label: "OLAHRAGA" },
   { slug: "keamanan", label: "KEAMANAN" },
+];
+
+// Daftar kanal lengkap untuk laci navigasi (termasuk kanal tanpa bilah utama).
+const drawerChannels = [
+  ...categoryNav,
+  { slug: "ekonomi", label: "EKONOMI" },
+  { slug: "dunia", label: "DUNIA" },
   { slug: "peduli", label: "PEDULI" },
 ];
 
 export function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  // Tanggal masthead dihitung di klien pasca-mount agar tidak terjadi
+  // hydration mismatch (server vs browser beda zona/tanggal).
+  const [today, setToday] = useState("");
+  useEffect(() => {
+    try {
+      setToday(
+        new Intl.DateTimeFormat("id-ID", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }).format(new Date())
+      );
+    } catch {
+      setToday("");
+    }
+  }, []);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -108,8 +127,32 @@ export function Navbar() {
             </Link>
           </div>
 
-          <div className={styles.headerSideRight} aria-hidden="true">
-            <div className={styles.spacer} />
+          <div className={styles.headerSideRight} aria-hidden="false">
+            {today && (
+              <span className={styles.mastDate} aria-label={`Edisi ${today}`}>
+                {today}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              className={styles.iconBtn}
+              aria-label="Cari berita"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className={styles.iconGlyph}
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -174,17 +217,17 @@ export function Navbar() {
               </div>
             </form>
 
-            <nav className={`${styles.drawerNav} space-y-1`} aria-label="Menu redaksi">
-              <p className={styles.drawerSectionTitle}>REDAKSI</p>
-              {corporateNav.map((item) => (
+            <nav className={`${styles.drawerNav} space-y-1`} aria-label="Kanal berita">
+              <p className={styles.drawerSectionTitle}>KANAL</p>
+              {drawerChannels.map((c) => (
                 <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={pathname === item.href ? "page" : undefined}
+                  key={c.slug}
+                  href={`/kategori/${c.slug}`}
+                  aria-current={pathname === `/kategori/${c.slug}` ? "page" : undefined}
                   className={`block py-2.5 px-4 rounded-xl text-white/90 hover:text-white hover:bg-white/10 text-sm font-medium transition-colors ${styles.drawerLink}`}
                   onClick={closeDrawer}
                 >
-                  <span>{item.label}</span>
+                  <span>{c.label.charAt(0) + c.label.slice(1).toLowerCase()}</span>
                 </Link>
               ))}
             </nav>

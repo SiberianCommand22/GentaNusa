@@ -60,6 +60,24 @@ export function sortByDate(articles: Article[]): Article[] {
   );
 }
 
+// Waktu relatif ala portal berita ("1 jam yang lalu"). Memakai created_at
+// bila tersedia (presisi jam), mundur ke kolom date (presisi hari).
+export function formatRelative(dateStr: string, createdAt?: string): string {
+  const t = createdAt ? new Date(createdAt) : new Date(dateStr + "T00:00:00Z");
+  if (isNaN(t.getTime())) return formatDate(dateStr);
+  const diffMs = Date.now() - t.getTime();
+  if (diffMs < 0) return formatDate(dateStr);
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 1) return "Baru saja";
+  if (minutes < 60) return `${minutes} menit yang lalu`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} jam yang lalu`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "Kemarin";
+  if (days < 7) return `${days} hari yang lalu`;
+  return formatDate(dateStr);
+}
+
 // Slug SEO turunan dari judul. Tabel Supabase belum punya kolom `slug`
 // (API mengabaikannya saat insert), jadi slug dihitung deterministik di
 // sini agar URL /<slug> stabil tanpa migrasi DB.

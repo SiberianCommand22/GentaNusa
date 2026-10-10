@@ -27,8 +27,8 @@
   }
 }
 
-/* Mobile: satu kolom dengan ritme vertikal lega (space-y-6). Desktop: tiga
-   kolom dengan jarak antar-kolom penuh. */
+/* Mobile: satu kolom dengan ritme vertikal lega (space-y-6).
+   Tablet: dua kolom. Desktop: empat kolom editorial. */
 .footerGrid {
   display: grid;
   grid-template-columns: 1fr;
@@ -37,15 +37,24 @@
 
 @media (min-width: 640px) {
   .footerGrid {
-    grid-template-columns: 5fr 3fr 3fr;
-    gap: 48px;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
   }
 }
 
 @media (min-width: 1024px) {
   .footerGrid {
-    gap: 64px;
+    grid-template-columns: 5fr 3fr 4fr 4fr;
+    gap: 48px;
   }
+}
+
+.footerNote {
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 4px 0 0;
+  max-width: 20rem;
 }
 
 .brandCol {

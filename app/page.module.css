@@ -124,7 +124,10 @@
 }
 
 .headlineCard:hover .headlineTitle {
-  color: #2563EB;
+  color: #1D4ED8;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
 }
 
 @media (min-width: 1024px) {
@@ -238,7 +241,223 @@
   color: #64748B;
 }
 
-/* ===== Sections & Cards ===== */
+/* ===== Tag kategori aksen + metadata penulis/waktu ===== */
+.catTag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1D4ED8;
+  margin-top: 12px;
+}
+
+.meta,
+.metaLight {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: #64748B;
+  margin-top: 8px;
+}
+
+.metaAuthor {
+  font-weight: 600;
+  color: #334155;
+}
+
+/* ===== Sekunder: daftar vertikal bergaris pemisah BBC ===== */
+.sideList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sideRow + .sideRow {
+  border-top: 1px solid #E2E8F0;
+}
+
+.sideLink {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 14px 0;
+}
+
+.sideText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sideText .catTag {
+  margin-top: 0;
+}
+
+.sideTitle {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 700;
+  color: #0F172A;
+  margin-top: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sideLink:hover .sideTitle {
+  color: #1D4ED8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.sideThumb {
+  width: 112px;
+  flex-shrink: 0;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f1f5f9;
+}
+
+.sideThumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ===== Terpopuler bernomor + Opini ===== */
+.popGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+@media (min-width: 1024px) {
+  .popGrid {
+    grid-template-columns: 7fr 5fr;
+  }
+}
+
+.popList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.popRow {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 14px 0;
+}
+
+.popRow + .popRow {
+  border-top: 1px solid #E2E8F0;
+}
+
+.popNum {
+  font-family: var(--font-serif);
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 800;
+  color: #CBD5E1;
+  min-width: 40px;
+}
+
+.popLink {
+  display: block;
+  min-width: 0;
+}
+
+.popTitle {
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 700;
+  color: #0F172A;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.popLink:hover .popTitle {
+  color: #1D4ED8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.opiniStack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.opiniCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.opiniBadge {
+  align-self: flex-start;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #fff;
+  background: #1D4ED8;
+  border-radius: 6px;
+  padding: 4px 10px;
+}
+
+.opiniTitle {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.opiniCard:hover .opiniTitle {
+  color: #1D4ED8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ===== Kepala blok kategori modular ===== */
+.blockHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.blockHead .sectionTitle {
+  margin-bottom: 0;
+}
+
+.blockMore {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1D4ED8;
+  white-space: nowrap;
+}
+
+.blockMore:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .section {
   padding: 28px 0;
 }
