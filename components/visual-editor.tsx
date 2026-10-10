@@ -8,6 +8,10 @@ type VisualEditorProps = {
   value: string;
   onChange: (html: string) => void;
   placeholder?: string;
+  /** ID kanvas agar <label htmlFor> luar dapat merujuknya (a11y DevTools). */
+  id?: string;
+  /** ID label luar untuk asosiasi aksesibel via aria-labelledby. */
+  labelledBy?: string;
 };
 
 function escapeHtml(s: string): string {
@@ -81,7 +85,7 @@ const IDLE: Active = {
   h2: false, h3: false, p: false, quote: false, ul: false, ol: false,
 };
 
-export function VisualEditor({ value, onChange, placeholder }: VisualEditorProps) {
+export function VisualEditor({ value, onChange, placeholder, id, labelledBy }: VisualEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const lastHtml = useRef<string | null>(null);
   const onChangeRef = useRef(onChange);
@@ -210,6 +214,7 @@ export function VisualEditor({ value, onChange, placeholder }: VisualEditorProps
       </div>
       <div
         ref={editorRef}
+        id={id}
         className={styles.canvas}
         contentEditable
         suppressContentEditableWarning
@@ -220,7 +225,8 @@ export function VisualEditor({ value, onChange, placeholder }: VisualEditorProps
         onPaste={onPaste}
         role="textbox"
         aria-multiline="true"
-        aria-label="Isi artikel"
+        aria-labelledby={labelledBy}
+        aria-label={labelledBy ? undefined : "Isi artikel"}
       />
     </div>
   );

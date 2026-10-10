@@ -641,10 +641,12 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
               <p className={styles.help} style={{ textAlign: "right" }}>{form.excerpt.trim().length}/600 karakter</p>
             </div>
             <div className={styles.field} id="field-content">
-              <label className={styles.fieldLabel} htmlFor="content">
+              <label className={styles.fieldLabel} htmlFor="content" id="content-label">
                 Konten Artikel
               </label>
               <VisualEditor
+                id="content"
+                labelledBy="content-label"
                 value={form.content}
                 onChange={(html) => setForm((f) => ({ ...f, content: html }))}
                 placeholder="Tulis isi berita di sini — tebal, miring, dan perataan langsung terlihat..."

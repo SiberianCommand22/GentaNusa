@@ -105,10 +105,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <nav className={styles.nav}>
             {NAV.map((item) => {
               const active = item.exact ? pathname === item.href : pathname?.startsWith(item.href);
+              // Halaman editor memuat chunk CSS/JS berat (rich-text) — jangan
+              // prefetch saat sidebar tampil agar tak ada preload mubazir.
+              const heavy = item.href.startsWith("/admin/posts");
               return (
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={heavy ? false : undefined}
                   className={`${styles.navLink} ${active ? styles.navLinkActive : ""}`}
                 >
                   <span className={styles.navIcon}>
