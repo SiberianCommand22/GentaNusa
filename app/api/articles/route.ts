@@ -119,7 +119,9 @@ export async function POST(req: NextRequest) {
   // dari nama terverifikasi — klaim slug kustom non-admin DIABAIKAN agar
   // artikel tidak bisa disusupkan ke arsip penulis lain. Administrator
   // tetap bebas menetapkan nama penulis tampilan (kecuali nama bot).
-  const author = resolveAuthorName(session, requestedAuthor);
+  // Penulis boleh memakai nama pena/byline kustom (allowCustomByline);
+  // kepemilikan tetap murni user_id server dan nama bot tetap dinetralkan.
+  const author = resolveAuthorName(session, requestedAuthor, "Redaksi GentaNusa", true);
   const cleanRequestedSlug = sanitizeSlug(requestedSlug);
   const authorSlug = session.isAdmin
     ? cleanRequestedSlug || slugify(author)

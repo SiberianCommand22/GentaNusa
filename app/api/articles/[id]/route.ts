@@ -177,7 +177,7 @@ export async function PUT(
   // Slug non-admin DIABAIKAN dari payload: dipertahankan dari baris
   // existing (kontinuitas arsip) atau diturunkan server dari nama —
   // tidak pernah dari klaim klien, agar tak bisa pindah arsip orang lain.
-  const author = resolveAuthorName(session, requestedAuthor, fallbackAuthor);
+  const author = resolveAuthorName(session, requestedAuthor, fallbackAuthor, true);
   const cleanRequestedSlug = sanitizeSlug(requestedSlug);
   const existingSlug = sanitizeSlug(existing.author_slug ?? "");
   const authorSlug = session.isAdmin

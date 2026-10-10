@@ -173,18 +173,24 @@ function normalizeAuthorName(value: unknown): string {
 /**
  * Nama penulis tampilan untuk tulis/update artikel.
  *
- * - Penulis biasa: SELALU identitas sesi login (`auth.getUser()`), tidak
- *   pernah input klien mentah dan tidak pernah nama bot.
  * - Administrator: boleh menetapkan nama tampilan, kecuali nama bot.
+ * - Penulis biasa: bila `allowCustomByline` true, input klien yang lolos
+ *   filter (bukan nama bot, maks 80 karakter) dipakai — memungkinkan nama
+ *   pena / "Tim Liputan". Bila false (default), SELALU identitas sesi login.
+ *   Kepemilikan artikel TIDAK pernah mengikuti byline (murni `user_id`).
  */
 export function resolveAuthorName(
   session: EditorialSession,
   requested: unknown,
-  fallback = "Redaksi GentaNusa"
+  fallback = "Redaksi GentaNusa",
+  allowCustomByline = false
 ): string {
-  const clean = normalizeAuthorName(requested);
+  const clean = normalizeAuthorName(requested).slice(0, 80);
   if (session.isAdmin) {
     return clean || session.fullName || fallback;
+  }
+  if (allowCustomByline && clean) {
+    return clean;
   }
   return session.fullName || clean || fallback;
 }

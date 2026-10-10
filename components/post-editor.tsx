@@ -142,6 +142,28 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, draftKey, loadedEdit]);
 
+  // Mode tulis baru: prefill byline dari display_name sesi login (bebas
+  // diedit penulis — nama pena / "Tim Liputan" diperbolehkan server).
+  useEffect(() => {
+    if (editId) return;
+    try {
+      if (localStorage.getItem(draftKey)) return;
+    } catch {
+      // abaikan
+    }
+    fetch("/api/admin/check")
+      .then(async (r) => {
+        if (!r.ok) return;
+        const j = (await r.json().catch(() => ({}))) as {
+          display_name?: string;
+        };
+        const name = typeof j.display_name === "string" ? j.display_name.trim() : "";
+        if (name) setForm((f) => (f.author.trim() ? f : { ...f, author: name }));
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editId, draftKey]);
+
   // Mode edit: ID datang dari route server (/admin/posts/edit/[id]) yang sudah
   // memeriksa sesi + kepemilikan. Query `?edit=` tetap didukung agar
   // bookmark lama tidak rusak.
