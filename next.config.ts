@@ -41,8 +41,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async redirects() {
-    return [
+  async redirects() {    return [
       {
         source: "/tentang",
         destination: "/tentang-kami",
@@ -88,6 +87,19 @@ const nextConfig: NextConfig = {
         source: "/kategori/peduli",
         destination: "/peduli",
         permanent: true,
+      },
+    ];
+  },
+  // Pengaman fallback: kanal baru TANPA halaman root-level dipetakan
+  // /<slug> -> /kategori/<slug> secara internal (URL tetap, tanpa 404).
+  // SENGAJA hanya 4 slug baru: nasional/politik/pertahanan/ekonomi/dunia/
+  // peduli punya halaman root + redirect 301 di atas — memasukkannya ke sini
+  // akan membayangi halaman asli / berisiko loop redirect.
+  async rewrites() {
+    return [
+      {
+        source: "/:category(sosial-budaya|kesehatan|olahraga|keamanan)",
+        destination: "/kategori/:category",
       },
     ];
   },

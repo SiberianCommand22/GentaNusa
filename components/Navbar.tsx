@@ -116,7 +116,10 @@ export function Navbar() {
         <nav className={styles.categoryBar} aria-label="Kategori berita">
           <div className={styles.categoryBarInner}>
             {categoryNav.map((c) => {
-              const href = `/${c.slug}`;
+              // Selalu ke /kategori/<slug>: hanya 6 kanal lama yang punya
+              // halaman root-level; kanal baru (sosial-budaya, kesehatan,
+              // olahraga, keamanan) hanya ada di bawah /kategori/.
+              const href = `/kategori/${c.slug}`;
               const isActive = pathname === href;
               return (
                 <Link
