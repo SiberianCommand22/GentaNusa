@@ -158,9 +158,24 @@ function mapRow(a: DbArticle): Article {
     lead: a.lead ?? a.excerpt ?? undefined,
     created_at: a.created_at ?? a.date ?? undefined,
     status: a.status ?? "published",
-    content: Array.isArray(a.content) ? a.content : JSON.parse(a.content || "[]"),
-    tags: Array.isArray(a.tags) ? a.tags : JSON.parse(a.tags || "[]"),
+    content: parseJsonBlocks(a.content),
+    tags: parseJsonBlocks(a.tags),
   };
+}
+
+function parseJsonBlocks(value: unknown): string[] {
+  if (Array.isArray(value)) return value.filter((b): b is string => typeof b === "string");
+  if (typeof value !== "string" || !value.trim()) return [];
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((b): b is string => typeof b === "string");
+    }
+    return [];
+  } catch {
+    // Baris lawas ber-content teks polos (bukan JSON): satu blok statului.
+    return [value];
+  }
 }
 
 async function fetchArticlesDb(): Promise<Article[] | null> {

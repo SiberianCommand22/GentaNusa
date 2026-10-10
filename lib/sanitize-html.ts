@@ -48,6 +48,23 @@ function cleanAttrs(tag: string, name: string, attrs: string): string {
   const href = attrs.match(/href\s*=\s*"([^"]*)"/i);
   if (name === "a" && href && (/^https?:\/\//i.test(href[1]) || href[1].startsWith("/"))) {
     out += ` href="${href[1]}"`;
+    // target/rel hanya nilai aman: target dibatasi _blank/_self, rel ke
+    // token allowlist (mencegah rel="opener" dsb). Link eksternal mendapat
+    // noopener+noreferrer implisit via rel yang ditulis eksplisit.
+    const target = attrs.match(/target\s*=\s*"([^"]*)"/i);
+    if (target && /^\s*_(blank|self)\s*$/i.test(target[1])) {
+      out += ` target="${target[1].trim().toLowerCase()}"`;
+    }
+    const rel = attrs.match(/rel\s*=\s*"([^"]*)"/i);
+    if (rel) {
+      const kept = rel[1]
+        .split(/[\s,]+/)
+        .map((t) => t.trim().toLowerCase())
+        .filter((t) =>
+          ["noopener", "noreferrer", "nofollow", "ugc", "sponsored"].includes(t)
+        );
+      if (kept.length > 0) out += ` rel="${[...new Set(kept)].join(" ")}"`;
+    }
   }
   // Inline style diloloskan HANYA untuk perataan teks toolbar
   // (text-align + text-justify). Deklarasi lain dibuang agar aman.
@@ -106,17 +123,40 @@ const MAX_BLOCK_CHARS = 100_000;
 
 /**
  * Sanitasi input `content` artikel (string | string[]) sebelum simpan DB.
+ *
+ * Editor CMS mengirim `content` sebagai STRING JSON (`JSON.stringify(paras)`)
+ * — string itu WAJIB di-parse dulu; membungkusnya mentah sebagai satu blok
+ * membuat halaman publik hanya menampilkan lead (blok pertama "JSON"
+ * terbuang sebagai fallback lead, body kosong). String HTML polos (bukan
+ * JSON) tetap diperlakukan sebagai satu blok.
+ *
  * Blok teks polos dikembalikan apa adanya; blok ber-HTML disanitasi dengan
  * kebijakan yang SAMA persis dengan jalur render. Kembalikan null bila tipe
  * input tidak dikenali.
  */
 export function sanitizeContentInput(content: unknown): string[] | null {
-  const list: unknown[] = Array.isArray(content)
-    ? content
-    : typeof content === "string"
-      ? [content]
-      : [];
-  if (!Array.isArray(content) && typeof content !== "string") return null;
+  let list: unknown[];
+  if (Array.isArray(content)) {
+    list = content;
+  } else if (typeof content === "string") {
+    const trimmed = content.trim();
+    if ((trimmed.startsWith("[") && trimmed.endsWith("]")) || trimmed === "") {
+      try {
+        const parsed: unknown = JSON.parse(trimmed === "" ? "[]" : trimmed);
+        if (Array.isArray(parsed)) {
+          list = parsed;
+        } else {
+          list = [content];
+        }
+      } catch {
+        list = [content];
+      }
+    } else {
+      list = [content];
+    }
+  } else {
+    return null;
+  }
   const out: string[] = [];
   for (const raw of list.slice(0, MAX_BLOCKS)) {
     if (typeof raw !== "string") continue;

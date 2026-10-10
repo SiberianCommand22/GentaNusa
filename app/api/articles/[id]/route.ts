@@ -240,8 +240,15 @@ export async function PUT(
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
   revalidatePath("/kategori/[slug]", "page");
+  revalidatePath("/kategori");
   revalidatePath("/penulis/[slug]", "page");
   revalidatePath("/[slug]", "page");
+  // Jalur konkret artikel revisi (rute publik memakai /<slug>).
+  if (data && typeof data === "object") {
+    const row = data as { slug?: unknown; id?: unknown };
+    const slug = String(row.slug || "").trim() || String(row.id ?? id).trim();
+    if (slug) revalidatePath(`/${slug}`);
+  }
   revalidatePath("/admin");
   revalidatePath("/admin/posts");
   return NextResponse.json(data);

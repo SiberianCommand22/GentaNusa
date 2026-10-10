@@ -186,7 +186,13 @@ export default async function ArticlePage({ params }: Params) {
     ? article.content
     : [String(article.content ?? "")];
   const paras = rawParas.map((b) => sanitizeEditorialText(String(b ?? "")));
-  const [firstParagraph, ...body] = paras;
+  // RC-B: blok pertama HANYA dipakai sebagai fallback lead bila artikel tidak
+  // punya lead. Bila lead ada, SELURUH blok dirender sebagai body — versi
+  // lama selalu membuang blok pertama sehingga artikel pendek hanya
+  // menampilkan lead.
+  const hasLead = Boolean((article.lead || "").trim());
+  const [firstParagraph, ...rest] = paras;
+  const body = hasLead ? paras : rest;
   const rawLead = article.lead || firstParagraph || "";
   const lead = cleanLead(sanitizeEditorialText(rawLead));
   const coverImage = article.cover_image || article.image;
