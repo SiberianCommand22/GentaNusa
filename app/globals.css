@@ -239,6 +239,17 @@
   background: var(--genta-slate-400);
 }
 
+/* Utilitas `no-scrollbar`: sembunyikan scrollbar tapi tetap bisa digulir
+   (dipakai strip kategori mobile/tablet pada Navbar). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* ===== Focus visible for accessibility ===== */
 :focus-visible {
   outline: 2px solid var(--accent);

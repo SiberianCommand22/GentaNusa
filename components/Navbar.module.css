@@ -1,304 +1,42 @@
-/* Gemini AI style header: navy editorial bar + category bar
-   Minimalist, balanced, dark theme with #041d56 */
+/* Navbar single-bar GentaNusa.
+   Bilah utama & strip kategori memakai utility Tailwind (#0F172A, h-14/h-16).
+   Modul ini hanya memegang state visual yang butuh pseudo-element
+   (garis bawah kategori) dan gaya drawer navigasi mobile. */
 
-/* Slim editorial header: brand bar ~50px + category strip ~38px.
-   Navy #0A192F, border 1px hairline, tanpa bayangan tebal. */
-
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  width: 100%;
-  background: #0A192F;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+/* Garis bawah amber pada kategori aktif/hover. */
+.catLink {
+  padding-bottom: 2px;
 }
 
-.headerInner {
-  max-width: 80rem;
-  margin: 0 auto;
-  padding: 0 16px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-@media (min-width: 640px) {
-  .headerInner {
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  min-width: 0;
-}
-
-/* Sisi kiri/kanan seimbang agar logo tepat di tengah */
-.headerSideLeft {
-  flex: 1 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  min-width: 0;
-}
-
-.headerSideRight {
-  flex: 1 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  min-width: 0;
-}
-
-/* Tanggal edisi masthead (desktop) + penanda edisi + tombol ikon. */
-.mastDate {
-  display: none;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: #D4D4D4;
-  white-space: nowrap;
-}
-
-@media (min-width: 1024px) {
-  .mastDate {
-    display: block;
-  }
-}
-
-.editionTag {
-  display: none;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-  white-space: nowrap;
-}
-
-@media (min-width: 640px) {
-  .editionTag {
-    display: block;
-  }
-}
-
-.iconBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
-  background: transparent;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
-  flex-shrink: 0;
-}
-
-.iconBtn:hover {
-  border-color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.iconBtn:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
-  outline-offset: 2px;
-}
-
-.iconGlyph {
-  width: 18px;
-  height: 18px;
-  color: currentColor;
-}
-
-/* Tombol Hamburger Minimalis - Gemini AI Style */
-.hamburgerBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
-  background: transparent;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
-}
-
-.hamburgerBtn:hover {
-  border-color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-}
-
-.hamburgerBtn:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
-  outline-offset: 2px;
-}
-
-/* Drawer hanya untuk <1024px: di desktop navigasi murni bilah
-   kategori horizontal. Unlayered agar menang atas utilitas Tailwind. */
-@media (min-width: 1024px) {
-  .hamburgerBtn {
-    display: none;
-  }
-}
-
-.hamburgerIcon {
-  width: 20px;
-  height: 16px;
-  color: currentColor;
-}
-
-/* Tier 2 — strip kategori ~38px, swipeable di bawah lg. */
-.categoryBar {
-  background: #071224;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Mobile/tablet: gulir horizontal mulus tanpa scrollbar terlihat. */
-.categoryBarInner {
-  max-width: 80rem;
-  margin: 0 auto;
-  padding: 0 16px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  justify-content: flex-start;
-  white-space: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-}
-
-/* Desktop lg: terpusat simetris, tanpa gulir. */
-@media (min-width: 1024px) {
-  .categoryBarInner {
-    justify-content: center;
-    gap: 32px;
-    padding-left: 24px;
-    padding-right: 24px;
-    overflow-x: visible;
-  }
-}
-
-.categoryBarInner::-webkit-scrollbar {
-  display: none;
-}
-
-.categoryLink {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  height: 38px;
-  padding: 8px 0;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: #D4D4D4;
-  white-space: nowrap;
-  transition: color 0.15s;
-}
-
-.categoryLink::after {
+.catLink::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 4px;
+  bottom: 0;
   height: 2px;
   border-radius: 9999px;
-  background: #F59E0B;
+  background: #f59e0b;
   transform: scaleX(0);
+  transform-origin: center;
   transition: transform 0.2s ease;
 }
 
-.categoryLink:hover {
-  color: #fff;
-}
-
-.categoryLink:hover::after {
+.catLink:hover::after,
+.catLink:focus-visible::after {
   transform: scaleX(1);
 }
 
-.categoryLinkActive {
+.catLinkActive {
   color: #fff;
-  font-weight: 700;
+  font-weight: 600;
 }
 
-.categoryLinkActive::after {
+.catLinkActive::after {
   transform: scaleX(1);
 }
 
-/* Strip pencarian expandable di bawah header. */
-.searchStrip {
-  background: #071224;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.searchStripForm {
-  max-width: 80rem;
-  margin: 0 auto;
-  padding: 10px 16px;
-  display: flex;
-  gap: 8px;
-}
-
-@media (min-width: 640px) {
-  .searchStripForm {
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-}
-
-.searchStripInput {
-  flex: 1;
-  min-width: 0;
-  padding: 8px 14px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  font-size: 14px;
-  color: #fff;
-  outline: none;
-}
-
-.searchStripInput::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.searchStripInput:focus {
-  border-color: #F59E0B;
-}
-
-.searchStripBtn {
-  padding: 8px 20px;
-  border-radius: 8px;
-  border: none;
-  background: #F59E0B;
-  color: #0A192F;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.searchStripBtn:hover {
-  background: #FBBF24;
-}
-
-/* ===== DRAWER / SIDEBAR - GEMINI AI STYLE ===== */
+/* ===== DRAWER / SIDEBAR ===== */
 .drawerOverlay {
   position: fixed;
   inset: 0;
@@ -381,9 +119,9 @@
   height: 18px;
 }
 
-/* Search Form in Sidebar */
+/* Kolom pencarian di dalam drawer (terintegrasi di atas menu). */
 .drawerSearchForm {
-  margin: 0 16px 20px;
+  margin: 16px 16px 8px;
 }
 
 .searchWrapper {
@@ -426,7 +164,7 @@
 
 .drawerNav {
   flex: 1;
-  padding: 0 24px 24px;
+  padding: 8px 24px 24px;
   overflow-y: auto;
 }
 
@@ -450,108 +188,7 @@
 }
 
 .drawerFooter {
-  padding: 20px 20px 24px;
+  padding: 20px 24px 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   text-align: left;
-}
-
-/* Tautan sosial drawer: kelas modul (unlayered) menjaga warna badge agar tidak
-   kalah oleh utility Tailwind di @layer utilities. Tata letak (flex, gap,
-   anti-wrap) tetap memakai utility Tailwind di TSX. */
-.drawerSocial {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  min-height: 44px;
-  padding: 8px;
-  border-radius: 12px;
-  text-decoration: none;
-  transition: color 0.15s, background-color 0.15s;
-}
-
-.drawerSocial:hover {
-  color: #34d399;
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.drawerSocial:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
-  outline-offset: 2px;
-}
-
-/* Kolom teks dua baris: label pendek + nomor/handle nowrap. min-width:0 +
-   truncate mencegah nomor WhatsApp patah menjadi dua baris di layar kecil. */
-.drawerSocialText {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.drawerSocialLabel {
-  font-size: 11px;
-  line-height: 1.3;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.drawerSocialValue {
-  font-size: 13px;
-  line-height: 1.4;
-  font-weight: 500;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-@media (min-width: 380px) {
-  .drawerSocialValue {
-    font-size: 14px;
-  }
-}
-
-.drawerSocial:hover .drawerSocialValue {
-  color: #6ee7b7;
-}
-
-.drawerWaBadge,
-.drawerIgBadge {
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.drawerWaBadge {
-  background: rgba(5, 150, 105, 0.2);
-}
-
-.drawerSocial:hover .drawerWaBadge {
-  background: rgba(5, 150, 105, 0.32);
-}
-
-.drawerIgBadge {
-  background: rgba(236, 72, 153, 0.2);
-}
-
-.drawerSocial:hover .drawerIgBadge {
-  background: rgba(236, 72, 153, 0.32);
-}
-
-.drawerWaGlyph {
-  width: 16px;
-  height: 16px;
-  fill: #34d399;
-}
-
-.drawerIgGlyph {
-  width: 15px;
-  height: 15px;
-  color: #ec4899;
 }
