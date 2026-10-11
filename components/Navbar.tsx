@@ -20,27 +20,19 @@ const categoryNav = [
   { slug: "keamanan", label: "Keamanan" },
 ];
 
-// Daftar kanal lengkap = 7 kanal resmi (Navbar, Drawer, Footer memakai
-// daftar yang sama — tak ada kanal ghost).
-const drawerChannels = categoryNav;
-
 export function Navbar() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
   const router = useRouter();
 
-  const closeDrawer = () => setDrawerOpen(false);
   const closeSearch = () => setSearchOpen(false);
 
-  // Kunci scroll halaman + tombol Escape selagi overlay (drawer / modal
-  // pencarian) terbuka.
+  // Kunci scroll halaman + tombol Escape selagi modal pencarian terbuka.
   useEffect(() => {
-    if (!drawerOpen && !searchOpen) return;
+    if (!searchOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setDrawerOpen(false);
         setSearchOpen(false);
       }
     };
@@ -51,7 +43,7 @@ export function Navbar() {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
-  }, [drawerOpen, searchOpen]);
+  }, [searchOpen]);
 
   const submitSearch = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -60,7 +52,6 @@ export function Navbar() {
     router.push(`/cari?q=${encodeURIComponent(q)}`);
     setSearchQuery("");
     setSearchOpen(false);
-    setDrawerOpen(false);
   };
 
   const renderCategoryLink = (c: { slug: string; label: string }, key?: string) => {
@@ -114,7 +105,7 @@ export function Navbar() {
             {categoryNav.map((c) => renderCategoryLink(c))}
           </nav>
 
-          {/* Sisi kanan — pencarian + menu (hamburger hanya < lg) */}
+          {/* Sisi kanan — pencarian saja (tanpa tombol hamburger) */}
           <div className="flex items-center gap-3 shrink-0">
             <button
               type="button"
@@ -134,28 +125,6 @@ export function Navbar() {
               >
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.3-4.3" />
-              </svg>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setDrawerOpen(true)}
-              className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-white/60 transition-colors cursor-pointer"
-              aria-label="Buka Navigasi"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                className="w-5 h-5"
-              >
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
               </svg>
             </button>
           </div>
@@ -242,87 +211,6 @@ export function Navbar() {
                 </svg>
               </button>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* ── Drawer navigasi (mobile/tablet) ── */}
-      {drawerOpen && (
-        <div className={styles.drawerOverlay} onClick={closeDrawer}>
-          <div
-            className={styles.drawer}
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navigasi"
-          >
-            <div className={styles.drawerHeader}>
-              <span className={styles.drawerTitle}>Navigasi</span>
-              <button
-                type="button"
-                className={styles.drawerClose}
-                onClick={closeDrawer}
-                aria-label="Tutup navigasi"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Pencarian terintegrasi di dalam drawer */}
-            <form onSubmit={submitSearch} role="search" className={styles.drawerSearchForm}>
-              <div className={styles.searchWrapper}>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  className={styles.searchIcon}
-                >
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.3-4.3" />
-                </svg>
-                <label htmlFor="drawer-search" className="sr-only">
-                  Telusuri berita
-                </label>
-                <input
-                  id="drawer-search"
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Telusuri berita..."
-                  className={styles.searchInput}
-                />
-              </div>
-            </form>
-
-            <nav className={styles.drawerNav} aria-label="Kanal berita">
-              <p className={styles.drawerSectionTitle}>KANAL</p>
-              <div className="space-y-1">
-                {drawerChannels.map((c) => (
-                  <Link
-                    key={c.slug}
-                    href={`/kategori/${c.slug}`}
-                    aria-current={pathname === `/kategori/${c.slug}` ? "page" : undefined}
-                    className={`block py-2.5 px-4 rounded-xl text-white/90 hover:text-white hover:bg-white/10 text-sm font-medium transition-colors ${styles.drawerLink}`}
-                    onClick={closeDrawer}
-                  >
-                    <span>{c.label}</span>
-                  </Link>
-                ))}
-              </div>
-            </nav>
-
-            <div className={styles.drawerFooter}>
-              <div className="text-xs text-white/50">
-                © 2026 GentaNusa. Portal Berita Nasional.
-              </div>
-            </div>
           </div>
         </div>
       )}
