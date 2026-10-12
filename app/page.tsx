@@ -79,6 +79,14 @@ export default async function Home() {
   const popular = rest.slice(0, 5);
   const opinions = latest.filter(isOpinion).slice(0, 3);
 
+  // Blok kategori beranda — setiap blok hanya mengambil slug kategorinya
+  // masing-masing (setara query Supabase berikut):
+  // - "Pertahanan & Keamanan": .in('category_slug', ['pertahanan', 'keamanan'])
+  // - "Sosial & Budaya":       .eq('category_slug', 'sosial-budaya')
+  // - "Kesehatan":             .eq('category_slug', 'kesehatan')
+  // - "Olahraga":              .eq('category_slug', 'olahraga')
+  // Kategori lama yang tidak terdaftar ('dunia', 'ekonomi', 'peduli')
+  // tidak pernah muncul di feed beranda.
   const blocks: Array<{ title: string; href: string; items: Article[] }> = [
     {
       title: "Pertahanan & Keamanan",
@@ -89,8 +97,13 @@ export default async function Home() {
       title: "Sosial & Budaya",
       href: "/kategori/sosial-budaya",
       items: latest
-        .filter((a) => inCategories(a, ["Sosial Budaya", "Kesehatan"]))
+        .filter((a) => inCategories(a, ["Sosial Budaya", "Sosial & Budaya"]))
         .slice(0, 4),
+    },
+    {
+      title: "Kesehatan",
+      href: "/kategori/kesehatan",
+      items: latest.filter((a) => inCategories(a, ["Kesehatan"])).slice(0, 4),
     },
     {
       title: "Olahraga",
@@ -99,11 +112,18 @@ export default async function Home() {
     },
   ].filter((b) => b.items.length > 0);
 
-  const seen = new Set<number>([
+  // Deduplikasi feed: lacak seluruh ID artikel yang sudah dirender di blok
+  // atas (Hero/lead, Sorotan/secondary, Terpopuler, dan semua Blok Kategori)
+  // agar "Berita Terbaru" mengecualikannya — setara filter Supabase:
+  // .not('id', 'in', `(${displayedPostIds.join(',')})`)
+  const displayedPostIds: number[] = [
     lead.id,
     ...secondary.map((a) => a.id),
     ...popular.map((a) => a.id),
-  ]);
+    ...opinions.map((a) => a.id),
+    ...blocks.flatMap((b) => b.items.map((a) => a.id)),
+  ];
+  const seen = new Set<number>(displayedPostIds);
   const recentArticles = latest.filter((a) => !seen.has(a.id)).slice(0, 8);
 
   return (

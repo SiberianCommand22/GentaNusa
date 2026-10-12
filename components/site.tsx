@@ -118,21 +118,17 @@ export function Footer() {
             <Link href="/kebijakan-privasi">Kebijakan Privasi</Link>
             <Link href="/syarat-ketentuan">Syarat &amp; Ketentuan</Link>
             <p className={styles.footerNote}>
-              Seluruh isi tunduk pada UU Pers No. 40/1999, UU ITE, dan Kode
-              Etik Jurnalistik. Dilarang mengutip tanpa atribusi.
+              Seluruh materi jurnalisme GentaNusa dilindungi Undang-Undang
+              No. 40 Tahun 1999 tentang Pers dan Pedoman Pemberitaan Media
+              Siber (PPMS). Dilarang menyalin atau mengutip tanpa
+              menyertakan atribusi resmi.
             </p>
           </div>
         </div>
 
-        {/* Baris bawah dipisah dari tombol Back-to-Top yang melayang di pojok
-            kanan bawah. Padding kanan (pr-16 / sm:pr-20) menyisakan ruang
-            selebar tombol + jaraknya, sehingga "Edisi Digital Nasional" tidak
-            pernah tertabrak atau terpotong. */}
-        <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50 pr-16 sm:pr-20">
+        {/* Baris bawah: hak cipta. */}
+        <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
           <p>© 2026 GentaNusa. Seluruh hak cipta dilindungi.</p>
-          <span className="font-medium tracking-wide text-white/40">
-            Edisi Digital Nasional
-          </span>
         </div>
       </div>
     </footer>
