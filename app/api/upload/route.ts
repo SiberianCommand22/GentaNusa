@@ -50,6 +50,18 @@ export async function POST(req: NextRequest) {
 
     const ready = isSupabaseReady();
     if (!ready.ok || !adminClient) {
+      // Fallback eksplisit: Vercel memakai SUPABASE_SERVICE_ROLE_KEY,
+      // lokal memakai SUPABASE_SERVICE_KEY.
+      const supabaseServiceKey =
+        process.env.SUPABASE_SERVICE_ROLE_KEY ||
+        process.env.SUPABASE_SERVICE_KEY;
+      if (!supabaseServiceKey) {
+        console.error("Missing Supabase Service Role Key");
+        return NextResponse.json(
+          { error: "Konfigurasi server storage belum lengkap" },
+          { status: 500 }
+        );
+      }
       return NextResponse.json(
         { error: "Storage belum siap: kunci service Supabase belum terpasang" },
         { status: 500 }

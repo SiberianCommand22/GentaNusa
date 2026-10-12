@@ -45,6 +45,45 @@ function splitTags(raw: string): string[] {
   return raw.split(",").map((t) => t.trim()).filter(Boolean);
 }
 
+// Batas payload client-side: Vercel menolak body multipart > ~4.5 MB,
+// jadi validasi di 4 MB agar tidak meledak sebagai "koneksi putus".
+const CLIENT_MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+// Kompresi otomatis bila berkas > 2 MB: resize proporsional maks 1920px
+// via Canvas, output JPEG kualitas 0.82.
+const COMPRESS_THRESHOLD_BYTES = 2 * 1024 * 1024;
+
+async function compressImageIfNeeded(file: File): Promise<File> {
+  if (file.size <= COMPRESS_THRESHOLD_BYTES) return file;
+  if (!file.type.startsWith("image/")) return file;
+  try {
+    const bitmap = await createImageBitmap(file);
+    try {
+      const longest = Math.max(bitmap.width, bitmap.height);
+      const scale = longest > 1920 ? 1920 / longest : 1;
+      const w = Math.max(1, Math.round(bitmap.width * scale));
+      const h = Math.max(1, Math.round(bitmap.height * scale));
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return file;
+      ctx.drawImage(bitmap, 0, 0, w, h);
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/jpeg", 0.82)
+      );
+      if (!blob || blob.size === 0) return file;
+      // Jangan pakai hasil yang malah lebih besar dari aslinya.
+      if (blob.size >= file.size) return file;
+      const name = file.name.replace(/\.(png|webp)$/i, ".jpg");
+      return new File([blob], name || "foto.jpg", { type: "image/jpeg" });
+    } finally {
+      if (typeof bitmap.close === "function") bitmap.close();
+    }
+  } catch {
+    return file;
+  }
+}
+
 export function PostEditor({ editId = null }: { editId?: number | null }) {
   const router = useRouter();
   const [form, setForm] = useState(emptyForm);
@@ -297,18 +336,28 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
 
   // Unggah sampul via endpoint dedikasi /api/upload (multipart kecil —
   // tanpa Base64 di JSON). Mengembalikan URL proksi /media/... .
+  // Kompresi client-side dulu bila > 2 MB; tolak tegas bila hasil akhir
+  // masih > 4 MB agar tidak disalahartikan sebagai koneksi putus.
   async function uploadImage(): Promise<string | null> {
     if (!imageFile) return form.image || null;
+    const payload = await compressImageIfNeeded(imageFile);
+    if (payload.size > CLIENT_MAX_IMAGE_BYTES) {
+      setImgErr("Ukuran foto terlalu besar (maksimal 4 MB). Harap kompres terlebih dahulu.");
+      return null;
+    }
     const fd = new FormData();
-    fd.append("file", imageFile);
+    fd.append("file", payload);
     let r: Response;
     try {
       r = await fetch("/api/upload", { method: "POST", body: fd });
-    } catch {
-      setImgErr("Server tidak terjangkau saat mengunggah foto — periksa koneksi lalu coba lagi.");
+    } catch (err) {
+      const detail = err instanceof Error && err.name === "AbortError"
+        ? "unggahan dibatalkan (timeout)"
+        : "periksa koneksi lalu coba lagi";
+      setImgErr(`Server tidak terjangkau saat mengunggah foto — ${detail}.`);
       return null;
     }
-    const j = await r.json().catch(() => ({}));
+    const j = (await r.json().catch(() => ({}))) as { url?: string; error?: string };
     if (!r.ok || !j.url) {
       setImgErr(typeof j.error === "string" && j.error ? j.error : `Gagal mengunggah foto (kode ${r.status})`);
       return null;
@@ -319,16 +368,24 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
   // Unggah Foto 2 (Dokumentasi Kedua - Opsional)
   async function uploadSecondaryImage(): Promise<string | null> {
     if (!secondaryImageFile) return form.secondary_image || null;
+    const payload = await compressImageIfNeeded(secondaryImageFile);
+    if (payload.size > CLIENT_MAX_IMAGE_BYTES) {
+      setImgErr("Ukuran foto terlalu besar (maksimal 4 MB). Harap kompres terlebih dahulu.");
+      return null;
+    }
     const fd = new FormData();
-    fd.append("file", secondaryImageFile);
+    fd.append("file", payload);
     let r: Response;
     try {
       r = await fetch("/api/upload", { method: "POST", body: fd });
-    } catch {
-      setImgErr("Server tidak terjangkau saat mengunggah foto kedua — periksa koneksi lalu coba lagi.");
+    } catch (err) {
+      const detail = err instanceof Error && err.name === "AbortError"
+        ? "unggahan dibatalkan (timeout)"
+        : "periksa koneksi lalu coba lagi";
+      setImgErr(`Server tidak terjangkau saat mengunggah foto kedua — ${detail}.`);
       return null;
     }
-    const j = await r.json().catch(() => ({}));
+    const j = (await r.json().catch(() => ({}))) as { url?: string; error?: string };
     if (!r.ok || !j.url) {
       setImgErr(typeof j.error === "string" && j.error ? j.error : `Gagal mengunggah foto kedua (kode ${r.status})`);
       return null;
@@ -717,7 +774,7 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
                   </svg>
                 </span>
                 <p className={styles.dropzoneText}>Seret dan lepas foto sampul di sini, atau klik untuk memilih</p>
-                <p className={styles.dropzoneHint}>JPG, PNG, WebP maks 5MB</p>
+                <p className={styles.dropzoneHint}>JPG, PNG, WebP maks 4MB (otomatis dikompres bila &gt; 2MB)</p>
               </div>
             ) : (
               <div>
@@ -805,7 +862,7 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
                     </svg>
                   </span>
                   <p className={styles.dropzoneText}>Seret dan lepas foto dokumentasi kedua di sini, atau klik untuk memilih</p>
-                  <p className={styles.dropzoneHint}>JPG, PNG, WebP maks 5MB — Maksimal 2 foto per artikel</p>
+                  <p className={styles.dropzoneHint}>JPG, PNG, WebP maks 4MB — Maksimal 2 foto per artikel</p>
                 </div>
               ) : (
                 <div>

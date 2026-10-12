@@ -52,7 +52,8 @@ let cachedSummary:
 
 function envValues() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const readKey = process.env.SUPABASE_SERVICE_KEY;
+  const readKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
   if (!url || !readKey) {
     throw new Error("Supabase analytics env belum lengkap");
   }

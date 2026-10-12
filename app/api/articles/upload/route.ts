@@ -33,7 +33,18 @@ function detectImage(bytes: Uint8Array): ImageType | null {
 function ensureClient() {
   const ready = isSupabaseReady();
   if (!ready.ok) return { ok: false as const, error: ready.reason };
-  if (!adminClient) return { ok: false as const, error: "Storage belum siap" };
+  if (!adminClient) {
+    // Fallback eksplisit: Vercel memakai SUPABASE_SERVICE_ROLE_KEY,
+    // lokal memakai SUPABASE_SERVICE_KEY.
+    const supabaseServiceKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      process.env.SUPABASE_SERVICE_KEY;
+    if (!supabaseServiceKey) {
+      console.error("Missing Supabase Service Role Key");
+      return { ok: false as const, error: "Konfigurasi server storage belum lengkap" };
+    }
+    return { ok: false as const, error: "Storage belum siap" };
+  }
   return { ok: true as const, client: adminClient };
 }
 
