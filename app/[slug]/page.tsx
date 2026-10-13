@@ -16,8 +16,7 @@ import { CardImage } from "@/components/card-image";
 import { ShareButtons } from "@/components/share-buttons";
 import { cleanLead, sanitizeEditorialText } from "@/lib/text-formatter";
 
-const RESERVED_SLUGS = [
-  "admin",
+const RESERVED_SLUGS = [  "admin",
   "api",
   "cari",
   "tentang",
@@ -38,6 +37,10 @@ const RESERVED_SLUGS = [
 ];
 
 type Params = { params: Promise<{ slug: string }> };
+
+// ISR detail berita: cache CDN 60 dtk untuk trafik viral; invalidasi instan
+// via revalidatePath('/[slug]') + revalidatePath(`/${slug}`) di API publikasi.
+export const revalidate = 60;
 
 async function isAdminSession(): Promise<boolean> {
   try {

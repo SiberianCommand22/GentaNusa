@@ -1,17 +1,35 @@
 /**
- * Sanitizer HTML bersama (server-safe: tanpa API DOM, hanya regex).
+ * Sanitizer HTML bersama (server-safe: DOMPurify isomorphic + regex lapis-2).
  *
  * Kebijakan allowlist tunggal untuk seluruh render + penyimpanan konten:
  * dipakai oleh `components/article-content.tsx` (render publik),
  * `components/visual-editor.tsx` (kanvas editor), dan rute API
  * `POST /api/articles` / `PUT /api/articles/[id]` (sanitasi server-side
  * sebelum tulis DB — titik kepercayaan terakhir).
+ *
+ * Lapis 1 (utama): DOMPurify (isomorphic-dompurify, aman SSR + browser)
+ * dengan whitelist tag/atribut editorial media.
+ * Lapis 2 (defense-in-depth): filter regex lama — menegakkan href https/relatif,
+ * rel noopener+noreferrer otomatis, dan class allowlist.
  */
+import DOMPurify from "isomorphic-dompurify";
 
-// Tag yang boleh lolos sanitasi (semua yang dihasilkan toolbar CMS).
+// Whitelist tag editorial (spesifikasi hardening media + tag toolbar CMS).
+const DOMPURIFY_TAGS = [
+  "p", "b", "i", "em", "strong", "u", "s", "code", "a",
+  "h2", "h3", "h4", "ul", "ol", "li",
+  "blockquote", "img", "figure", "figcaption", "br", "hr",
+];
+
+const DOMPURIFY_ATTR = [
+  "href", "src", "alt", "title", "target", "rel", "class", "width", "height",
+];
+
+// Tag yang boleh lolos sanitasi (semua yang dihasilkan toolbar CMS + media).
 const SAFE_TAGS = new Set([
   "strong", "b", "em", "i", "u", "s", "code", "a",
-  "p", "br", "h2", "h3", "blockquote", "ul", "ol", "li",
+  "p", "br", "h2", "h3", "h4", "blockquote", "ul", "ol", "li",
+  "img", "figure", "figcaption", "hr",
 ]);
 
 // Token class yang diizinkan (subset aman ala prose, tanpa Tailwind).
@@ -49,21 +67,43 @@ function cleanAttrs(tag: string, name: string, attrs: string): string {
   if (name === "a" && href && (/^https?:\/\//i.test(href[1]) || href[1].startsWith("/"))) {
     out += ` href="${href[1]}"`;
     // target/rel hanya nilai aman: target dibatasi _blank/_self, rel ke
-    // token allowlist (mencegah rel="opener" dsb). Link eksternal mendapat
-    // noopener+noreferrer implisit via rel yang ditulis eksplisit.
+    // token allowlist (mencegah rel="opener" dsb). Seluruh link <a> otomatis
+    // mendapat rel="noopener noreferrer" (anti reverse-tabnabbing XSS).
     const target = attrs.match(/target\s*=\s*"([^"]*)"/i);
+    let isBlank = false;
     if (target && /^\s*_(blank|self)\s*$/i.test(target[1])) {
-      out += ` target="${target[1].trim().toLowerCase()}"`;
+      const t = target[1].trim().toLowerCase();
+      out += ` target="${t}"`;
+      isBlank = t === "_blank";
     }
     const rel = attrs.match(/rel\s*=\s*"([^"]*)"/i);
+    const kept = new Set<string>(["noopener", "noreferrer"]);
     if (rel) {
-      const kept = rel[1]
-        .split(/[\s,]+/)
-        .map((t) => t.trim().toLowerCase())
-        .filter((t) =>
-          ["noopener", "noreferrer", "nofollow", "ugc", "sponsored"].includes(t)
-        );
-      if (kept.length > 0) out += ` rel="${[...new Set(kept)].join(" ")}"`;
+      for (const t of rel[1].split(/[\s,]+/).map((s) => s.trim().toLowerCase())) {
+        if (["noopener", "noreferrer", "nofollow", "ugc", "sponsored"].includes(t)) kept.add(t);
+      }
+    }
+    // Eksternal (http...) selalu bawa noopener+noreferrer walau tanpa target.
+    if (isBlank || /^https?:\/\//i.test(href[1])) {
+      kept.add("noopener");
+      kept.add("noreferrer");
+    }
+    out += ` rel="${[...kept].join(" ")}"`;
+  }
+  // Gambar: src https/relatif saja (tolak javascript:/data:text/html),
+  // alt/title/width/height lolos; class difilter allowlist di bawah.
+  if (name === "img") {
+    const src = attrs.match(/src\s*=\s*"([^"]*)"/i);
+    if (src && (/^https?:\/\//i.test(src[1]) || src[1].startsWith("/") || src[1].startsWith("blob:") || src[1].startsWith("data:image/"))) {
+      if (!/^javascript:/i.test(src[1])) out += ` src="${src[1]}"`;
+    }
+    const alt = attrs.match(/alt\s*=\s*"([^"]*)"/i);
+    if (alt) out += ` alt="${alt[1].slice(0, 300)}"`;
+    const title = attrs.match(/title\s*=\s*"([^"]*)"/i);
+    if (title) out += ` title="${title[1].slice(0, 300)}"`;
+    for (const dim of ["width", "height"] as const) {
+      const m = attrs.match(new RegExp(`${dim}\\s*=\\s*"([^"]*)"`, "i"));
+      if (m && /^\d{1,4}$/.test(m[1].trim())) out += ` ${dim}="${m[1].trim()}"`;
     }
   }
   // Inline style diloloskan HANYA untuk perataan teks toolbar
@@ -91,7 +131,7 @@ function cleanAttrs(tag: string, name: string, attrs: string): string {
 
 // Parser tag ringan: tag tak dikenal dibuang (isi dipertahankan),
 // atribut disaring ketat. Blok komentar & doctype dibuang.
-export function sanitizeHtml(html: string): string {
+function regexScrub(html: string): string {
   return html
     .replace(FORBIDDEN, "")
     .replace(/<!--[\s\S]*?-->/g, "")
@@ -103,6 +143,39 @@ export function sanitizeHtml(html: string): string {
       if (full.endsWith("/>")) return `${cleanAttrs(name, name, attrs)}/>`;
       return cleanAttrs(name, name, attrs) + ">";
     });
+}
+
+export function sanitizeHtml(html: string): string {
+  const input = String(html ?? "");
+  if (!input) return "";
+  // Lapis 1: DOMPurify — parser DOM sungguhan (tahan mutasi XSS yang
+  // lolos regex: SVG/math, style expression, event handler non-standar).
+  // Seluruh <a> dipaksa membawa rel noopener+noreferrer pasca-sanitasi.
+  try {
+    const purified = DOMPurify.sanitize(input, {
+      ALLOWED_TAGS: DOMPURIFY_TAGS,
+      ALLOWED_ATTR: DOMPURIFY_ATTR,
+      ALLOW_DATA_ATTR: false,
+      FORBID_TAGS: ["script", "style", "iframe", "object", "embed", "form", "input", "button", "svg", "math", "link", "meta", "base"],
+      FORBID_ATTR: ["onerror", "onload", "onclick", "style"],
+    });
+    const withRel = String(purified).replace(/<a\b([^<>]*)>/gi, (tag) => {
+      if (/rel\s*=/i.test(tag)) {
+        return tag.replace(/rel\s*=\s*"([^"]*)"/i, (_m, v: string) => {
+          const kept = new Set<string>(["noopener", "noreferrer"]);
+          for (const t of String(v).split(/[\s,]+/).map((s) => s.trim().toLowerCase())) {
+            if (["noopener", "noreferrer", "nofollow", "ugc", "sponsored"].includes(t)) kept.add(t);
+          }
+          return `rel="${[...kept].join(" ")}"`;
+        });
+      }
+      return tag.replace(/<a\b/i, '<a rel="noopener noreferrer"');
+    });
+    // Lapis 2: scrub regex (href/src/class allowlist ketat).
+    return regexScrub(withRel);
+  } catch {
+    return regexScrub(input);
+  }
 }
 
 // Blok yang terlanjur tersimpan sebagai entitas escape (`&lt;p ...&gt;`)

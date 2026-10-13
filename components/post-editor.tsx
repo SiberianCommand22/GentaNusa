@@ -49,7 +49,8 @@ function splitTags(raw: string): string[] {
 // jadi validasi di 4 MB agar tidak meledak sebagai "koneksi putus".
 const CLIENT_MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 // Kompresi otomatis bila berkas > 2 MB: resize proporsional maks 1920px
-// via Canvas, output JPEG kualitas 0.82.
+// via Canvas, output WebP/JPEG kualitas 0.85 (target < 1.5 MB agar lolos
+// limit payload serverless Vercel ~4.5 MB).
 const COMPRESS_THRESHOLD_BYTES = 2 * 1024 * 1024;
 
 async function compressImageIfNeeded(file: File): Promise<File> {
@@ -58,6 +59,7 @@ async function compressImageIfNeeded(file: File): Promise<File> {
   try {
     const bitmap = await createImageBitmap(file);
     try {
+      // Resize proporsional: sisi terpanjang dibatasi 1920px.
       const longest = Math.max(bitmap.width, bitmap.height);
       const scale = longest > 1920 ? 1920 / longest : 1;
       const w = Math.max(1, Math.round(bitmap.width * scale));
@@ -68,14 +70,25 @@ async function compressImageIfNeeded(file: File): Promise<File> {
       const ctx = canvas.getContext("2d");
       if (!ctx) return file;
       ctx.drawImage(bitmap, 0, 0, w, h);
-      const blob = await new Promise<Blob | null>((resolve) =>
-        canvas.toBlob(resolve, "image/jpeg", 0.82)
+      // Ekspor WebP dulu (lebih ringan); fallback JPEG bila tak didukung.
+      // Kualitas 0.85 menargetkan hasil akhir di bawah 1.5 MB.
+      let blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/webp", 0.85)
       );
+      let outType = "image/webp";
+      let outExt = ".webp";
+      if (!blob || blob.size === 0) {
+        blob = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob(resolve, "image/jpeg", 0.85)
+        );
+        outType = "image/jpeg";
+        outExt = ".jpg";
+      }
       if (!blob || blob.size === 0) return file;
       // Jangan pakai hasil yang malah lebih besar dari aslinya.
       if (blob.size >= file.size) return file;
-      const name = file.name.replace(/\.(png|webp)$/i, ".jpg");
-      return new File([blob], name || "foto.jpg", { type: "image/jpeg" });
+      const base = file.name.replace(/\.[a-z0-9]+$/i, "") || "foto";
+      return new File([blob], `${base}${outExt}`, { type: outType });
     } finally {
       if (typeof bitmap.close === "function") bitmap.close();
     }

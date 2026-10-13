@@ -7,7 +7,9 @@ import { supabaseAnon } from "@/lib/supabase";
 import { articleUrl, type Article } from "@/lib/data";
 import styles from "./category.module.css";
 
-export const dynamic = "force-dynamic";
+// ISR kategori: cache CDN 60 dtk; invalidasi instan via
+// revalidatePath('/kategori/[slug]') di POST/PUT /api/articles.
+export const revalidate = 60;
 
 type Params = { params: Promise<{ slug: string }> };
 

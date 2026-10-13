@@ -11,8 +11,10 @@ import {
 import { Footer } from "@/components/site";
 import styles from "./page.module.css";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+// ISR viral-traffic: jutaan pembaca dilayani dari cache CDN Vercel (60 dtk)
+// tanpa membebani kuota query Supabase. Breaking news tampil instan via
+// revalidatePath('/') di POST/PUT /api/articles.
+export const revalidate = 60;
 
 function inCategories(a: Article, names: string[]): boolean {
   const c = String(a.category || "").trim().toLowerCase();

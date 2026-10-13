@@ -9,7 +9,10 @@ export const dynamic = "force-dynamic";
 
 // Endpoint dedikasi unggah sampul: multipart kecil (bukan Base64 di JSON)
 // agar tidak menyentuh batas payload. Khusus editor CMS (cookie admin).
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+// Batas server 4 MB: mencegah crash memori serverless Vercel (limit ~4.5 MB).
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+
+const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 const EXTENSIONS = {
   "image/jpeg": ".jpg",
@@ -45,25 +48,25 @@ export async function POST(req: NextRequest) {
     // tidak pernah cukup untuk endpoint tulis.
     const session = await getEditorialSession();
     if (!session) {
-      return NextResponse.json({ error: "Akses ditolak. Wajib login." }, { status: 401 });
+      return NextResponse.json({ url: "", error: "Akses ditolak. Wajib login." }, { status: 401 });
     }
 
     const ready = isSupabaseReady();
     if (!ready.ok || !adminClient) {
-      // Fallback eksplisit: Vercel memakai SUPABASE_SERVICE_ROLE_KEY,
-      // lokal memakai SUPABASE_SERVICE_KEY.
-      const supabaseServiceKey =
+      // Fallback tangguh Service Role Key: Vercel memakai
+      // SUPABASE_SERVICE_ROLE_KEY, lokal memakai SUPABASE_SERVICE_KEY.
+      const serviceKey =
         process.env.SUPABASE_SERVICE_ROLE_KEY ||
         process.env.SUPABASE_SERVICE_KEY;
-      if (!supabaseServiceKey) {
+      if (!serviceKey) {
         console.error("Missing Supabase Service Role Key");
         return NextResponse.json(
-          { error: "Konfigurasi server storage belum lengkap" },
+          { url: "", error: "Konfigurasi server storage belum lengkap (Service Role Key hilang)" },
           { status: 500 }
         );
       }
       return NextResponse.json(
-        { error: "Storage belum siap: kunci service Supabase belum terpasang" },
+        { url: "", error: "Storage belum siap: kunci service Supabase belum terpasang" },
         { status: 500 }
       );
     }
@@ -72,34 +75,43 @@ export async function POST(req: NextRequest) {
     try {
       formData = await req.formData();
     } catch {
-      return NextResponse.json({ error: "Format upload tidak valid" }, { status: 400 });
+      return NextResponse.json({ url: "", error: "Format upload tidak valid" }, { status: 400 });
     }
 
     const file = formData.get("file");
     if (!(file instanceof File)) {
-      return NextResponse.json({ error: "Tidak ada file yang diunggah" }, { status: 400 });
+      return NextResponse.json({ url: "", error: "Tidak ada file yang diunggah" }, { status: 400 });
     }
     if (file.size === 0) {
-      return NextResponse.json({ error: "Berkas kosong" }, { status: 400 });
+      return NextResponse.json({ url: "", error: "Berkas kosong" }, { status: 400 });
     }
     if (file.size > MAX_IMAGE_BYTES) {
       return NextResponse.json(
-        { error: "Ukuran foto maksimal 5 MB — kecilkan dulu lalu coba lagi" },
+        { url: "", error: "Ukuran foto maksimal 4 MB — kecilkan dulu lalu coba lagi" },
         { status: 413 }
       );
     }
 
+    // Validasi server-side ketat: HANYA jpeg/png/webp. Tolak SVG/HTML/EXE/dll.
+    // Dobel-lapis: cek deklarasi MIME klien + verifikasi magic-byte isi berkas.
+    if (file.type && !ALLOWED_MIME.has(file.type)) {
+      return NextResponse.json(
+        { url: "", error: "Hanya JPG, PNG, atau WebP yang diterima" },
+        { status: 400 }
+      );
+    }
     const bytes = new Uint8Array(await file.arrayBuffer());
     const type = detectImage(bytes);
     if (!type) {
       return NextResponse.json(
-        { error: "Hanya JPG, PNG, atau WebP yang diterima" },
-        { status: 415 }
+        { url: "", error: "Hanya JPG, PNG, atau WebP yang diterima" },
+        { status: 400 }
       );
     }
 
-    // Kompresi WhatsApp-friendly: maks lebar 1200px, JPEG kualitas 78
-    // (target akhir 100–300 KB agar thumbnail selalu lolos scraper).
+    // Nama file unik & aman via crypto.randomUUID() + ekstensi tervalidasi:
+    // menutup path traversal (`../`) dan mencegah penimpaan berkas lama
+    // (upsert: false di bawah menolak tabrakan nama).
     let payload: Uint8Array = bytes;
     let objectName = `${randomUUID()}${EXTENSIONS[type]}`;
     let contentType: string = type;
@@ -129,15 +141,15 @@ export async function POST(req: NextRequest) {
 
     if (uploadError) {
       return NextResponse.json(
-        { error: `Gagal upload storage: ${uploadError.message}` },
+        { url: "", error: `Gagal upload storage: ${uploadError.message}` },
         { status: 500 }
       );
     }
 
-    // URL proksi lokal (relative — tanpa CORS, lolos validator /media).
+    // Sukses: respon JSON terstruktur { url } + status 200.
     return NextResponse.json({ url: `/media/${objectName}` }, { status: 200 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Terjadi kesalahan upload";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ url: "", error: message }, { status: 500 });
   }
 }
