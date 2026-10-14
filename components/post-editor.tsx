@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { VisualEditor, blocksToHtml, htmlToBlocks, htmlToText } from "@/components/visual-editor";
+import { sanitizeContentInput } from "@/lib/sanitize-html";
 import styles from "@/app/admin/cms.module.css";
 
 /**
@@ -489,7 +490,11 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
     }
     setBusy(true);
     try {
-      const paras = htmlToBlocks(form.content);
+      // ANTI-XSS saat submit: bersihkan blok HTML editor dengan allowlist
+      // editorial yang SAMA persis dengan server (lib/sanitize-html) sebelum
+      // dikirim — database tidak pernah menerima skrip berbahaya.
+      const rawParas = htmlToBlocks(form.content);
+      const paras = sanitizeContentInput(rawParas) ?? rawParas;
       const tags = splitTags(form.tags).filter((t) => t !== HEADLINE_TAG);
       if (form.headline) tags.unshift(HEADLINE_TAG);
       const uploadedPath = await uploadImage();
@@ -590,7 +595,8 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
       const secondaryCaptionPub = form.secondary_image_caption.trim();
       const secondaryCreditPub = form.secondary_image_credit.trim();
       const title = form.title.trim();
-      const paras = htmlToBlocks(form.content);
+      const rawParasPub = htmlToBlocks(form.content);
+      const paras = sanitizeContentInput(rawParasPub) ?? rawParasPub;
       const plainText = htmlToText(form.content);
       const tags = splitTags(form.tags).filter((t) => t !== HEADLINE_TAG);
       if (form.headline) tags.unshift(HEADLINE_TAG);

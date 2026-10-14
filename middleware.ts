@@ -6,7 +6,7 @@ import { canAccessAdminArea, TOKEN_COOKIE } from "@/lib/roles";
 // Guard tepi ruang redaksi GentaNusa.
 //
 // - Meneruskan header asli Cloudflare tanpa menimpa/memblokir.
-// - Melarang cache agresif pada rute dinamis redaksi (/admin/*, /api/*).
+// - Melarang cache agresif pada rute dinamis redaksi (/admin/*).
 // - /admin/:path* (kecuali halaman login privat) WAJIB sesi Supabase Auth
 //   terverifikasi via @supabase/ssr + peran redaksi
 //   (app_metadata.role === 'admin' | 'editor' dan varian admin).
