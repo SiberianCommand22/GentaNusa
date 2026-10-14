@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type User } from "@supabase/supabase-js";
 import {
   sessionFromSupabaseUser,
   SESSION_COOKIE,
   TOKEN_COOKIE,
   type EditorialSession,
 } from "@/lib/auth";
+import { isMasterEmail } from "@/lib/roles";
 
 // Rate limit per IP+email (in-memory per instance; dilapisi Cloudflare WAF,
 // lihat SECURITY.md). Kunci gabungan mencegah satu IP mengunci seluruh
@@ -99,18 +100,94 @@ export async function POST(request: NextRequest) {
     const supabase = createClient(url, anonKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error || !data.user) {
-      // Catat hanya kegagalan autentikasi — bukan setiap request.
-      const prev = rateLimitMap.get(key);
-      if (prev && Date.now() < prev.resetAt) {
-        prev.count += 1;
-      } else {
-        rateLimitMap.set(key, { count: 1, resetAt: Date.now() + RATE_LIMIT_WINDOW_MS });
+
+    // Klien admin (Service Role) untuk self-healing akun master.
+    // Fallback env: Vercel memakai SUPABASE_SERVICE_ROLE_KEY,
+    // lokal memakai SUPABASE_SERVICE_KEY.
+    const serviceKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+    const supabaseAdmin = serviceKey
+      ? createClient(url, serviceKey, {
+          auth: { persistSession: false, autoRefreshToken: false },
+        })
+      : null;
+
+    async function healMasterAccount(masterEmail: string): Promise<boolean> {
+      // Konfirmasi email + pastikan role admin di app_metadata & user_metadata.
+      if (!supabaseAdmin) return false;
+      try {
+        const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+        if (error || !data?.users) return false;
+        const target = data.users.find(
+          (u) => String(u.email ?? "").toLowerCase() === masterEmail.toLowerCase()
+        );
+        if (!target) return false;
+        const appMeta = { ...(target.app_metadata ?? {}), role: "admin" };
+        const userMeta = { ...(target.user_metadata ?? {}), role: "admin" };
+        const { error: upErr } =
+          await supabaseAdmin.auth.admin.updateUserById(target.id, {
+            email_confirm: true,
+            app_metadata: appMeta,
+            user_metadata: userMeta,
+          });
+        return !upErr;
+      } catch {
+        return false;
       }
+    }
+
+    let authUser: User | null = null;
+    let accessToken: string | null = null;
+    let refreshToken: string | null = null;
+
+    const first = await supabase.auth.signInWithPassword({ email, password });
+    if (!first.error && first.data.user && first.data.session) {
+      authUser = first.data.user;
+      accessToken = first.data.session.access_token;
+      refreshToken = first.data.session.refresh_token;
+    } else {
+      const msg = String(first.error?.message ?? "");
+      // SELF-HEALING MASTER ADMIN: bila Supabase menolak karena email belum
+      // terkonfirmasi, konfirmasi + tanam role admin lalu ulangi sign-in
+      // otomatis satu kali. (Master saat ini sudah confirmed — jalur ini
+      // menjadi pengaman bila status berubah di masa depan.)
+      if (/email not confirmed/i.test(msg) && isMasterEmail(email)) {
+        const healed = await healMasterAccount(String(email));
+        if (healed) {
+          const retry = await supabase.auth.signInWithPassword({ email, password });
+          if (!retry.error && retry.data.user && retry.data.session) {
+            authUser = retry.data.user;
+            accessToken = retry.data.session.access_token;
+            refreshToken = retry.data.session.refresh_token;
+          }
+        }
+        if (!authUser) {
+          return NextResponse.json(
+            {
+              ok: false,
+              error:
+                "Akun administrator belum terkonfirmasi. Hubungi Administrator Utama atau coba lagi dalam beberapa saat.",
+            },
+            { status: 403 }
+          );
+        }
+      } else {
+        // Catat hanya kegagalan autentikasi — bukan setiap request.
+        const prev = rateLimitMap.get(key);
+        if (prev && Date.now() < prev.resetAt) {
+          prev.count += 1;
+        } else {
+          rateLimitMap.set(key, { count: 1, resetAt: Date.now() + RATE_LIMIT_WINDOW_MS });
+        }
+        // Jangan bocorkan apakah email terdaftar — pesan generik.
+        const hint = /email not confirmed/i.test(msg)
+          ? "Akun belum terverifikasi. Periksa email konfirmasi Anda."
+          : "Email atau kata sandi tidak valid.";
+        return NextResponse.json({ ok: false, error: hint }, { status: 401 });
+      }
+    }
+
+    if (!authUser) {
       return NextResponse.json(
         { ok: false, error: "Email atau kata sandi tidak valid." },
         { status: 401 }
@@ -120,8 +197,30 @@ export async function POST(request: NextRequest) {
     // Kredensial benar — reset catatan gagal agar tidak terkunci.
     rateLimitMap.delete(key);
 
-    const identity: EditorialSession = sessionFromSupabaseUser(data.user);
-    const fallbackName = (data.user.email ?? email).split("@")[0];
+    // Sinkronisasi peran master: pastikan app_metadata.role = 'admin' selalu
+    // tertanam agar seluruh pemeriksaan downstream konsisten.
+    if (isMasterEmail(authUser.email)) {
+      const currentRole = String(
+        ((authUser.app_metadata ?? {}) as Record<string, unknown>).role ?? ""
+      )
+        .trim()
+        .toLowerCase();
+      if (currentRole !== "admin" && supabaseAdmin) {
+        try {
+          const patched = await supabaseAdmin.auth.admin.updateUserById(authUser.id, {
+            app_metadata: { ...(authUser.app_metadata ?? {}), role: "admin" },
+            user_metadata: { ...(authUser.user_metadata ?? {}), role: "admin" },
+          });
+          if (!patched.error && patched.data?.user) authUser = patched.data.user;
+        } catch {
+          // patch gagal — lanjutkan dengan sesi apa adanya (jalur email
+          // master di middleware/lib tetap mengizinkan akses)
+        }
+      }
+    }
+
+    const identity: EditorialSession = sessionFromSupabaseUser(authUser);
+    const fallbackName = (authUser.email ?? String(email)).split("@")[0];
     const session: SessionPayload = {
       email: identity.email ?? email,
       role: identity.role,
@@ -130,8 +229,8 @@ export async function POST(request: NextRequest) {
       author_slug: identity.authorSlug,
       is_admin: identity.isAdmin,
     };
-    const accessToken = data.session?.access_token ?? null;
-    if (!accessToken) {
+    const accessTokenChecked = accessToken;
+    if (!accessTokenChecked || !authUser) {
       return NextResponse.json(
         { ok: false, error: "Gagal membuat sesi. Coba lagi." },
         { status: 500 }
@@ -139,18 +238,26 @@ export async function POST(request: NextRequest) {
     }
 
     // Set sesi: flag admin (kompatibel dgn seluruh guard API) + ringkasan sesi.
+    // supabaseSession dikembalikan agar browser juga bisa menyinkronkan sesi
+    // Supabase client-side (setSession) — anti redirect-loop di /admin.
     const res = NextResponse.json({
       ok: true,
       admin: true,
       message: "Berhasil masuk",
       session,
+      role: identity.role,
+      user: { id: identity.userId, email: identity.email },
+      supabaseSession: refreshToken
+        ? { access_token: accessTokenChecked, refresh_token: refreshToken }
+        : { access_token: accessTokenChecked },
     });
 
     res.cookies.set("genta_admin", "1", cookieFlags(60 * 60 * 24 * 7)); // 7 hari
     res.cookies.set(SESSION_COOKIE, JSON.stringify(session), cookieFlags(60 * 60 * 24 * 7));
     // Access token Supabase disimpan httpOnly agar `auth.getUser()` bisa
     // memverifikasi ulang peran di setiap permintaan (anti pemalsuan cookie).
-    res.cookies.set(TOKEN_COOKIE, accessToken, cookieFlags(60 * 60 * 24 * 7));
+    // Middleware membaca cookie ini sebagai fallback (lihat middleware.ts).
+    res.cookies.set(TOKEN_COOKIE, accessTokenChecked, cookieFlags(60 * 60 * 24 * 7));
 
     return res;
   } catch {

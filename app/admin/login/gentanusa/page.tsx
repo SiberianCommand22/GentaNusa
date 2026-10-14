@@ -2,7 +2,8 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { createBrowserClient } from "@supabase/ssr";
 import { BrandLogo } from "@/components/BrandLogo";
 import styles from "../login.module.css";
 
@@ -23,7 +24,6 @@ function getSafeNext(raw: string | null): string {
  * dan rute lama /admin/login sengaja disegel (notFound).
  */
 function PrivateAdminLoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,15 +42,42 @@ function PrivateAdminLoginForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+      const data = await res.json().catch(() => ({}));
 
       if (res.ok) {
+        // Sinkronkan sesi Supabase di browser agar guard client-side di
+        // /admin (bila ada) juga melihat sesi aktif — kegagalan di sini
+        // tidak boleh menggagalkan login (cookie httpOnly tetap sumber utama).
+        try {
+          const sess = data.supabaseSession as
+            | { access_token?: string; refresh_token?: string }
+            | undefined;
+          const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+          const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+          if (sess?.access_token && sess?.refresh_token && url && anonKey) {
+            const browser = createBrowserClient(url, anonKey);
+            await browser.auth.setSession({
+              access_token: sess.access_token,
+              refresh_token: sess.refresh_token,
+            });
+          }
+        } catch {
+          // abaikan — navigasi penuh di bawah membaca cookie httpOnly
+        }
+        // Full reload (bukan router.push): memastikan Server Component tujuan
+        // menerima cookie httpOnly yang baru ditulis pada request bersih.
         const safeNext = getSafeNext(searchParams.get("next"));
-        router.push(safeNext);
-        router.refresh();
-      } else {
-        const data = await res.json().catch(() => ({}));
-        setError(data.error || "Login gagal");
+        window.location.href = safeNext;
+        return;
       }
+      // Tampilkan SELALU pesan error server — jangan pernah gagal diam-diam.
+      setError(
+        typeof data.error === "string" && data.error
+          ? data.error
+          : typeof data.message === "string" && data.message
+            ? data.message
+            : `Login gagal (kode ${res.status}).`
+      );
     } catch {
       setError("Terjadi kesalahan. Coba lagi.");
     } finally {

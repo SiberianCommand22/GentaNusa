@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
+import { canAccessAdminArea, TOKEN_COOKIE } from "@/lib/roles";
 
 // Guard tepi ruang redaksi GentaNusa.
 //
@@ -20,25 +22,9 @@ import { createServerClient } from "@supabase/ssr";
 // NEXT_PUBLIC_). Kunci service hanya dipakai server-side (lib/supabase.ts,
 // route handler API, skrip server).
 
-const ADMIN_ROLES = new Set([
-  "admin",
-  "superadmin",
-  "super_admin",
-  "administrator",
-]);
-const EDITORIAL_ROLES = new Set([...ADMIN_ROLES, "editor"]);
-
+// Gerbang peran terpusat (lib/roles.ts) — dipakai identik oleh login API.
 function hasEditorialRole(role: unknown, email: unknown): boolean {
-  const r = String(role ?? "").trim().toLowerCase();
-  if (EDITORIAL_ROLES.has(r)) return true;
-  // Jalur Administrator Utama: kecocokan email master terverifikasi.
-  const master = String(
-    process.env.MASTER_ADMIN_EMAIL || "siberiantwotwo@gmail.com"
-  )
-    .trim()
-    .toLowerCase();
-  const e = String(email ?? "").trim().toLowerCase();
-  return e.length > 0 && e === master;
+  return canAccessAdminArea(role, email);
 }
 
 export async function middleware(req: NextRequest) {
@@ -87,9 +73,37 @@ export async function middleware(req: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  type EdgeUser = {
+    email?: string | null;
+    app_metadata?: Record<string, unknown> | null;
+  };
+  let user: EdgeUser | null = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = (data?.user as unknown as EdgeUser | null) ?? null;
+  } catch {
+    user = null;
+  }
+
+  // FALLBACK ANTI REDIRECT-LOOP: `/api/admin/login` menulis sesi ke cookie
+  // `genta_token` (httpOnly), BUKAN ke cookie bawaan @supabase/ssr
+  // (`sb-<ref>-auth-token`). Tanpa fallback ini, getUser() di atas SELALU
+  // null setelah login dan setiap request /admin mental kembali ke halaman
+  // login meskipun kredensial benar. Verifikasi token langsung ke Supabase.
+  if (!user) {
+    const token = req.cookies.get(TOKEN_COOKIE)?.value;
+    if (token) {
+      try {
+        const direct = createClient(url, anonKey, {
+          auth: { persistSession: false, autoRefreshToken: false },
+        });
+        const { data, error } = await direct.auth.getUser(token);
+        if (!error && data?.user) user = data.user as unknown as EdgeUser;
+      } catch {
+        // token tidak valid — biarkan jatuh ke redirect login di bawah
+      }
+    }
+  }
 
   if (!user) {
     const loginUrl = new URL("/admin/login/gentanusa", req.url);

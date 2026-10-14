@@ -1,5 +1,14 @@
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
+import {
+  MASTER_ADMIN_EMAIL as SHARED_MASTER_EMAIL,
+  ADMIN_FLAG_COOKIE as SHARED_FLAG,
+  SESSION_COOKIE as SHARED_SESSION,
+  TOKEN_COOKIE as SHARED_TOKEN,
+  isAdminIdentity as sharedIsAdminIdentity,
+  canAccessAdminArea as sharedCanAccessAdminArea,
+  isMasterEmail as sharedIsMasterEmail,
+} from "@/lib/roles";
 
 /**
  * Lapisan RBAC redaksi GentaNusa (pasca-remediasi keamanan Okt 2026).
@@ -21,20 +30,16 @@ import { createClient } from "@supabase/supabase-js";
  *   - genta_token : access token Supabase Auth (sumber kebenaran sesi).
  */
 
-// Email Administrator Utama. Dapat dioverride lewat env untuk staging/offline.
-export const MASTER_ADMIN_EMAIL = (
-  process.env.MASTER_ADMIN_EMAIL || "siberiantwotwo@gmail.com"
-)
-  .trim()
-  .toLowerCase();
+// Email Administrator Utama (sumber tunggal: lib/roles.ts, dipakai juga
+// middleware Edge). Dapat dioverride lewat env untuk staging/offline.
+export const MASTER_ADMIN_EMAIL = SHARED_MASTER_EMAIL;
+export { sharedCanAccessAdminArea as canAccessAdminArea };
+export { sharedIsMasterEmail as isMasterEmail };
 
-// Role yang punya hak administrator: melihat semua berita + menghapus berita.
-const ADMIN_ROLES = new Set(["admin", "superadmin", "super_admin", "administrator"]);
-
-export const ADMIN_FLAG_COOKIE = "genta_admin";
+export const ADMIN_FLAG_COOKIE = SHARED_FLAG;
 /** @deprecated Hanya petunjuk tampilan — jangan pernah dipakai untuk otorisasi. */
-export const SESSION_COOKIE = "genta_session";
-export const TOKEN_COOKIE = "genta_token";
+export const SESSION_COOKIE = SHARED_SESSION;
+export const TOKEN_COOKIE = SHARED_TOKEN;
 
 export type EditorialSession = {
   /** UUID akun Supabase Auth pemilik artikel. */
@@ -70,20 +75,9 @@ function readString(value: unknown): string | null {
  * `role` WAJIB berasal dari `app_metadata` (atau email master yang sudah
  * terverifikasi via Supabase Auth). Meneruskan nilai dari `user_metadata`
  * ke parameter ini adalah pelanggaran keamanan.
+ * (Implementasi terpusat di lib/roles.ts — dipakai identik oleh middleware.)
  */
-export function isAdminIdentity(input: {
-  role?: unknown;
-  email?: unknown;
-}): boolean {
-  const role = String(input.role ?? "")
-    .trim()
-    .toLowerCase();
-  const email = String(input.email ?? "")
-    .trim()
-    .toLowerCase();
-  if (ADMIN_ROLES.has(role)) return true;
-  return email.length > 0 && email === MASTER_ADMIN_EMAIL;
-}
+export const isAdminIdentity = sharedIsAdminIdentity;
 
 /**
  * Bangun EditorialSession dari user Supabase Auth TERVERIFIKASI.
