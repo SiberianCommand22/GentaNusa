@@ -9,7 +9,8 @@ import {
   fetchArticlesForSession,
   sanitizeSlug,
 } from "@/lib/editorial-articles";
-import { sanitizeContentInput } from "@/lib/sanitize-html";
+// sanitize-html (isomorphic-dompurify/jsdom) dimuat malas di dalam handler
+// tulis saja — jalur baca (GET) tidak boleh menyentuh jsdom di serverless.
 
 // Selalu dinamis: jangan pernah diprerender statis (baca cookie sesi +
 // searchParams per request). Mencegah 500 kosong dari prerender-prod.
@@ -142,6 +143,8 @@ export async function POST(req: NextRequest) {
     ? cleanRequestedSlug || slugify(author)
     : slugify(author);
 
+  // Lazy-load sanitizer (jsdom) hanya di jalur tulis.
+  const { sanitizeContentInput } = await import("@/lib/sanitize-html");
   const allowedPayload: Record<string, unknown> = {
     title: body.title,
     category: body.category,

@@ -10,7 +10,8 @@ import {
   sanitizeSlug,
   type ArticleRow,
 } from "@/lib/editorial-articles";
-import { sanitizeContentInput } from "@/lib/sanitize-html";
+// sanitize-html (isomorphic-dompurify/jsdom) dimuat malas di dalam handler
+// tulis saja — jalur baca (GET) tidak boleh menyentuh jsdom di serverless.
 
 // Selalu dinamis: baca cookie sesi + searchParams per request.
 export const dynamic = "force-dynamic";
@@ -187,6 +188,8 @@ export async function PUT(
     ? cleanRequestedSlug || existingSlug || slugify(author)
     : existingSlug || slugify(author);
 
+  // Lazy-load sanitizer (jsdom) hanya di jalur tulis.
+  const { sanitizeContentInput } = await import("@/lib/sanitize-html");
   const fullUpdate: Record<string, unknown> = {
     title: body.title,
     category: body.category,
