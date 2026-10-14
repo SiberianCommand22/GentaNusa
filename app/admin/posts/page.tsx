@@ -69,12 +69,22 @@ export default function ManagePostsPage() {
     try {
       // `scope=mine` = Administrator melihat semua baris; penulis biasa hanya
       // baris miliknya (filter kepemilikan ditegakkan di server).
-      const rows: Row[] = await fetch("/api/articles?scope=mine").then((r) =>
-        r.ok ? r.json() : []
-      );
+      // Kegagalan server WAJIB tampil sebagai banner error — jangan pernah
+      // ditelan menjadi tabel kosong "0 berita".
+      const r = await fetch("/api/articles?scope=mine");
+      if (!r.ok) {
+        const j = await r.json().catch(() => ({}));
+        const detail =
+          typeof j.error === "string" && j.error ? j.error : `kode ${r.status}`;
+        setMsg(`Gagal memuat daftar berita: ${detail}`);
+        setArticles([]);
+        return;
+      }
+      const rows: Row[] = await r.json().catch(() => []);
       setArticles(Array.isArray(rows) ? rows : []);
     } catch {
-      // tabel tetap tampil kosong
+      setMsg("Gagal memuat daftar berita: server tidak terjangkau.");
+      setArticles([]);
     } finally {
       setLoading(false);
     }
@@ -106,6 +116,8 @@ export default function ManagePostsPage() {
     if (filter === "draft") return isDraftRow(a);
     return true;
   });
+  const publishedCount = articles.filter((a) => !isDraftRow(a)).length;
+  const draftCount = articles.filter((a) => isDraftRow(a)).length;
 
   const isAdmin = session?.isAdmin === true;
   const isAuthorMode = session !== null && !session.isAdmin;
@@ -137,14 +149,20 @@ export default function ManagePostsPage() {
       {msg && <p className={styles.msg}>{msg}</p>}
 
       <div className={styles.filterRow} role="group" aria-label="Filter status berita">
-        {(["all", "published", "draft"] as Filter[]).map((f) => (
+        {(
+          [
+            { key: "all", label: `Semua (${articles.length})` },
+            { key: "published", label: `Published (${publishedCount})` },
+            { key: "draft", label: `Draft (${draftCount})` },
+          ] as Array<{ key: Filter; label: string }>
+        ).map((f) => (
           <button
-            key={f}
+            key={f.key}
             type="button"
-            className={`${styles.filterBtn} ${filter === f ? styles.filterBtnActive : ""}`}
-            onClick={() => setFilter(f)}
+            className={`${styles.filterBtn} ${filter === f.key ? styles.filterBtnActive : ""}`}
+            onClick={() => setFilter(f.key)}
           >
-            {f === "all" ? "Semua" : f === "published" ? "Published" : "Draft"}
+            {f.label}
           </button>
         ))}
       </div>
@@ -251,7 +269,9 @@ export default function ManagePostsPage() {
           {!loading && visible.length === 0 && (
             <p className={styles.emptyNote}>
               {articles.length === 0
-                ? "Belum ada berita yang Anda tulis. Klik 'Tulis Berita Baru' untuk memulai."
+                ? isAdmin
+                  ? "Belum ada berita di database. Klik 'Tulis Berita Baru' untuk memulai."
+                  : "Belum ada berita yang Anda tulis. Klik 'Tulis Berita Baru' untuk memulai."
                 : "Tidak ada berita pada filter ini."}
             </p>
           )}

@@ -24,6 +24,7 @@ export default function AdminDashboard() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [drafts, setDrafts] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [role, setRole] = useState<"admin" | "editor" | null>(null);
 
   useEffect(() => {
@@ -43,17 +44,27 @@ export default function AdminDashboard() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError("");
     try {
       // scope=mine: Administrator melihat seluruh berita, penulis biasa hanya
-      // miliknya sendiri (filter di server).
-      const all: Article[] = await fetch("/api/articles?scope=mine").then((r) =>
-        r.ok ? r.json() : []
-      );
+      // miliknya sendiri (filter di server). Error server ditampilkan —
+      // jangan ditelan menjadi metrik 0.
+      const r = await fetch("/api/articles?scope=mine");
+      if (!r.ok) {
+        const j = await r.json().catch(() => ({}));
+        const detail =
+          typeof j.error === "string" && j.error ? j.error : `kode ${r.status}`;
+        setLoadError(`Gagal memuat statistik: ${detail}`);
+        setDrafts([]);
+        setArticles([]);
+        return;
+      }
+      const all: Article[] = await r.json().catch(() => []);
       const list = Array.isArray(all) ? all : [];
       setDrafts(list.filter(isDraftRow));
       setArticles(list.filter((a) => !isDraftRow(a)));
     } catch {
-      // biarkan metrik nol — dashboard tetap tampil
+      setLoadError("Gagal memuat statistik: server tidak terjangkau.");
     } finally {
       setLoading(false);
     }
@@ -85,6 +96,11 @@ export default function AdminDashboard() {
       </div>
 
       <div className={styles.metrics}>
+        {loadError && (
+          <p className={styles.err} role="alert" style={{ width: "100%" }}>
+            {loadError}
+          </p>
+        )}
         <div className={styles.metricCard}>
           <p className={styles.metricLabel}>Total Berita</p>
           <p className={`${styles.metricValue} ${styles.metricAccent}`}>

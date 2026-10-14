@@ -134,14 +134,21 @@ async function verifySupabaseToken(token: string): Promise<EditorialSession | nu
  * cookie `genta_session` yang tidak ditandatangani tidak pernah diterima.
  */
 export async function getEditorialSession(): Promise<EditorialSession | null> {
-  const store = await cookies();
-  if (store.get(ADMIN_FLAG_COOKIE)?.value !== "1") return null;
+  // TIDAK PERNAH melempar: kegagalan apa pun = "belum login" (null) sehingga
+  // route handler menjawab 401 JSON — bukan crash 500 tanpa body yang
+  // ditelan halaman admin menjadi tabel kosong "0 berita".
+  try {
+    const store = await cookies();
+    if (store.get(ADMIN_FLAG_COOKIE)?.value !== "1") return null;
 
-  const token = store.get(TOKEN_COOKIE)?.value;
-  if (!token) return null;
+    const token = store.get(TOKEN_COOKIE)?.value;
+    if (!token) return null;
 
-  // Satu-satunya jalan: verifikasi ke Supabase Auth. Gagal = tidak login.
-  return verifySupabaseToken(token);
+    // Satu-satunya jalan: verifikasi ke Supabase Auth. Gagal = tidak login.
+    return await verifySupabaseToken(token);
+  } catch {
+    return null;
+  }
 }
 
 // Nama byline otomatisasi/bot yang dilarang tampil sebagai penulis artikel.

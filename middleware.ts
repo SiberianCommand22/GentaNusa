@@ -28,6 +28,25 @@ function hasEditorialRole(role: unknown, email: unknown): boolean {
 }
 
 export async function middleware(req: NextRequest) {
+  // Middleware TIDAK BOLEH melempar: crash di sini = 500 tanpa body untuk
+  // SEMUA /admin/* dan /api/* (ditelan client menjadi "0 berita"). Fail-closed
+  // yang terlihat: halaman admin → login, API → JSON 500 ber-body.
+  try {
+    return await guard(req);
+  } catch {
+    if (req.nextUrl.pathname.startsWith("/api/")) {
+      return NextResponse.json(
+        { error: "Layanan autentikasi tepi gagal. Coba lagi." },
+        { status: 500 }
+      );
+    }
+    const loginUrl = new URL("/admin/login/gentanusa", req.url);
+    loginUrl.searchParams.set("next", req.nextUrl.pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+}
+
+async function guard(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
   // Teruskan header Cloudflare apa adanya.

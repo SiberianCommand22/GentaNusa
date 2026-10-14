@@ -12,6 +12,9 @@ import {
 } from "@/lib/editorial-articles";
 import { sanitizeContentInput } from "@/lib/sanitize-html";
 
+// Selalu dinamis: baca cookie sesi + searchParams per request.
+export const dynamic = "force-dynamic";
+
 function slugify(value: string): string {
   return (
     String(value || "")

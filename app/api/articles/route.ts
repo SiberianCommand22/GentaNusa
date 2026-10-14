@@ -11,6 +11,10 @@ import {
 } from "@/lib/editorial-articles";
 import { sanitizeContentInput } from "@/lib/sanitize-html";
 
+// Selalu dinamis: jangan pernah diprerender statis (baca cookie sesi +
+// searchParams per request). Mencegah 500 kosong dari prerender-prod.
+export const dynamic = "force-dynamic";
+
 function slugify(value: string): string {
   return (
     String(value || "")
@@ -30,7 +34,18 @@ export async function GET(req: NextRequest) {
   const scope = req.nextUrl.searchParams.get("scope");
 
   if (scope === "all" || scope === "mine" || scope === "draft") {
-    const session = await getEditorialSession();
+    // getEditorialSession dibungkus try/catch: kegagalan tak terduga WAJIB
+    // menjawab JSON (401/500 ber-body), bukan crash 500 tanpa body yang
+    // ditelan halaman admin menjadi tabel kosong "0 berita".
+    let session;
+    try {
+      session = await getEditorialSession();
+    } catch {
+      return NextResponse.json(
+        { error: "Gagal memeriksa sesi. Coba muat ulang halaman." },
+        { status: 500 }
+      );
+    }
     if (!session) {
       return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
     }

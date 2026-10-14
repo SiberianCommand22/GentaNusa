@@ -7,13 +7,25 @@ const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const serviceKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
 
-export const supabaseAnon: SupabaseClient | null = url && anonKey
-  ? createClient(url, anonKey)
-  : null;
+// PENTING: konstruksi klien TIDAK BOLEH melempar saat import modul.
+// Bila env belum ter-set (mis. runtime produksi pincang), klien = null dan
+// setiap route handler menjawab JSON 503 — bukan crash 500 tanpa body yang
+// ditelan client admin menjadi tabel kosong "0 berita".
+function safeCreate(
+  u: string | undefined,
+  k: string | undefined
+): SupabaseClient | null {
+  if (!u || !k) return null;
+  try {
+    return createClient(u, k);
+  } catch {
+    return null;
+  }
+}
 
-export const adminClient: SupabaseClient | null = url && serviceKey
-  ? createClient(url, serviceKey)
-  : null;
+export const supabaseAnon: SupabaseClient | null = safeCreate(url, anonKey);
+
+export const adminClient: SupabaseClient | null = safeCreate(url, serviceKey);
 
 export function isSupabaseReady() {
   if (!url) return { ok: false as const, reason: "NEXT_PUBLIC_SUPABASE_URL belum di-set (.env.local)" };
