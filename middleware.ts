@@ -13,9 +13,12 @@ import { canAccessAdminArea, TOKEN_COOKIE } from "@/lib/roles";
 //   - Belum login  -> redirect ke /admin/login/gentanusa (form login privat;
 //     /admin/login disegel, tidak ada /login publik).
 //   - Login tapi bukan redaksi -> redirect ke beranda /.
-// - API internal (/api/*) TIDAK diautentikasi di sini; setiap route handler
-//   menegakkan sesinya sendiri via lib/auth.ts (getEditorialSession).
-//   Middleware hanya memaksa Cache-Control: no-store untuk API.
+// - API internal (/api/*) TIDAK diautentikasi di sini dan TIDAK melewati
+//   middleware sama sekali (matcher di bawah hanya /admin/* — hemat kuota
+//   Edge Middleware Invocations dari pembaca publik). Setiap route handler
+//   menegakkan sesinya sendiri via lib/auth.ts (getEditorialSession), dan
+//   Cache-Control: no-store untuk API dipasang via headers() di next.config
+//   (tanpa biaya invocation).
 //
 // CATATAN KEAMANAN: SUPABASE_SERVICE_ROLE_KEY / SUPABASE_SERVICE_KEY tidak
 // pernah disentuh di berkas ini maupun di klien mana pun (tanpa prefiks
@@ -29,17 +32,11 @@ function hasEditorialRole(role: unknown, email: unknown): boolean {
 
 export async function middleware(req: NextRequest) {
   // Middleware TIDAK BOLEH melempar: crash di sini = 500 tanpa body untuk
-  // SEMUA /admin/* dan /api/* (ditelan client menjadi "0 berita"). Fail-closed
-  // yang terlihat: halaman admin → login, API → JSON 500 ber-body.
+  // halaman /admin (ditelan client menjadi "0 berita"). Fail-closed yang
+  // terlihat: lempar kembali ke halaman login.
   try {
     return await guard(req);
   } catch {
-    if (req.nextUrl.pathname.startsWith("/api/")) {
-      return NextResponse.json(
-        { error: "Layanan autentikasi tepi gagal. Coba lagi." },
-        { status: 500 }
-      );
-    }
     const loginUrl = new URL("/admin/login/gentanusa", req.url);
     loginUrl.searchParams.set("next", req.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
@@ -63,14 +60,11 @@ async function guard(req: NextRequest) {
     path === "/login" ||
     path.startsWith("/login/");
 
-  // Halaman login privat + API: tanpa verifikasi sesi di middleware.
-  // (API menegakkan auth per-route; login harus reachable saat logged-out.)
+  // HEMAT KUOTA: middleware hanya untuk area redaksi. Rute login privat
+  // dikecualikan agar selalu reachable saat logged-out; API dan halaman
+  // publik tidak memicu invocation sama sekali.
   if (!isAdminRoute || isLoginRoute) {
-    const res = NextResponse.next({ request: { headers: outgoing } });
-    if (path.startsWith("/admin") || path.startsWith("/api/")) {
-      res.headers.set("Cache-Control", "no-store");
-    }
-    return res;
+    return NextResponse.next({ request: { headers: outgoing } });
   }
 
   // ---- /admin/:path* terproteksi: validasi sesi via @supabase/ssr ----
@@ -139,5 +133,8 @@ async function guard(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/:path*"],
+  // HEMAT KUOTA HOBBY: hanya /admin/* yang memicu Edge Middleware Invocation.
+  // Pembaca publik + panggilan /api/* (termasuk analytics tracker) bebas
+  // invocation; proteksi API tetap per-route via lib/auth.ts.
+  matcher: ["/admin/:path*"],
 };

@@ -38,9 +38,9 @@ const RESERVED_SLUGS = [  "admin",
 
 type Params = { params: Promise<{ slug: string }> };
 
-// ISR detail berita: cache CDN 60 dtk untuk trafik viral; invalidasi instan
+// ISR detail berita: cache CDN 24 jam untuk hemat kuota; invalidasi instan
 // via revalidatePath('/[slug]') + revalidatePath(`/${slug}`) di API publikasi.
-export const revalidate = 60;
+export const revalidate = 86400;
 
 async function isAdminSession(): Promise<boolean> {
   try {

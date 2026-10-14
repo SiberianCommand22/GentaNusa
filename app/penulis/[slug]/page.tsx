@@ -7,8 +7,9 @@ import styles from "./author.module.css";
 
 type Params = { params: Promise<{ slug: string }> };
 
-// Penulis tetap statis (daftar penulis fixed), artikel-nya auto-refresh
-export const revalidate = 60;
+// Penulis tetap statis (daftar penulis fixed), artikel-nya auto-refresh.
+// ISR 24 jam hemat kuota; invalidasi instan via revalidatePath saat publikasi.
+export const revalidate = 86400;
 
 export async function generateStaticParams() {
   return (await getAuthors()).map((a) => ({ slug: a.slug }));

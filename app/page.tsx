@@ -11,10 +11,10 @@ import {
 import { Footer } from "@/components/site";
 import styles from "./page.module.css";
 
-// ISR viral-traffic: jutaan pembaca dilayani dari cache CDN Vercel (60 dtk)
-// tanpa membebani kuota query Supabase. Breaking news tampil instan via
-// revalidatePath('/') di POST/PUT /api/articles.
-export const revalidate = 60;
+// ISR hemat kuota: pembaca dilayani dari cache CDN Vercel (24 jam) tanpa
+// membebani kuota query Supabase maupun Function Invocations. Breaking news
+// tetap tampil instan via revalidatePath('/') di POST/PUT /api/articles.
+export const revalidate = 86400;
 
 function inCategories(a: Article, names: string[]): boolean {
   const c = String(a.category || "").trim().toLowerCase();

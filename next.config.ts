@@ -28,6 +28,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   generateEtags: true,
   images: {
+    // HEMAT KUOTA VERCEL HOBBY: tanpa Image Optimization sama sekali.
+    // `next/image` tetap dipakai (layout anti-shift, lazy-load, sizes),
+    // tetapi file gambar disajikan apa adanya tanpa transformasi server.
+    unoptimized: true,
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
@@ -139,9 +143,20 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // Cache images from Supabase Storage — immutable, 1 year
+      // Pengganti Cache-Control middleware untuk API (nol invocation):
+      // seluruh /api/* no-store. Gambar /media/* mengatur immutable-nya
+      // sendiri di dalam route handler (app/media/[name]/route.ts).
       {
-        source: "/api/media/:path*",
+        source: "/api/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      // Cache images from Supabase Storage — immutable, 1 year.
+      // (Aktif di dalam handler app/media/[name]/route.ts; aturan statis
+      // ini dipertahankan sebagai lapis cadangan.)
+      {
+        source: "/media/:path*",
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
