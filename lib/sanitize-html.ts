@@ -14,22 +14,22 @@
  */
 import DOMPurify from "isomorphic-dompurify";
 
-// Whitelist tag editorial (spesifikasi hardening media + tag toolbar CMS).
+// Whitelist tag editorial aman (spesifikasi hardening XSS media).
 const DOMPURIFY_TAGS = [
-  "p", "b", "i", "em", "strong", "u", "s", "code", "a",
-  "h2", "h3", "h4", "ul", "ol", "li",
-  "blockquote", "img", "figure", "figcaption", "br", "hr",
+  "p", "b", "i", "em", "strong", "a",
+  "h1", "h2", "h3", "h4", "ul", "ol", "li",
+  "blockquote", "img", "figure", "figcaption", "br", "hr", "span",
 ];
 
 const DOMPURIFY_ATTR = [
   "href", "src", "alt", "title", "target", "rel", "class", "width", "height",
 ];
 
-// Tag yang boleh lolos sanitasi (semua yang dihasilkan toolbar CMS + media).
+// Tag yang boleh lolos sanitasi (sama persis dengan allowlist DOMPurify).
 const SAFE_TAGS = new Set([
-  "strong", "b", "em", "i", "u", "s", "code", "a",
-  "p", "br", "h2", "h3", "h4", "blockquote", "ul", "ol", "li",
-  "img", "figure", "figcaption", "hr",
+  "p", "b", "i", "em", "strong", "a",
+  "h1", "h2", "h3", "h4", "ul", "ol", "li",
+  "blockquote", "img", "figure", "figcaption", "br", "hr", "span",
 ]);
 
 // Token class yang diizinkan (subset aman ala prose, tanpa Tailwind).

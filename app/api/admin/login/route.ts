@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getClientIp } from "@/lib/get-client-ip";
 import {
   sessionFromSupabaseUser,
   SESSION_COOKIE,
@@ -8,12 +7,24 @@ import {
   type EditorialSession,
 } from "@/lib/auth";
 
-// Track rate per IP (fallback in-memory; lihat lib catatan arsitektur di
-// app/api/rate-limit.ts — tidak efektif lintas instance serverless, lapisi
-// dengan aturan Cloudflare WAF,<Item:> lihat SECURITY.md).
-const rateMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT = 5; // max attempts
-const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+// Rate limit per IP+email (in-memory per instance; dilapisi Cloudflare WAF,
+// lihat SECURITY.md). Kunci gabungan mencegah satu IP mengunci seluruh
+// pengguna dan mencegah satu email mengunci banyak IP di serverless Vercel.
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_MAX = 10; // 10 percobaan gagal
+const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // jendela 5 menit (300 detik)
+
+function getRateLimitIp(req: NextRequest): string {
+  return (
+    req.headers.get("x-real-ip") ||
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "127.0.0.1"
+  );
+}
+
+function getRetryAfterSeconds(entry: { resetAt: number }): number {
+  return Math.max(1, Math.ceil((entry.resetAt - Date.now()) / 1000));
+}
 
 // Bentuk ringkasan sesi yang disimpan di cookie httpOnly `genta_session`.
 // PERINGATAN: cookie ini hanya petunjuk tampilan — lib/auth.ts TIDAK PERNAH
@@ -40,22 +51,6 @@ function cookieFlags(maxAge: number) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting (IP asli via Cloudflare-aware helper)
-    const ip = getClientIp(request);
-    const now = Date.now();
-    const entry = rateMap.get(ip);
-    if (entry && now < entry.resetAt) {
-      if (entry.count >= RATE_LIMIT) {
-        return NextResponse.json(
-          { ok: false, error: "Too many attempts. Try again later." },
-          { status: 429 }
-        );
-      }
-      entry.count++;
-    } else {
-      rateMap.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    }
-
     const body = await request.json().catch(() => null);
     const { email, password } = body || {};
 
@@ -64,6 +59,28 @@ export async function POST(request: NextRequest) {
         { ok: false, error: "Email dan kata sandi wajib diisi." },
         { status: 400 }
       );
+    }
+
+    // Rate limiting per IP+email: 10x gagal / 5 menit. Kunci gabungan agar
+    // tidak ada kunci global/statis yang mengunci seluruh pengguna Vercel.
+    const ip = getRateLimitIp(request);
+    const key = `${ip}:${String(email).toLowerCase()}`;
+    const now = Date.now();
+    const entry = rateLimitMap.get(key);
+    if (entry && now < entry.resetAt) {
+      if (entry.count >= RATE_LIMIT_MAX) {
+        const retryAfter = getRetryAfterSeconds(entry);
+        return NextResponse.json(
+          {
+            ok: false,
+            error: `Terlalu banyak percobaan gagal. Silakan coba lagi dalam ${retryAfter} detik.`,
+          },
+          { status: 429 }
+        );
+      }
+    } else if (entry) {
+      // Jendela kedaluwarsa — mulai hitung ulang.
+      rateLimitMap.delete(key);
     }
 
     // Seluruh autentikasi lewat Supabase Auth — tidak ada kredensial
@@ -87,11 +104,21 @@ export async function POST(request: NextRequest) {
       password,
     });
     if (error || !data.user) {
+      // Catat hanya kegagalan autentikasi — bukan setiap request.
+      const prev = rateLimitMap.get(key);
+      if (prev && Date.now() < prev.resetAt) {
+        prev.count += 1;
+      } else {
+        rateLimitMap.set(key, { count: 1, resetAt: Date.now() + RATE_LIMIT_WINDOW_MS });
+      }
       return NextResponse.json(
         { ok: false, error: "Email atau kata sandi tidak valid." },
         { status: 401 }
       );
     }
+
+    // Kredensial benar — reset catatan gagal agar tidak terkunci.
+    rateLimitMap.delete(key);
 
     const identity: EditorialSession = sessionFromSupabaseUser(data.user);
     const fallbackName = (data.user.email ?? email).split("@")[0];

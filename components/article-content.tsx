@@ -37,7 +37,7 @@ function legacyToHtml(block: string): string {
   return rest;
 }
 
-const BLOCK_TAG = /^\s*<(p|h2|h3|h4|blockquote|ul|ol|figure|hr|img)\b/i;
+const BLOCK_TAG = /^\s*<(p|h1|h2|h3|h4|blockquote|ul|ol|figure|hr|img)\b/i;
 
 // Kutipan narasumber: paragraf polos yang diawali tanda kutip atau markdown `>`.
 const QUOTE_START = /^([">“‘»]|&gt;|&quot;|&#39;|—\s)/;

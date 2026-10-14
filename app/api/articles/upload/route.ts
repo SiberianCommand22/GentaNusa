@@ -4,7 +4,7 @@ import { adminClient, isSupabaseReady } from "@/lib/supabase";
 import { getEditorialSession } from "@/lib/auth";
 import { rateLimit } from "@/app/api/rate-limit";
 
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 const EXTENSIONS = {
   "image/jpeg": ".jpg",
   "image/png": ".png",
@@ -74,13 +74,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Foto wajib dipilih" }, { status: 400 });
   }
   if (uploaded.size === 0 || uploaded.size > MAX_IMAGE_BYTES) {
-    return NextResponse.json({ error: "Ukuran foto maksimal 5 MB" }, { status: 413 });
+    return NextResponse.json({ error: "Ukuran foto maksimal 4 MB" }, { status: 400 });
   }
 
   const bytes = new Uint8Array(await uploaded.arrayBuffer());
   const type = detectImage(bytes);
   if (!type) {
-    return NextResponse.json({ error: "Hanya JPG, PNG, atau WebP yang diterima" }, { status: 415 });
+    return NextResponse.json({ error: "Hanya JPG, PNG, atau WebP yang diterima" }, { status: 400 });
   }
 
   const objectName = `${randomUUID()}${EXTENSIONS[type]}`;

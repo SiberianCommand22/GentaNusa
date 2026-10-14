@@ -1,10 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { BrandLogo } from "@/components/BrandLogo";
 import styles from "../login.module.css";
+
+/** Tolak open redirect: hanya path absolut internal yang diizinkan. */
+function getSafeNext(raw: string | null): string {
+  const rawNext = raw || "/admin";
+  return rawNext.startsWith("/") && !rawNext.startsWith("//") && !rawNext.startsWith("/\\")
+    ? rawNext
+    : "/admin";
+}
 
 /**
  * Form login redaksi — RUTE PRIVAT.
@@ -14,18 +22,19 @@ import styles from "../login.module.css";
  * halaman ini: tidak ada tautan login di navbar maupun drawer menu publik,
  * dan rute lama /admin/login sengaja disegel (notFound).
  */
-export default function PrivateAdminLoginPage() {
+function PrivateAdminLoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       const res = await fetch("/api/admin/login", {
@@ -35,7 +44,8 @@ export default function PrivateAdminLoginPage() {
       });
 
       if (res.ok) {
-        router.push("/admin");
+        const safeNext = getSafeNext(searchParams.get("next"));
+        router.push(safeNext);
         router.refresh();
       } else {
         const data = await res.json().catch(() => ({}));
@@ -44,7 +54,7 @@ export default function PrivateAdminLoginPage() {
     } catch {
       setError("Terjadi kesalahan. Coba lagi.");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }
 
@@ -56,7 +66,7 @@ export default function PrivateAdminLoginPage() {
         </div>
         <p className={styles.tagline}>CEPAT • AKURAT • TERPERCAYA</p>
         <h1 className={styles.title}>Login Redaksi</h1>
-        <p className={styles.subtitle}>Ruang kerja khusus=redaksi GentaNusa</p>
+        <p className={styles.subtitle}>Ruang kerja khusus redaksi GentaNusa</p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
@@ -109,8 +119,8 @@ export default function PrivateAdminLoginPage() {
 
           {error && <p className={styles.error}>{error}</p>}
 
-          <button type="submit" className={styles.submitBtn} disabled={loading}>
-            {loading ? "Memeriksa..." : "Masuk"}
+          <button type="submit" className={styles.submitBtn} disabled={isLoading}>
+            {isLoading ? "Memeriksa..." : "Masuk"}
           </button>
         </form>
 
@@ -119,5 +129,13 @@ export default function PrivateAdminLoginPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function PrivateAdminLoginPage() {
+  return (
+    <Suspense>
+      <PrivateAdminLoginForm />
+    </Suspense>
   );
 }
