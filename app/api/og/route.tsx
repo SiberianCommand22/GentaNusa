@@ -1,9 +1,11 @@
 import { ImageResponse } from '@vercel/og';
 import { NextRequest } from 'next/server';
 
-export const runtime = 'edge';
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge
+// (batas 1 MB paket Hobby). @vercel/og v1 mendukung runtime nodejs.
+export const runtime = 'nodejs';
 
-// Batas anti-SSRF (duplikat edge-safe dari logika di app/api/og-image/route.ts):
+// Batas anti-SSRF (duplikat dari logika di app/api/og-image/route.ts):
 // hanya path lokal atau https ke host allowlist yang boleh dirender satori.
 // Satori me-fetch `src` dari sisi server, jadi URL mentah = SSRF.
 function isAllowedImageUrl(urlStr: string): boolean {

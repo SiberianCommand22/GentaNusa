@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { getEditorialSession } from "@/lib/auth";
 import { getCategories } from "@/lib/data";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge.
+export const runtime = 'nodejs';
+
 export async function GET() {
   if (process.env.NODE_ENV === "production") {
     return new NextResponse(null, { status: 404 });

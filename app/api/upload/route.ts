@@ -7,6 +7,9 @@ import { rateLimit } from "@/app/api/rate-limit";
 
 export const dynamic = "force-dynamic";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge.
+export const runtime = 'nodejs';
+
 // Endpoint dedikasi unggah sampul: multipart kecil (bukan Base64 di JSON)
 // agar tidak menyentuh batas payload. Khusus editor CMS (cookie admin).
 // Batas server 4 MB: mencegah crash memori serverless Vercel (limit ~4.5 MB).

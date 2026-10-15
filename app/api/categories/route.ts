@@ -1,6 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getEditorialSession } from "@/lib/auth";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge.
+export const runtime = 'nodejs';
+
 async function requireAdmin() {
   const session = await getEditorialSession();
   if (!session) {

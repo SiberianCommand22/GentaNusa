@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { ADMIN_FLAG_COOKIE, SESSION_COOKIE, TOKEN_COOKIE } from "@/lib/auth";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge.
+export const runtime = 'nodejs';
+
 // Cookie sesi bawaan @supabase/ssr di browser (`sb-<ref>-auth-token*`).
 // Dibersihkan best-effort saat logout karena halaman login kini juga
 // menyinkronkan sesi browser (setSession) selain cookie httpOnly kustom.

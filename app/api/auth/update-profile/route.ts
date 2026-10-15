@@ -6,6 +6,9 @@ import { rateLimit } from "@/app/api/rate-limit";
 
 export const dynamic = "force-dynamic";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge.
+export const runtime = 'nodejs';
+
 // POST|PATCH /api/auth/update-profile — perbarui nama tampilan penulis.
 // displayName 2–60 karakter; ditulis ke user_metadata via token sesi milik
 // user sendiri (cakupan tepat akun sendiri, bukan service key).

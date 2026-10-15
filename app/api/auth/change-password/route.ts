@@ -5,6 +5,9 @@ import { rateLimit } from "@/app/api/rate-limit";
 
 export const dynamic = "force-dynamic";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge.
+export const runtime = 'nodejs';
+
 function passwordIssues(pw: string): string | null {
   if (pw.length < 8) return "Kata sandi baru minimal 8 karakter.";
   if (!/[A-Za-z]/.test(pw) || !/[0-9]/.test(pw) || !/[^A-Za-z0-9]/.test(pw)) {

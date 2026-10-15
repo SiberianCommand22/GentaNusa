@@ -3,6 +3,9 @@ import { recordAnalytics } from "@/lib/analytics-server";
 import { getArticles } from "@/lib/data";
 import { rateLimit } from "@/app/api/rate-limit";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge.
+export const runtime = 'nodejs';
+
 // Endpoint pencatat view — TIDAK PERNAH mengembalikan 4xx/5xx ke browser.
 // Payload tracker yang belum lengkap (mis. tanpa articleId) atau kegagalan
 // penyimpanan dijawab 200 `{ ok: false }` agar konsol browser bersih;

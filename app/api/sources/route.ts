@@ -3,6 +3,9 @@ import { adminClient, isSupabaseReady } from "@/lib/supabase";
 import { getEditorialSession } from "@/lib/auth";
 import { apiError } from "../error-handler";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge.
+export const runtime = 'nodejs';
+
 // Penulis endpoint ini: administrator saja — diverifikasi lewat sesi
 // Supabase Auth, bukan flag cookie mentah.
 async function requireAdmin() {

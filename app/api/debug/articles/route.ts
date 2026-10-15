@@ -3,6 +3,9 @@ import { adminClient, isSupabaseReady } from "@/lib/supabase";
 import { getEditorialSession } from "@/lib/auth";
 import { getArticles, getCategories } from "@/lib/data";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge.
+export const runtime = 'nodejs';
+
 export async function GET() {
   if (process.env.NODE_ENV === "production") {
     return new NextResponse(null, { status: 404 });

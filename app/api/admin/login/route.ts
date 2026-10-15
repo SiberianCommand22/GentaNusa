@@ -8,6 +8,9 @@ import {
 } from "@/lib/auth";
 import { canAccessAdminArea, isMasterEmail } from "@/lib/roles";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge.
+export const runtime = 'nodejs';
+
 // Rate limit per IP+email (in-memory per instance; dilapisi Cloudflare WAF,
 // lihat SECURITY.md). Kunci gabungan mencegah satu IP mengunci seluruh
 // pengguna dan mencegah satu email mengunci banyak IP di serverless Vercel.
