@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "sync": "node scripts/sync-supabase.mjs",
-    "build": "next build",
-    "build:sync": "node scripts/sync-supabase.mjs && next build",
+    "build": "next build --webpack",
+    "build:sync": "node scripts/sync-supabase.mjs && next build --webpack",
     "start": "next start",
     "seed": "node scripts/seed-users.js",
     "lint": "eslint"
