@@ -22,6 +22,10 @@ import {
 // searchParams per request). Mencegah 500 kosong dari prerender-prod.
 export const dynamic = "force-dynamic";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge
+// (batas 1 MB paket Hobby): rute ini memakai fetch PostgREST + JSON besar.
+export const runtime = "nodejs";
+
 function slugify(value: string): string {
   return (
     String(value || "")

@@ -21,6 +21,10 @@ import {
 // Selalu dinamis: baca cookie sesi + searchParams per request.
 export const dynamic = "force-dynamic";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge
+// (batas 1 MB paket Hobby).
+export const runtime = "nodejs";
+
 function slugify(value: string): string {
   return (
     String(value || "")
