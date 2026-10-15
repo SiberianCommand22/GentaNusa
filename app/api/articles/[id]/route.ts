@@ -1,14 +1,19 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
-import { getEditorialSession, resolveAuthorName } from "@/lib/auth";
+// RINGAN KUOTA: impor data HANYA dari fetch-REST murni (tanpa supabase-js
+// ±215 KB) agar bundel fungsi tetap di bawah batas 1 MB paket Hobby.
 import {
   ACCESS_DENIED_DELETE,
-  ARTICLE_COLUMNS_WITH_OWNER,
-  ensureSupabaseServiceClient,
-  fetchArticleForSession,
-  sanitizeSlug,
-  type ArticleRow,
-} from "@/lib/editorial-articles";
+  deleteArticleById,
+  ensureRestClient,
+  fetchArticleForSessionRest as fetchArticleForSession,
+  getArticleByIdLite as getArticle,
+  getArticleBySlugOrIdLite,
+  getEditorialSessionRest as getEditorialSession,
+  resolveAuthorNameRest as resolveAuthorName,
+  sanitizeSlugRest as sanitizeSlug,
+  updateArticleTolerant,
+} from "@/lib/supabase-rest";
 // Sanitizer backend regex-murni (`lib/sanitize-server`, NOL jsdom/DOM)
 // dimuat malas di dalam handler tulis saja — tidak ada impor DOM di bundle
 // serverless, sehingga ERR_REQUIRE_ESM tidak mungkin terjadi.
@@ -26,71 +31,6 @@ function slugify(value: string): string {
   );
 }
 
-// Skema resmi mencakup kolom `status` TEXT ('published' | 'draft').
-// Update dikirim lengkap; setiap kolom yang ditolak schema-cache dibuang
-// satu per satu lalu diulang (zero data loss, toleran antar-lingkungan).
-function isMissingColumnError(message: string): { column: string } | null {
-  const m = /Could not find the '([^']+)' column/i.exec(message || "");
-  return m ? { column: m[1] } : null;
-}
-
-async function updateTolerant(
-  // Builder Supabase dinamis (tipe generik PostgREST) — any terisolasi di sini.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  client: { from: (t: string) => any },
-  id: string,
-  values: Record<string, unknown>
-) {
-  const pending: Record<string, unknown> = { ...values };
-  let lastError: { message: string } | null = null;
-  for (let attempt = 0; attempt < 8; attempt++) {
-    const { data, error } = await client
-      .from("articles")
-      .update(pending)
-      .eq("id", id)
-      .select()
-      .single();
-    if (!error) return { data, error: null };
-    const miss = isMissingColumnError(error.message);
-    if (!miss || !(miss.column in pending)) return { data: null, error };
-    delete pending[miss.column];
-    lastError = error;
-  }
-  return { data: null, error: lastError };
-}
-
-async function getArticle(id: string, publishedOnly: boolean): Promise<ArticleRow | null> {
-  const c = ensureSupabaseServiceClient();
-  if (!c.ok) return null;
-  let columns = ARTICLE_COLUMNS_WITH_OWNER;
-  for (let attempt = 0; attempt < 8; attempt++) {
-    let query = c.client
-      .from("articles")
-      .select(columns)
-      .eq("id", id);
-    // HIGH-1: pemanggil tanpa sesi admin TIDAK BOLEH menerima draf —
-    // filter di sisi query, bukan di JS pasca-baca.
-    if (publishedOnly) query = query.eq("status", "published");
-    const res = await query.maybeSingle();
-    if (!res.error) return (res.data as ArticleRow | null) ?? null;
-    const m = /Could not find the '([^']+)' column/i.exec(res.error.message || "");
-    if (!m) {
-      // Skema tanpa kolom `status`: ambil tanpa filter lalu tegakkan di JS
-      // (fail-closed — baris non-published tetap ditolak).
-      if (publishedOnly) {
-        const fallback = await getArticle(id, false);
-        return fallback && fallback.status === "published" ? fallback : null;
-      }
-      return null;
-    }
-    const parts = columns.split(",").map((s) => s.trim()).filter(Boolean);
-    const kept = parts.filter((p) => p !== m[1]);
-    if (kept.length === parts.length) return null;
-    columns = kept.join(",");
-  }
-  return null;
-}
-
 // GET /api/articles/[id] — satu artikel (publik).
 // ?scope=edit — mode editor: MENJAGA KEPEMILIKAN (penulis lain → 403).
 // Mendukung slug SEO maupun ID numerik lawas.
@@ -103,7 +43,7 @@ export async function GET(
   const wantsEditScope = req.nextUrl.searchParams.get("scope") === "edit";
 
   if (wantsEditScope) {
-    const session = await getEditorialSession();
+    const session = await getEditorialSession(req.headers.get("cookie"));
     if (!session) {
       return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
     }
@@ -120,7 +60,7 @@ export async function GET(
   if (/^\d+$/.test(raw)) {
     const pub = await getArticle(String(Number(raw)), true);
     if (pub) return NextResponse.json(pub);
-    const session = await getEditorialSession();
+    const session = await getEditorialSession(req.headers.get("cookie"));
     if (session?.isAdmin) {
       const data = await getArticle(String(Number(raw)), false);
       if (data) return NextResponse.json(data);
@@ -128,8 +68,7 @@ export async function GET(
     return NextResponse.json({ error: "Tidak ditemukan" }, { status: 404 });
   }
   // Fallback: cocokkan slug turunan (tanpa perlu kolom slug di DB).
-  const { getArticleBySlugOrId } = await import("@/lib/data");
-  const bySlug = await getArticleBySlugOrId(id);
+  const bySlug = await getArticleBySlugOrIdLite(id);
   if (bySlug) return NextResponse.json(bySlug);
   return NextResponse.json({ error: "Tidak ditemukan" }, { status: 404 });
 }
@@ -141,11 +80,11 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getEditorialSession();
+  const session = await getEditorialSession(req.headers.get("cookie"));
   if (!session) {
     return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
   }
-  const c = ensureSupabaseServiceClient();
+  const c = ensureRestClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
 
   const { id } = await params;
@@ -244,7 +183,7 @@ export async function PUT(
         : null)
   );
 
-  const { data, error } = await updateTolerant(c.client, id, fullUpdate);
+  const { data, error } = await updateArticleTolerant(id, fullUpdate);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
@@ -280,19 +219,19 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getEditorialSession();
+  const session = await getEditorialSession(req.headers.get("cookie"));
   if (!session) {
     return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
   }
   if (!session.isAdmin) {
     return NextResponse.json({ error: ACCESS_DENIED_DELETE }, { status: 403 });
   }
-  const c = ensureSupabaseServiceClient();
+  const c = ensureRestClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
 
   const { id } = await params;
   // Permanent delete via service_role (bypass RLS) — admin only (dicek di atas).
-  const { error } = await c.client.from("articles").delete().eq("id", id);
+  const { error } = await deleteArticleById(id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
   revalidatePath("/kategori");

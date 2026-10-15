@@ -1,14 +1,19 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
-import { getEditorialSession, resolveAuthorName } from "@/lib/auth";
-import { getArticles } from "@/lib/data";
+// RINGAN KUOTA: impor data HANYA dari fetch-REST murni (tanpa supabase-js
+// ±215 KB) agar bundel fungsi tetap di bawah batas 1 MB paket Hobby.
 import {
   ACCESS_DENIED_DELETE,
-  ensureSupabaseServiceClient,
-  fetchArticlesForSession,
-  sanitizeSlug,
-} from "@/lib/editorial-articles";
+  deleteArticleById,
+  ensureRestClient,
+  fetchArticlesForSessionRest as fetchArticlesForSession,
+  getEditorialSessionRest as getEditorialSession,
+  getPublicArticlesLite as getArticles,
+  insertArticleTolerant,
+  resolveAuthorNameRest as resolveAuthorName,
+  sanitizeSlugRest as sanitizeSlug,
+} from "@/lib/supabase-rest";
 // Sanitizer backend regex-murni (`lib/sanitize-server`, NOL jsdom/DOM)
 // dimuat malas di dalam handler tulis saja — tidak ada impor DOM di bundle
 // serverless, sehingga ERR_REQUIRE_ESM tidak mungkin terjadi.
@@ -41,7 +46,7 @@ export async function GET(req: NextRequest) {
     // ditelan halaman admin menjadi tabel kosong "0 berita".
     let session;
     try {
-      session = await getEditorialSession();
+      session = await getEditorialSession(req.headers.get("cookie"));
     } catch {
       return NextResponse.json(
         { error: "Gagal memeriksa sesi. Coba muat ulang halaman." },
@@ -67,7 +72,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(result.data);
   }
 
-  const c = ensureSupabaseServiceClient();
+  const c = ensureRestClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
   try {
     const articles = await getArticles();
@@ -93,11 +98,11 @@ export async function GET(req: NextRequest) {
 // Kepemilikan dikunci permanen: user_id diisi dari SESI server, bukan dari
 // payload klien, sehingga artikel tidak bisa "dipinjam" penulis lain.
 export async function POST(req: NextRequest) {
-  const session = await getEditorialSession();
+  const session = await getEditorialSession(req.headers.get("cookie"));
   if (!session) {
     return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
   }
-  const c = ensureSupabaseServiceClient();
+  const c = ensureRestClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
 
   let body: Record<string, unknown>;
@@ -203,19 +208,9 @@ export async function POST(req: NextRequest) {
   allowedPayload.secondary_image_caption = secondaryCaption;
   allowedPayload.secondary_image_credit = secondaryCredit;
 
-  const pending: Record<string, unknown> = { ...allowedPayload };
-  let data = null;
-  let error: { message?: string } | null = null;
-  for (let attempt = 0; attempt < 8; attempt++) {
-    const res = await c.client.from("articles").insert([pending]).select().single();
-    data = res.data;
-    error = res.error;
-    if (!error) break;
-    const m = /Could not find the '([^']+)' column/i.exec(error.message || "");
-    if (!m || !(m[1] in pending)) break;
-    delete pending[m[1]];
-    error = null;
-  }
+  // Insert toleran skema via PostgREST murni (kolom yang belum ada di DB
+  // dikupas otomatis, maks 8x — zero data loss antar-lingkungan).
+  const { data, error } = await insertArticleTolerant({ ...allowedPayload });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
@@ -248,14 +243,14 @@ export async function POST(req: NextRequest) {
 // DELETE — hapus artikel. HAK EKSKLUSIF ADMINISTRATOR.
 // Penulis biasa: 403 Forbidden, apa pun status sesinya.
 export async function DELETE(req: NextRequest) {
-  const session = await getEditorialSession();
+  const session = await getEditorialSession(req.headers.get("cookie"));
   if (!session) {
     return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
   }
   if (!session.isAdmin) {
     return NextResponse.json({ error: ACCESS_DENIED_DELETE }, { status: 403 });
   }
-  const c = ensureSupabaseServiceClient();
+  const c = ensureRestClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
   const id = req.nextUrl.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id wajib" }, { status: 400 });
@@ -263,7 +258,7 @@ export async function DELETE(req: NextRequest) {
   if (!Number.isFinite(numId) || numId <= 0) {
     return NextResponse.json({ error: "id tidak valid" }, { status: 400 });
   }
-  const { error } = await c.client.from("articles").delete().eq("id", numId);
+  const { error } = await deleteArticleById(numId);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
   revalidatePath("/kategori");

@@ -1,14 +1,18 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
+import { sessionFromRestUser, verifyAuthToken } from "@/lib/supabase-rest";
 import { canAccessAdminArea, TOKEN_COOKIE } from "@/lib/roles";
 
 // Guard tepi ruang redaksi GentaNusa.
 //
+// RINGAN KUOTA EDGE (batas 1 MB paket Hobby): middleware ini SENGAJA tidak
+// mengimpor `@supabase/ssr` / `@supabase/supabase-js` (menyeret realtime +
+// phoenix + gotrue + storage, ±215 KB). Verifikasi sesi memakai `fetch`
+// murni ke Supabase Auth (`lib/supabase-rest.ts`, nol dependensi).
+//
 // - Meneruskan header asli Cloudflare tanpa menimpa/memblokir.
 // - Melarang cache agresif pada rute dinamis redaksi (/admin/*).
 // - /admin/:path* (kecuali halaman login privat) WAJIB sesi Supabase Auth
-//   terverifikasi via @supabase/ssr + peran redaksi
+//   terverifikasi via fetch murni + peran redaksi
 //   (app_metadata.role dalam EDITORIAL_ROLES lib/roles.ts: admin + seluruh
 //   varian redaksi editor/author/writer/penulis/jurnalis/dll, case-insensitive).
 //   - Belum login  -> redirect ke /admin/login/gentanusa (form login privat;
@@ -20,7 +24,7 @@ import { canAccessAdminArea, TOKEN_COOKIE } from "@/lib/roles";
 // - API internal (/api/*) TIDAK diautentikasi di sini dan TIDAK melewati
 //   middleware sama sekali (matcher di bawah hanya /admin/* — hemat kuota
 //   Edge Middleware Invocations dari pembaca publik). Setiap route handler
-//   menegakkan sesinya sendiri via lib/auth.ts (getEditorialSession), dan
+//   menegakkan sesinya sendiri via fetch murni, dan
 //   Cache-Control: no-store untuk API dipasang via headers() di next.config
 //   (tanpa biaya invocation).
 //
@@ -30,9 +34,6 @@ import { canAccessAdminArea, TOKEN_COOKIE } from "@/lib/roles";
 // route handler API, skrip server).
 
 // Gerbang peran terpusat (lib/roles.ts) — dipakai identik oleh login API.
-function hasEditorialRole(role: unknown, email: unknown): boolean {
-  return canAccessAdminArea(role, email);
-}
 
 export async function middleware(req: NextRequest) {
   // Middleware TIDAK BOLEH melempar: crash di sini = 500 tanpa body untuk
@@ -71,71 +72,36 @@ async function guard(req: NextRequest) {
     return NextResponse.next({ request: { headers: outgoing } });
   }
 
-  // ---- /admin/:path* terproteksi: validasi sesi via @supabase/ssr ----
+  // ---- /admin/:path* terproteksi: validasi sesi via fetch murni ----
+  // SATU panggilan verifikasi token (hemat latensi Edge): tanpa token /
+  // token tak valid → halaman login (bawa `next`); token valid tapi bukan
+  // peran redaksi → beranda `/`. TIDAK PERNAH melempar (fail-closed).
   const res = NextResponse.next({ request: { headers: outgoing } });
   res.headers.set("Cache-Control", "no-store");
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     // Konfigurasi backend belum lengkap — jangan bocorkan dasbor.
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  const supabase = createServerClient(url, anonKey, {
-    cookies: {
-      getAll: () => req.cookies.getAll(),
-      // Middleware tepi: read-only terhadap cookie sesi.
-      setAll: () => {},
-    },
-  });
-
-  type EdgeUser = {
-    email?: string | null;
-    email_confirmed_at?: string | null;
-    confirmed_at?: string | null;
-    app_metadata?: Record<string, unknown> | null;
-  };
-  let user: EdgeUser | null = null;
-  try {
-    const { data } = await supabase.auth.getUser();
-    user = (data?.user as unknown as EdgeUser | null) ?? null;
-  } catch {
-    user = null;
+  const token = req.cookies.get(TOKEN_COOKIE)?.value ?? null;
+  if (!token) {
+    const loginUrl = new URL("/admin/login/gentanusa", req.url);
+    loginUrl.searchParams.set("next", path);
+    return NextResponse.redirect(loginUrl);
   }
 
-  // FALLBACK ANTI REDIRECT-LOOP: `/api/admin/login` menulis sesi ke cookie
-  // `genta_token` (httpOnly), BUKAN ke cookie bawaan @supabase/ssr
-  // (`sb-<ref>-auth-token`). Tanpa fallback ini, getUser() di atas SELALU
-  // null setelah login dan setiap request /admin mental kembali ke halaman
-  // login meskipun kredensial benar. Verifikasi token langsung ke Supabase.
-  if (!user) {
-    const token = req.cookies.get(TOKEN_COOKIE)?.value;
-    if (token) {
-      try {
-        const direct = createClient(url, anonKey, {
-          auth: { persistSession: false, autoRefreshToken: false },
-        });
-        const { data, error } = await direct.auth.getUser(token);
-        if (!error && data?.user) user = data.user as unknown as EdgeUser;
-      } catch {
-        // token tidak valid — biarkan jatuh ke redirect login di bawah
-      }
-    }
-  }
-
+  const user = await verifyAuthToken(token);
   if (!user) {
     const loginUrl = new URL("/admin/login/gentanusa", req.url);
     loginUrl.searchParams.set("next", path);
     return NextResponse.redirect(loginUrl);
   }
 
-  const role = (user.app_metadata as Record<string, unknown> | null)?.role;
+  const session = sessionFromRestUser(user);
   // Kecocokan email master hanya untuk identitas TERVERIFIKASI — selaras
-  // dengan lib/auth.ts (isAdminIdentity). Tanpa konfirmasi, email saja
-  // tidak memberi hak masuk area redaksi.
-  const verifiedEmail = user.email_confirmed_at || user.confirmed_at ? user.email : null;
-  if (!hasEditorialRole(role, verifiedEmail)) {
+  // dengan lib/auth.ts (isAdminIdentity).
+  if (!canAccessAdminArea(session.appRole, session.emailVerified ? session.email : null)) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
