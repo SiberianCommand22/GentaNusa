@@ -1,5 +1,5 @@
 import styles from "./article-content.module.css";
-import { sanitizeHtml, decodeEscapedHtml } from "@/lib/sanitize-html";
+import { cleanArticleHtml, decodeEscapedHtml } from "@/lib/sanitize-regex";
 
 export type ContentBlock = string;
 
@@ -87,13 +87,13 @@ export function ArticleContent({ content }: { content: ContentBlock[] }) {
         // tanpa menunggu tag <blockquote> dari CMS.
         if (isQuoteParagraph(raw) && !/<[a-z][\s\S]*>/i.test(raw)) {
           const quoteText = stripQuoteMarkers(raw);
-          const html = sanitizeHtml(parseInline(quoteText));
+          const html = cleanArticleHtml(parseInline(quoteText));
           return <blockquote key={i} className={`${styles.quote} ${QUOTE_TW}`} dangerouslySetInnerHTML={{ __html: html }} />;
         }
         // Dekode entitas escape dulu, lalu sanitasi. Render SELALU via
         // dangerouslySetInnerHTML — jangan pernah `{p}` teks biasa.
         const decoded = decodeEscapedHtml(raw);
-        const html = sanitizeHtml(decoded.includes("<") ? decoded : parseInline(legacyToHtml(decoded)));
+        const html = cleanArticleHtml(decoded.includes("<") ? decoded : parseInline(legacyToHtml(decoded)));
         if (BLOCK_TAG.test(html)) {
           return <div key={i} className={`${styles.rawBlock} ${JUSTIFY}`} dangerouslySetInnerHTML={{ __html: html }} />;
         }
@@ -101,7 +101,7 @@ export function ArticleContent({ content }: { content: ContentBlock[] }) {
         // (mis. lolos dari toolbar) tetap diangkat jadi blockquote.
         const textOnly = html.replace(/<[^>]*>/g, "").trim();
         if (QUOTE_START.test(html.trimStart()) || isQuoteParagraph(textOnly)) {
-          const inner = sanitizeHtml(parseInline(stripQuoteMarkers(textOnly)));
+          const inner = cleanArticleHtml(parseInline(stripQuoteMarkers(textOnly)));
           return <blockquote key={i} className={`${styles.quote} ${QUOTE_TW}`} dangerouslySetInnerHTML={{ __html: inner }} />;
         }
         return (

@@ -28,7 +28,7 @@
 - Rate limiting login: 5 percobaan per 15 menit per IP
 - Timing-safe password compare (`timingSafeEqual`)
 - Cookie admin: `httpOnly`, `secure`, `sameSite: lax`, path `/api/admin`
-- XSS sanitasi pada konten artikel (DOMPurify)
+- XSS sanitasi pada konten artikel (regex murni `lib/sanitize-regex.ts`, tanpa jsdom)
 - Validasi input: ID numerik wajib pada `/api/articles/[id]`
 - Error handling: detail error hanya di development, production → generic message
 - RLS aktif di Supabase (publik baca, admin tulis via service_role)

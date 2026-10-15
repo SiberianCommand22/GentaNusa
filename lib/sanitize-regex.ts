@@ -6,8 +6,8 @@
  * Serverless Functions (jalur tulis `POST/PUT /api/articles`) tanpa pernah
  * memicu `Error [ERR_REQUIRE_ESM]: require() of ES Module`.
  *
- * Kebijakan allowlist TUNGGAL dipakai bersama `lib/sanitize-html.ts`
- * (Lapis 2) dan `lib/sanitize-server.ts` (satu-satunya sanitasi backend).
+ * Kebijakan allowlist TUNGGAL dipakai bersama `lib/sanitize-server.ts`
+ * (satu-satunya sanitasi backend) dan komponen render/editor frontend.
  */
 
 // Tag yang boleh lolos sanitasi.

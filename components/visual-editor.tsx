@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import styles from "./visual-editor.module.css";
-import { sanitizeHtml } from "@/lib/sanitize-html";
+import { cleanArticleHtml } from "@/lib/sanitize-regex";
 
 type VisualEditorProps = {
   value: string;
@@ -102,7 +102,7 @@ export function VisualEditor({ value, onChange, placeholder, id, labelledBy }: V
     if (!el) return;
     const next = value || "";
     if (next !== lastHtml.current && document.activeElement !== el) {
-      const safe = next.includes("<") ? sanitizeHtml(next) : next;
+      const safe = next.includes("<") ? cleanArticleHtml(next) : next;
       el.innerHTML = safe;
       lastHtml.current = safe;
     }

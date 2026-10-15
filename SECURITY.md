@@ -9,7 +9,7 @@
 | 3 | Debug mode OFF | ✅ | `poweredByHeader: false`, `generateEtags: true` |
 | 4 | Error jangan bocor | ✅ | `apiError()` — detail hanya di dev |
 | 5 | Validasi input | ✅ | `/api/articles/[id]` ID numerik → 400 jika bukan |
-| 6 | Sanitasi input | ✅ | `article-content.tsx` + DOMPurify |
+| 6 | Sanitasi input | ✅ | `lib/sanitize-regex.ts` (regex murni, nol jsdom) |
 | 7 | Anti SQL injection | ✅ | Supabase ORM (parameterized) |
 | 8 | Anti XSS | ✅ | Sanitizer + CSP header |
 | 9 | Server-side auth | ✅ | Cookie `genta_admin` di server |
