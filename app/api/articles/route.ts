@@ -120,16 +120,80 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Body JSON tidak valid" }, { status: 400 });
   }
 
-  const required = ["title", "category", "excerpt", "content", "tags"];
-  for (const field of required) {
-    if (!body[field]) {
-      return NextResponse.json({ error: `${field} wajib` }, { status: 400 });
-    }
-  }
-
   // Skema resmi: kolom `status` TEXT ('published' | 'draft') ADA di DB.
   // Nilai divalidasi ketat — selain 'draft' selalu menjadi 'published'.
   const status = body.status === "draft" ? "draft" : "published";
+
+  // Aturan validasi dipisah: draf fleksibel, publikasi ketat standar redaksi.
+  if (status === "draft") {
+    // Draf: hanya judul yang wajib agar jurnalis bisa menyimpan progresif.
+    // `excerpt` (Kutipan/Lead) TIDAK BOLEH WAJIB untuk draf.
+    const titleDraft = typeof body.title === "string" ? body.title.trim() : "";
+    if (!titleDraft) {
+      return NextResponse.json({ error: "title wajib" }, { status: 400 });
+    }
+  } else {
+    const required = ["title", "category", "excerpt", "content", "tags"];
+    for (const field of required) {
+      const v = body[field];
+      const empty =
+        v === undefined ||
+        v === null ||
+        (typeof v === "string" && !v.trim()) ||
+        (Array.isArray(v) && v.length === 0);
+      if (empty || !v) {
+        return NextResponse.json({ error: `${field} wajib` }, { status: 400 });
+      }
+    }
+  }
+
+  // Fallback excerpt draf: "" atau 150 karakter pertama content/judul agar
+  // kolom NOT NULL di Supabase tidak menolak penyimpanan draf.
+  function excerptFallback(): string {
+    const raw =
+      typeof body.excerpt === "string" && body.excerpt.trim()
+        ? body.excerpt.trim()
+        : typeof body.lead === "string" && body.lead.trim()
+          ? body.lead.trim()
+          : "";
+    if (raw) return raw;
+    if (status === "published") return raw;
+    const titlePart = typeof body.title === "string" ? body.title.trim() : "";
+    let textPart = "";
+    const c = body.content;
+    if (typeof c === "string") {
+      textPart = c
+        .replace(/<[^>]*>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      // Bila content berupa JSON string array blok, coba parse dulu.
+      if (textPart.startsWith("[") && textPart.endsWith("]")) {
+        try {
+          const parsed: unknown = JSON.parse(c);
+          if (Array.isArray(parsed)) {
+            textPart = parsed
+              .filter((x): x is string => typeof x === "string")
+              .map((s) => s.replace(/<[^>]*>/g, " "))
+              .join(" ")
+              .replace(/\s+/g, " ")
+              .trim();
+          }
+        } catch {
+          // abaikan — pakai textPart apa adanya
+        }
+      }
+    } else if (Array.isArray(c)) {
+      textPart = c
+        .filter((x): x is string => typeof x === "string")
+        .map((s) => s.replace(/<[^>]*>/g, " "))
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+    const combined = textPart || titlePart;
+    return combined.slice(0, 150);
+  }
+  const excerptFinal = excerptFallback();
   const todayWIB = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(new Date());
 
   const requestedAuthor = typeof body.author === "string" ? body.author.trim() : "";
@@ -157,12 +221,17 @@ export async function POST(req: NextRequest) {
   // di Vercel Serverless). Modul server-only, dimuat malas di jalur tulis.
   const { sanitizeContentInputServer } = await import("@/lib/sanitize-server");
   const allowedPayload: Record<string, unknown> = {
-    title: body.title,
-    category: body.category,
-    excerpt: body.excerpt,
-    content: sanitizeContentInputServer(body.content) ?? [],
+    title: typeof body.title === "string" ? body.title.trim() : body.title,
+    category:
+      typeof body.category === "string" && body.category.trim()
+        ? body.category
+        : status === "draft"
+          ? "Nasional"
+          : body.category,
+    excerpt: excerptFinal,
+    content: sanitizeContentInputServer(body.content ?? []) ?? [],
     image: body.image ?? body.cover_image ?? null,
-    tags: body.tags,
+    tags: body.tags ?? [],
     author,
     author_slug: authorSlug,
     author_role:
@@ -172,7 +241,10 @@ export async function POST(req: NextRequest) {
     date: body.date || todayWIB,
     image_caption: body.image_caption ?? "",
     image_credit: body.image_credit ?? "",
-    lead: body.lead ?? body.excerpt,
+    lead:
+      typeof body.lead === "string" && body.lead.trim()
+        ? body.lead
+        : excerptFinal,
     status,
     // Kunci kepemilikan (Pilar 3.4). Null bila migrasi kolom belum jalan —
     // helper pemBACAan sudah tolerate hal ini via author_slug.

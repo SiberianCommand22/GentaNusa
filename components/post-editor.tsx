@@ -478,7 +478,9 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
     }, 50);
   }
 
-  // Handler A — Simpan Draf: validasi minimal (judul), status eksplisit 'draft'.
+  // Handler A — Simpan Draf: validasi minimal (judul SAJA), status eksplisit
+  // 'draft'. SENGAJA tidak memvalidasi `excerpt`/lead agar jurnalis bisa
+  // menyimpan draf progresif tanpa terblokir — excerpt opsional untuk draf.
   async function handleSaveDraft() {
     setMsg("");
     setOkMsg("");
@@ -517,10 +519,18 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
       const secondaryImagePath = secondaryRaw ? secondaryRaw : null;
       const secondaryCaptionRaw = form.secondary_image_caption.trim();
       const secondaryCreditRaw = form.secondary_image_credit.trim();
+      // Draf: excerpt opsional — fallback "" (atau 150 karakter pertama
+      // konten/judul bila DB NOT NULL) agar tidak 400 `excerpt wajib`.
+      const excerptTrimmed = form.excerpt.trim();
+      const draftFallback =
+        excerptTrimmed ||
+        htmlToText(form.content).replace(/\s+/g, " ").trim().slice(0, 150) ||
+        title.slice(0, 150) ||
+        "";
       const draftPayload = {
         title,
         category: form.category || "Nasional",
-        excerpt: form.excerpt.trim(),
+        excerpt: excerptTrimmed || draftFallback || "",
         content: JSON.stringify(paras),
         image: imagePath,
         optional_image: secondaryImagePath,
@@ -537,7 +547,7 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         image_credit: form.image_credit.trim(),
         secondary_image_caption: secondaryCaptionRaw ? secondaryCaptionRaw : null,
         secondary_image_credit: secondaryCreditRaw ? secondaryCreditRaw : null,
-        lead: form.excerpt.trim(),
+        lead: excerptTrimmed || draftFallback || "",
         status: "draft",
       };
       const targetUrl = activeId ? `/api/articles/${activeId}` : "/api/articles";

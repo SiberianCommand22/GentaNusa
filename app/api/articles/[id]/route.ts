@@ -110,6 +110,99 @@ export async function PUT(
   // staging. Inilah akar bug lama: update ke published menimpa author_slug
   // dengan prefix staging- sehingga baris tak pernah lolos filter publik.
   const status = body.status === "draft" ? "draft" : "published";
+
+  // Aturan validasi dipisah: draf fleksibel (excerpt opsional), publikasi
+  // ketat standar redaksi (excerpt/kategori/judul wajib).
+  if (status === "draft") {
+    // Draf: excerpt TIDAK BOLEH WAJIB — kosong/null diterima, fallback "".
+    const titleVal =
+      typeof body.title === "string"
+        ? body.title.trim()
+        : typeof existing.title === "string"
+          ? String(existing.title).trim()
+          : "";
+    if (!titleVal && !body.title) {
+      // Izinkan update parsial draf selama baris existing punya judul;
+      // tolak hanya bila keduanya kosong.
+      const existingTitle =
+        typeof existing.title === "string" ? existing.title.trim() : "";
+      if (!existingTitle) {
+        return NextResponse.json({ error: "title wajib" }, { status: 400 });
+      }
+    }
+  } else {
+    const required = ["title", "category", "excerpt", "content", "tags"];
+    for (const field of required) {
+      const v =
+        body[field] !== undefined && body[field] !== null
+          ? body[field]
+          : (existing as Record<string, unknown>)[field];
+      const empty =
+        v === undefined ||
+        v === null ||
+        (typeof v === "string" && !v.trim()) ||
+        (Array.isArray(v) && v.length === 0);
+      if (empty) {
+        return NextResponse.json({ error: `${field} wajib` }, { status: 400 });
+      }
+    }
+  }
+
+  // Fallback excerpt draf: "" atau 150 karakter pertama content/judul agar
+  // kolom NOT NULL di Supabase tidak menolak penyimpanan draf.
+  function resolveExcerpt(): string {
+    const raw =
+      typeof body.excerpt === "string" && body.excerpt.trim()
+        ? body.excerpt.trim()
+        : typeof body.lead === "string" && body.lead.trim()
+          ? body.lead.trim()
+          : typeof existing.excerpt === "string" && existing.excerpt.trim()
+            ? String(existing.excerpt).trim()
+            : "";
+    if (raw) return raw;
+    if (status === "published") return raw;
+    const titlePart =
+      typeof body.title === "string" && body.title.trim()
+        ? body.title.trim()
+        : typeof existing.title === "string"
+          ? String(existing.title).trim()
+          : "";
+    let textPart = "";
+    const c = body.content ?? existing.content;
+    const strip = (s: string) =>
+      s.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    if (typeof c === "string") {
+      const trimmed = c.trim();
+      if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+        try {
+          const parsed: unknown = JSON.parse(trimmed === "" ? "[]" : trimmed);
+          if (Array.isArray(parsed)) {
+            textPart = parsed
+              .filter((x): x is string => typeof x === "string")
+              .map(strip)
+              .join(" ")
+              .replace(/\s+/g, " ")
+              .trim();
+          } else {
+            textPart = strip(c);
+          }
+        } catch {
+          textPart = strip(c);
+        }
+      } else {
+        textPart = strip(c);
+      }
+    } else if (Array.isArray(c)) {
+      textPart = c
+        .filter((x): x is string => typeof x === "string")
+        .map(strip)
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+    return (textPart || titlePart).slice(0, 150);
+  }
+  const excerptFinal = resolveExcerpt();
   const requestedSlug =
     typeof body.author_slug === "string"
       ? body.author_slug.trim()
@@ -137,12 +230,13 @@ export async function PUT(
   // di Vercel Serverless). Modul server-only, dimuat malas di jalur tulis.
   const { sanitizeContentInputServer } = await import("@/lib/sanitize-server");
   const fullUpdate: Record<string, unknown> = {
-    title: body.title,
-    category: body.category,
-    excerpt: body.excerpt,
-    content: sanitizeContentInputServer(body.content) ?? [],
-    image: body.image ?? body.cover_image ?? null,
-    tags: body.tags ?? [],
+    title: body.title ?? existing.title,
+    category: body.category ?? existing.category ?? "Nasional",
+    excerpt: excerptFinal,
+    content:
+      sanitizeContentInputServer(body.content ?? existing.content ?? []) ?? [],
+    image: body.image ?? body.cover_image ?? existing.image ?? null,
+    tags: body.tags ?? existing.tags ?? [],
     author,
     author_slug: authorSlug,
     author_role:
@@ -150,10 +244,13 @@ export async function PUT(
       (typeof body.authorRole === "string" && body.authorRole) ||
       existing.author_role ||
       null,
-    date: body.date,
-    image_caption: body.image_caption ?? "",
-    image_credit: body.image_credit ?? "",
-    lead: body.lead ?? body.excerpt,
+    date: body.date ?? existing.date,
+    image_caption: body.image_caption ?? existing.image_caption ?? "",
+    image_credit: body.image_credit ?? existing.image_credit ?? "",
+    lead:
+      typeof body.lead === "string" && body.lead.trim()
+        ? body.lead
+        : excerptFinal,
     status,
     // `user_id` SENGAJA tidak ditulis di sini: kepemilikan artikel bersifat
     // permanen sejak baris pertama dibuat (tidak bisa dialihkan-ecak oleh
