@@ -2,6 +2,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
 import { getEditorialSession } from "@/lib/auth";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge
+// (batas 1 MB paket Hobby).
+export const runtime = "nodejs";
+
 // Statistik artikel: administrator saja — sesi wajib terverifikasi
 // Supabase Auth, bukan flag cookie mentah.
 async function requireAdmin() {

@@ -4,6 +4,10 @@ import { adminClient, isSupabaseReady } from "@/lib/supabase";
 import { getEditorialSession } from "@/lib/auth";
 import { rateLimit } from "@/app/api/rate-limit";
 
+// Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge
+// (batas 1 MB paket Hobby + `node:crypto` hanya ada di Node).
+export const runtime = "nodejs";
+
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 const EXTENSIONS = {
   "image/jpeg": ".jpg",
