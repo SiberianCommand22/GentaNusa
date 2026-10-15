@@ -1,133 +1,47 @@
 /**
- * Sanitizer HTML bersama (server-safe: DOMPurify isomorphic + regex lapis-2).
+ * Sanitizer HTML bersama — 100% REGEX, NOL dependensi DOM/jsdom.
  *
  * Kebijakan allowlist tunggal untuk seluruh render + penyimpanan konten:
  * dipakai oleh `components/article-content.tsx` (render publik),
- * `components/visual-editor.tsx` (kanvas editor), dan rute API
- * `POST /api/articles` / `PUT /api/articles/[id]` (sanitasi server-side
- * sebelum tulis DB — titik kepercayaan terakhir).
+ * `components/visual-editor.tsx` (kanvas editor),
+ * `components/post-editor.tsx` (via `sanitizeContentInput`), dan —
+ * melalui `lib/sanitize-server.ts` — rute API `POST /api/articles` /
+ * `PUT /api/articles/[id]`.
  *
- * Lapis 1 (utama): DOMPurify (isomorphic-dompurify, aman SSR + browser)
- * dengan whitelist tag/atribut editorial media. PENTING: isomorphic-dompurify
- * TIDAK BOLEH diimpor statis di top-level — entry server-nya me-require
- * `jsdom` (rantai lru-cache ESM-only) dan meledak dengan
- * `Error [ERR_REQUIRE_ESM]: Failed to load external module jsdom` tepat
- * saat modul dimuat di Vercel Serverless, SEBELUM try/catch mana pun sempat
- * berjalan (itulah HTTP 500 saat publikasi artikel). Pemuatan dilakukan
- * MALAS saat dipanggil di dalam try/catch (`loadPurifier`); bila gagal,
- * sanitasi jatuh ke Lapis 2 (regex ketat + strip konten aktif) dan API
- * TIDAK PERNAH crash.
- * Lapis 2 (defense-in-depth): filter regex lama — menegakkan href https/relatif,
- * rel noopener+noreferrer otomatis, dan class allowlist.
+ * `isomorphic-dompurify`/`dompurify`/`jsdom` SUDAH DICABUT TOTAL dari
+ * codebase: dependensi menghapusnya agar Webpack tidak lagi membundel
+ * jejak `jsdom`/`html-encoding-sniffer` ke Vercel Serverless Functions
+ * (penyebab `Error [ERR_REQUIRE_ESM]` → HTTP 500 saat publikasi).
+ * Seluruh sanitasi memakai `lib/sanitize-regex.ts` (allowlist ketat:
+ * tag, href/src https-or-relatif, class, rel noopener+noreferrer,
+ * strip <script>/<style>/<iframe> beserta isi, buang on*= total).
  */
-type DomPurifier = {
-  sanitize: (
-    dirty: string,
-    config?: Record<string, unknown>
-  ) => string | unknown;
-};
-
-// undefined = belum dicoba; null = gagal / tidak tersedia (pakai fallback).
-let purifierCache: DomPurifier | null | undefined;
-
-/**
- * Muat DOMPurify secara malas dan aman. Tidak pernah melempar:
- * mengembalikan null bila `require` tak tersedia (Edge) atau rantai
- * jsdom gagal dimuat di serverless (ERR_REQUIRE_ESM).
- */
-function loadPurifier(): DomPurifier | null {
-  if (purifierCache !== undefined) return purifierCache;
-  purifierCache = null;
-  try {
-    if (typeof require === "function") {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mod = require("isomorphic-dompurify") as
-        | ({ default?: DomPurifier } & Partial<DomPurifier>)
-        | null
-        | undefined;
-      const candidate = mod?.default ?? mod;
-      if (
-        candidate &&
-        typeof (candidate as Partial<DomPurifier>).sanitize === "function"
-      ) {
-        purifierCache = candidate as DomPurifier;
-      }
-    }
-  } catch (e) {
-    // jsdom gagal dimuat di serverless: JANGAN crash — Lapis 2 menutup XSS.
-    console.warn("Server-side DOMPurify warning (bypassed safely):", e);
-    purifierCache = null;
-  }
-  return purifierCache;
-}
-
 import {
+  cleanArticleHtml,
   decodeEscapedHtml,
   MAX_BLOCKS,
   MAX_BLOCK_CHARS,
-  regexScrub,
-  stripActiveContent,
 } from "./sanitize-regex";
 
 // Kompatibilitas impor lama (`article-content.tsx`): teruskan helper regex.
 export { decodeEscapedHtml };
 
-// Whitelist tag editorial aman (spesifikasi hardening XSS media).
-const DOMPURIFY_TAGS = [
-  "p", "b", "i", "em", "strong", "a",
-  "h1", "h2", "h3", "h4", "ul", "ol", "li",
-  "blockquote", "img", "figure", "figcaption", "br", "hr", "span",
-];
-
-const DOMPURIFY_ATTR = [
-  "href", "src", "alt", "title", "target", "rel", "class", "width", "height",
-];
-
 export function sanitizeHtml(html: string): string {
   const input = String(html ?? "");
   if (!input) return "";
-  // Lapis 1: DOMPurify — parser DOM sungguhan (tahan mutasi XSS yang
-  // lolos regex: SVG/math, style expression, event handler non-standar).
-  // Seluruh <a> dipaksa membawa rel noopener+noreferrer pasca-sanitasi.
-  // loadPurifier() tidak pernah melempar (null bila jsdom gagal dimuat).
   try {
-    const purifier = loadPurifier();
-    if (purifier) {
-      const purified = purifier.sanitize(input, {
-        ALLOWED_TAGS: DOMPURIFY_TAGS,
-        ALLOWED_ATTR: DOMPURIFY_ATTR,
-        ALLOW_DATA_ATTR: false,
-        FORBID_TAGS: ["script", "style", "iframe", "object", "embed", "form", "input", "button", "svg", "math", "link", "meta", "base"],
-        FORBID_ATTR: ["onerror", "onload", "onclick", "style"],
-      });
-      const withRel = String(purified).replace(/<a\b([^<>]*)>/gi, (tag) => {
-        if (/rel\s*=/i.test(tag)) {
-          return tag.replace(/rel\s*=\s*"([^"]*)"/i, (_m, v: string) => {
-            const kept = new Set<string>(["noopener", "noreferrer"]);
-            for (const t of String(v).split(/[\s,]+/).map((s) => s.trim().toLowerCase())) {
-              if (["noopener", "noreferrer", "nofollow", "ugc", "sponsored"].includes(t)) kept.add(t);
-            }
-            return `rel="${[...kept].join(" ")}"`;
-          });
-        }
-        return tag.replace(/<a\b/i, '<a rel="noopener noreferrer"');
-      });
-      // Lapis 2: scrub regex (href/src/class allowlist ketat).
-      return regexScrub(withRel);
-    }
-    // Fallback: DOMPurify tak tersedia (jsdom gagal di serverless) —
-    // strip konten aktif lalu scrub regex ketat. Anti-crash, tetap anti-XSS.
-    return regexScrub(stripActiveContent(input));
+    // Identik dengan jalur backend (`cleanArticleHtml`) — satu kebijakan,
+    // satu output, di semua lingkungan (browser, prerender, serverless).
+    return cleanArticleHtml(input);
   } catch {
-    return regexScrub(stripActiveContent(input));
+    return "";
   }
 }
 
 /**
- * Sanitasi input `content` artikel (string | string[]) — varian CLIENT
- * (dipakai `components/post-editor.tsx`). Kebijakan & batas IDENTIK dengan
- * `sanitizeContentInputServer`; hanya pembersih HTML-nya memakai Lapis 1+2
- * (DOMPurify bila tersedia di browser, regex ketat bila tidak).
+ * Sanitasi input `content` artikel (string | string[]) — dipakai
+ * `components/post-editor.tsx`. Kebijakan & batas IDENTIK dengan
+ * `sanitizeContentInputServer` (satu implementasi regex yang sama).
  * Sanitasi input `content` artikel (string | string[]) sebelum simpan DB.
  *
  * Editor CMS mengirim `content` sebagai STRING JSON (`JSON.stringify(paras)`)
