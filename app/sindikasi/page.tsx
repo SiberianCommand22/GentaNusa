@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Footer } from "@/components/site";
 import { getSyndicated, getSources } from "@/lib/syndication";
 import { formatDate } from "@/lib/data";
+import { siteUrl } from "@/lib/site";
 import styles from "./syndication.module.css";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
+const SITE_URL = siteUrl();
 
 export const metadata: Metadata = {
   title: "Sindikasi",

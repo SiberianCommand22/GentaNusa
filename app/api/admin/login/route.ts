@@ -6,7 +6,7 @@ import {
   TOKEN_COOKIE,
   type EditorialSession,
 } from "@/lib/auth";
-import { isMasterEmail } from "@/lib/roles";
+import { canAccessAdminArea, isMasterEmail } from "@/lib/roles";
 
 // Rate limit per IP+email (in-memory per instance; dilapisi Cloudflare WAF,
 // lihat SECURITY.md). Kunci gabungan mencegah satu IP mengunci seluruh
@@ -217,6 +217,35 @@ export async function POST(request: NextRequest) {
           // master di middleware/lib tetap mengizinkan akses)
         }
       }
+    }
+
+    // GERBANG REDAKSI (anti mental-ke-"/" diam-diam): kredensial benar
+    // saja TIDAK cukup — app_metadata.role wajib termasuk EDITORIAL_ROLES
+    // (admin + varian editor/author/penulis/jurnalis/...) atau email master
+    // terverifikasi. Tanpa ini, middleware akan melempar sesi ke beranda `/`
+    // tepat setelah login sukses. Tolak di sini dengan 403 + pesan jelas
+    // agar mis-provisioning langsung terlihat, bukan menjadi redirect misterius.
+    const appRole = String(
+      ((authUser.app_metadata ?? {}) as Record<string, unknown>).role ?? ""
+    );
+    const loginEmailVerified = Boolean(
+      (authUser as { email_confirmed_at?: string | null }).email_confirmed_at ||
+        (authUser as { confirmed_at?: string | null }).confirmed_at
+    );
+    if (
+      !canAccessAdminArea(
+        appRole,
+        loginEmailVerified ? authUser.email : null
+      )
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "Akun ini belum memiliki peran redaksi (admin/editor/penulis/jurnalis). Hubungi Administrator Utama untuk mengaktifkan akses.",
+        },
+        { status: 403 }
+      );
     }
 
     const identity: EditorialSession = sessionFromSupabaseUser(authUser);

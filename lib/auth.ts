@@ -50,6 +50,13 @@ export type EditorialSession = {
   isAdmin: boolean;
   fullName: string | null;
   authorSlug: string | null;
+  /**
+   * Peran TERVERIFIKASI dari `app_metadata.role` (sumber gerbang /admin).
+   * Berbeda dari `role` (label tampilan yang boleh jatuh ke user_metadata).
+   */
+  appRole: string;
+  /** true bila email identitas sudah terkonfirmasi di Supabase Auth. */
+  emailVerified: boolean;
 };
 
 type SupaUserLike = {
@@ -102,6 +109,8 @@ export function sessionFromSupabaseUser(user: SupaUserLike): EditorialSession {
     email,
     role: displayRole,
     isAdmin: isAdminIdentity({ role: adminRole, email: emailVerified ? email : null }),
+    appRole: adminRole,
+    emailVerified,
     fullName:
       readString(userMeta.full_name) ??
       readString(userMeta.name) ??

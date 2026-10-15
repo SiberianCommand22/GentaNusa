@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/site";
 import styles from "./about.module.css";
+import { siteUrl } from "@/lib/site";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
+const SITE_URL = siteUrl();
 
 export const metadata: Metadata = {
   title: "Tentang Kami",

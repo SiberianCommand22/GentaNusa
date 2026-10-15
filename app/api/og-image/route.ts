@@ -3,6 +3,7 @@ import sharp from "sharp";
 import path from "path";
 import { promises as fs } from "fs";
 import { rateLimit } from "@/app/api/rate-limit";
+import { siteUrl } from "@/lib/site";
 
 export const runtime = "nodejs";
 
@@ -116,7 +117,7 @@ export async function GET(req: NextRequest) {
   const title = searchParams.get("title") || "";
   const category = searchParams.get("category") || "";
 
-  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
+  const SITE_URL = siteUrl();
   // articleImage may be a full remote URL (Supabase, Pollinations) or a local
   // /media/... path. Prefixing SITE_URL onto an absolute URL produced
   // "https://gentanusa.idhttps://..." which 404s, dropping every share preview

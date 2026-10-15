@@ -1,7 +1,12 @@
 import type { MetadataRoute } from "next";
 import { getArticles, articleUrl } from "@/lib/data";
+import { siteUrl } from "@/lib/site";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
+// Sitemap hemat kuota: regenerasi maksimal 1x/jam dari cache CDN;
+// invalidasi artikel baru tetap instan via revalidatePath di API tulis.
+export const revalidate = 3600;
+
+const SITE_URL = siteUrl();
 
 // Rute kategori root yang bersih (tanpa prefix /kategori/*).
 const CATEGORY_ROUTES = [
@@ -21,13 +26,18 @@ const CHANNEL_ROUTES = [
   "/kategori/keamanan",
 ];
 
-// Halaman kelembagaan resmi.
+// Halaman kelembagaan resmi — semuanya route nyata (terverifikasi ada):
+// /tentang (redirect 301 -> /tentang-kami) dan /syarat, /privasi (redirect)
+// SENGAJA tidak dicantumkan agar sitemap bebas URL redirect/404.
 const INSTITUTIONAL_ROUTES = [
   "/tentang-kami",
   "/pedoman-media-siber",
   "/kebijakan-privasi",
   "/syarat-ketentuan",
   "/kontak",
+  "/susunan-redaksi",
+  "/sindikasi",
+  "/kategori",
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

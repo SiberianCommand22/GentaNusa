@@ -9,10 +9,14 @@ import { canAccessAdminArea, TOKEN_COOKIE } from "@/lib/roles";
 // - Melarang cache agresif pada rute dinamis redaksi (/admin/*).
 // - /admin/:path* (kecuali halaman login privat) WAJIB sesi Supabase Auth
 //   terverifikasi via @supabase/ssr + peran redaksi
-//   (app_metadata.role === 'admin' | 'editor' dan varian admin).
+//   (app_metadata.role dalam EDITORIAL_ROLES lib/roles.ts: admin + seluruh
+//   varian redaksi editor/author/writer/penulis/jurnalis/dll, case-insensitive).
 //   - Belum login  -> redirect ke /admin/login/gentanusa (form login privat;
 //     /admin/login disegel, tidak ada /login publik).
 //   - Login tapi bukan redaksi -> redirect ke beranda /.
+//   - Akun yang perannya hanya ada di user_metadata (tidak di app_metadata)
+//     DITOLAK di sini: peran redaksi wajib ditanam backend via Service Role
+//     (scripts/assign-admin-role.ts / backfill-editor-roles.ts).
 // - API internal (/api/*) TIDAK diautentikasi di sini dan TIDAK melewati
 //   middleware sama sekali (matcher di bawah hanya /admin/* — hemat kuota
 //   Edge Middleware Invocations dari pembaca publik). Setiap route handler
@@ -88,6 +92,8 @@ async function guard(req: NextRequest) {
 
   type EdgeUser = {
     email?: string | null;
+    email_confirmed_at?: string | null;
+    confirmed_at?: string | null;
     app_metadata?: Record<string, unknown> | null;
   };
   let user: EdgeUser | null = null;
@@ -125,7 +131,11 @@ async function guard(req: NextRequest) {
   }
 
   const role = (user.app_metadata as Record<string, unknown> | null)?.role;
-  if (!hasEditorialRole(role, user.email)) {
+  // Kecocokan email master hanya untuk identitas TERVERIFIKASI — selaras
+  // dengan lib/auth.ts (isAdminIdentity). Tanpa konfirmasi, email saja
+  // tidak memberi hak masuk area redaksi.
+  const verifiedEmail = user.email_confirmed_at || user.confirmed_at ? user.email : null;
+  if (!hasEditorialRole(role, verifiedEmail)) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 

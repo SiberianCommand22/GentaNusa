@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import styles from "./share-buttons.module.css";
+import { siteUrl } from "@/lib/site";
 
 interface ShareButtonsProps {
   title: string;
@@ -33,7 +34,7 @@ const icons: Record<string, React.ReactNode> = {
 
 export function ShareButtons({ title, url }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
-  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
+  const SITE_URL = siteUrl();
   const isAbsolute = url.startsWith("http://") || url.startsWith("https://");
   const baseUrl = isAbsolute ? url : `${SITE_URL}${url.startsWith("/") ? url : `/${url}`}`;
 

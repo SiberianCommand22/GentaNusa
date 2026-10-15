@@ -22,7 +22,25 @@
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-const ALLOWED_ROLES = new Set(["admin", "superadmin", "editor"]);
+// Selaras dengan EDITORIAL_ROLES di lib/roles.ts (gerbang /admin):
+// admin (penuh) + seluruh varian redaksi non-admin.
+const ALLOWED_ROLES = new Set([
+  "admin",
+  "superadmin",
+  "super_admin",
+  "administrator",
+  "editor",
+  "author",
+  "writer",
+  "penulis",
+  "jurnalis",
+  "journalist",
+  "reporter",
+  "redaksi",
+  "redaktur",
+  "kontributor",
+  "contributor",
+]);
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

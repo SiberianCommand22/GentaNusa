@@ -3,7 +3,6 @@ import { revalidatePath } from "next/cache";
 import { getEditorialSession, resolveAuthorName } from "@/lib/auth";
 import {
   ACCESS_DENIED_DELETE,
-  ARTICLE_COLUMNS_BASE,
   ARTICLE_COLUMNS_WITH_OWNER,
   ensureSupabaseServiceClient,
   fetchArticleForSession,
@@ -35,6 +34,8 @@ function isMissingColumnError(message: string): { column: string } | null {
 }
 
 async function updateTolerant(
+  // Builder Supabase dinamis (tipe generik PostgREST) — any terisolasi di sini.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client: { from: (t: string) => any },
   id: string,
   values: Record<string, unknown>
@@ -247,8 +248,19 @@ export async function PUT(
   revalidatePath("/");
   revalidatePath("/kategori/[slug]", "page");
   revalidatePath("/kategori");
+  // Halaman root-level kanal lama (route terpisah, bukan di bawah /kategori).
+  revalidatePath("/nasional");
+  revalidatePath("/pertahanan");
+  revalidatePath("/politik");
+  revalidatePath("/ekonomi");
+  revalidatePath("/dunia");
+  revalidatePath("/peduli");
   revalidatePath("/penulis/[slug]", "page");
   revalidatePath("/[slug]", "page");
+  // Feed & sitemap statis (disajikan dari cache CDN hingga direvalidasi).
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/news-sitemap.xml");
+  revalidatePath("/feed.xml");
   // Jalur konkret artikel revisi (rute publik memakai /<slug>).
   if (data && typeof data === "object") {
     const row = data as { slug?: unknown; id?: unknown };
@@ -281,6 +293,18 @@ export async function DELETE(
   const { error } = await c.client.from("articles").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
+  revalidatePath("/kategori");
+  revalidatePath("/kategori/[slug]", "page");
+  revalidatePath("/nasional");
+  revalidatePath("/pertahanan");
+  revalidatePath("/politik");
+  revalidatePath("/ekonomi");
+  revalidatePath("/dunia");
+  revalidatePath("/peduli");
+  revalidatePath("/[slug]", "page");
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/news-sitemap.xml");
+  revalidatePath("/feed.xml");
   revalidatePath("/admin");
   revalidatePath("/admin/posts");
   return NextResponse.json({ ok: true });

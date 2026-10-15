@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/site";
 import { OFFICIAL_WA_DISPLAY, OFFICIAL_WA_URL } from "@/lib/social";
+import { siteUrl } from "@/lib/site";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
+const SITE_URL = siteUrl();
 
 export const metadata: Metadata = {
   title: { absolute: "Tentang Kami & Struktur Redaksi GentaNusa" },

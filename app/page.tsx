@@ -92,7 +92,9 @@ export default async function Home() {
   const blocks: Array<{ title: string; href: string; items: Article[] }> = [
     {
       title: "Pertahanan & Keamanan",
-      href: "/kategori/pertahanan",
+      // Halaman root-level /pertahanan (redirect 301 /kategori/pertahanan
+      // -> /pertahanan di next.config.ts) — taut langsung tanpa redirect.
+      href: "/pertahanan",
       items: latest.filter((a) => inCategories(a, ["Pertahanan", "Keamanan"])).slice(0, 4),
     },
     {
@@ -135,7 +137,7 @@ export default async function Home() {
         <div className={styles.container}>
           <div className={styles.splitGrid}>
             <article className={styles.headline}>
-              <Link href={articleUrl(lead)} className={styles.headlineCard}>
+              <Link href={articleUrl(lead)} prefetch={false} className={styles.headlineCard}>
                 <div className={styles.headlineThumb}>
                   <Image
                     src={lead.image || "/images/placeholder-article.svg"}
@@ -159,7 +161,7 @@ export default async function Home() {
                 <ul className={styles.sideList}>
                   {secondary.map((a) => (
                     <li key={a.id} className={styles.sideRow}>
-                      <Link href={articleUrl(a)} className={styles.sideLink}>
+                      <Link href={articleUrl(a)} prefetch={false} className={styles.sideLink}>
                         <span className={styles.sideText}>
                           <CategoryTag label={a.category} />
                           <span className={styles.sideTitle}>{a.title}</span>
@@ -196,7 +198,7 @@ export default async function Home() {
                   <span className={styles.popNum} aria-hidden="true">
                     {i + 1}
                   </span>
-                  <Link href={articleUrl(a)} className={styles.popLink}>
+                  <Link href={articleUrl(a)} prefetch={false} className={styles.popLink}>
                     <span className={styles.popTitle}>{a.title}</span>
                     <Meta a={a} />
                   </Link>
@@ -208,7 +210,7 @@ export default async function Home() {
                 <h2 className={styles.sectionTitle}>Opini &amp; Analisis</h2>
                 <div className={styles.opiniStack}>
                   {opinions.map((a) => (
-                    <Link key={a.id} href={articleUrl(a)} className={styles.opiniCard}>
+                      <Link key={a.id} href={articleUrl(a)} prefetch={false} className={styles.opiniCard}>
                       <span className={styles.opiniBadge}>OPINI</span>
                       <span className={styles.opiniTitle}>{a.title}</span>
                       <Meta a={a} />
@@ -233,7 +235,7 @@ export default async function Home() {
             </div>
             <div className={styles.grid}>
               {b.items.map((a) => (
-                <Link key={a.id} href={articleUrl(a)} className={styles.compactCard}>
+                <Link key={a.id} href={articleUrl(a)} prefetch={false} className={styles.compactCard}>
                   <div className={styles.compactThumb}>
                     <Image
                       src={a.image || "/images/placeholder-article.svg"}
@@ -261,7 +263,7 @@ export default async function Home() {
             <h2 className={styles.sectionTitle}>Berita Terbaru</h2>
             <div className={styles.grid}>
               {recentArticles.map((a) => (
-                <Link key={a.id} href={articleUrl(a)} className={styles.compactCard}>
+                <Link key={a.id} href={articleUrl(a)} prefetch={false} className={styles.compactCard}>
                   <div className={styles.compactThumb}>
                     <Image
                       src={a.image || "/images/placeholder-article.svg"}

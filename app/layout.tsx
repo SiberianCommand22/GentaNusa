@@ -24,7 +24,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.gentanusa.id"),
+  metadataBase: new URL("https://gentanusa.id"),
   title: {
     default: "GentaNusa - Berita Terkini & Kabar Kedaulatan Nasional",
     template: "%s | GentaNusa",
@@ -44,13 +44,13 @@ export const metadata: Metadata = {
     title: "GentaNusa",
     description:
       "Portal berita nasional independen menyajikan kabar Nusantara terkini.",
-    url: "https://www.gentanusa.id",
+    url: "https://gentanusa.id",
     siteName: "GentaNusa",
     locale: "id_ID",
     type: "website",
     images: [
       {
-        url: "https://www.gentanusa.id/og-default.jpg",
+        url: "https://gentanusa.id/og-default.jpg",
         width: 1200,
         height: 630,
         alt: "GentaNusa - Kabar Kedaulatan & Dinamika Nusantara",
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     title: "GentaNusa",
     description:
       "Portal berita nasional independen menyajikan kabar Nusantara terkini.",
-    images: ["https://www.gentanusa.id/og-default.jpg"],
+    images: ["https://gentanusa.id/og-default.jpg"],
   },
   verification: process.env.GOOGLE_SITE_VERIFICATION
     ? { google: process.env.GOOGLE_SITE_VERIFICATION }

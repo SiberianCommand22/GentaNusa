@@ -1,9 +1,10 @@
 import { getArticles, sortByDate, articleUrl } from "@/lib/data";
+import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
+const SITE_URL = siteUrl();
 const SITE_NAME = "GentaNusa";
 
 // Google News only surfaces articles published in the last 48 hours, and rejects

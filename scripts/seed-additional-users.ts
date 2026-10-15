@@ -90,6 +90,35 @@ function isAlreadyRegistered(message: string): boolean {
   );
 }
 
+async function findUserIdByEmail(email: string): Promise<string | null> {
+  let page = 1;
+  for (;;) {
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+      page,
+      perPage: 100,
+    });
+    if (error || !data?.users) return null;
+    const found = data.users.find(
+      (u) => (u.email ?? "").trim().toLowerCase() === email.toLowerCase()
+    );
+    if (found) return found.id;
+    if (data.users.length < 100) return null;
+    page++;
+    if (page > 100) return null;
+  }
+}
+
+// Peran redaksi WAJIB di app_metadata (dibaca middleware + login API).
+// user_metadata.role hanya label tampilan — tidak pernah memberi hak akses.
+async function ensureEditorAppRole(email: string): Promise<boolean> {
+  const userId = await findUserIdByEmail(email);
+  if (!userId) return false;
+  const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+    app_metadata: { role: "editor" },
+  });
+  return !error;
+}
+
 async function seed(): Promise<void> {
   console.log("Mendaftarkan 4 jurnalis tambahan GentaNusa...");
   for (const user of users) {
@@ -97,6 +126,11 @@ async function seed(): Promise<void> {
       email: user.email,
       password: user.password,
       email_confirm: true,
+      // AKAR BUG LOGIN EDITOR: versi lama hanya menulis user_metadata.role
+      // (bisa diubah user, diabaikan middleware) sehingga akun jurnalis
+      // selalu ditolak gerbang /admin dan mental ke beranda `/`.
+      // app_metadata.role di bawah inilah yang dibaca middleware + login API.
+      app_metadata: { role: "editor" },
       user_metadata: {
         full_name: user.name,
         role: "editor",
@@ -106,7 +140,13 @@ async function seed(): Promise<void> {
     });
     if (error) {
       if (isAlreadyRegistered(error.message)) {
-        console.warn(`[SKIP / TERDAFTAR] ${user.email}: sudah ada`);
+        // Akun lama (pra-perbaikan) tidak punya app_metadata.role — perbaiki
+        // agar bisa masuk /admin tanpa redirect ke `/`.
+        const fixed = await ensureEditorAppRole(user.email);
+        console.warn(
+          `[SKIP / TERDAFTAR] ${user.email}: sudah ada` +
+            (fixed ? " — app_metadata.role=editor dipastikan." : " — GAGAL menanam app_metadata.role, jalankan scripts/backfill-editor-roles.ts --apply.")
+        );
         continue;
       }
       console.warn(`[GAGAL] ${user.email}: ${error.message}`);

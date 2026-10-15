@@ -19,7 +19,7 @@ function getSafeNext(raw: string | null): string {
  * Form login redaksi — RUTE PRIVAT.
  *
  * Hanya pihak yang mengetahui URL persisnya
- * (https://www.gentanusa.id/admin/login/gentanusa) yang bisa menemukan
+ * (https://gentanusa.id/admin/login/gentanusa) yang bisa menemukan
  * halaman ini: tidak ada tautan login di navbar maupun drawer menu publik,
  * dan rute lama /admin/login sengaja disegel (notFound).
  */

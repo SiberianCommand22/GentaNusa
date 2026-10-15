@@ -15,6 +15,7 @@ import { ArticleContent } from "@/components/article-content";
 import { CardImage } from "@/components/card-image";
 import { ShareButtons } from "@/components/share-buttons";
 import { cleanLead, sanitizeEditorialText } from "@/lib/text-formatter";
+import { canonicalCategoryHref } from "@/lib/site";
 
 const RESERVED_SLUGS = [  "admin",
   "api",
@@ -81,7 +82,7 @@ export async function generateMetadata({ params }: Params) {
     return { title: "Berita Tidak Ditemukan" };
   }
 
-  const siteUrl = "https://www.gentanusa.id";
+  const siteUrl = "https://gentanusa.id";
 
   // Resolusi URL gambar WAJIB absolut: scraper medsos (WhatsApp, Telegram,
   // Facebook, X, LinkedIn) menolak path relatif. Relatif /media/... diberi
@@ -181,7 +182,7 @@ export default async function ArticlePage({ params }: Params) {
     })
     .slice(0, 3);
 
-  const SITE_URL = "https://www.gentanusa.id";
+  const SITE_URL = "https://gentanusa.id";
   // MODUL 2 — Sanitasi naskah lama SEBELUM dipecah menjadi paragraf:
   // spasi tak terlihat, spasi ganda, dan spasi liar tanda baca otomatis
   // rapi saat ditampilkan tanpa mengubah data mentah di database.
@@ -233,7 +234,7 @@ export default async function ArticlePage({ params }: Params) {
           <Link href="/">Beranda</Link>
           <span className={styles.breadcrumbSep}>/</span>
           <Link
-            href={"/" + slugifyTitle(article.category)}
+            href={canonicalCategoryHref(slugifyTitle(article.category))}
             className={styles.breadcrumbCategory}
           >
             {article.category || "Nasional"}
@@ -380,7 +381,7 @@ export default async function ArticlePage({ params }: Params) {
                 <h2 className={styles.relatedTitle}>Berita Terkait</h2>
                 <div className={styles.relatedGrid}>
                   {related.map((a) => (
-                    <Link key={a.id} href={articleUrl(a)} className={styles.relatedCard}>
+                    <Link key={a.id} href={articleUrl(a)} prefetch={false} className={styles.relatedCard}>
                       {a.image && (
                         <div className={styles.relatedImage}>
                           <CardImage src={a.image} alt={a.title} className={styles.cardImg} />

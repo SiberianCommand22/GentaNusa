@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import { canonicalCategoryHref } from "@/lib/site";
 import styles from "./Navbar.module.css";
 
 // Navigasi utama 100% editorial. Tautan korporat (Tentang, Pedoman,
@@ -55,10 +56,10 @@ export function Navbar() {
   };
 
   const renderCategoryLink = (c: { slug: string; label: string }, key?: string) => {
-    // Selalu ke /kategori/<slug>: hanya 6 kanal lama yang punya
-    // halaman root-level; kanal baru (sosial-budaya, kesehatan,
-    // olahraga, keamanan) hanya ada di bawah /kategori/.
-    const href = `/kategori/${c.slug}`;
+    // Href kanonis selaras next.config.ts: 6 kanal lama (nasional, politik,
+    // pertahanan, ekonomi, dunia, peduli) langsung ke halaman root-level
+    // `/<slug>` (tanpa 301); kanal baru tetap `/kategori/<slug>` (rewrite).
+    const href = canonicalCategoryHref(c.slug);
     const isActive = pathname === href;
     return (
       <Link

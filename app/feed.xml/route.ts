@@ -1,8 +1,9 @@
 import { getArticles, sortByDate, articleUrl } from "@/lib/data";
+import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://gentanusa.id";
+const SITE_URL = siteUrl();
 const SITE_NAME = "GentaNusa";
 const SITE_DESC = "Berita Nusantara terkini, akurat, dan terpercaya.";
 

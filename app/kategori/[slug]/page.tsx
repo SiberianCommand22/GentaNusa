@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Footer } from "@/components/site";
 import { supabaseAnon } from "@/lib/supabase";
 import { articleUrl, type Article } from "@/lib/data";
+import { siteUrl } from "@/lib/site";
 import styles from "./category.module.css";
 
 // ISR kategori hemat kuota: cache CDN 24 jam; invalidasi instan via
@@ -147,7 +148,7 @@ async function fetchByCategory(label: string): Promise<Article[]> {
   }
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
+const SITE_URL = siteUrl();
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug: raw } = await params;

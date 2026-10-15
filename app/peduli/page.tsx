@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Footer } from "@/components/site";
 import styles from "@/app/kategori/[slug]/category.module.css";
+import { siteUrl } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
+// ISR hemat kuota: dilayani dari cache CDN 24 jam tanpa Function
+// Invocation per kunjungan; invalidasi instan via revalidatePath di API tulis.
+export const revalidate = 86400;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
+const SITE_URL = siteUrl();
 
 export const metadata: Metadata = {
   title: { absolute: "GentaNusa Peduli — Dokumentasi Aksi Sosial Segera Hadir" },

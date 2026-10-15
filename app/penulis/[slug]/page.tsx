@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Footer } from "@/components/site";
 import { getAuthor, getAuthors, getArticlesByAuthor, articleUrl } from "@/lib/data";
+import { siteUrl } from "@/lib/site";
 import styles from "./author.module.css";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -15,7 +16,7 @@ export async function generateStaticParams() {
   return (await getAuthors()).map((a) => ({ slug: a.slug }));
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
+const SITE_URL = siteUrl();
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;

@@ -219,8 +219,19 @@ export async function POST(req: NextRequest) {
   revalidatePath("/");
   revalidatePath("/kategori/[slug]", "page");
   revalidatePath("/kategori");
+  // Halaman root-level kanal lama (route terpisah, bukan di bawah /kategori).
+  revalidatePath("/nasional");
+  revalidatePath("/pertahanan");
+  revalidatePath("/politik");
+  revalidatePath("/ekonomi");
+  revalidatePath("/dunia");
+  revalidatePath("/peduli");
   revalidatePath("/penulis/[slug]", "page");
   revalidatePath("/[slug]", "page");
+  // Feed & sitemap statis (disajikan dari cache CDN hingga direvalidasi).
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/news-sitemap.xml");
+  revalidatePath("/feed.xml");
   // Jalur konkret artikel baru (rute publik memakai /<slug>, bukan /berita/).
   if (data && typeof data === "object") {
     const row = data as { slug?: unknown; id?: unknown };
@@ -253,6 +264,18 @@ export async function DELETE(req: NextRequest) {
   const { error } = await c.client.from("articles").delete().eq("id", numId);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
+  revalidatePath("/kategori");
+  revalidatePath("/kategori/[slug]", "page");
+  revalidatePath("/nasional");
+  revalidatePath("/pertahanan");
+  revalidatePath("/politik");
+  revalidatePath("/ekonomi");
+  revalidatePath("/dunia");
+  revalidatePath("/peduli");
+  revalidatePath("/[slug]", "page");
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/news-sitemap.xml");
+  revalidatePath("/feed.xml");
   revalidatePath("/admin");
   revalidatePath("/admin/posts");
   return NextResponse.json({ ok: true });

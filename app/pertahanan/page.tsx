@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/site";
 import { supabaseAnon } from "@/lib/supabase";
 import { articleUrl, type Article } from "@/lib/data";
+import { siteUrl } from "@/lib/site";
 import styles from "@/app/kategori/[slug]/category.module.css";
 
-export const dynamic = "force-dynamic";
+// ISR hemat kuota: dilayani dari cache CDN 24 jam tanpa Function
+// Invocation per kunjungan; invalidasi instan via revalidatePath di API tulis.
+export const revalidate = 86400;
 
 type DbRow = {
   id: number;
@@ -92,7 +94,7 @@ async function fetchPertahananArticles(): Promise<Article[]> {
   }
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gentanusa.id";
+const SITE_URL = siteUrl();
 
 export const metadata: Metadata = {
   title: { absolute: "Berita Pertahanan Terkini | GentaNusa" },

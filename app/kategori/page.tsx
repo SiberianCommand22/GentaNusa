@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/site";
+import { canonicalCategoryHref } from "@/lib/site";
 import styles from "./[slug]/category.module.css";
 
-export const dynamic = "force-dynamic";
+// Halaman indeks kanal 100% statis (tanpa query DB) — cache CDN 24 jam.
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: { absolute: "Berita Terkini | GentaNusa" },
   description:
     "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, Peduli, Sosial Budaya, Kesehatan, Olahraga, dan Keamanan.",
-  alternates: { canonical: "https://www.gentanusa.id/kategori" },
+  alternates: { canonical: "https://gentanusa.id/kategori" },
   openGraph: {
-    url: "https://www.gentanusa.id/kategori",
+    url: "https://gentanusa.id/kategori",
     siteName: "GentaNusa",
     locale: "id_ID",
     type: "website",
@@ -20,7 +22,7 @@ export const metadata: Metadata = {
       "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, Peduli, Sosial Budaya, Kesehatan, Olahraga, dan Keamanan.",
     images: [
       {
-        url: "https://www.gentanusa.id/og-default.jpg",
+        url: "https://gentanusa.id/og-default.jpg",
         width: 1200,
         height: 630,
         alt: "Kanal Berita GentaNusa",
@@ -32,7 +34,7 @@ export const metadata: Metadata = {
     title: "Berita Terkini | GentaNusa",
     description:
       "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, Peduli, Sosial Budaya, Kesehatan, Olahraga, dan Keamanan.",
-    images: ["https://www.gentanusa.id/og-default.jpg"],
+    images: ["https://gentanusa.id/og-default.jpg"],
   },
 };
 
@@ -112,7 +114,7 @@ export default function CategoryIndexPage() {
 
         <div className={styles.grid}>
           {CHANNELS.map((c) => (
-            <Link key={c.slug} href={`/kategori/${c.slug}`} className={styles.card}>
+            <Link key={c.slug} href={canonicalCategoryHref(c.slug)} className={styles.card}>
               <div className={styles.cardBody}>
                 <div className={styles.cardBadge}>{c.label}</div>
                 <h2 className={styles.cardTitle}>{c.label}</h2>

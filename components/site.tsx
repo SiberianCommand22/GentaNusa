@@ -6,6 +6,7 @@ import {
   OFFICIAL_IG_URL,
   OFFICIAL_WA_URL,
 } from "@/lib/social";
+import { canonicalCategoryHref } from "@/lib/site";
 import styles from "./site.module.css";
 
 // Footer editorial navy — 4 kolom: profil, kanal, redaksi, legalitas.
@@ -53,7 +54,7 @@ export function Footer() {
           <nav className={styles.footerCol} aria-label="Kanal berita">
             <h4>Kanal</h4>
             {QUICK_CHANNELS.map((c) => (
-              <Link key={c.slug} href={`/kategori/${c.slug}`}>
+              <Link key={c.slug} href={canonicalCategoryHref(c.slug)}>
                 {c.label}
               </Link>
             ))}
