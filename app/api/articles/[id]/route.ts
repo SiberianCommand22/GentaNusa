@@ -9,8 +9,9 @@ import {
   sanitizeSlug,
   type ArticleRow,
 } from "@/lib/editorial-articles";
-// sanitize-html (isomorphic-dompurify/jsdom) dimuat malas di dalam handler
-// tulis saja — jalur baca (GET) tidak boleh menyentuh jsdom di serverless.
+// Sanitizer backend regex-murni (`lib/sanitize-server`, NOL jsdom/DOM)
+// dimuat malas di dalam handler tulis saja — tidak ada impor DOM di bundle
+// serverless, sehingga ERR_REQUIRE_ESM tidak mungkin terjadi.
 
 // Selalu dinamis: baca cookie sesi + searchParams per request.
 export const dynamic = "force-dynamic";
@@ -189,13 +190,14 @@ export async function PUT(
     ? cleanRequestedSlug || existingSlug || slugify(author)
     : existingSlug || slugify(author);
 
-  // Lazy-load sanitizer (jsdom) hanya di jalur tulis.
-  const { sanitizeContentInput } = await import("@/lib/sanitize-html");
+  // Sanitasi backend regex-murni (TANPA jsdom/DOM — anti ERR_REQUIRE_ESM
+  // di Vercel Serverless). Modul server-only, dimuat malas di jalur tulis.
+  const { sanitizeContentInputServer } = await import("@/lib/sanitize-server");
   const fullUpdate: Record<string, unknown> = {
     title: body.title,
     category: body.category,
     excerpt: body.excerpt,
-    content: sanitizeContentInput(body.content) ?? [],
+    content: sanitizeContentInputServer(body.content) ?? [],
     image: body.image ?? body.cover_image ?? null,
     tags: body.tags ?? [],
     author,
