@@ -8,11 +8,58 @@
  * sebelum tulis DB — titik kepercayaan terakhir).
  *
  * Lapis 1 (utama): DOMPurify (isomorphic-dompurify, aman SSR + browser)
- * dengan whitelist tag/atribut editorial media.
+ * dengan whitelist tag/atribut editorial media. PENTING: isomorphic-dompurify
+ * TIDAK BOLEH diimpor statis di top-level — entry server-nya me-require
+ * `jsdom` (rantai lru-cache ESM-only) dan meledak dengan
+ * `Error [ERR_REQUIRE_ESM]: Failed to load external module jsdom` tepat
+ * saat modul dimuat di Vercel Serverless, SEBELUM try/catch mana pun sempat
+ * berjalan (itulah HTTP 500 saat publikasi artikel). Pemuatan dilakukan
+ * MALAS saat dipanggil di dalam try/catch (`loadPurifier`); bila gagal,
+ * sanitasi jatuh ke Lapis 2 (regex ketat + strip konten aktif) dan API
+ * TIDAK PERNAH crash.
  * Lapis 2 (defense-in-depth): filter regex lama — menegakkan href https/relatif,
  * rel noopener+noreferrer otomatis, dan class allowlist.
  */
-import DOMPurify from "isomorphic-dompurify";
+type DomPurifier = {
+  sanitize: (
+    dirty: string,
+    config?: Record<string, unknown>
+  ) => string | unknown;
+};
+
+// undefined = belum dicoba; null = gagal / tidak tersedia (pakai fallback).
+let purifierCache: DomPurifier | null | undefined;
+
+/**
+ * Muat DOMPurify secara malas dan aman. Tidak pernah melempar:
+ * mengembalikan null bila `require` tak tersedia (Edge) atau rantai
+ * jsdom gagal dimuat di serverless (ERR_REQUIRE_ESM).
+ */
+function loadPurifier(): DomPurifier | null {
+  if (purifierCache !== undefined) return purifierCache;
+  purifierCache = null;
+  try {
+    if (typeof require === "function") {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mod = require("isomorphic-dompurify") as
+        | ({ default?: DomPurifier } & Partial<DomPurifier>)
+        | null
+        | undefined;
+      const candidate = mod?.default ?? mod;
+      if (
+        candidate &&
+        typeof (candidate as Partial<DomPurifier>).sanitize === "function"
+      ) {
+        purifierCache = candidate as DomPurifier;
+      }
+    }
+  } catch (e) {
+    // jsdom gagal dimuat di serverless: JANGAN crash — Lapis 2 menutup XSS.
+    console.warn("Server-side DOMPurify warning (bypassed safely):", e);
+    purifierCache = null;
+  }
+  return purifierCache;
+}
 
 // Whitelist tag editorial aman (spesifikasi hardening XSS media).
 const DOMPURIFY_TAGS = [
@@ -145,36 +192,54 @@ function regexScrub(html: string): string {
     });
 }
 
+// Strip konten AKTIF beserta isinya (fallback tidak punya parser DOM —
+// regexScrub di bawah hanya membuang tag tapi mempertahankan isi teks,
+// yang berbahaya untuk <script>/<style>/<iframe>). Dipakai HANYA di jalur
+// fallback agar 500 lenyap tanpa melemahkan Lapis 1.
+function stripActiveContent(html: string): string {
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script\s*>/gi, "")
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style\s*>/gi, "")
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe\s*>/gi, "");
+}
+
 export function sanitizeHtml(html: string): string {
   const input = String(html ?? "");
   if (!input) return "";
   // Lapis 1: DOMPurify — parser DOM sungguhan (tahan mutasi XSS yang
   // lolos regex: SVG/math, style expression, event handler non-standar).
   // Seluruh <a> dipaksa membawa rel noopener+noreferrer pasca-sanitasi.
+  // loadPurifier() tidak pernah melempar (null bila jsdom gagal dimuat).
   try {
-    const purified = DOMPurify.sanitize(input, {
-      ALLOWED_TAGS: DOMPURIFY_TAGS,
-      ALLOWED_ATTR: DOMPURIFY_ATTR,
-      ALLOW_DATA_ATTR: false,
-      FORBID_TAGS: ["script", "style", "iframe", "object", "embed", "form", "input", "button", "svg", "math", "link", "meta", "base"],
-      FORBID_ATTR: ["onerror", "onload", "onclick", "style"],
-    });
-    const withRel = String(purified).replace(/<a\b([^<>]*)>/gi, (tag) => {
-      if (/rel\s*=/i.test(tag)) {
-        return tag.replace(/rel\s*=\s*"([^"]*)"/i, (_m, v: string) => {
-          const kept = new Set<string>(["noopener", "noreferrer"]);
-          for (const t of String(v).split(/[\s,]+/).map((s) => s.trim().toLowerCase())) {
-            if (["noopener", "noreferrer", "nofollow", "ugc", "sponsored"].includes(t)) kept.add(t);
-          }
-          return `rel="${[...kept].join(" ")}"`;
-        });
-      }
-      return tag.replace(/<a\b/i, '<a rel="noopener noreferrer"');
-    });
-    // Lapis 2: scrub regex (href/src/class allowlist ketat).
-    return regexScrub(withRel);
+    const purifier = loadPurifier();
+    if (purifier) {
+      const purified = purifier.sanitize(input, {
+        ALLOWED_TAGS: DOMPURIFY_TAGS,
+        ALLOWED_ATTR: DOMPURIFY_ATTR,
+        ALLOW_DATA_ATTR: false,
+        FORBID_TAGS: ["script", "style", "iframe", "object", "embed", "form", "input", "button", "svg", "math", "link", "meta", "base"],
+        FORBID_ATTR: ["onerror", "onload", "onclick", "style"],
+      });
+      const withRel = String(purified).replace(/<a\b([^<>]*)>/gi, (tag) => {
+        if (/rel\s*=/i.test(tag)) {
+          return tag.replace(/rel\s*=\s*"([^"]*)"/i, (_m, v: string) => {
+            const kept = new Set<string>(["noopener", "noreferrer"]);
+            for (const t of String(v).split(/[\s,]+/).map((s) => s.trim().toLowerCase())) {
+              if (["noopener", "noreferrer", "nofollow", "ugc", "sponsored"].includes(t)) kept.add(t);
+            }
+            return `rel="${[...kept].join(" ")}"`;
+          });
+        }
+        return tag.replace(/<a\b/i, '<a rel="noopener noreferrer"');
+      });
+      // Lapis 2: scrub regex (href/src/class allowlist ketat).
+      return regexScrub(withRel);
+    }
+    // Fallback: DOMPurify tak tersedia (jsdom gagal di serverless) —
+    // strip konten aktif lalu scrub regex ketat. Anti-crash, tetap anti-XSS.
+    return regexScrub(stripActiveContent(input));
   } catch {
-    return regexScrub(input);
+    return regexScrub(stripActiveContent(input));
   }
 }
 
