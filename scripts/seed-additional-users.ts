@@ -1,5 +1,5 @@
 /**
- * Seed 4 jurnalis tambahan GentaNusa ke Supabase Auth (idempoten).
+ * Seed jurnalis tambahan GentaNusa ke Supabase Auth (idempoten).
  *
  * Env (server-only):
  *   SUPABASE_SERVICE_ROLE_KEY (disarankan) / SUPABASE_SERVICE_KEY (fallback)
@@ -37,6 +37,12 @@ const users: NewUser[] = [
     email: "ahmad.luluil@gentanusa.id",
     password: "Genta#Luluil2026!",
     slug: "ahmad-luluil",
+  },
+  {
+    name: "Fakhri Putra",
+    email: "fakhri.putra@gentanusa.id",
+    password: "GentaNusa2026!Fakhri#Secure",
+    slug: "fakhri-putra",
   },
 ];
 
@@ -120,7 +126,7 @@ async function ensureEditorAppRole(email: string): Promise<boolean> {
 }
 
 async function seed(): Promise<void> {
-  console.log("Mendaftarkan 4 jurnalis tambahan GentaNusa...");
+  console.log("Mendaftarkan jurnalis tambahan GentaNusa...");
   for (const user of users) {
     const { error } = await supabaseAdmin.auth.admin.createUser({
       email: user.email,

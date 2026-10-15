@@ -352,6 +352,8 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
   // tanpa Base64 di JSON). Mengembalikan URL proksi /media/... .
   // Kompresi client-side dulu bila > 2 MB; tolak tegas bila hasil akhir
   // masih > 4 MB agar tidak disalahartikan sebagai koneksi putus.
+  // `credentials: "same-origin"` memastikan cookie sesi httpOnly
+  // (genta_token) selalu terkirim agar endpoint mengenali redaksi login.
   async function uploadImage(): Promise<string | null> {
     if (!imageFile) return form.image || null;
     const payload = await compressImageIfNeeded(imageFile);
@@ -363,7 +365,7 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
     fd.append("file", payload);
     let r: Response;
     try {
-      r = await fetch("/api/upload", { method: "POST", body: fd });
+      r = await fetch("/api/upload", { method: "POST", body: fd, credentials: "same-origin" });
     } catch (err) {
       const detail = err instanceof Error && err.name === "AbortError"
         ? "unggahan dibatalkan (timeout)"
@@ -391,7 +393,7 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
     fd.append("file", payload);
     let r: Response;
     try {
-      r = await fetch("/api/upload", { method: "POST", body: fd });
+      r = await fetch("/api/upload", { method: "POST", body: fd, credentials: "same-origin" });
     } catch (err) {
       const detail = err instanceof Error && err.name === "AbortError"
         ? "unggahan dibatalkan (timeout)"

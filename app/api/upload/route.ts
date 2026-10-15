@@ -143,8 +143,22 @@ export async function POST(req: NextRequest) {
       });
 
     if (uploadError) {
+      const rawMsg = uploadError.message || "kesalahan tak dikenal";
+      const lowered = rawMsg.toLowerCase();
+      console.error("[api/upload] storage.upload gagal:", {
+        message: rawMsg,
+        bucket: "articles",
+        objectName,
+        contentType,
+        size: payload.length,
+        uploader: session.email ?? session.userId ?? "unknown",
+      });
+      const friendly =
+        lowered.includes("bucket") && (lowered.includes("not found") || lowered.includes("does not exist") || lowered.includes("could not be found"))
+          ? "Bucket penyimpanan 'articles' tidak ditemukan di Supabase Storage — buat bucket bernama 'articles' (public) lalu coba lagi."
+          : `Gagal upload storage: ${rawMsg}`;
       return NextResponse.json(
-        { url: "", error: `Gagal upload storage: ${uploadError.message}` },
+        { url: "", error: friendly },
         { status: 500 }
       );
     }
@@ -153,6 +167,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: `/media/${objectName}` }, { status: 200 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Terjadi kesalahan upload";
+    console.error("[api/upload] kesalahan tak terduga:", err instanceof Error ? (err.stack ?? err.message) : err);
     return NextResponse.json({ url: "", error: message }, { status: 500 });
   }
 }
