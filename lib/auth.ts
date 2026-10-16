@@ -104,6 +104,9 @@ export function sessionFromSupabaseUser(user: SupaUserLike): EditorialSession {
   // email_confirmed_at, kecocokan email tidak memberi hak admin.
   // (Jalur app_metadata.role tidak terpengaruh — ditulis backend.)
   const emailVerified = Boolean(user.email_confirmed_at || user.confirmed_at);
+  // Prioritas nama: full_name → name → display_name → pecahan email.
+  // Pecahan email MURNI fallback terakhir bila kolom nama benar-benar kosong.
+  const emailFallback = email ? email.split("@")[0].trim() || null : null;
   return {
     userId: user.id || null,
     email,
@@ -114,7 +117,8 @@ export function sessionFromSupabaseUser(user: SupaUserLike): EditorialSession {
     fullName:
       readString(userMeta.full_name) ??
       readString(userMeta.name) ??
-      readString(userMeta.display_name),
+      readString(userMeta.display_name) ??
+      emailFallback,
     authorSlug: readString(userMeta.author_slug),
   };
 }

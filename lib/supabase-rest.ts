@@ -103,6 +103,9 @@ export function sessionFromRestUser(user: RestUser): EditorialSession {
     adminRole || String(userMeta.role ?? "").trim().toLowerCase() || "editor";
   const email = readString(user.email);
   const emailVerified = Boolean(user.email_confirmed_at || user.confirmed_at);
+  // Prioritas nama: full_name → name → display_name → pecahan email.
+  // Pecahan email MURNI fallback terakhir bila kolom nama benar-benar kosong.
+  const emailFallback = email ? email.split("@")[0].trim() || null : null;
   return {
     userId: user.id || null,
     email,
@@ -113,7 +116,8 @@ export function sessionFromRestUser(user: RestUser): EditorialSession {
     fullName:
       readString(userMeta.full_name) ??
       readString(userMeta.name) ??
-      readString(userMeta.display_name),
+      readString(userMeta.display_name) ??
+      emailFallback,
     authorSlug: readString(userMeta.author_slug),
   };
 }
@@ -670,4 +674,101 @@ export async function getArticleByIdLite(
     columns = kept.join(",");
   }
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// Profil penulis (dipakai /api/auth/update-profile)
+// ---------------------------------------------------------------------------
+
+/**
+ * Sanitasi nama tampilan pena — BEBAS dari format username email.
+ * Hanya: trim, lipat whitespace, buang karakter kontrol + <>, batasi 60.
+ * Contoh "Fidel Apta" untuk fidel.moreno@gentanusa.id adalah VALID.
+ */
+export function sanitizeDisplayNameRest(value: unknown, maxLen = 60): string {
+  let s = String(value ?? "")
+    .replace(/[ -]/g, "")
+    .replace(/[<>"`\\]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (s.length > maxLen) s = s.slice(0, maxLen).trim();
+  return s;
+}
+
+function isUuidLike(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    value
+  );
+}
+
+/**
+ * Simpan nama tampilan ke Supabase Auth via Admin REST API (service_role).
+ * `PUT /auth/v1/admin/users/${userId}` dengan user_metadata:
+ * full_name + display_name (+ name untuk kompatibilitas lama).
+ * Permanen di sisi server — tidak bergantung pada token user yang bisa kedaluwarsa.
+ */
+export async function updateAuthUserDisplayName(
+  userId: string,
+  displayName: string
+): Promise<
+  | { ok: true; user: RestUser }
+  | { ok: false; status: number; error: string }
+> {
+  const c = ensureRestClient();
+  if (!c.ok) return { ok: false, status: 503, error: c.error };
+  const id = String(userId || "").trim();
+  if (!id || !isUuidLike(id)) {
+    return { ok: false, status: 400, error: "user_id tidak valid." };
+  }
+  const clean = sanitizeDisplayNameRest(displayName);
+  if (clean.length < 2 || clean.length > 60) {
+    return {
+      ok: false,
+      status: 400,
+      error: "Nama tampilan wajib 2–60 karakter.",
+    };
+  }
+  try {
+    const res = await fetch(`${c.cfg.url}/auth/v1/admin/users/${id}`, {
+      method: "PUT",
+      headers: {
+        apikey: c.cfg.serviceKey,
+        Authorization: `Bearer ${c.cfg.serviceKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_metadata: {
+          full_name: clean,
+          display_name: clean,
+          name: clean,
+        },
+      }),
+    });
+    if (!res.ok) {
+      let detail = "";
+      try {
+        const j = (await res.json()) as { message?: string; msg?: string };
+        detail = String(j.message || j.msg || "").trim();
+      } catch {
+        // abaikan — pakai status
+      }
+      return {
+        ok: false,
+        status: res.status,
+        error: detail || `Gagal memperbarui nama (kode ${res.status}).`,
+      };
+    }
+    const user = (await res.json()) as RestUser & { user?: RestUser };
+    const inner = (user as { user?: RestUser }).user ?? user;
+    if (!inner || typeof (inner as RestUser).id !== "string") {
+      return { ok: false, status: 500, error: "Respons Supabase tidak valid." };
+    }
+    return { ok: true, user: inner as RestUser };
+  } catch (e) {
+    return {
+      ok: false,
+      status: 500,
+      error: e instanceof Error ? e.message : "Jaringan Supabase gagal",
+    };
+  }
 }
