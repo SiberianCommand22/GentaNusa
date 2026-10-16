@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { getEditorialSession, TOKEN_COOKIE } from "@/lib/auth";
-import { canAccessAdminArea } from "@/lib/roles";
 import {
   sanitizeDisplayNameRest,
   updateAuthUserDisplayName,
@@ -97,23 +96,14 @@ export async function POST(req: NextRequest) {
       { status: 401 }
     );
   }
-  // Gerbang redaksi: tolak sesi valid yang BUKAN peran redaksi — tetapi
-  // IZINKAN seluruh varian redaksi (admin/editor/author/jurnalis/...).
-  if (
-    !canAccessAdminArea(
-      session.appRole,
-      session.emailVerified ? session.email : null
-    )
-  ) {
-    return NextResponse.json(
-      {
-        ok: false,
-        success: false,
-        error: "Akun ini tidak memiliki akses redaksi.",
-      },
-      { status: 403 }
-    );
-  }
+  // HAK AKSES: endpoint ini SENGAJA tidak membatasi hanya untuk admin
+  // (isAdmin). Setiap sesi redaksi valid (getEditorialSession non-null)
+  // BOLEH memperbarui profil MILIKNYA SENDIRI (targetUserId === session.userId
+  // → 200 OK). Hanya bila body menunjuk userId milik orang lain, user
+  // non-admin ditolak 403; admin memiliki izin penuh atas akun mana pun.
+  // (Tidak ada gerbang canAccessAdminArea di sini agar akun redaksi dengan
+  // peran apa pun tidak pernah mendapat "Gagal memperbarui nama" saat
+  // menyimpan namanya sendiri.)
 
   const body = await req.json().catch(() => null);
   const clean = sanitizeDisplayNameRest(readDisplayName(body));

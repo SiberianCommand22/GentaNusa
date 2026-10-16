@@ -45,7 +45,7 @@ export default function AdminSettingsPage() {
       .catch(() => {});
   }, []);
 
-  async function submitProfile(e: React.FormEvent) {
+  async function handleUpdateName(e: React.FormEvent) {
     e.preventDefault();
     setProfileLoading(true);
     setProfileNotice(null);
@@ -56,23 +56,47 @@ export default function AdminSettingsPage() {
         body: JSON.stringify({ displayName: displayName.trim() }),
       });
       const j = (await r.json().catch(() => ({}))) as {
+        ok?: boolean;
         success?: boolean;
         message?: string;
         error?: string;
-        user?: { display_name?: string };
+        user?: { display_name?: string; email?: string };
       };
-      if (r.ok && j.success) {
-        if (typeof j.user?.display_name === "string") setDisplayName(j.user.display_name);
+      if (r.ok && (j.success || j.ok)) {
+        const saved =
+          (typeof j.user?.display_name === "string" && j.user.display_name.trim()) ||
+          displayName.trim();
+        setDisplayName(saved);
         setProfileNotice({ ok: true, text: j.message || "Nama penulis berhasil diperbarui" });
+        // Sinkronisasi header/navbar tanpa relogin: layout /admin mendengarkan event ini.
+        try {
+          window.dispatchEvent(
+            new CustomEvent("genta-profile-updated", { detail: { display_name: saved } })
+          );
+        } catch {
+          // abaikan — event hanya untuk UX instan
+        }
       } else {
-        setProfileNotice({ ok: false, text: j.error || `Gagal menyimpan (kode ${r.status}).` });
+        const serverMsg =
+          (typeof j.error === "string" && j.error.trim()) ||
+          (typeof j.message === "string" && j.message.trim()) ||
+          `Gagal menyimpan (kode ${r.status}).`;
+        console.error("[settings] Gagal memperbarui nama:", {
+          status: r.status,
+          body: j,
+        });
+        setProfileNotice({ ok: false, text: serverMsg });
       }
-    } catch {
+    } catch (err) {
+      console.error("[settings] Gagal memperbarui nama (jaringan):", err);
       setProfileNotice({ ok: false, text: "Jaringan bermasalah. Coba lagi." });
     } finally {
       setProfileLoading(false);
     }
   }
+
+  // Alias kompatibilitas: form memakai handleUpdateName.
+  const submitProfile = handleUpdateName;
 
   function set(field: Field, value: string) {
     setForm((f) => ({ ...f, [field]: value }));

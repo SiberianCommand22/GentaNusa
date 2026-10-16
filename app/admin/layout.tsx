@@ -74,6 +74,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       setProfile(j);
       setAuthed(true);
     });
+    // Sinkronisasi instan nama tampilan setelah /admin/settings berhasil
+    // menyimpan — tanpa harus relogin / reload halaman.
+    const onProfileUpdated = (ev: Event) => {
+      const detail = (ev as CustomEvent<{ display_name?: string }>).detail;
+      const name = typeof detail?.display_name === "string" ? detail.display_name.trim() : "";
+      if (!name) return;
+      setProfile((p) => ({ ...(p ?? {}), display_name: name }));
+    };
+    window.addEventListener("genta-profile-updated", onProfileUpdated);
+    return () => window.removeEventListener("genta-profile-updated", onProfileUpdated);
   }, [isLogin, router]);
 
   async function logout() {
