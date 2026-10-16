@@ -25,7 +25,7 @@ type Session = {
   authorSlug: string | null;
 };
 
-const DELETE_FORBIDDEN = "Hanya Administrator Utama yang berhak menghapus berita.";
+const DELETE_FORBIDDEN_OWN = "Anda hanya memiliki izin untuk menghapus artikel buatan Anda sendiri.";
 
 function isDraftRow(r: Row): boolean {
   if (r.status === "draft") return true;
@@ -43,8 +43,10 @@ export default function ManagePostsPage() {
   const [session, setSession] = useState<Session | null>(null);
 
   // Peran dihitung dari SESI SERVER (/api/admin/check memverifikasi ulang ke
-  // Supabase Auth), bukan dari kondisi UI — tombol Hapus hanya muncul bila
-  // isAdmin === true.
+  // Supabase Auth). Daftar memakai scope=mine sehingga penulis biasa hanya
+  // menerima baris miliknya — tombol Hapus tampil untuk semua baris yang
+  // terlihat (admin: semua berita; penulis: milik sendiri). Backend tetap
+  // menegakkan kepemilikan (403 bila memaksa ID orang lain).
   useEffect(() => {
     fetch("/api/admin/check")
       .then(async (r) => {
@@ -97,7 +99,7 @@ export default function ManagePostsPage() {
   }, [load]);
 
   async function delArticle(id: number, title: string) {
-    if (!confirm(`Hapus permanen "${title}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+    if (!confirm(`Hapus permanen "${title}"? Artikel akan dihapus permanen dan tindakan ini tidak bisa dibatalkan. Lanjutkan?`)) return;
     setMsg("");
     const r = await fetch(`/api/articles/${id}`, { method: "DELETE" });
     if (r.ok) {
@@ -107,7 +109,7 @@ export default function ManagePostsPage() {
     } else {
       const j = await r.json().catch(() => ({}));
       const detail = typeof j.error === "string" && j.error ? j.error : `kode ${r.status}`;
-      setMsg(r.status === 403 ? DELETE_FORBIDDEN : `Gagal menghapus: ${detail}`);
+      setMsg(r.status === 403 && !detail ? DELETE_FORBIDDEN_OWN : `Gagal menghapus: ${detail}`);
     }
   }
 
@@ -141,8 +143,8 @@ export default function ManagePostsPage() {
       {isAuthorMode && (
         <div className={styles.infoBanner} role="status">
           Mode Penulis{session?.displayName ? ` — ${session.displayName}` : ""}. Anda hanya
-          melihat dan menyunting berita milik Anda sendiri; tombol hapus tidak tersedia
-          untuk peran ini.
+          melihat berita milik Anda sendiri; Anda dapat menyunting dan menghapus
+          artikel buatan Anda sendiri.
         </div>
       )}
 
@@ -244,21 +246,20 @@ export default function ManagePostsPage() {
                             <path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z" />
                           </svg>
                         </button>
-                        {/* Pilar 4 — HAK EKSKLUSIF ADMINISTRATOR.
-                            Penulis biasa tidak melihat tombol ini sama sekali;
-                            backend juga menolak dengan 403 bila dipaksakan. */}
-                        {isAdmin && (
-                          <button
-                            className={`${styles.iconBtn} ${styles.iconBtnDanger}`}
-                            title="Hapus permanen"
-                            aria-label={`Hapus ${a.title}`}
-                            onClick={() => delArticle(a.id, a.title)}
-                          >
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                              <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                            </svg>
-                          </button>
-                        )}
+                        {/* Otorisasi hapus: admin akses penuh; penulis hanya
+                            melihat baris miliknya (scope=mine) sehingga semua
+                            tombol Hapus di bawah sah diklik. Backend menolak
+                            403 bila ID milik penulis lain dipaksakan. */}
+                        <button
+                          className={`${styles.iconBtn} ${styles.iconBtnDanger}`}
+                          title="Hapus permanen"
+                          aria-label={`Hapus ${a.title}`}
+                          onClick={() => delArticle(a.id, a.title)}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                          </svg>
+                        </button>
                       </div>
                     </td>
                   </tr>

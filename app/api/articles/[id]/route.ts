@@ -3,7 +3,8 @@ import { revalidatePath } from "next/cache";
 // RINGAN KUOTA: impor data HANYA dari fetch-REST murni (tanpa supabase-js
 // ±215 KB) agar bundel fungsi tetap di bawah batas 1 MB paket Hobby.
 import {
-  ACCESS_DENIED_DELETE,
+  ACCESS_DENIED_DELETE_OWN,
+  canDeleteArticleRest,
   deleteArticleById,
   ensureRestClient,
   fetchArticleForSessionRest as fetchArticleForSession,
@@ -315,7 +316,9 @@ export async function PUT(
 }
 
 // DELETE /api/articles/[id] — hapus artikel.
-// HAK EKSKLUSIF ADMINISTRATOR: selain itu 403 Forbidden, tidak ada pengecualian.
+// Administrator: akses penuh ke artikel mana pun.
+// Editor/penulis redaksi: HANYA boleh menghapus artikel miliknya sendiri
+// (article.user_id === session.userId); milik orang lain → 403.
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -324,15 +327,28 @@ export async function DELETE(
   if (!session) {
     return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
   }
-  if (!session.isAdmin) {
-    return NextResponse.json({ error: ACCESS_DENIED_DELETE }, { status: 403 });
-  }
   const c = ensureRestClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
 
   const { id } = await params;
-  // Permanent delete via service_role (bypass RLS) — admin only (dicek di atas).
-  const { error } = await deleteArticleById(id);
+  const raw = String(id ?? "").trim();
+  if (!/^\d+$/.test(raw) || Number(raw) <= 0) {
+    return NextResponse.json({ error: "id tidak valid" }, { status: 400 });
+  }
+  // Penjagaan kepemilikan: ambil dulu baris target, lalu cek user_id.
+  // Baris lawas tanpa user_id hanya boleh dihapus admin (fail-closed).
+  if (!session.isAdmin) {
+    const target = await getArticle(String(Number(raw)), false);
+    if (!target) {
+      return NextResponse.json({ error: "Artikel tidak ditemukan" }, { status: 404 });
+    }
+    if (!canDeleteArticleRest(target, session)) {
+      return NextResponse.json({ error: ACCESS_DENIED_DELETE_OWN }, { status: 403 });
+    }
+  }
+  // Permanent delete via service_role (bypass RLS) — otorisasi dicek di atas
+  // (admin penuh; penulis hanya milik sendiri).
+  const { error } = await deleteArticleById(raw);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   revalidatePath("/");
   revalidatePath("/kategori");

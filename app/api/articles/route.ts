@@ -4,10 +4,12 @@ import { revalidatePath } from "next/cache";
 // RINGAN KUOTA: impor data HANYA dari fetch-REST murni (tanpa supabase-js
 // ±215 KB) agar bundel fungsi tetap di bawah batas 1 MB paket Hobby.
 import {
-  ACCESS_DENIED_DELETE,
+  ACCESS_DENIED_DELETE_OWN,
+  canDeleteArticleRest,
   deleteArticleById,
   ensureRestClient,
   fetchArticlesForSessionRest as fetchArticlesForSession,
+  getArticleByIdLite,
   getEditorialSessionRest as getEditorialSession,
   getPublicArticlesLite as getArticles,
   insertArticleTolerant,
@@ -316,15 +318,14 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(data, { status: 201 });
 }
 
-// DELETE — hapus artikel. HAK EKSKLUSIF ADMINISTRATOR.
-// Penulis biasa: 403 Forbidden, apa pun status sesinya.
+// DELETE — hapus artikel.
+// Administrator: akses penuh ke artikel mana pun.
+// Editor/penulis redaksi: HANYA boleh menghapus artikel miliknya sendiri
+// (article.user_id === session.userId); milik orang lain → 403.
 export async function DELETE(req: NextRequest) {
   const session = await getEditorialSession(req.headers.get("cookie"));
   if (!session) {
     return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
-  }
-  if (!session.isAdmin) {
-    return NextResponse.json({ error: ACCESS_DENIED_DELETE }, { status: 403 });
   }
   const c = ensureRestClient();
   if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
@@ -333,6 +334,17 @@ export async function DELETE(req: NextRequest) {
   const numId = Number(id);
   if (!Number.isFinite(numId) || numId <= 0) {
     return NextResponse.json({ error: "id tidak valid" }, { status: 400 });
+  }
+  // Penjagaan kepemilikan: ambil dulu baris target, lalu cek user_id.
+  // Baris lawas tanpa user_id hanya boleh dihapus admin (fail-closed).
+  if (!session.isAdmin) {
+    const target = await getArticleByIdLite(String(numId), false);
+    if (!target) {
+      return NextResponse.json({ error: "Artikel tidak ditemukan" }, { status: 404 });
+    }
+    if (!canDeleteArticleRest(target, session)) {
+      return NextResponse.json({ error: ACCESS_DENIED_DELETE_OWN }, { status: 403 });
+    }
   }
   const { error } = await deleteArticleById(numId);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

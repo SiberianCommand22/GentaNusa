@@ -277,20 +277,21 @@ export default async function ArticlePage({ params }: Params) {
             <span className={styles.readTime}>{readMinutes} menit membaca</span>
           </div>
 
-          {/* 5. Foto sampul (Hero) — TIPE 1 & TIPE 2 identik di paling atas.
-              Rasio aspect-video w-full, zero layout shift via fill.
-              MODUL 3: `sizes` presisi agar preload `priority` cocok dengan
-              permintaan akhir browser (eliminasi galat preload console). */}
+          {/* 5. Foto sampul (Hero) — adaptif orientasi & anti-crop wajah.
+              Portrait/vertikal ditampilkan utuh via object-contain dalam
+              kontainer berbatas tinggi (bukan aspect-video + object-cover
+              yang memotong kepala/wajah). Landscape tetap penuh lebar. */}
           {coverImage && (
             <figure className="max-w-3xl mx-auto w-full">
-              <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 max-sm:rounded-xl">
+              <div className="relative w-full max-h-[550px] md:max-h-[650px] overflow-hidden rounded-2xl bg-slate-950/5 border border-slate-200 flex items-center justify-center my-6 max-sm:rounded-xl">
                 <Image
                   src={coverImage}
                   alt={article.image_caption || article.title}
-                  fill
+                  width={1200}
+                  height={800}
                   priority
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 768px, 800px"
-                  className="object-cover"
+                  className="w-full h-auto max-h-[550px] md:max-h-[650px] object-contain mx-auto"
                 />
               </div>
               {/* HANYA tampil bila caption/kredit asli ada di database */}
@@ -324,16 +325,18 @@ export default async function ArticlePage({ params }: Params) {
                   <ArticleContent content={headParas} />
                 </div>
               )}
-              {/* Komponen Foto Kedua di Tengah Naskah */}
+              {/* Komponen Foto Kedua di Tengah Naskah — adaptif portrait:
+                  object-contain + fokus atas agar wajah tidak terpotong. */}
               {optionalImage && (
                 <figure className="my-8 rounded-2xl overflow-hidden bg-slate-50 border border-slate-200/80 shadow-sm max-w-3xl mx-auto w-full max-sm:rounded-xl">
-                  <div className="relative aspect-video w-full bg-slate-100">
+                  <div className="relative w-full max-h-[480px] overflow-hidden bg-slate-100 flex items-center justify-center">
                     <Image
                       src={optionalImage}
                       alt={optionalCaption || article.title}
-                      fill
+                      width={1200}
+                      height={800}
                       sizes="(max-width: 768px) 100vw, 720px"
-                      className="object-cover"
+                      className="w-full h-auto max-h-[480px] object-contain object-top mx-auto"
                     />
                   </div>
                   {(optionalCaption || optionalCredit) && (

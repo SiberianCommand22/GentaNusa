@@ -260,6 +260,10 @@ export const ACCESS_DENIED_EDIT =
 export const ACCESS_DENIED_DELETE =
   "Hanya Administrator Utama yang berhak menghapus berita.";
 
+/** Pesan error saat penulis mencoba menghapus artikel milik penulis lain. */
+export const ACCESS_DENIED_DELETE_OWN =
+  "Anda hanya memiliki izin untuk menghapus artikel buatan Anda sendiri.";
+
 type PgError = { code?: string; message?: string };
 
 async function pgRequest(
@@ -342,6 +346,19 @@ export function ownsArticleRest(
 
 /** Administrator boleh mengedit apa pun; selain itu harus pemilik artikel. */
 export function canEditArticleRest(
+  article: { user_id?: string | null } | null,
+  session: EditorialSession | null
+): boolean {
+  if (!session) return false;
+  if (session.isAdmin) return true;
+  return ownsArticleRest(article, session);
+}
+
+/**
+ * Administrator boleh menghapus apa pun; penulis redaksi boleh menghapus
+ * HANYA artikel miliknya sendiri (user_id === session.userId).
+ */
+export function canDeleteArticleRest(
   article: { user_id?: string | null } | null,
   session: EditorialSession | null
 ): boolean {
