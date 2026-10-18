@@ -9,7 +9,8 @@
     "build:sync": "node scripts/sync-supabase.mjs && next build --webpack",
     "start": "next start",
     "seed": "node scripts/seed-users.js",
-    "lint": "eslint"
+    "lint": "eslint",
+    "audit:security": "tsx scripts/audit-system.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -30,6 +31,7 @@
     "playwright": "^1.63.0",
     "postcss": "^8.5.28",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
