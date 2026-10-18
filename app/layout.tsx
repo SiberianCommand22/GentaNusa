@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Source_Serif_4, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { AnalyticsTracker } from "@/components/analytics-tracker";
 import { SiteChrome } from "@/components/site-chrome";
@@ -22,6 +22,16 @@ const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
   display: "swap",
 });
+
+// Viewport eksplisit memakai format bawaan Next.js App Router —
+// menghindari tag <meta name="viewport"> manual yang duplikat (merusak
+// rendering Safari Mobile: halaman kosong / freeze saat first paint).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#F8FAFC",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gentanusa.id"),
