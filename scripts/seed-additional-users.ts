@@ -44,6 +44,24 @@ const users: NewUser[] = [
     password: "GentaNusa2026!Fakhri#Secure",
     slug: "fakhri-putra",
   },
+  {
+    name: "Muh. Dafa Putra Anindito",
+    email: "dafa.anindito@gentanusa.id",
+    password: "GentaNusa2026!Dafa#Secure",
+    slug: "muh-dafa-putra-anindito",
+  },
+  {
+    name: "Devan Nizar",
+    email: "devan.nizar@gentanusa.id",
+    password: "GentaNusa2026!Devan#Secure",
+    slug: "devan-nizar",
+  },
+  {
+    name: "Thaqif Sahama",
+    email: "thaqif.sahama30@gentanusa.id",
+    password: "GentaNusa2026!Thaqif#Secure",
+    slug: "thaqif-sahama",
+  },
 ];
 
 function loadEnvLocal(): void {

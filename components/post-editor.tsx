@@ -247,13 +247,17 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
     // `scope=edit` memaksa server menegakkan kepemilikan artikel.
     fetch(`/api/articles/${target}?scope=edit`).then(async (r) => {
       if (!r.ok) {
-        const j = await r.json().catch(() => ({}));
+        let errorMessage = `Gagal memuat artikel (kode ${r.status}).`;
+        try {
+          const data = await r.json();
+          errorMessage = data.error || data.message || errorMessage;
+        } catch {
+          errorMessage = `Server merespons status ${r.status} (${r.statusText || 'Error'}). Periksa log runtime Vercel.`;
+        }
         setGuardMsg(
           r.status === 403
             ? ACCESS_DENIED_EDIT
-            : typeof j.error === "string" && j.error
-              ? j.error
-              : `Gagal memuat artikel (kode ${r.status}).`
+            : errorMessage
         );
         setLoadedEdit(true);
         return;
@@ -571,9 +575,14 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         writeDraftSnapshot(form);
         setOkMsg("Tersimpan sebagai draf. Berita ini tidak akan tampil di halaman depan maupun kategori sampai Anda mempublikasikannya.");
       } else {
-        const j = await r.json().catch(() => ({}));
-        const detail = typeof j.error === "string" && j.error ? j.error : `kode ${r.status}`;
-        setMsg(`Gagal menyimpan draf: ${detail}`);
+        let errorMessage = "Terjadi kesalahan pada server.";
+        try {
+          const data = await r.json();
+          errorMessage = data.error || data.message || errorMessage;
+        } catch {
+          errorMessage = `Server merespons status ${r.status} (${r.statusText || 'Error'}). Periksa log runtime Vercel.`;
+        }
+        setMsg(`Gagal menyimpan draf: ${errorMessage}`);
       }
     } catch (e) {
       setBusy(false);
@@ -681,9 +690,14 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         setOkMsg("Berita berhasil dipublikasikan!");
         window.setTimeout(() => router.push("/admin/posts"), 600);
       } else {
-        const j = await r.json().catch(() => ({}));
-        const detail = typeof j.error === "string" && j.error ? j.error : `kode ${r.status}`;
-        setMsg(`Gagal memublikasikan artikel: ${detail}`);
+        let errorMessage = "Terjadi kesalahan pada server.";
+        try {
+          const data = await r.json();
+          errorMessage = data.error || data.message || errorMessage;
+        } catch {
+          errorMessage = `Server merespons status ${r.status} (${r.statusText || 'Error'}). Periksa log runtime Vercel.`;
+        }
+        setMsg(`Gagal memublikasikan artikel: ${errorMessage}`);
       }
     } catch (e) {
       setBusy(false);
