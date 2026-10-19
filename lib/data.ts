@@ -1,4 +1,5 @@
 import { supabaseAnon } from "./supabase";
+import type { CategorySlug } from "./categories";
 
 export type Article = {
   id: number;
@@ -35,7 +36,7 @@ export type Author = {
 };
 
 export type Category = {
-  slug: string;
+  slug: CategorySlug;
   name: string;
 };
 

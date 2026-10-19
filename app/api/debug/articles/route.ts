@@ -21,7 +21,7 @@ export async function GET() {
   const localArticles = await getArticles();
   const localCategories = await getCategories();
   const localArticleIds = localArticles.map((a) => a.id).sort((a, b) => a - b);
-  const localCategorySlugs = localCategories.map((c) => c.slug);
+  const localCategorySlugs: string[] = localCategories.map((c) => c.slug);
 
   let dbArticleIds: number[] = [];
   const dbCategorySlugs: string[] = [];

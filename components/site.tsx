@@ -14,6 +14,7 @@ const QUICK_CHANNELS = [
   { slug: "nasional", label: "Nasional" },
   { slug: "politik", label: "Politik" },
   { slug: "pertahanan", label: "Pertahanan" },
+  { slug: "dunia", label: "Dunia" },
   { slug: "sosial-budaya", label: "Sosial Budaya" },
   { slug: "kesehatan", label: "Kesehatan" },
   { slug: "olahraga", label: "Olahraga" },

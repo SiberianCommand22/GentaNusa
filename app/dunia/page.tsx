@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Footer } from "@/components/site";
 import { supabaseAnon } from "@/lib/supabase";
 import { articleUrl, type Article } from "@/lib/data";
+import { requireCategoryDefinition } from "@/lib/categories";
 import { siteUrl } from "@/lib/site";
 import styles from "@/app/kategori/[slug]/category.module.css";
 
@@ -96,19 +97,21 @@ async function fetchDuniaArticles(): Promise<Article[]> {
 
 const SITE_URL = siteUrl();
 
+// Metadata SEO diinjeksi dari master kategori (lib/categories.ts) agar
+// judul & deskripsi /dunia selalu sinkron dengan data kategori kanonik.
+const DUNIA = requireCategoryDefinition("dunia");
+
 export const metadata: Metadata = {
-  title: { absolute: "Berita Dunia Terkini | GentaNusa" },
-  description:
-    "Kabar internasional, geopolitik kawasan, dan hubungan diplomatik global.",
+  title: { absolute: DUNIA.metaTitle },
+  description: DUNIA.metaDescription,
   alternates: { canonical: `${SITE_URL}/dunia` },
   openGraph: {
     url: `${SITE_URL}/dunia`,
     siteName: "GentaNusa",
     locale: "id_ID",
     type: "website",
-    title: "Berita Dunia Terkini | GentaNusa",
-    description:
-      "Kabar internasional, geopolitik kawasan, dan hubungan diplomatik global.",
+    title: DUNIA.metaTitle,
+    description: DUNIA.metaDescription,
     images: [
       {
         url: `${SITE_URL}/og-default.jpg`,
@@ -120,9 +123,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Berita Dunia Terkini | GentaNusa",
-    description:
-      "Kabar internasional, geopolitik kawasan, dan hubungan diplomatik global.",
+    title: DUNIA.metaTitle,
+    description: DUNIA.metaDescription,
     images: [`${SITE_URL}/og-default.jpg`],
   },
 };
@@ -145,7 +147,7 @@ export default async function DuniaPage() {
             <span className="text-xs uppercase tracking-widest text-[#041d56] font-bold">Kanal Berita</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Dunia</h1>
-          <p className="text-sm text-slate-500 mt-1 max-w-2xl">Kabar internasional, geopolitik kawasan, dan hubungan diplomatik global.</p>
+          <p className="text-sm text-slate-500 mt-1 max-w-2xl">{DUNIA.description}</p>
         </div>
 
         {articles.length === 0 ? (

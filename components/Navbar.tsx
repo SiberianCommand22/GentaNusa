@@ -15,6 +15,7 @@ const categoryNav = [
   { slug: "nasional", label: "Nasional" },
   { slug: "politik", label: "Politik" },
   { slug: "pertahanan", label: "Pertahanan" },
+  { slug: "dunia", label: "Dunia" },
   { slug: "sosial-budaya", label: "Sosial Budaya" },
   { slug: "kesehatan", label: "Kesehatan" },
   { slug: "olahraga", label: "Olahraga" },
@@ -101,7 +102,7 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Tengah — 7 kategori resmi, horizontal, hanya di desktop */}
+          {/* Tengah — 8 kategori resmi, horizontal, hanya di desktop */}
           <nav className="hidden lg:flex items-center gap-8" aria-label="Kategori berita">
             {categoryNav.map((c) => renderCategoryLink(c))}
           </nav>

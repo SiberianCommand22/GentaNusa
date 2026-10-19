@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { VisualEditor, blocksToHtml, htmlToBlocks, htmlToText } from "@/components/visual-editor";
 import { sanitizeContentInputServer } from "@/lib/sanitize-server";
+import { CATEGORIES as CATEGORY_DEFINITIONS } from "@/lib/categories";
 import styles from "@/app/admin/cms.module.css";
 
 /**
@@ -16,7 +17,10 @@ import styles from "@/app/admin/cms.module.css";
  * Supabase Auth; kolom di bawah tidak pernah dipercaya untuk itu.
  */
 
-const CATEGORIES = ["Nasional", "Pertahanan", "Politik", "Ekonomi", "Dunia", "Peduli", "Sosial Budaya", "Kesehatan", "Olahraga", "Keamanan"];
+// Label kanal untuk dropdown & validasi POST — diturunkan dari master
+// lib/categories.ts sehingga kanal baru (mis. "Dunia") ikut terpanggil
+// tanpa perlu disalin manual ke dua tempat.
+const CATEGORIES = CATEGORY_DEFINITIONS.map((c) => c.label);
 
 // Penanda headline disimpan sebagai tag khusus (difilter dari tampilan publik).
 const HEADLINE_TAG = "headline";
