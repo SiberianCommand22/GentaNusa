@@ -29,8 +29,10 @@ import { canAccessAdminArea, TOKEN_COOKIE } from "@/lib/roles";
 //   middleware sama sekali (matcher di bawah hanya /admin/* — hemat kuota
 //   Edge Middleware Invocations dari pembaca publik). Setiap route handler
 //   menegakkan sesinya sendiri via fetch murni, dan
-//   Cache-Control: no-store untuk API dipasang via headers() di next.config
-//   (tanpa biaya invocation).
+//   Cache-Control: no-store untuk rute API privat dipasang via headers() di
+//   next.config (tanpa biaya invocation). Pengecualian: feed publik persis
+//   /api/articles dikendalikan route handler (cabang publik: s-maxage edge;
+//   cabang scope admin: no-store eksplisit).
 //
 // CATATAN KEAMANAN: SUPABASE_SERVICE_ROLE_KEY / SUPABASE_SERVICE_KEY tidak
 // pernah disentuh di berkas ini maupun di klien mana pun (tanpa prefiks

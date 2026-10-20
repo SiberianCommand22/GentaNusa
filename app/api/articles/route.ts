@@ -46,6 +46,11 @@ function slugify(value: string): string {
 export async function GET(req: NextRequest) {
   const scope = req.nextUrl.searchParams.get("scope");
 
+  // Cabang privat TIDAK boleh pernah masuk cache mana pun (config headers
+  // tidak mencakup path persis /api/articles — feed publik yang dikendalikan
+  // handler), jadi no-store dipasang EKSPLISIT di sini.
+  const noStore = { headers: { "Cache-Control": "no-store" } } as const;
+
   if (scope === "all" || scope === "mine" || scope === "draft") {
     // getEditorialSession dibungkus try/catch: kegagalan tak terduga WAJIB
     // menjawab JSON (401/500 ber-body), bukan crash 500 tanpa body yang
@@ -56,30 +61,38 @@ export async function GET(req: NextRequest) {
     } catch {
       return NextResponse.json(
         { error: "Gagal memeriksa sesi. Coba muat ulang halaman." },
-        { status: 500 }
+        { status: 500, ...noStore }
       );
     }
     if (!session) {
-      return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Butuh login redaksi" },
+        { status: 401, ...noStore }
+      );
     }
     // Isolasi data: penulis biasa tidak pernah boleh melihat seluruh repo.
     if (scope === "all" && !session.isAdmin) {
       return NextResponse.json(
         { error: "Hanya Administrator yang dapat melihat seluruh berita." },
-        { status: 403 }
+        { status: 403, ...noStore }
       );
     }
     const result = await fetchArticlesForSession(session, {
       draftsOnly: scope === "draft",
     });
     if (!result.ok) {
-      return NextResponse.json({ error: result.error }, { status: result.status });
+      return NextResponse.json(
+        { error: result.error },
+        { status: result.status, ...noStore }
+      );
     }
-    return NextResponse.json(result.data);
+    return NextResponse.json(result.data, noStore);
   }
 
   const c = ensureRestClient();
-  if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
+  if (!c.ok) {
+    return NextResponse.json({ error: c.error }, { status: 503, ...noStore });
+  }
   try {
     const articles = await getArticles();
     return NextResponse.json(
@@ -93,10 +106,23 @@ export async function GET(req: NextRequest) {
         author: a.author,
         image: a.image,
         tags: a.tags,
-      }))
+      })),
+      {
+        headers: {
+          // Feed publik TIDAK membaca cookie sehingga aman disimpan CDN edge
+          // selama 60 detik (nol Function Invocation di bawa pembaca). Cabang
+          // scope=all/mine/draft tidak memakai header ini — tetap no-store.
+          // Catatan: invalidasi revalidatePath menarget halaman ISR HTML;
+          // feed JSON ini boleh basi maksimal 60 detik setelah publikasi.
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
+      }
     );
   } catch {
-    return NextResponse.json({ error: "Gagal memuat artikel" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Gagal memuat artikel" },
+      { status: 500, ...noStore }
+    );
   }
 }
 

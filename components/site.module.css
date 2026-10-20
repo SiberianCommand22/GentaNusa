@@ -4,6 +4,8 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.7);
   padding: 64px 0 48px;
+  /* Bar home-indicator iPhone: copyright tidak tenggelam di balik gesture bar. */
+  padding-bottom: calc(48px + env(safe-area-inset-bottom));
   margin-top: 40px;
 }
 
@@ -11,7 +13,7 @@
    di jalur tombol Back-to-Top yang melayang (fixed bottom-6 right-6). */
 @media (max-width: 639px) {
   .footer {
-    padding-bottom: 72px;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
   }
 }
 

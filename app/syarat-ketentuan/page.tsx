@@ -41,7 +41,7 @@ const POINTS: Array<{ title: string; body: string }> = [
 export default function SyaratKetentuanPage() {
   return (
     <>
-      <main className="min-h-screen bg-[#F8FAFC] py-12 px-4 sm:px-6 lg:px-8">
+      <main className="min-h-dvh bg-[#F8FAFC] py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6">
           <header>
             <span className="px-3 py-1 rounded bg-blue-50 text-blue-700 font-bold text-xs uppercase tracking-wider">

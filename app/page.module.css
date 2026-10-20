@@ -6,6 +6,7 @@
 
 .main {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* ===== Empty state (0 berita) ===== */

@@ -546,7 +546,12 @@ export async function getPublicArticlesLite(): Promise<PublicArticleLite[]> {
   let result: PublicArticleLite[] = [];
   if (c.ok) {
     try {
-      const sp = new URLSearchParams({ select: "*" });
+      // DIET PAYLOAD: feed publik hanya memetakan kolom daftar — kolom `content`
+      // (blok HTML panjang) TIDAK ikut diambil, memangkas transfer PostgREST
+      // >>90% tanpa mengubah bentuk respons API.
+      const sp = new URLSearchParams({
+        select: "id,slug,title,category,excerpt,date,author,image,tags",
+      });
       sp.set("status", "eq.published");
       sp.set("author_slug", "not.like.staging-*");
       orderParams(sp);

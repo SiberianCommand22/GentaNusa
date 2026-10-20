@@ -92,7 +92,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="id" className={`${sourceSerif.variable} ${inter.variable} ${jakarta.variable}`}>
-      <body className={`${jakarta.className} bg-[#F8FAFC] text-slate-900 antialiased min-h-screen flex flex-col justify-between`}>
+      <body className={`${jakarta.className} bg-[#F8FAFC] text-slate-900 antialiased min-h-dvh flex flex-col justify-between`}>
         <AnalyticsTracker />
         <SiteChrome>{children}</SiteChrome>
       </body>

@@ -32,7 +32,9 @@ export default function GlobalError({
         <main
           style={{
             display: "flex",
-            minHeight: "100vh",
+            // `dvh` menutupi toolbar URL Safari iOS; nilai inline tanpa
+            // fallback aman — properti yang tak dikenal dibuang peramban.
+            minHeight: "100dvh",
             alignItems: "center",
             justifyContent: "center",
             padding: "40px 20px",

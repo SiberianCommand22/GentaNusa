@@ -25,7 +25,7 @@ export function BackToTop() {
       type="button"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="Kembali ke atas"
-      className={`fixed bottom-6 right-6 z-40 w-10 h-10 sm:w-11 sm:h-11 rounded-full shadow-lg transition-colors ${styles.button}`}
+      className={`fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] right-6 z-40 w-10 h-10 sm:w-11 sm:h-11 rounded-full shadow-lg transition-colors ${styles.button}`}
     >
       <svg
         viewBox="0 0 24 24"

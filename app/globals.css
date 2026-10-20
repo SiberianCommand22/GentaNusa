@@ -52,7 +52,10 @@
     font-family: var(--font-jakarta), var(--font-sans), system-ui, sans-serif;
     background-color: #F8FAFC;
     color: #0f172a;
+    /* Progressive: `dvh` mengikuti tinggi URL toolbar Safari iOS; peramban
+       lama mengabaikan baris ini dan tetap memakai `vh` di atasnya. */
     min-height: 100vh;
+    min-height: 100dvh;
   }
 
   html {

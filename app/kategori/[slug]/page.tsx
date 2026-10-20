@@ -135,7 +135,9 @@ async function fetchByCategory(label: string): Promise<Article[]> {
   try {
     const { data, error } = await supabaseAnon
       .from("articles")
-      .select("*")
+      // DIET PAYLOAD: kartu daftar hanya butuh image/title/category — kolom
+      // `content` (blok HTML panjang) tidak ikut diambil.
+      .select("id,slug,title,category,excerpt,date,author,image")
       .ilike("category", label)
       .eq("status", "published")
       .order("date", { ascending: false })

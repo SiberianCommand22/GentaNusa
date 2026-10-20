@@ -143,11 +143,86 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // Pengganti Cache-Control middleware untuk API (nol invocation):
-      // seluruh /api/* no-store. Gambar /media/* mengatur immutable-nya
-      // sendiri di dalam route handler (app/media/[name]/route.ts).
+      // Pengganti Cache-Control middleware untuk API (nol invocation).
+      // KECUALIAN: path persis /api/articles (feed publik, cabang GET tanpa
+      // `scope`) TIDAK dicakup aturan mana pun sehingga route handler-lah
+      // yang menentukan: `public, s-maxage=60` untuk feed publik,
+      // `no-store` eksplisit untuk cabang scope=all/mine/draft.
+      // DIVERIFIKASI (next start + curl): header next.config MENANG atas
+      // header route handler — karena itu seluruh rute privat harus
+      // dieksplisitkan di sini. Pola /api/articles/:path* tidak dipakai
+      // karena :path* ikut cocok dengan path tanpa sub-segmen.
+      // Gambar /media/* mengatur immutable-nya sendiri di dalam route
+      // handler (app/media/[name]/route.ts). Rute API BARU wajib ditambahkan
+      // ke daftar ini agar tetap no-store.
       {
-        source: "/api/:path*",
+        source: "/api/admin/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/api/analytics/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/api/articles/upload",
+        headers: [
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/api/articles/:id",
+        headers: [
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/api/articles/:id/stats",
+        headers: [
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/api/auth/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/api/categories",
+        headers: [
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/api/debug/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/api/og",
+        headers: [
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/api/og-image",
+        headers: [
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/api/sources",
+        headers: [
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/api/upload",
         headers: [
           { key: "Cache-Control", value: "no-store" },
         ],
