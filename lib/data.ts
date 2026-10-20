@@ -222,7 +222,7 @@ async function fetchAllArticlesDb(): Promise<Article[] | null> {
 // Tabel `public.categories` tidak ada di Supabase, jadi TIDAK ada query
 // ke tabel itu di mana pun agar tidak menimbulkan log PGRST205.
 // Urutan mengikuti hierarki kognitif pembaca (lihat lib/categories.ts):
-// 8 kanal primer lebih dulu, kanal legacy ekonomi di akhir.
+// 8 kanal primer lebih dulu, kanal legacy ekonomi + peduli di akhir.
 const STATIC_CATEGORIES: Category[] = [
   { slug: "nasional", name: "Nasional" },
   { slug: "politik", name: "Politik" },
@@ -233,6 +233,7 @@ const STATIC_CATEGORIES: Category[] = [
   { slug: "kesehatan", name: "Kesehatan" },
   { slug: "olahraga", name: "Olahraga" },
   { slug: "ekonomi", name: "Ekonomi" },
+  { slug: "peduli", name: "Peduli" },
 ];
 
 // Baca artikel: dari Supabase (cached). Tanpa fallback array — bila database

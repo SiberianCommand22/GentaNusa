@@ -6,20 +6,14 @@ import {
   OFFICIAL_IG_URL,
   OFFICIAL_WA_URL,
 } from "@/lib/social";
+import { NAV_CATEGORIES } from "@/lib/categories";
 import { canonicalCategoryHref } from "@/lib/site";
 import styles from "./site.module.css";
 
 // Footer editorial navy — 4 kolom: profil, kanal, redaksi, legalitas.
-const QUICK_CHANNELS = [
-  { slug: "nasional", label: "Nasional" },
-  { slug: "politik", label: "Politik" },
-  { slug: "pertahanan", label: "Pertahanan" },
-  { slug: "dunia", label: "Dunia" },
-  { slug: "sosial-budaya", label: "Sosial Budaya" },
-  { slug: "kesehatan", label: "Kesehatan" },
-  { slug: "olahraga", label: "Olahraga" },
-  { slug: "keamanan", label: "Keamanan" },
-];
+// Daftar kanal di footer TURUNAN dari master kategori (NAV_CATEGORIES =
+// 8 kanal primer sesuai hierarki kognitif pembaca di lib/categories.ts)
+// agar urutan nav & footer selalu sinkron otomatis — tanpa duplikasi data.
 
 export function Footer() {
   return (
@@ -54,7 +48,7 @@ export function Footer() {
 
           <nav className={styles.footerCol} aria-label="Kanal berita">
             <h4>Kanal</h4>
-            {QUICK_CHANNELS.map((c) => (
+            {NAV_CATEGORIES.map((c) => (
               <Link key={c.slug} href={canonicalCategoryHref(c.slug)}>
                 {c.label}
               </Link>
