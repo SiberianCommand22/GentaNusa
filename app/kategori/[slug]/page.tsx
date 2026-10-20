@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Footer } from "@/components/site";
 import { supabaseAnon } from "@/lib/supabase";
 import { articleUrl, type Article } from "@/lib/data";
+import { CATEGORIES, type CategoryDefinition } from "@/lib/categories";
 import { siteUrl } from "@/lib/site";
 import styles from "./category.module.css";
 
@@ -14,48 +15,12 @@ export const revalidate = 86400;
 
 type Params = { params: Promise<{ slug: string }> };
 
-const VALID_CATEGORIES: Record<string, { label: string; desc: string }> = {
-  nasional: {
-    label: "Nasional",
-    desc: "Berita dan peristiwa terkini seputar kebijakan nasional dan dinamika tanah air.",
-  },
-  pertahanan: {
-    label: "Pertahanan",
-    desc: "Sorotan strategis militer, alutsista, dan kedaulatan wilayah Indonesia.",
-  },
-  politik: {
-    label: "Politik",
-    desc: "Dinamika parlemen, kebijakan publik, dan lanskap demokrasi nasional.",
-  },
-  ekonomi: {
-    label: "Ekonomi",
-    desc: "Perkembangan pasar modal, perbankan, dan kebijakan makroekonomi.",
-  },
-  dunia: {
-    label: "Dunia",
-    desc: "Kabar internasional, geopolitik kawasan, dan hubungan diplomatik global.",
-  },
-  "sosial-budaya": {
-    label: "Sosial Budaya",
-    desc: "Kehidupan masyarakat, tradisi, seni budaya, dan dinamika sosial nusantara.",
-  },
-  kesehatan: {
-    label: "Kesehatan",
-    desc: "Layanan kesehatan, kebijakan publik bidang kesehatan, dan gaya hidup sehat.",
-  },
-  olahraga: {
-    label: "Olahraga",
-    desc: "Prestasi atlet, kompetisi, dan pembinaan olahraga Indonesia.",
-  },
-  keamanan: {
-    label: "Keamanan",
-    desc: "Ketertiban umum, penegakan hukum, dan keamanan masyarakat.",
-  },
-  peduli: {
-    label: "Peduli",
-    desc: "Dokumentasi kegiatan sosial, aksi kemanusiaan, dan bakti nusantara GentaNusa.",
-  },
-};
+// Turunan dari master lib/categories.ts — satu sumber kebenaran untuk
+// label, deskripsi banner, dan teks SEO (metaTitle/metaDescription)
+// seluruh kanal, termasuk "Dunia".
+const VALID_CATEGORIES = new Map<string, CategoryDefinition>(
+  CATEGORIES.map((c) => [c.slug, c])
+);
 
 // Kanal "Peduli" belum punya ruang publik. Halaman kategori khusus ini
 // menampilkan editorial "coming soon" dan tidak pernah menanyakan DB.
@@ -155,15 +120,16 @@ const SITE_URL = siteUrl();
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug: raw } = await params;
   const slug = normalizeSlug(raw);
-  const info = VALID_CATEGORIES[slug];
+  const info = VALID_CATEGORIES.get(slug);
   if (!info) return { title: "Kategori tidak ditemukan" };
   const url = `${SITE_URL}/kategori/${slug}`;
-  const title = `Berita ${info.label} Terkini | GentaNusa`;
+  const title = info.metaTitle;
+  const description = info.metaDescription;
   const banner = `${SITE_URL}/og-default.jpg`;
   return {
     // absolute agar tidak ganda dengan template "%s | GentaNusa" di layout.
     title: { absolute: title },
-    description: info.desc,
+    description,
     alternates: { canonical: url },
     openGraph: {
       url,
@@ -171,13 +137,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       locale: "id_ID",
       type: "website",
       title,
-      description: info.desc,
+      description,
       images: [{ url: banner, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
       title,
-      description: info.desc,
+      description,
       images: [banner],
     },
   };
@@ -186,7 +152,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function CategoryPage({ params }: Params) {
   const { slug: raw } = await params;
   const slug = normalizeSlug(raw);
-  const categoryInfo = VALID_CATEGORIES[slug];
+  const categoryInfo = VALID_CATEGORIES.get(slug);
   if (!categoryInfo) notFound();
 
   // Kanal "Peduli": tampilkan halaman Coming Soon, tanpa query database.
@@ -206,7 +172,7 @@ export default async function CategoryPage({ params }: Params) {
             <div className={styles.bannerInner}>
               <span className={styles.bannerLabel}>Kategori</span>
               <h1 className={styles.title}>{categoryInfo.label}</h1>
-              <p className={styles.subtitle}>{categoryInfo.desc}</p>
+              <p className={styles.subtitle}>{categoryInfo.description}</p>
             </div>
             <div className={styles.bannerAccent} />
           </div>
@@ -288,7 +254,7 @@ export default async function CategoryPage({ params }: Params) {
           <div className={styles.bannerInner}>
             <span className={styles.bannerLabel}>Kategori</span>
             <h1 className={styles.title}>{categoryInfo.label}</h1>
-            <p className={styles.subtitle}>{categoryInfo.desc}</p>
+            <p className={styles.subtitle}>{categoryInfo.description}</p>
           </div>
           <div className={styles.bannerAccent} />
         </div>

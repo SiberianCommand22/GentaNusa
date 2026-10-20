@@ -221,16 +221,18 @@ async function fetchAllArticlesDb(): Promise<Article[] | null> {
 // Kategori resmi GentaNusa — didefinisikan di kode (bukan tabel DB).
 // Tabel `public.categories` tidak ada di Supabase, jadi TIDAK ada query
 // ke tabel itu di mana pun agar tidak menimbulkan log PGRST205.
+// Urutan mengikuti hierarki kognitif pembaca (lihat lib/categories.ts):
+// 8 kanal primer lebih dulu, kanal legacy ekonomi di akhir.
 const STATIC_CATEGORIES: Category[] = [
   { slug: "nasional", name: "Nasional" },
-  { slug: "pertahanan", name: "Pertahanan" },
   { slug: "politik", name: "Politik" },
-  { slug: "ekonomi", name: "Ekonomi" },
   { slug: "dunia", name: "Dunia" },
+  { slug: "pertahanan", name: "Pertahanan" },
+  { slug: "keamanan", name: "Keamanan" },
   { slug: "sosial-budaya", name: "Sosial Budaya" },
   { slug: "kesehatan", name: "Kesehatan" },
   { slug: "olahraga", name: "Olahraga" },
-  { slug: "keamanan", name: "Keamanan" },
+  { slug: "ekonomi", name: "Ekonomi" },
 ];
 
 // Baca artikel: dari Supabase (cached). Tanpa fallback array — bila database
@@ -259,12 +261,17 @@ export async function getCategoryBySlug(slug: string): Promise<Category | undefi
 export async function getArticlesByCategory(slug: string): Promise<Article[]> {
   const key = String(slug || "").trim();
   if (!key) return [];
+  // Peta slug → label kategori ("sosial-budaya" → "Sosial Budaya").
+  // Kolom `category` menyimpan LABEL, bukan slug; ilike mentah terhadap slug
+  // tidak akan cocok untuk kategori multi-kata.
+  const label =
+    STATIC_CATEGORIES.find((c) => c.slug === key)?.name ?? key;
   if (supabaseAnon) {
     try {
       const { data, error } = await supabaseAnon
         .from("articles")
         .select("*")
-        .ilike("category", key)
+        .ilike("category", label)
         .eq("status", "published")
         .not("author_slug", "like", "staging-%")
         .order("date", { ascending: false })
@@ -276,7 +283,7 @@ export async function getArticlesByCategory(slug: string): Promise<Article[]> {
     }
   }
   return (await getArticles()).filter(
-    (a) => a.category.toLowerCase() === key.toLowerCase() && a.status === "published"
+    (a) => a.category.toLowerCase() === label.toLowerCase() && a.status === "published"
   );
 }
 

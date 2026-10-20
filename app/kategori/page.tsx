@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/site";
 import { canonicalCategoryHref } from "@/lib/site";
+import { CATEGORIES } from "@/lib/categories";
 import styles from "./[slug]/category.module.css";
 
 // Halaman indeks kanal 100% statis (tanpa query DB) — cache CDN 24 jam.
@@ -10,7 +11,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: { absolute: "Berita Terkini | GentaNusa" },
   description:
-    "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, Peduli, Sosial Budaya, Kesehatan, Olahraga, dan Keamanan.",
+    "Jelajahi kanal berita GentaNusa: Nasional, Politik, Dunia, Pertahanan, Keamanan, Sosial Budaya, Kesehatan, Olahraga, Ekonomi, dan Peduli.",
   alternates: { canonical: "https://gentanusa.id/kategori" },
   openGraph: {
     url: "https://gentanusa.id/kategori",
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     type: "website",
     title: "Berita Terkini | GentaNusa",
     description:
-      "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, Peduli, Sosial Budaya, Kesehatan, Olahraga, dan Keamanan.",
+      "Jelajahi kanal berita GentaNusa: Nasional, Politik, Dunia, Pertahanan, Keamanan, Sosial Budaya, Kesehatan, Olahraga, Ekonomi, dan Peduli.",
     images: [
       {
         url: "https://gentanusa.id/og-default.jpg",
@@ -33,63 +34,10 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Berita Terkini | GentaNusa",
     description:
-      "Jelajahi kanal berita GentaNusa: Nasional, Pertahanan, Politik, Ekonomi, Dunia, Peduli, Sosial Budaya, Kesehatan, Olahraga, dan Keamanan.",
+      "Jelajahi kanal berita GentaNusa: Nasional, Politik, Dunia, Pertahanan, Keamanan, Sosial Budaya, Kesehatan, Olahraga, Ekonomi, dan Peduli.",
     images: ["https://gentanusa.id/og-default.jpg"],
   },
 };
-
-const CHANNELS: { slug: string; label: string; desc: string }[] = [
-  {
-    slug: "nasional",
-    label: "Nasional",
-    desc: "Kabar dan peristiwa terkini seputar kebijakan nasional dan dinamika tanah air.",
-  },
-  {
-    slug: "pertahanan",
-    label: "Pertahanan",
-    desc: "Sorotan strategis militer, alutsista, dan kedaulatan wilayah Indonesia.",
-  },
-  {
-    slug: "politik",
-    label: "Politik",
-    desc: "Dinamika parlemen, kebijakan publik, dan lanskap demokrasi nasional.",
-  },
-  {
-    slug: "ekonomi",
-    label: "Ekonomi",
-    desc: "Perkembangan pasar modal, perbankan, dan kebijakan makroekonomi.",
-  },
-  {
-    slug: "dunia",
-    label: "Dunia",
-    desc: "Kabar internasional, geopolitik kawasan, dan hubungan diplomatik global.",
-  },
-  {
-    slug: "sosial-budaya",
-    label: "Sosial Budaya",
-    desc: "Kehidupan masyarakat, tradisi, seni budaya, dan dinamika sosial nusantara.",
-  },
-  {
-    slug: "kesehatan",
-    label: "Kesehatan",
-    desc: "Layanan kesehatan, kebijakan publik bidang kesehatan, dan gaya hidup sehat.",
-  },
-  {
-    slug: "olahraga",
-    label: "Olahraga",
-    desc: "Prestasi atlet, kompetisi, dan pembinaan olahraga Indonesia.",
-  },
-  {
-    slug: "keamanan",
-    label: "Keamanan",
-    desc: "Ketertiban umum, penegakan hukum, dan keamanan masyarakat.",
-  },
-  {
-    slug: "peduli",
-    label: "Peduli",
-    desc: "Dokumentasi kegiatan sosial, aksi kemanusiaan, dan bakti nusantara GentaNusa. Segera hadir.",
-  },
-];
 
 export default function CategoryIndexPage() {
   return (
@@ -113,12 +61,12 @@ export default function CategoryIndexPage() {
         </div>
 
         <div className={styles.grid}>
-          {CHANNELS.map((c) => (
+          {CATEGORIES.map((c) => (
             <Link key={c.slug} href={canonicalCategoryHref(c.slug)} className={styles.card}>
               <div className={styles.cardBody}>
                 <div className={styles.cardBadge}>{c.label}</div>
                 <h2 className={styles.cardTitle}>{c.label}</h2>
-                <p className={styles.cardExcerpt}>{c.desc}</p>
+                <p className={styles.cardExcerpt}>{c.description}</p>
               </div>
             </Link>
           ))}

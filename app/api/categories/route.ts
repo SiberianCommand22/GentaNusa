@@ -17,16 +17,18 @@ async function requireAdmin() {
 
 // Kategori resmi GentaNusa — kanonis di kode (tidak ada tabel
 // `public.categories` di Supabase, jadi rute ini tidak menyentuh DB).
+// Urutan = hierarki kognitif pembaca (8 kanal primer dulu; ekonomi legacy
+// di akhir) — sinkron dengan lib/categories.ts.
 const STATIC_CATEGORIES = [
   { slug: "nasional", name: "Nasional" },
-  { slug: "pertahanan", name: "Pertahanan" },
   { slug: "politik", name: "Politik" },
-  { slug: "ekonomi", name: "Ekonomi" },
   { slug: "dunia", name: "Dunia" },
+  { slug: "pertahanan", name: "Pertahanan" },
+  { slug: "keamanan", name: "Keamanan" },
   { slug: "sosial-budaya", name: "Sosial Budaya" },
   { slug: "kesehatan", name: "Kesehatan" },
   { slug: "olahraga", name: "Olahraga" },
-  { slug: "keamanan", name: "Keamanan" },
+  { slug: "ekonomi", name: "Ekonomi" },
 ];
 
 // GET — daftar kategori (public, statis).

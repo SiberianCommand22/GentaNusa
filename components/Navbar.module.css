@@ -36,3 +36,14 @@
 .catLinkActive::after {
   transform: scaleX(1);
 }
+
+/* Strip kategori mobile/tablet:
+   - tinggi sentuh minimum 44px (WCAG 2.5.5 / pedoman Material)
+   - fade halus di tepi kanan sebagai petunjuk konten masih bisa digeser
+     (mask menempel pada box nav, tidak ikut bergeser saat scroll). */
+.catStrip {
+  min-height: 44px;
+  align-items: center;
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 2rem), transparent);
+  mask-image: linear-gradient(to right, black calc(100% - 2rem), transparent);
+}

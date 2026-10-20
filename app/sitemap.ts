@@ -9,13 +9,15 @@ export const revalidate = 3600;
 const SITE_URL = siteUrl();
 
 // Rute kategori root yang bersih (tanpa prefix /kategori/*).
-const CATEGORY_ROUTES = [
-  "/nasional",
-  "/pertahanan",
-  "/politik",
-  "/ekonomi",
-  "/dunia",
-  "/peduli",
+// "Dunia" dinaikkan ke hourly karena kanal internasional diperbarui
+// paling sering dalam satu hari; sisanya daily.
+const CATEGORY_ROUTES: { path: string; freq: "hourly" | "daily" }[] = [
+  { path: "/nasional", freq: "daily" },
+  { path: "/politik", freq: "daily" },
+  { path: "/dunia", freq: "hourly" },
+  { path: "/pertahanan", freq: "daily" },
+  { path: "/ekonomi", freq: "daily" },
+  { path: "/peduli", freq: "daily" },
 ];
 
 // Kanal tanpa halaman root — diakses via /kategori/<slug>.
@@ -51,9 +53,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     ...CATEGORY_ROUTES.map((r) => ({
-      url: `${SITE_URL}${r}`,
+      url: `${SITE_URL}${r.path}`,
       lastModified: now,
-      changeFrequency: "daily" as const,
+      changeFrequency: r.freq,
       priority: 0.8,
     })),
     ...CHANNEL_ROUTES.map((r) => ({

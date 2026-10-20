@@ -10,21 +10,31 @@
  *  - Urutan array = urutan dropdown redaksi (`components/post-editor.tsx`),
  *    sehingga item seperti "Dunia" ikut terpanggil otomatis.
  *
- * Catatan: kanal "Peduli" ada di sini (dropdown redaksi) tetapi belum
- * punya halaman publik — belum masuk `STATIC_CATEGORIES` di lib/data.ts.
+ * Hierarki urutan mengikuti psikologi kognitif pembaca — dari lingkar
+ * terdekat (Nasional) ke lebih luas (Politik, Dunia), lalu turun ke isu
+ * spesifik (Pertahanan → Keamanan → Sosial Budaya → Kesehatan) dan
+ * ditutup kanal hiburan penutup harian (Olahraga):
+ *
+ *   Nasional → Politik → Dunia → Pertahanan → Keamanan →
+ *   Sosial Budaya → Kesehatan → Olahraga   (8 kanal primer, tampil di nav)
+ *
+ * Kanal lawas `ekonomi` & `peduli` dipertahankan SETELAH 8 kanal primer
+ * sebagai kanal legacy: artikel lama tetap bisa diedit dan halaman
+ * root-level /ekonomi & /peduli tidak rusak, tetapi keduanya tidak
+ * ikut tampil di navbar publik (lihat `NAV_CATEGORIES`).
  */
 
 export type CategorySlug =
   | "nasional"
-  | "pertahanan"
   | "politik"
-  | "ekonomi"
   | "dunia"
-  | "peduli"
+  | "pertahanan"
+  | "keamanan"
   | "sosial-budaya"
   | "kesehatan"
   | "olahraga"
-  | "keamanan";
+  | "ekonomi"
+  | "peduli";
 
 export type CategoryDefinition = {
   slug: CategorySlug;
@@ -45,14 +55,6 @@ export const CATEGORIES: readonly CategoryDefinition[] = [
     metaDescription: "Berita dan peristiwa terkini seputar kebijakan nasional dan dinamika tanah air.",
   },
   {
-    slug: "pertahanan",
-    name: "Pertahanan",
-    label: "Pertahanan",
-    description: "Sorotan strategis militer, alutsista, dan kedaulatan wilayah Indonesia.",
-    metaTitle: "Berita Pertahanan Terkini | GentaNusa",
-    metaDescription: "Sorotan strategis militer, alutsista, dan kedaulatan wilayah Indonesia.",
-  },
-  {
     slug: "politik",
     name: "Politik",
     label: "Politik",
@@ -61,31 +63,29 @@ export const CATEGORIES: readonly CategoryDefinition[] = [
     metaDescription: "Dinamika parlemen, kebijakan publik, dan lanskap demokrasi nasional.",
   },
   {
-    slug: "ekonomi",
-    name: "Ekonomi",
-    label: "Ekonomi",
-    description: "Perkembangan pasar modal, perbankan, dan kebijakan makroekonomi.",
-    metaTitle: "Berita Ekonomi Terkini | GentaNusa",
-    metaDescription: "Perkembangan pasar modal, perbankan, dan kebijakan makroekonomi.",
-  },
-  {
     slug: "dunia",
     name: "Dunia",
     label: "Dunia",
-    description: "Kabar, peristiwa global, isu geopolitik, dan dinamika internasional terkini.",
-    metaTitle: "Berita Dunia Hari Ini | GentaNusa",
+    description: "Kabar peristiwa global, dinamika geopolitik internasional, dan isu mancanegara.",
+    metaTitle: "Berita Dunia Terkini & Isu Internasional - GentaNusa",
     metaDescription:
-      "Kumpulan berita dunia terkini, kabar luar negeri, dan peristiwa geopolitik global.",
+      "Liputan berita mancanegara, hubungan internasional, geopolitik, dan peristiwa global terkini.",
   },
   {
-    slug: "peduli",
-    name: "Peduli",
-    label: "Peduli",
-    description:
-      "Dokumentasi kegiatan sosial, aksi kemanusiaan, dan bakti nusantara GentaNusa.",
-    metaTitle: "Berita Peduli Terkini | GentaNusa",
-    metaDescription:
-      "Dokumentasi kegiatan sosial, aksi kemanusiaan, dan bakti nusantara GentaNusa.",
+    slug: "pertahanan",
+    name: "Pertahanan",
+    label: "Pertahanan",
+    description: "Sorotan strategis militer, alutsista, dan kedaulatan wilayah Indonesia.",
+    metaTitle: "Berita Pertahanan Terkini | GentaNusa",
+    metaDescription: "Sorotan strategis militer, alutsista, dan kedaulatan wilayah Indonesia.",
+  },
+  {
+    slug: "keamanan",
+    name: "Keamanan",
+    label: "Keamanan",
+    description: "Ketertiban umum, penegakan hukum, dan keamanan masyarakat.",
+    metaTitle: "Berita Keamanan Terkini | GentaNusa",
+    metaDescription: "Ketertiban umum, penegakan hukum, dan keamanan masyarakat.",
   },
   {
     slug: "sosial-budaya",
@@ -111,15 +111,46 @@ export const CATEGORIES: readonly CategoryDefinition[] = [
     metaTitle: "Berita Olahraga Terkini | GentaNusa",
     metaDescription: "Prestasi atlet, kompetisi, dan pembinaan olahraga Indonesia.",
   },
+  // ── Kanal legacy (di luar nav publik; tetap valid untuk artikel lama) ──
   {
-    slug: "keamanan",
-    name: "Keamanan",
-    label: "Keamanan",
-    description: "Ketertiban umum, penegakan hukum, dan keamanan masyarakat.",
-    metaTitle: "Berita Keamanan Terkini | GentaNusa",
-    metaDescription: "Ketertiban umum, penegakan hukum, dan keamanan masyarakat.",
+    slug: "ekonomi",
+    name: "Ekonomi",
+    label: "Ekonomi",
+    description: "Perkembangan pasar modal, perbankan, dan kebijakan makroekonomi.",
+    metaTitle: "Berita Ekonomi Terkini | GentaNusa",
+    metaDescription: "Perkembangan pasar modal, perbankan, dan kebijakan makroekonomi.",
+  },
+  {
+    slug: "peduli",
+    name: "Peduli",
+    label: "Peduli",
+    description:
+      "Dokumentasi kegiatan sosial, aksi kemanusiaan, dan bakti nusantara GentaNusa.",
+    metaTitle: "Berita Peduli Terkini | GentaNusa",
+    metaDescription:
+      "Dokumentasi kegiatan sosial, aksi kemanusiaan, dan bakti nusantara GentaNusa.",
   },
 ];
+
+/**
+ * 8 kanal primer — urutan hierarki kognitif pembaca.
+ * Navbar publik (desktop & strip mobile) HANYA merender daftar ini.
+ */
+export const PRIMARY_CATEGORY_SLUGS: readonly CategorySlug[] = [
+  "nasional",
+  "politik",
+  "dunia",
+  "pertahanan",
+  "keamanan",
+  "sosial-budaya",
+  "kesehatan",
+  "olahraga",
+];
+
+/** Definisi 8 kanal primer dalam urutan nav (turunan dari CATEGORIES). */
+export const NAV_CATEGORIES: readonly CategoryDefinition[] = CATEGORIES.filter((c) =>
+  PRIMARY_CATEGORY_SLUGS.includes(c.slug)
+);
 
 export function isCategorySlug(value: string): value is CategorySlug {
   return (CATEGORIES as readonly CategoryDefinition[]).some((c) => c.slug === value);

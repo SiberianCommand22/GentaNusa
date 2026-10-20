@@ -5,22 +5,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { canonicalCategoryHref } from "@/lib/site";
+import { NAV_CATEGORIES } from "@/lib/categories";
 import styles from "./Navbar.module.css";
 
 // Navigasi utama 100% editorial. Tautan korporat (Tentang, Pedoman,
 // Kontak) TIDAK ada di navbar — semuanya tinggal di footer.
 // Link login redaksi SENGAJA tidak ditampilkan (kebijakan keamanan:
 // jalur /admin/login/gentanusa privat, tanpa tautan publik).
-const categoryNav = [
-  { slug: "nasional", label: "Nasional" },
-  { slug: "politik", label: "Politik" },
-  { slug: "pertahanan", label: "Pertahanan" },
-  { slug: "dunia", label: "Dunia" },
-  { slug: "sosial-budaya", label: "Sosial Budaya" },
-  { slug: "kesehatan", label: "Kesehatan" },
-  { slug: "olahraga", label: "Olahraga" },
-  { slug: "keamanan", label: "Keamanan" },
-];
+// Urutan & keanggotaan nav diambil dari master lib/categories.ts
+// (NAV_CATEGORIES = 8 kanal primer sesuai hierarki kognitif pembaca;
+// kanal legacy ekonomi/peduli sengaja tidak tampil di nav).
 
 export function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -67,7 +61,7 @@ export function Navbar() {
         key={key ?? c.slug}
         href={href}
         aria-current={isActive ? "page" : undefined}
-        className={`${styles.catLink} relative whitespace-nowrap text-xs font-medium text-slate-300 transition-colors hover:text-white lg:text-sm ${
+        className={`${styles.catLink} relative flex min-h-[44px] items-center whitespace-nowrap text-xs font-medium text-slate-300 transition-colors hover:text-white lg:inline-flex lg:min-h-0 lg:self-center lg:text-sm ${
           isActive ? styles.catLinkActive : ""
         }`}
       >
@@ -104,7 +98,7 @@ export function Navbar() {
 
           {/* Tengah — 8 kategori resmi, horizontal, hanya di desktop */}
           <nav className="hidden lg:flex items-center gap-8" aria-label="Kategori berita">
-            {categoryNav.map((c) => renderCategoryLink(c))}
+            {NAV_CATEGORIES.map((c) => renderCategoryLink(c))}
           </nav>
 
           {/* Sisi kanan — pencarian saja (tanpa tombol hamburger) */}
@@ -134,10 +128,10 @@ export function Navbar() {
 
         {/* ── Tier 2: strip kategori geser horizontal (mobile/tablet) ── */}
         <nav
-          className="lg:hidden flex overflow-x-auto no-scrollbar whitespace-nowrap gap-4 px-4 py-2 border-t border-slate-800/60"
+          className={`lg:hidden flex overflow-x-auto no-scrollbar whitespace-nowrap gap-1 sm:gap-4 px-4 border-t border-slate-800/60 ${styles.catStrip}`}
           aria-label="Kategori berita"
         >
-          {categoryNav.map((c) => renderCategoryLink(c))}
+          {NAV_CATEGORIES.map((c) => renderCategoryLink(c))}
         </nav>
       </header>
 
