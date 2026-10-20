@@ -66,10 +66,10 @@ export const CATEGORIES: readonly CategoryDefinition[] = [
     slug: "dunia",
     name: "Dunia",
     label: "Dunia",
-    description: "Kabar peristiwa global, dinamika geopolitik internasional, dan isu mancanegara.",
+    description: "Kabar peristiwa global, geopolitik mancanegara, dan dinamika internasional terkini.",
     metaTitle: "Berita Dunia Terkini & Isu Internasional - GentaNusa",
     metaDescription:
-      "Liputan berita mancanegara, hubungan internasional, geopolitik, dan peristiwa global terkini.",
+      "Liputan berita mancanegara, geopolitik global, hubungan internasional, dan peristiwa dunia terkini.",
   },
   {
     slug: "pertahanan",
