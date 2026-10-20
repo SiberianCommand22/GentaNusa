@@ -42,11 +42,13 @@
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
 }
 
-.retry {
+.retry,
+.reload {
   padding: 10px 24px;
   border-radius: 8px;
   border: none;
@@ -57,7 +59,8 @@
   cursor: pointer;
 }
 
-.retry:hover {
+.retry:hover,
+.reload:hover {
   background: #a00d25;
 }
 

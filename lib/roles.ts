@@ -2,7 +2,7 @@
  * Aturan peran redaksi GentaNusa — TERPUSAT & EDGE-SAFE.
  *
  * Modul ini SENGAJA tidak mengimpor `next/headers` / `@supabase/*` agar bisa
- * dipakai di `middleware.ts` (Edge Runtime) maupun route handler Node.
+ * dipakai di `proxy.ts` (Edge Runtime) maupun route handler Node.
  * Satu-satunya sumber kebenaran "boleh masuk /admin":
  *   - `app_metadata.role` / peran setara dalam {admin, superadmin,
  *     super_admin, administrator, editor}, ATAU
@@ -82,7 +82,7 @@ export function isAdminIdentity(input: {
 }
 
 /**
- * Gerbang area /admin — dipakai IDENTIK oleh `middleware.ts`,
+ * Gerbang area /admin — dipakai IDENTIK oleh `proxy.ts`,
  * `app/api/admin/login`, dan guard server lain. Mengizinkan email master,
  * `app_metadata.role` admin/editor, dan seluruh varian redaksi.
  *

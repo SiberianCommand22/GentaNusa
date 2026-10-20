@@ -29,6 +29,11 @@ const jakarta = Plus_Jakarta_Sans({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  // `maximumScale: 5` menjaga zoom tetap TERSEDIA bagi pengguna low-vision
+  // (aksesibilitas) sambil mencegah layout "terkunci" akibat zoom tak
+  // terkendali di Safari iOS/macOS. JANGAN pernah memakai
+  // `userScalable: false` — mematikan zoom di iOS Safari adalah regresi a11y.
+  maximumScale: 5,
   viewportFit: "cover",
   themeColor: "#F8FAFC",
 };

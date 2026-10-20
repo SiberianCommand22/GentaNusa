@@ -41,6 +41,31 @@ export const ADMIN_FLAG_COOKIE = SHARED_FLAG;
 export const SESSION_COOKIE = SHARED_SESSION;
 export const TOKEN_COOKIE = SHARED_TOKEN;
 
+/** Masa berlaku cookie sesi redaksi (7 hari) — selaras dengan akses token. */
+export const SESSION_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
+
+/**
+ * Flag cookie sesi standar industri — SATU sumber kebenaran yang dipakai
+ * bersama oleh `app/api/admin/login` (menulis) dan `app/api/admin/logout`
+ * (menghapus), sehingga atributnya tidak mungkin drift:
+ *   `SameSite=Lax` | `Path=/` | `HttpOnly` | `Secure` (produksi HTTPS).
+ *
+ * Atribut ini diterima Safari Intelligent Tracking Prevention (ITP):
+ * cookie ditulis lewat header `Set-Cookie` oleh server (bukan skrip), jadi
+ * tidak terkena pemotongan aturan 7 hari untuk cookie buatan JavaScript.
+ * `SameSite=Lax` — bukan `None` — agar tetap terkirim pada navigasi biasa
+ * tanpa kehilangan poin konteks lintas-situs.
+ */
+export function sessionCookieFlags(maxAgeSeconds: number) {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: maxAgeSeconds,
+  };
+}
+
 export type EditorialSession = {
   /** UUID akun Supabase Auth pemilik artikel. */
   userId: string | null;

@@ -27,6 +27,13 @@ export default function Error({
           <button onClick={() => reset()} className={styles.retry}>
             Coba Lagi
           </button>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className={styles.reload}
+          >
+            Muat Ulang Halaman
+          </button>
           <Link href="/" className={styles.home}>
             Kembali ke Beranda
           </Link>

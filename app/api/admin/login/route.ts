@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient, type User } from "@supabase/supabase-js";
 import {
   sessionFromSupabaseUser,
+  ADMIN_FLAG_COOKIE,
   SESSION_COOKIE,
+  SESSION_COOKIE_MAX_AGE_SECONDS,
+  sessionCookieFlags,
   TOKEN_COOKIE,
   type EditorialSession,
 } from "@/lib/auth";
@@ -43,15 +46,9 @@ type SessionPayload = {
   is_admin: boolean;
 };
 
-function cookieFlags(maxAge: number) {
-  return {
-    httpOnly: true,
-    sameSite: "lax" as const,
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
-    maxAge,
-  };
-}
+// Flag cookie sesi ditetapkan TUNGGAL di `sessionCookieFlags` (lib/auth.ts):
+// SameSite=Lax, Path=/, HttpOnly, Secure pada produksi — atribut yang
+// diterima Safari ITP dan konsisten dengan penghapusan di /api/admin/logout.
 
 export async function POST(request: NextRequest) {
   try {
@@ -272,6 +269,8 @@ export async function POST(request: NextRequest) {
     // Set sesi: flag admin (kompatibel dgn seluruh guard API) + ringkasan sesi.
     // supabaseSession dikembalikan agar browser juga bisa menyinkronkan sesi
     // Supabase client-side (setSession) — anti redirect-loop di /admin.
+    // Atribut cookie: `sessionCookieFlags` (SameSite=Lax, Path=/, HttpOnly,
+    // Secure di produksi) — konsisten dengan /api/admin/logout.
     const res = NextResponse.json({
       ok: true,
       admin: true,
@@ -284,12 +283,13 @@ export async function POST(request: NextRequest) {
         : { access_token: accessTokenChecked },
     });
 
-    res.cookies.set("genta_admin", "1", cookieFlags(60 * 60 * 24 * 7)); // 7 hari
-    res.cookies.set(SESSION_COOKIE, JSON.stringify(session), cookieFlags(60 * 60 * 24 * 7));
+    const flags = sessionCookieFlags(SESSION_COOKIE_MAX_AGE_SECONDS);
+    res.cookies.set(ADMIN_FLAG_COOKIE, "1", flags);
+    res.cookies.set(SESSION_COOKIE, JSON.stringify(session), flags);
     // Access token Supabase disimpan httpOnly agar `auth.getUser()` bisa
     // memverifikasi ulang peran di setiap permintaan (anti pemalsuan cookie).
-    // Middleware membaca cookie ini sebagai fallback (lihat middleware.ts).
-    res.cookies.set(TOKEN_COOKIE, accessTokenChecked, cookieFlags(60 * 60 * 24 * 7));
+    // Middleware membaca cookie ini sebagai fallback (lihat proxy.ts).
+    res.cookies.set(TOKEN_COOKIE, accessTokenChecked, flags);
 
     return res;
   } catch {

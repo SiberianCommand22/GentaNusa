@@ -1,6 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { Footer } from "@/components/site";
 import styles from "./not-found.module.css";
+
+// Client Component sadar: 404 harus tetap render walau root layout / data
+// prefetch gagal (Safari mobile & jaringan lambat) — tanpa ini, kendala
+// hydrasi di halaman ini bisa berujung layar kosong.
 
 export default function NotFound() {
   return (

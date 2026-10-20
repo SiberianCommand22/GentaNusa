@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { ADMIN_FLAG_COOKIE, SESSION_COOKIE, TOKEN_COOKIE } from "@/lib/auth";
+import {
+  ADMIN_FLAG_COOKIE,
+  SESSION_COOKIE,
+  TOKEN_COOKIE,
+  sessionCookieFlags,
+} from "@/lib/auth";
 
 // Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge.
 export const runtime = 'nodejs';
@@ -31,13 +36,11 @@ export async function GET() {
 
 function clearSession() {
   const res = NextResponse.json({ ok: true });
-  const clear = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    maxAge: 0,
-    path: "/",
-  };
+  // Atribut yang sama dengan saat ditulis (sessionCookieFlags di lib/auth.ts),
+  // hanya `maxAge: 0` — penghapusan GAGAL bila atributnya tidak persis cocok
+  // (Secure/SameSite/Path). Cookie Supabase SSR tetap `httpOnly: false`
+  // karena memang ditulis oleh klien browser.
+  const clear = sessionCookieFlags(0);
   res.cookies.set(ADMIN_FLAG_COOKIE, "", clear);
   res.cookies.set(SESSION_COOKIE, "", clear);
   res.cookies.set(TOKEN_COOKIE, "", clear);
