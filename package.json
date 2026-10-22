@@ -2,6 +2,9 @@
   "name": "gentanusa",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "dev": "next dev",
     "sync": "node scripts/sync-supabase.mjs",
@@ -10,7 +13,9 @@
     "start": "next start",
     "seed": "node scripts/seed-users.js",
     "lint": "eslint",
-    "audit:security": "tsx scripts/audit-system.ts"
+    "audit:security": "tsx scripts/audit-system.ts",
+    "audit:users": "tsx scripts/audit-users.ts",
+    "set:passwords": "tsx scripts/set-all-passwords.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -33,5 +38,8 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.15",
     "typescript": "^5"
+  },
+  "overrides": {
+    "fflate": "0.7.5"
   }
 }

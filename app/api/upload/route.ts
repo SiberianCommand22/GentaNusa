@@ -120,6 +120,9 @@ export async function POST(req: NextRequest) {
     let contentType: string = type;
     try {
       const compressed = await sharp(Buffer.from(bytes))
+        // `.rotate()` menerapkan orientasi EXIF lalu MEMBUANG seluruh
+        // metadata (termasuk GPS/kamera) — output selalu JPEG bersih.
+        .rotate()
         .resize({ width: 1200, withoutEnlargement: true })
         .jpeg({ quality: 78 })
         .toBuffer();
@@ -156,7 +159,7 @@ export async function POST(req: NextRequest) {
       const friendly =
         lowered.includes("bucket") && (lowered.includes("not found") || lowered.includes("does not exist") || lowered.includes("could not be found"))
           ? "Bucket penyimpanan 'articles' tidak ditemukan di Supabase Storage — buat bucket bernama 'articles' (public) lalu coba lagi."
-          : `Gagal upload storage: ${rawMsg}`;
+          : "Gagal menyimpan gambar. Coba beberapa saat lagi.";
       return NextResponse.json(
         { url: "", error: friendly },
         { status: 500 }
@@ -166,8 +169,11 @@ export async function POST(req: NextRequest) {
     // Sukses: respon JSON terstruktur { url } + status 200.
     return NextResponse.json({ url: `/media/${objectName}` }, { status: 200 });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Terjadi kesalahan upload";
+    // Detail internal hanya ke log server — jangan dikirim ke klien.
     console.error("[api/upload] kesalahan tak terduga:", err instanceof Error ? (err.stack ?? err.message) : err);
-    return NextResponse.json({ url: "", error: message }, { status: 500 });
+    return NextResponse.json(
+      { url: "", error: "Terjadi kesalahan saat mengunggah gambar." },
+      { status: 500 }
+    );
   }
 }

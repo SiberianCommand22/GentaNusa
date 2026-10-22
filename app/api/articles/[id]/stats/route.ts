@@ -42,7 +42,11 @@ export async function GET(
     .eq("article_id", id)
     .single();
   if (error && error.code !== "PGRST116") {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("[GET /api/articles/[id]/stats] select gagal:", error);
+    return NextResponse.json(
+      { error: "Terjadi kesalahan internal pada server" },
+      { status: 500 }
+    );
   }
   return NextResponse.json(data ?? { article_id: id, views: 0, likes: 0, shares: 0 });
 }
@@ -71,6 +75,12 @@ export async function POST(
     )
     .select()
     .single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error("[POST /api/articles/[id]/stats] upsert gagal:", error);
+    return NextResponse.json(
+      { error: "Terjadi kesalahan internal pada server" },
+      { status: 500 }
+    );
+  }
   return NextResponse.json(data);
 }

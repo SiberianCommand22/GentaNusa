@@ -102,6 +102,14 @@ const nextConfig: NextConfig = {
   // akan membayangi halaman asli / berisiko loop redirect.
   async rewrites() {
     return [
+      // MODUL 4 — CYBER DECEPTION: `/.git/*` tidak bisa dibuat sebagai folder
+      // route karena Git menolak melacak apa pun di dalam direktori `.git`
+      // (akan hilang saat deploy via Vercel/Git). Petakan URL umpan ke handler
+      // `app/api/decoy/git/[...path]` yang mencatat & menahan pemindai.
+      {
+        source: "/.git/:path*",
+        destination: "/api/decoy/git/:path*",
+      },
       {
         source: "/:category(sosial-budaya|kesehatan|olahraga|keamanan)",
         destination: "/kategori/:category",
@@ -141,6 +149,47 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
+          // MODUL 4 — CYBER DECEPTION: umpan fingerprint. Penyerang otomatis
+          // (Nuclei/WhatWeb/WPScan) memilih payload berdasarkan header ini;
+          // menampilkan stack LAMP fiktif membuat eksploitasi PHP/WordPress
+          // yang tak relevan tetap dicoba dan langsung tertangkap decoy route.
+          // Catatan: Vercel dapat menimpa `Server` pada edge jaringan; header
+          // ini tetap berlaku untuk respons yang di-stream Next.js.
+          {
+            key: "Server",
+            value: "Apache/2.4.52 (Unix) OpenSSL/1.1.1",
+          },
+          {
+            key: "X-Powered-By",
+            value: "PHP/8.1.12",
+          },
+          // Isolasi browsing context tanpa memutus popup iklan/AdSense:
+          // popup yang dibuka dokumen ini tetap mempertahankan window.opener.
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin-allow-popups",
+          },
+          {
+            key: "X-Permitted-Cross-Domain-Policies",
+            value: "none",
+          },
+        ],
+      },
+      // API = permukaan privat: jangan pernah diindeks mesin pencari dan
+      // jangan boleh di-embed lintas situs (JSON tidak untuk <script>/<img>).
+      {
+        source: "/api(.*)",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+          { key: "Cross-Origin-Resource-Policy", value: "same-site" },
+        ],
+      },
+      // Halaman admin tidak boleh masuk indeks/cache bersama.
+      {
+        source: "/admin(.*)",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+          { key: "Cache-Control", value: "no-store" },
         ],
       },
       // Pengganti Cache-Control middleware untuk API (nol invocation).

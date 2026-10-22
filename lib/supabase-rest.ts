@@ -408,7 +408,7 @@ export async function fetchArticlesForSessionRest(
   const withOwner = ownerColumnAvailable !== false;
   let columns = withOwner ? ARTICLE_COLUMNS_WITH_OWNER : ARTICLE_COLUMNS_BASE;
   let useOwner = withOwner;
-  let first = await run(useOwner, columns);
+  const first = await run(useOwner, columns);
   let data = first.rows;
   let error = first.error;
 

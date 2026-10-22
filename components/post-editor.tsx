@@ -218,7 +218,6 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
         if (name) setForm((f) => (f.author.trim() ? f : { ...f, author: name }));
       })
       .catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editId, draftKey]);
 
   // Mode edit: ID datang dari route server (/admin/posts/edit/[id]) yang sudah
@@ -230,22 +229,26 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
       editId ?? (legacyId && /^\d+$/.test(legacyId) ? Number(legacyId) : null);
 
     // Cek draf tersimpan: tawarkan "Muat Draf Tersimpan" bila form masih kosong.
-    try {
-      const key = `gentanusa_draft_${target || "new"}`;
-      const raw = localStorage.getItem(key);
-      if (raw) {
-        const d = JSON.parse(raw);
-        const isEmptyForm = !emptyForm.title && !emptyForm.excerpt && !emptyForm.content;
-        if (d && (d.title || d.excerpt || d.content) && isEmptyForm) {
-          setHasStoredDraft(true);
+    // Dijadwalkan async agar setState tidak terjadi langsung di body effect.
+    const draftTimer = window.setTimeout(() => {
+      try {
+        const key = `gentanusa_draft_${target || "new"}`;
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          const d = JSON.parse(raw);
+          const isEmptyForm = !emptyForm.title && !emptyForm.excerpt && !emptyForm.content;
+          if (d && (d.title || d.excerpt || d.content) && isEmptyForm) {
+            setHasStoredDraft(true);
+          }
         }
+      } catch {
+        // abaikan
       }
-    } catch {
-      // abaikan
-    }
+      if (!target) setLoadedEdit(true);
+    }, 0);
+
     if (!target) {
-      setLoadedEdit(true);
-      return;
+      return () => window.clearTimeout(draftTimer);
     }
 
     // `scope=edit` memaksa server menegakkan kepemilikan artikel.
@@ -307,6 +310,8 @@ export function PostEditor({ editId = null }: { editId?: number | null }) {
       }
       setLoadedEdit(true);
     });
+
+    return () => window.clearTimeout(draftTimer);
   }, [editId]);
 
   // Prefill kolom Penulis dari sesi login (/api/admin/check terverifikasi

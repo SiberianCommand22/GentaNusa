@@ -72,9 +72,10 @@ function describeStorageError(message: string): string {
     return "Bucket penyimpanan 'articles' tidak ditemukan di Supabase Storage — buat bucket bernama 'articles' (public) lalu coba lagi.";
   }
   if (m.includes("row-level security") || m.includes("rls") || m.includes("not authorized") || m.includes("permission")) {
-    return `Upload ditolak kebijakan storage (RLS): ${message}. Pastikan Service Role Key dipakai server dan policy bucket mengizinkan tulis service_role.`;
+    return "Upload ditolak oleh kebijakan keamanan penyimpanan. Hubungi administrator untuk memeriksa konfigurasi bucket.";
   }
-  return `Gagal menyimpan foto: ${message}`;
+  // Jangan teruskan pesan mentah storage ke klien (bisa memuat detail internal).
+  return "Gagal menyimpan foto. Coba lagi atau hubungi administrator.";
 }
 
 export async function POST(req: NextRequest) {
@@ -123,13 +124,38 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Hanya JPG, PNG, atau WebP yang diterima" }, { status: 400 });
     }
 
-    const objectName = `${randomUUID()}${EXTENSIONS[type]}`;
+    // Normalisasi + buang metadata: `.rotate()` menerapkan orientasi EXIF
+    // lalu sharp MEMBUANG seluruh metadata (GPS/kamera/model) dari output.
+    // Bila binding sharp tidak tersedia, berkas asli (sudah lolos validasi
+    // magic-byte) tetap diunggah agar fitur tidak mati total.
+    let payload: Buffer = Buffer.from(bytes);
+    let objectName = `${randomUUID()}${EXTENSIONS[type]}`;
+    let contentType: ImageType = type;
+    try {
+      const sharp = (await import("sharp")).default;
+      const compressed = await sharp(payload)
+        .rotate()
+        .resize({ width: 1600, withoutEnlargement: true })
+        .jpeg({ quality: 80 })
+        .toBuffer();
+      if (compressed.length > 0 && compressed.length <= MAX_IMAGE_BYTES) {
+        payload = compressed;
+        objectName = `${randomUUID()}.jpg`;
+        contentType = "image/jpeg";
+      }
+    } catch (err) {
+      console.warn(
+        "[articles/upload] sharp tidak tersedia, memakai berkas asli:",
+        err instanceof Error ? err.message : err
+      );
+    }
+
     let data: { path: string } | null = null;
     try {
       const res = await client.client.storage
         .from("articles")
-        .upload(`articles/${objectName}`, Buffer.from(bytes), {
-          contentType: type,
+        .upload(`articles/${objectName}`, payload, {
+          contentType,
           cacheControl: "public, max-age=31536000, immutable",
           upsert: false,
         });
@@ -141,8 +167,8 @@ export async function POST(req: NextRequest) {
         message,
         bucket: "articles",
         objectName,
-        contentType: type,
-        size: bytes.length,
+        contentType,
+        size: payload.length,
         uploader: session.email ?? session.userId ?? "unknown",
       });
       return NextResponse.json({ error: describeStorageError(message) }, { status: 500 });

@@ -75,3 +75,47 @@ CREATE POLICY "Admin update articles bucket"
   TO authenticated
   USING (bucket_id = 'articles' AND (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
   WITH CHECK (bucket_id = 'articles' AND (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+
+-- ---------------------------------------------------------------------------
+-- 5. Tabel articles — isolasi kepemilikan untuk peran `editor`.
+--    CMS memakai Service Role Key (bypass RLS), tetapi policy ini adalah
+--    lapis kedua: bila anon key/klien Supabase dipakai langsung, editor tetap
+--    hanya bisa membaca draft miliknya dan menulis baris dengan user_id
+--    miliknya sendiri. Hapus TIDAK diberikan ke editor (admin-only di aplikasi
+--    dan default-deny di sini).
+-- ---------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Editor read own articles" ON "public"."articles";
+CREATE POLICY "Editor read own articles"
+  ON "public"."articles" FOR SELECT
+  TO authenticated
+  USING (user_id = auth.uid());
+
+DROP POLICY IF EXISTS "Editor insert own articles" ON "public"."articles";
+CREATE POLICY "Editor insert own articles"
+  ON "public"."articles" FOR INSERT
+  TO authenticated
+  WITH CHECK (user_id = auth.uid());
+
+DROP POLICY IF EXISTS "Editor update own articles" ON "public"."articles";
+CREATE POLICY "Editor update own articles"
+  ON "public"."articles" FOR UPDATE
+  TO authenticated
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+
+-- ---------------------------------------------------------------------------
+-- 6. Tabel categories — baca publik, tulis hanya admin.
+-- ---------------------------------------------------------------------------
+ALTER TABLE "public"."categories" ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public read categories" ON "public"."categories";
+CREATE POLICY "Public read categories"
+  ON "public"."categories" FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Admin write categories" ON "public"."categories";
+CREATE POLICY "Admin write categories"
+  ON "public"."categories" FOR ALL
+  TO authenticated
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');

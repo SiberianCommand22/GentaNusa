@@ -89,7 +89,11 @@ export function VisualEditor({ value, onChange, placeholder, id, labelledBy }: V
   const editorRef = useRef<HTMLDivElement>(null);
   const lastHtml = useRef<string | null>(null);
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
   const [active, setActive] = useState<Active>(IDLE);
 
   // Sinkronisasi SATU ARAH: HTML luar → kanvas hanya saat kanvas tidak fokus,

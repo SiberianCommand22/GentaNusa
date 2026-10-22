@@ -172,7 +172,7 @@ export async function fetchArticlesForSession(
   const withOwner = ownerColumnAvailable !== false;
   let columns = withOwner ? ARTICLE_COLUMNS_WITH_OWNER : ARTICLE_COLUMNS_BASE;
   let useOwner = withOwner;
-  let first = await run(useOwner, columns);
+  const first = await run(useOwner, columns);
   let data = first.data as ArticleRow[] | null;
   let error = first.error as { code?: string; message?: string } | null;
 

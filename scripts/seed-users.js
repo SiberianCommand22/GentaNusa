@@ -15,6 +15,8 @@
  * Jalankan: npm run seed  (node scripts/seed-users.js)
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports -- skrip Node CommonJS (package.json tanpa "type": "module") */
+
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -85,7 +87,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
 async function seed() {
   console.log("Memulai pendaftaran 20 akun redaksi GentaNusa...");
   for (const u of users) {
-    const { data, error } = await supabase.auth.admin.createUser({
+    const { error } = await supabase.auth.admin.createUser({
       email: u.email,
       password: u.password,
       email_confirm: true,

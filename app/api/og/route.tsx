@@ -164,7 +164,9 @@ export async function GET(req: NextRequest) {
       },
     );
   } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : "Unknown error";
-    return new Response(`Failed to generate image: ${message}`, { status: 500 });
+    // Jangan bocorkan detail internal (stack/pesan library) ke klien.
+    // Detail tetap tercatat di log server untuk diagnosis.
+    console.error("[GET /api/og] gagal render:", e);
+    return new Response("Failed to generate image", { status: 500 });
   }
 }

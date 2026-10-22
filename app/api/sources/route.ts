@@ -32,7 +32,10 @@ export async function GET() {
     const c = ensureClient();
     if (!c.ok) return NextResponse.json({ error: c.error }, { status: 503 });
     const { data, error } = await c.client.from("sources").select("*");
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      console.error("[GET /api/sources] select gagal:", error);
+      return apiError(error, "Terjadi kesalahan internal pada server");
+    }
     return NextResponse.json(data);
   } catch (e) {
     return apiError(e);
@@ -55,7 +58,10 @@ export async function POST(req: NextRequest) {
       .insert([{ name: body.name, url: body.url, active: body.active ?? true }])
       .select()
       .single();
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      console.error("[POST /api/sources] insert gagal:", error);
+      return apiError(error, "Terjadi kesalahan internal pada server");
+    }
     return NextResponse.json(data, { status: 201 });
   } catch (e) {
     return apiError(e);
@@ -72,7 +78,10 @@ export async function DELETE(req: NextRequest) {
     const id = req.nextUrl.searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id wajib" }, { status: 400 });
     const { error } = await c.client.from("sources").delete().eq("id", id);
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      console.error("[DELETE /api/sources] hapus gagal:", error);
+      return apiError(error, "Terjadi kesalahan internal pada server");
+    }
     return NextResponse.json({ ok: true });
   } catch (e) {
     return apiError(e);

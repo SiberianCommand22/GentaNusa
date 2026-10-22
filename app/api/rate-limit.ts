@@ -24,38 +24,59 @@ export type RateLimitStore = {
   incr(key: string, windowMs: number): Promise<{ count: number; resetAt: number }>;
 };
 
+export type RateLimitOptions = {
+  /**
+   * Nama ember (bucket). Tiap endpoint mutasi WAJIB punya bucket sendiri
+   * agar unggahan gambar tidak menghabiskan kuota publikasi artikel (dan
+   * sebaliknya). Default: "default".
+   */
+  bucket?: string;
+  /** Maksimum permintaan per jendela. Default: RATE_LIMIT (10). */
+  limit?: number;
+  /** Panjang jendela dalam milidetik. Default: WINDOW_MS (60 detik). */
+  windowMs?: number;
+};
+
 // Store default: memori lokal + sapu entri kedaluwarsa agar tidak bocor.
+const PRUNE_INTERVAL_MS = 60 * 1000;
 let lastSweep = 0;
 function pruneExpired(now: number) {
-  if (now - lastSweep < WINDOW_MS) return;
+  if (now - lastSweep < PRUNE_INTERVAL_MS) return;
   lastSweep = now;
   for (const [key, entry] of rateMap) {
     if (now >= entry.resetAt) rateMap.delete(key);
   }
 }
 
-export function rateLimit(req: NextRequest): { ok: true } | { ok: false; response: NextResponse } {
+export function rateLimit(
+  req: NextRequest,
+  opts: RateLimitOptions = {}
+): { ok: true } | { ok: false; response: NextResponse } {
   // Resolusi IP Cloudflare-aware: cf-connecting-ip (dipertahankan middleware
   // dari header asli Cloudflare) -> x-real-ip -> x-forwarded-for[0].
   const ip = getClientIp(req);
+  const limit = Math.max(1, Math.floor(opts.limit ?? RATE_LIMIT));
+  const windowMs = Math.max(1000, Math.floor(opts.windowMs ?? WINDOW_MS));
+  const key = `${opts.bucket ?? "default"}:${ip}`;
 
   const now = Date.now();
   pruneExpired(now);
-  const entry = rateMap.get(ip);
+  const entry = rateMap.get(key);
 
   if (entry && now < entry.resetAt) {
-    if (entry.count >= RATE_LIMIT) {
+    if (entry.count >= limit) {
+      const retryAfter = Math.max(1, Math.ceil((entry.resetAt - now) / 1000));
       return {
         ok: false,
         response: NextResponse.json(
           { error: "Too many requests. Try again later." },
-          { status: 429 }
+          { status: 429, headers: { "Retry-After": String(retryAfter) } }
         ),
       };
     }
     entry.count++;
   } else {
-    rateMap.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+    rateMap.set(key, { count: 1, resetAt: now + windowMs });
   }
 
   return { ok: true };

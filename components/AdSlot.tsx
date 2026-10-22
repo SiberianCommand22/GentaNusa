@@ -33,6 +33,7 @@ export function AdSlot({
   "data-ad-client": adClient = "ca-pub-5435057710252308",
 }: AdSlotProps) {
   const adRef = useRef<HTMLDivElement>(null);
+  const pushedSlot = useRef<string | null>(null);
   const [adsLoaded, setAdsLoaded] = useState(false);
   const [adError, setAdError] = useState(false);
 
@@ -40,33 +41,36 @@ export function AdSlot({
   const variantClass = VARIANT_CLASSES[variant];
 
   useEffect(() => {
-    let mounted = true;
-    const timer = setTimeout(() => {
-      if (mounted && !adsLoaded) {
-        setAdError(true);
-      }
-    }, 5000);
+    // Satu push per slot: hindari double-push saat StrictMode / re-render.
+    if (pushedSlot.current === slotId) return;
+    pushedSlot.current = slotId;
 
     const w = window as unknown as {
       adsbygoogle?: unknown[];
       googletag?: unknown;
     };
 
-    try {
-      if (typeof window !== "undefined") {
+    // Fallback blokir iklan: hanya bila push tidak menghasilkan state loaded.
+    const fallbackTimer = setTimeout(() => setAdError(true), 5000);
+
+    // Push dijadwalkan keluar dari body effect agar tidak memicu cascading render.
+    const pushTimer = setTimeout(() => {
+      try {
         w.adsbygoogle = w.adsbygoogle || [];
         w.adsbygoogle.push({});
-        if (mounted) setAdsLoaded(true);
+        clearTimeout(fallbackTimer);
+        setAdsLoaded(true);
+      } catch {
+        clearTimeout(fallbackTimer);
+        setAdError(true);
       }
-    } catch {
-      if (mounted) setAdError(true);
-    }
+    }, 0);
 
     return () => {
-      mounted = false;
-      clearTimeout(timer);
+      clearTimeout(fallbackTimer);
+      clearTimeout(pushTimer);
     };
-  }, [slotId, adsLoaded]);
+  }, [slotId]);
 
   const isSticky = variant === "sticky-sidebar";
 

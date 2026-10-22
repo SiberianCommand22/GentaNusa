@@ -11,7 +11,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
 
-type NewUser = { name: string; email: string; password: string; slug: string };
+type NewUser = {
+  name: string;
+  email: string;
+  password: string;
+  slug: string;
+  /** Peran redaksi; default "editor". Ditulis ke app_metadata.role. */
+  role?: "editor" | "admin";
+};
 
 const users: NewUser[] = [
   {
@@ -61,6 +68,38 @@ const users: NewUser[] = [
     email: "thaqif.sahama30@gentanusa.id",
     password: "GentaNusa2026!Thaqif#Secure",
     slug: "thaqif-sahama",
+  },
+  {
+    name: "Hanaya Cahyani",
+    email: "hanaya.cahyani@gentanusa.id",
+    password: "GentaNusa2026!Hanaya#Secure",
+    slug: "hanaya-cahyani",
+  },
+  {
+    name: "Tika",
+    email: "tika@gentanusa.id",
+    password: "GentaNusa2026!Tika#Secure",
+    slug: "tika",
+  },
+  {
+    name: "Adyuta Dhaniswara",
+    email: "adyuta.dhaniswara@gentanusa.id",
+    password: "GentaNusa2026!Adyuta#Secure",
+    slug: "adyuta-dhaniswara",
+  },
+  {
+    name: "Dimas Arrizki",
+    email: "dimas.arrizki@gentanusa.id",
+    password: "GentaNusa2026!Dimas#Secure",
+    slug: "dimas-arrizki",
+    role: "editor",
+  },
+  {
+    name: "Adhira Bachtiar",
+    email: "adhira.bachtiar@gentanusa.id",
+    password: "GentaNusa2026!Adhira#Secure",
+    slug: "adhira-bachtiar",
+    role: "editor",
   },
 ];
 
@@ -134,11 +173,14 @@ async function findUserIdByEmail(email: string): Promise<string | null> {
 
 // Peran redaksi WAJIB di app_metadata (dibaca middleware + login API).
 // user_metadata.role hanya label tampilan — tidak pernah memberi hak akses.
-async function ensureEditorAppRole(email: string): Promise<boolean> {
+async function ensureEditorAppRole(
+  email: string,
+  role: "editor" | "admin" = "editor"
+): Promise<boolean> {
   const userId = await findUserIdByEmail(email);
   if (!userId) return false;
   const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
-    app_metadata: { role: "editor" },
+    app_metadata: { role },
   });
   return !error;
 }
@@ -146,6 +188,7 @@ async function ensureEditorAppRole(email: string): Promise<boolean> {
 async function seed(): Promise<void> {
   console.log("Mendaftarkan jurnalis tambahan GentaNusa...");
   for (const user of users) {
+    const role = user.role ?? "editor";
     const { error } = await supabaseAdmin.auth.admin.createUser({
       email: user.email,
       password: user.password,
@@ -154,10 +197,10 @@ async function seed(): Promise<void> {
       // (bisa diubah user, diabaikan middleware) sehingga akun jurnalis
       // selalu ditolak gerbang /admin dan mental ke beranda `/`.
       // app_metadata.role di bawah inilah yang dibaca middleware + login API.
-      app_metadata: { role: "editor" },
+      app_metadata: { role },
       user_metadata: {
         full_name: user.name,
-        role: "editor",
+        role,
         author_slug: user.slug,
         author_role: "Redaktur GentaNusa",
       },
@@ -166,10 +209,10 @@ async function seed(): Promise<void> {
       if (isAlreadyRegistered(error.message)) {
         // Akun lama (pra-perbaikan) tidak punya app_metadata.role — perbaiki
         // agar bisa masuk /admin tanpa redirect ke `/`.
-        const fixed = await ensureEditorAppRole(user.email);
+        const fixed = await ensureEditorAppRole(user.email, role);
         console.warn(
           `[SKIP / TERDAFTAR] ${user.email}: sudah ada` +
-            (fixed ? " — app_metadata.role=editor dipastikan." : " — GAGAL menanam app_metadata.role, jalankan scripts/backfill-editor-roles.ts --apply.")
+            (fixed ? ` — app_metadata.role=${role} dipastikan.` : " — GAGAL menanam app_metadata.role, jalankan scripts/backfill-editor-roles.ts --apply.")
         );
         continue;
       }

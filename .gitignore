@@ -49,3 +49,13 @@ next-env.d.ts
 *.log
 auto-original.lock
 .env*
+
+# kredensial redaksi (plaintext — JANGAN pernah commit)
+kredensial-redaksi.txt
+kredensial-*.txt
+
+# artefak build/audit lokal
+.tmp/
+
+# skill pihak ketiga (repo git terpisah, bukan submodule)
+.opencode/skills/security-audit/

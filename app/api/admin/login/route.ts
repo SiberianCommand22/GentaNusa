@@ -10,6 +10,7 @@ import {
   type EditorialSession,
 } from "@/lib/auth";
 import { canAccessAdminArea, isMasterEmail } from "@/lib/roles";
+import { getClientIp } from "@/lib/get-client-ip";
 
 // Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge.
 export const runtime = 'nodejs';
@@ -20,13 +21,32 @@ export const runtime = 'nodejs';
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_MAX = 10; // 10 percobaan gagal
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // jendela 5 menit (300 detik)
+// Batas keras ukuran map: penyerang bisa menyemprot email unik tanpa henti,
+// sehingga entri kedaluwarsa WAJIB dibersihkan dan map dibatasi agar memori
+// instance serverless tidak tumbuh tanpa batas (anti memory-exhaustion DoS).
+const RATE_LIMIT_MAX_KEYS = 10_000;
 
+// Panjang maksimum input — ditolak sebelum menyentuh Supabase Auth.
+const MAX_EMAIL_LENGTH = 254; // RFC 5321
+const MAX_PASSWORD_LENGTH = 200;
+
+function pruneRateLimit(now: number): void {
+  for (const [k, v] of rateLimitMap) {
+    if (now >= v.resetAt) rateLimitMap.delete(k);
+  }
+  if (rateLimitMap.size <= RATE_LIMIT_MAX_KEYS) return;
+  const overflow = rateLimitMap.size - RATE_LIMIT_MAX_KEYS;
+  let removed = 0;
+  for (const k of rateLimitMap.keys()) {
+    rateLimitMap.delete(k);
+    if (++removed >= overflow) break;
+  }
+}
+
+// Resolusi IP TUNGGAL lewat getClientIp (cf-connecting-ip -> x-real-ip ->
+// x-forwarded-for) agar tidak berbeda dari pembatas laju rute lain.
 function getRateLimitIp(req: NextRequest): string {
-  return (
-    req.headers.get("x-real-ip") ||
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    "127.0.0.1"
-  );
+  return getClientIp(req);
 }
 
 function getRetryAfterSeconds(entry: { resetAt: number }): number {
@@ -53,11 +73,28 @@ type SessionPayload = {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => null);
-    const { email, password } = body || {};
+    const { email, password } = (body ?? {}) as {
+      email?: unknown;
+      password?: unknown;
+    };
 
-    if (!email || !password) {
+    // Validasi tipe + panjang SEBELUM apa pun: body non-string (objek/array)
+    // bisa memicu `[object Object]` dan body raksasa membebani Supabase Auth.
+    if (typeof email !== "string" || typeof password !== "string") {
       return NextResponse.json(
         { ok: false, error: "Email dan kata sandi wajib diisi." },
+        { status: 400 }
+      );
+    }
+    if (!email.trim() || !password) {
+      return NextResponse.json(
+        { ok: false, error: "Email dan kata sandi wajib diisi." },
+        { status: 400 }
+      );
+    }
+    if (email.length > MAX_EMAIL_LENGTH || password.length > MAX_PASSWORD_LENGTH) {
+      return NextResponse.json(
+        { ok: false, error: "Email atau kata sandi tidak valid." },
         { status: 400 }
       );
     }
@@ -65,8 +102,9 @@ export async function POST(request: NextRequest) {
     // Rate limiting per IP+email: 10x gagal / 5 menit. Kunci gabungan agar
     // tidak ada kunci global/statis yang mengunci seluruh pengguna Vercel.
     const ip = getRateLimitIp(request);
-    const key = `${ip}:${String(email).toLowerCase()}`;
     const now = Date.now();
+    pruneRateLimit(now);
+    const key = `${ip}:${email.toLowerCase()}`;
     const entry = rateLimitMap.get(key);
     if (entry && now < entry.resetAt) {
       if (entry.count >= RATE_LIMIT_MAX) {
@@ -76,7 +114,7 @@ export async function POST(request: NextRequest) {
             ok: false,
             error: `Terlalu banyak percobaan gagal. Silakan coba lagi dalam ${retryAfter} detik.`,
           },
-          { status: 429 }
+          { status: 429, headers: { "Retry-After": String(retryAfter) } }
         );
       }
     } else if (entry) {

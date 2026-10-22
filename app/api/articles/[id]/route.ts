@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
+import { rateLimit } from "@/app/api/rate-limit";
 // RINGAN KUOTA: impor data HANYA dari fetch-REST murni (tanpa supabase-js
 // ±215 KB) agar bundel fungsi tetap di bawah batas 1 MB paket Hobby.
 import {
@@ -85,6 +86,9 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limited = rateLimit(req, { bucket: "articles:update", limit: 60 });
+  if (!limited.ok) return limited.response;
+
   const session = await getEditorialSession(req.headers.get("cookie"));
   if (!session) {
     return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
@@ -287,7 +291,13 @@ export async function PUT(
 
   const { data, error } = await updateArticleTolerant(id, fullUpdate);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error("[PUT /api/articles/[id]] update gagal:", error);
+    return NextResponse.json(
+      { error: "Terjadi kesalahan internal pada server" },
+      { status: 500 }
+    );
+  }
   revalidatePath("/");
   revalidatePath("/kategori/[slug]", "page");
   revalidatePath("/kategori");
@@ -323,6 +333,9 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limited = rateLimit(req, { bucket: "articles:delete", limit: 30 });
+  if (!limited.ok) return limited.response;
+
   const session = await getEditorialSession(req.headers.get("cookie"));
   if (!session) {
     return NextResponse.json({ error: "Butuh login redaksi" }, { status: 401 });
@@ -349,7 +362,13 @@ export async function DELETE(
   // Permanent delete via service_role (bypass RLS) — otorisasi dicek di atas
   // (admin penuh; penulis hanya milik sendiri).
   const { error } = await deleteArticleById(raw);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error("[DELETE /api/articles/[id]] hapus gagal:", error);
+    return NextResponse.json(
+      { error: "Terjadi kesalahan internal pada server" },
+      { status: 500 }
+    );
+  }
   revalidatePath("/");
   revalidatePath("/kategori");
   revalidatePath("/kategori/[slug]", "page");

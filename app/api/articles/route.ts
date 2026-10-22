@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
+import { rateLimit } from "@/app/api/rate-limit";
 // RINGAN KUOTA: impor data HANYA dari fetch-REST murni (tanpa supabase-js
 // ±215 KB) agar bundel fungsi tetap di bawah batas 1 MB paket Hobby.
 import {
@@ -130,6 +131,12 @@ export async function GET(req: NextRequest) {
 // Kepemilikan dikunci permanen: user_id diisi dari SESI server, bukan dari
 // payload klien, sehingga artikel tidak bisa "dipinjam" penulis lain.
 export async function POST(req: NextRequest) {
+  // Anti-abuse mutasi: bucket terpisah dari unggahan gambar agar kuota
+  // publikasi redaksi tidak tergerus endpoint lain. 30/menit/IP cukup
+  // longgar untuk kerja redaksi normal, tetapi memutus skrip massal.
+  const limited = rateLimit(req, { bucket: "articles:write", limit: 30 });
+  if (!limited.ok) return limited.response;
+
   try {
     const session = await getEditorialSession(req.headers.get("cookie"));
     if (!session) {
