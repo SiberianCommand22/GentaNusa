@@ -97,19 +97,9 @@ export function Navbar() {
           </Link>
 
           {/* Tengah — 8 kategori resmi, horizontal, hanya di desktop */}
-          <nav className="hidden lg:flex items-center gap-x-6 py-2 px-4" aria-label="Kategori berita">
+          <nav className="hidden lg:flex items-center gap-x-6" aria-label="Kategori berita">
             {NAV_CATEGORIES.map((c) => renderCategoryLink(c))}
-            <Link
-              href="/kategori/peduli"
-              className="flex items-center gap-1.5 self-center whitespace-nowrap text-xs font-semibold tracking-wide px-3.5 py-1 rounded-full bg-sky-950/80 border border-sky-400/50 text-sky-200 shadow-[0_0_12px_rgba(56,189,248,0.3)] transition-all hover:text-white hover:bg-sky-900/80 hover:border-sky-300/70 hover:shadow-[0_0_18px_rgba(56,189,248,0.4)]"
-              aria-current={pathname === "/kategori/peduli" ? "page" : undefined}
-            >
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-sky-300"></span>
-              </span>
-              Peduli
-            </Link>
+            {renderCategoryLink({ slug: "peduli", label: "Peduli" })}
           </nav>
 
           {/* Sisi kanan — pencarian saja (tanpa tombol hamburger) */}
@@ -139,21 +129,11 @@ export function Navbar() {
 
         {/* ── Tier 2: strip kategori geser horizontal (mobile/tablet) ── */}
         <nav
-          className={`lg:hidden flex overflow-x-auto no-scrollbar whitespace-nowrap items-center gap-x-6 py-2 px-4 border-t border-slate-800/60 ${styles.catStrip}`}
+          className={`lg:hidden flex overflow-x-auto no-scrollbar whitespace-nowrap items-center gap-x-4 px-4 border-t border-slate-800/60 ${styles.catStrip}`}
           aria-label="Kategori berita"
         >
           {NAV_CATEGORIES.map((c) => renderCategoryLink(c))}
-          <Link
-            href="/kategori/peduli"
-            className="flex items-center gap-1.5 self-center whitespace-nowrap text-xs font-semibold tracking-wide px-3.5 py-1 my-1 rounded-full bg-sky-950/80 border border-sky-400/50 text-sky-200 shadow-[0_0_12px_rgba(56,189,248,0.3)] transition-all"
-            aria-current={pathname === "/kategori/peduli" ? "page" : undefined}
-          >
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-sky-300"></span>
-            </span>
-            Peduli
-          </Link>
+          {renderCategoryLink({ slug: "peduli", label: "Peduli" })}
         </nav>
       </header>
 
