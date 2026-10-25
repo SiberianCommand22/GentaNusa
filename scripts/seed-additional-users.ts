@@ -101,6 +101,13 @@ const users: NewUser[] = [
     slug: "adhira-bachtiar",
     role: "editor",
   },
+  {
+    name: "Chelsea Aulya",
+    email: "chelsea.aulya@gentanusa.id",
+    password: "GentaNusa2026!Chelsea#Secure",
+    slug: "chelsea-aulya",
+    role: "editor",
+  },
 ];
 
 function loadEnvLocal(): void {
@@ -179,8 +186,10 @@ async function ensureEditorAppRole(
 ): Promise<boolean> {
   const userId = await findUserIdByEmail(email);
   if (!userId) return false;
+  const { data } = await supabaseAdmin.auth.admin.getUserById(userId);
   const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
-    app_metadata: { role },
+    app_metadata: { ...(data?.user?.app_metadata ?? {}), role },
+    user_metadata: { ...(data?.user?.user_metadata ?? {}), role },
   });
   return !error;
 }

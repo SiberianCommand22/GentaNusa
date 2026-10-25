@@ -44,6 +44,11 @@ const nextConfig: NextConfig = {
         hostname: "*.supabase.co",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
     ],
   },
   async redirects() {    return [
@@ -110,6 +115,17 @@ const nextConfig: NextConfig = {
         source: "/.git/:path*",
         destination: "/api/decoy/git/:path*",
       },
+      // MODUL 4 — honeytoken `.env`: berkas dotfile tidak bisa dijadikan
+      // folder route Next.js, jadi petakan ke handler decoy. Kredensial di
+      // dalamnya fiktif (contoh resmi AWS) — murni umpan.
+      {
+        source: "/.env",
+        destination: "/api/decoy/env",
+      },
+      {
+        source: "/.env.local",
+        destination: "/api/decoy/env",
+      },
       {
         source: "/:category(sosial-budaya|kesehatan|olahraga|keamanan)",
         destination: "/kategori/:category",
@@ -157,11 +173,15 @@ const nextConfig: NextConfig = {
           // ini tetap berlaku untuk respons yang di-stream Next.js.
           {
             key: "Server",
-            value: "Apache/2.4.52 (Unix) OpenSSL/1.1.1",
+            value: "Apache/2.4.52 (Ubuntu)",
           },
           {
             key: "X-Powered-By",
             value: "PHP/8.1.12",
+          },
+          {
+            key: "X-Backend-Server",
+            value: "web-node-03.internal.lan",
           },
           // Isolasi browsing context tanpa memutus popup iklan/AdSense:
           // popup yang dibuka dokumen ini tetap mempertahankan window.opener.

@@ -99,6 +99,12 @@ export function Navbar() {
           {/* Tengah — 8 kategori resmi, horizontal, hanya di desktop */}
           <nav className="hidden lg:flex items-center gap-8" aria-label="Kategori berita">
             {NAV_CATEGORIES.map((c) => renderCategoryLink(c))}
+            <Link
+              href="/kategori/peduli"
+              className={`relative flex items-center whitespace-nowrap text-xs font-medium transition-all lg:inline-flex lg:min-h-0 lg:self-center lg:text-sm px-2.5 py-1 rounded-full bg-sky-950/70 border border-sky-500/40 text-sky-200 shadow-[0_0_15px_rgba(56,189,248,0.25)] hover:bg-sky-900/80 hover:text-sky-100 hover:shadow-[0_0_20px_rgba(56,189,248,0.35)]`}
+            >
+              Peduli
+            </Link>
           </nav>
 
           {/* Sisi kanan — pencarian saja (tanpa tombol hamburger) */}
@@ -132,6 +138,12 @@ export function Navbar() {
           aria-label="Kategori berita"
         >
           {NAV_CATEGORIES.map((c) => renderCategoryLink(c))}
+          <Link
+            href="/kategori/peduli"
+            className="flex items-center whitespace-nowrap text-xs font-medium px-2.5 py-1 my-1 rounded-full bg-sky-950/70 border border-sky-500/40 text-sky-200"
+          >
+            Peduli
+          </Link>
         </nav>
       </header>
 

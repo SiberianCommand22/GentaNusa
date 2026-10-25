@@ -31,10 +31,13 @@ const EXTERNAL = "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h
 const LOGOUT = "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9";
 const SETTINGS = "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z";
 
+const HEART = "M12 21s-6-4.35-6-10a4 4 0 0 1 7-2.71A4 4 0 0 1 18 11c0 5.65-6 10-6 10z";
+
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: DASHBOARD, exact: true },
   { href: "/admin/posts/new", label: "Tulis Berita", icon: WRITE, exact: false },
   { href: "/admin/posts", label: "Kelola Berita", icon: POSTS, exact: true },
+  { href: "/admin/peduli", label: "Peduli", icon: HEART, exact: true },
   { href: "/admin/settings", label: "Pengaturan", icon: SETTINGS, exact: true },
 ];
 
@@ -42,6 +45,7 @@ const TITLES: Array<[string, string]> = [
   ["/admin/posts/new", "Tulis Berita"],
   ["/admin/posts/edit", "Edit Berita"],
   ["/admin/posts", "Kelola Berita"],
+  ["/admin/peduli", "Peduli: Aksi Kemanusiaan"],
   ["/admin/settings", "Pengaturan"],
   ["/admin/login/gentanusa", "Login Redaksi"],
   ["/admin/login", "Login Redaksi"],
