@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getEditorialSession } from "@/lib/auth";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
 
@@ -27,6 +28,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+    try {
+      revalidatePath("/kategori/peduli");
+      revalidatePath("/peduli");
+    } catch {}
     return NextResponse.json(data);
   } catch (e) {
     const error = e as { message?: string };
@@ -53,6 +58,10 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+    try {
+      revalidatePath("/kategori/peduli");
+      revalidatePath("/peduli");
+    } catch {}
     return NextResponse.json({ ok: true });
   } catch (e) {
     const error = e as { message?: string };

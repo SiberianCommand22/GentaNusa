@@ -8,6 +8,7 @@ import { articleUrl, type Article } from "@/lib/data";
 import { CATEGORIES, type CategoryDefinition } from "@/lib/categories";
 import { siteUrl } from "@/lib/site";
 import styles from "./category.module.css";
+import PeduliPage from "../peduli/page";
 
 // ISR kategori hemat kuota: cache CDN 24 jam; invalidasi instan via
 // revalidatePath('/kategori/[slug]') di POST/PUT /api/articles.
@@ -22,9 +23,8 @@ const VALID_CATEGORIES = new Map<string, CategoryDefinition>(
   CATEGORIES.map((c) => [c.slug, c])
 );
 
-// Kanal "Peduli" belum punya ruang publik. Halaman kategori khusus ini
-// menampilkan editorial "coming soon" dan tidak pernah menanyakan DB.
-const COMING_SOON_SLUGS = new Set(["peduli"]);
+// Kanal "Peduli" menggunakan halaman khusus clothesline; rute spesifik
+// app/kategori/peduli/page.tsx memiliki prioritas dan dirender langsung.
 
 function normalizeSlug(raw: string | undefined): string {
   return String(raw ?? "").toLowerCase().trim();
@@ -155,85 +155,10 @@ export default async function CategoryPage({ params }: Params) {
   const categoryInfo = VALID_CATEGORIES.get(slug);
   if (!categoryInfo) notFound();
 
-  // Kanal "Peduli": tampilkan halaman Coming Soon, tanpa query database.
-  if (COMING_SOON_SLUGS.has(slug)) {
-    return (
-      <>
-        <main className={styles.container}>
-          <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
-            <Link href="/">Beranda</Link>
-            <span aria-hidden="true"> &gt; </span>
-            <Link href="/kategori">Kategori</Link>
-            <span aria-hidden="true"> &gt; </span>
-            <span aria-current="page">{categoryInfo.label}</span>
-          </nav>
-
-          <div className={styles.banner}>
-            <div className={styles.bannerInner}>
-              <span className={styles.bannerLabel}>Kategori</span>
-              <h1 className={styles.title}>{categoryInfo.label}</h1>
-              <p className={styles.subtitle}>{categoryInfo.description}</p>
-            </div>
-            <div className={styles.bannerAccent} />
-          </div>
-
-          <section className={styles.comingSoon} aria-labelledby="peduli-title">
-            <span className={styles.soonBadge}>GENTANUSA PEDULI</span>
-            <h2 id="peduli-title" className={styles.soonTitle}>
-              Kanal Dokumentasi Aksi Sosial Segera Hadir
-            </h2>
-            <p className={styles.soonText}>
-              Redaksi GentaNusa sedang mempersiapkan ruang khusus peliputan dan
-              dokumentasi program kepedulian sosial, bakti masyarakat, dan aksi
-              kemanusiaan di berbagai pelosok negeri.
-            </p>
-
-            <div className={styles.soonCard} role="img" aria-label="Ilustrasi kegiatan sosial danocumentedasi aksi humanity GentaNusa">
-              <div className={styles.soonCardArt} aria-hidden="true">
-                <svg
-                  viewBox="0 0 120 120"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="60" cy="42" r="16" />
-                  <path d="M28 104c0-17.7 14.3-32 32-32s32 14.3 32 32" />
-                  <path d="M22 30h12l4-8 4 8h12" />
-                  <path d="M98 52v-12M92 46h12" />
-                  <path d="M60 84c-4-3-9 1-9 5 0 5 9 11 9 11s9-6 9-11c0-4-5-8-9-5z" />
-                </svg>
-              </div>
-              <div className={styles.soonCardBody}>
-                <h3 className={styles.soonCardTitle}>Ruang Liputan Sosial &amp; Kemanusiaan</h3>
-                <p className={styles.soonCardText}>
-                  Liputan lapangan, bakti masyarakat, bantuan bencana, dan cerita
-                  inspiratif warga akan hadir di kanal ini.
-                </p>
-                <ul className={styles.soonList}>
-                  <li>Dokumentasi bakti dan bhakti sosial desa</li>
-                  <li>Aksi kemanusiaan dan bantuan bencana</li>
-                  <li>Program Posyandu &amp; Pemberdayaan Desa</li>
-                </ul>
-              </div>
-            </div>
-
-            <span className={styles.soonStatus}>Segera hadir</span>
-
-            <div className={styles.soonActions}>
-              <Link href="/" className={styles.emptyButton}>
-                Kembali ke Beranda
-              </Link>
-              <Link href="/kategori" className={styles.soonGhostButton}>
-                Lihat Semua Kanal
-              </Link>
-            </div>
-          </section>
-        </main>
-        <Footer />
-      </>
-    );
+  // Kanal "Peduli": render halaman khusus clothesline melalui rute dinamis sebagai fallback
+  // untuk memastikan antarmuka Polaroid selalu tampil (rute spesifik tetap diutamakan).
+  if (slug === "peduli") {
+    return <PeduliPage />;
   }
 
   const articles = await fetchByCategory(categoryInfo.label);

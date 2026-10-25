@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getEditorialSession } from "@/lib/auth";
 import { adminClient, isSupabaseReady } from "@/lib/supabase";
 
@@ -19,8 +20,9 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
     return NextResponse.json(data || []);
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e) {
+    const error = e as { message?: string };
+    return NextResponse.json({ error: error.message || "Terjadi kesalahan" }, { status: 500 });
   }
 }
 
@@ -44,8 +46,13 @@ export async function POST(req: Request) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+    try {
+      revalidatePath("/kategori/peduli");
+      revalidatePath("/peduli");
+    } catch {}
     return NextResponse.json(data);
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e) {
+    const error = e as { message?: string };
+    return NextResponse.json({ error: error.message || "Terjadi kesalahan" }, { status: 500 });
   }
 }
