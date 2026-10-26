@@ -1,28 +1,64 @@
 "use client";
 
-import { useState } from "react";
-import type { ActivityEvent, BankAccount } from "@/types/peduli";
-import { Building2, Phone, MapPin, Copy, Check, ShieldCheck, HeartHandshake } from "lucide-react";
+import type { ActivityEvent } from "@/types/peduli";
+import { Building2, Phone, MapPin, HeartHandshake, MessageCircle } from "lucide-react";
 
 type Props = {
   event: ActivityEvent;
 };
 
-/** Rekening cadangan bila admin belum mengisi kolom `bank_accounts`. */
-const FALLBACK_ACCOUNT: BankAccount = {
-  bank_name: "Bank Syariah Indonesia (BSI)",
-  account_number: "7190028471",
-  account_holder: "Yayasan Ar-Rakha",
-};
+/** Ikon Instagram — lucide-react tidak lagi mengekspor ikon brand. */
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  );
+}
+
+const contactLinks = [
+  {
+    href: "https://instagram.com/yardysmarypmj",
+    label: "@yardysmarypmj",
+    external: true,
+    icon: "instagram" as const,
+    ariaLabel: "Buka Instagram resmi yayasan di tab baru",
+  },
+  {
+    href: "https://wa.me/628121330777",
+    label: "0812-1330-777",
+    external: true,
+    icon: "whatsapp" as const,
+    ariaLabel: "Hubungi via WhatsApp 0812-1330-777 di tab baru",
+  },
+  {
+    href: "https://wa.me/6281244440101",
+    label: "0812-4444-0101",
+    external: true,
+    icon: "whatsapp" as const,
+    ariaLabel: "Hubungi via WhatsApp 0812-4444-0101 di tab baru",
+  },
+  {
+    href: "tel:+622517556161",
+    label: "(0251) 755-6161",
+    external: false,
+    icon: "phone" as const,
+    ariaLabel: "Telepon kantor yayasan (0251) 755-6161",
+  },
+];
 
 export function OrphanageProfileCard({ event }: Props) {
-  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
-
-  const bankAccounts =
-    Array.isArray(event.bank_accounts) && event.bank_accounts.length > 0
-      ? event.bank_accounts
-      : [FALLBACK_ACCOUNT];
-
   const urgentNeeds = (Array.isArray(event.urgent_needs) ? event.urgent_needs : [])
     .map((need) => (typeof need === "string" ? need : need.item || need.title || ""))
     .filter(Boolean);
@@ -30,36 +66,18 @@ export function OrphanageProfileCard({ event }: Props) {
   const address = event.address || event.orphanage_address;
   const location = event.location_city || event.location;
 
-  function handleCopy(num: string, idx: number) {
-    navigator.clipboard
-      .writeText(num)
-      .then(() => {
-        setCopiedIdx(idx);
-        setTimeout(() => setCopiedIdx(null), 2500);
-      })
-      .catch(() => {
-        /* clipboard tidak tersedia — abaikan */
-      });
-  }
-
   return (
     <div className="bg-white border border-stone-200/90 rounded-3xl shadow-sm p-6 sm:p-8 space-y-6">
       {/* Header Info */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-100 pb-5">
-        <div>
-          <div className="flex items-center gap-2 text-sky-800 font-semibold text-xs tracking-wider uppercase mb-1">
-            <Building2 className="w-4 h-4 text-sky-700" aria-hidden="true" />
-            <span>Transparansi Mitra Panti</span>
-          </div>
-          <h2 className="font-editorial text-xl sm:text-2xl font-semibold text-slate-900">
-            {event.orphanage_name}
-          </h2>
-          {location && <p className="text-sm text-stone-500 mt-1">{location}</p>}
+      <div className="border-b border-stone-100 pb-5">
+        <div className="flex items-center gap-2 text-sky-800 font-semibold text-xs tracking-wider uppercase mb-1">
+          <Building2 className="w-4 h-4 text-sky-700" aria-hidden="true" />
+          <span>Transparansi Mitra Panti</span>
         </div>
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium self-start sm:self-auto">
-          <ShieldCheck className="w-4 h-4 text-emerald-600" aria-hidden="true" />
-          <span>Izin Terverifikasi Dinsos</span>
-        </div>
+        <h2 className="font-editorial text-xl sm:text-2xl font-semibold text-slate-900">
+          {event.orphanage_name}
+        </h2>
+        {location && <p className="text-sm text-stone-500 mt-1">{location}</p>}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-stone-600">
@@ -107,52 +125,42 @@ export function OrphanageProfileCard({ event }: Props) {
         </div>
       </div>
 
-      {/* Slip Rekening Donasi Mandiri */}
-      <div className="bg-sky-50/70 border border-sky-200/70 rounded-2xl p-5 space-y-4">
+      {/* Kanal Donasi & Kontak Langsung */}
+      <div className="bg-sky-50/70 border border-sky-200/80 rounded-2xl p-5 space-y-4">
         <div className="flex items-center gap-2 text-sky-950 font-medium text-sm">
           <HeartHandshake className="w-4 h-4 text-sky-700 shrink-0" aria-hidden="true" />
-          <span>Penyaluran Donasi Langsung ke Panti (100% Tanpa Perantara Redaksi):</span>
+          <span>Kanal Donasi &amp; Kontak Langsung Yayasan:</span>
         </div>
+
+        <p className="text-sm text-stone-600 leading-relaxed">
+          Bagi donatur atau masyarakat yang ingin menyalurkan santunan maupun bersilaturahmi
+          dengan pihak yayasan, silakan menghubungi kami secara langsung melalui kanal resmi
+          berikut:
+        </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {bankAccounts.map((bank, i) => (
-            <div
-              key={`${bank.bank_name}-${bank.account_number}`}
-              className="bg-white border border-sky-200/60 rounded-xl p-3.5 flex items-center justify-between gap-3 shadow-xs"
+          {contactLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target={link.external ? "_blank" : undefined}
+              rel={link.external ? "noopener noreferrer" : undefined}
+              aria-label={link.ariaLabel}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-sky-200/80 text-slate-800 text-sm font-medium hover:border-sky-400 hover:text-sky-700 hover:shadow-sm transition"
             >
-              <div className="min-w-0">
-                <p className="text-xs font-semibold text-sky-900">{bank.bank_name}</p>
-                <p className="text-lg font-mono font-bold text-slate-900 tracking-wider truncate">
-                  {bank.account_number}
-                </p>
-                <p className="text-[11px] text-stone-500 truncate">a.n {bank.account_holder}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleCopy(bank.account_number, i)}
-                aria-label={`Salin nomor rekening ${bank.bank_name}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-900 hover:bg-sky-800 text-white text-xs font-medium transition shadow-xs shrink-0"
-              >
-                {copiedIdx === i ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-emerald-300" aria-hidden="true" />
-                    <span>Tersalin!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5" aria-hidden="true" />
-                    <span>Salin</span>
-                  </>
-                )}
-              </button>
-            </div>
+              {link.icon === "instagram" && (
+                <InstagramIcon className="w-4 h-4 text-rose-500" />
+              )}
+              {link.icon === "whatsapp" && (
+                <MessageCircle className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+              )}
+              {link.icon === "phone" && (
+                <Phone className="w-4 h-4 text-sky-700" aria-hidden="true" />
+              )}
+              <span>{link.label}</span>
+            </a>
           ))}
         </div>
-
-        <p className="text-xs text-stone-500 italic">
-          *100% donasi disalurkan langsung ke rekening resmi yayasan tanpa perantara/potongan
-          redaksi.
-        </p>
       </div>
     </div>
   );
