@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ChangeEvent } from "react";
 import styles from "../cms.module.css";
 
 type BankAccount = {
@@ -12,6 +12,17 @@ type BankAccount = {
 type UrgentNeed = {
   item: string;
   priority?: "high" | "medium" | "low";
+};
+
+type PhotoRow = {
+  id: string;
+  event_id?: string | null;
+  src: string;
+  alt?: string | null;
+  caption?: string | null;
+  handwritten_note?: string | null;
+  order_index?: number | null;
+  created_at?: string;
 };
 
 type EventRow = {
@@ -31,6 +42,13 @@ type EventRow = {
   urgent_needs?: UrgentNeed[] | string[] | null;
   bank_accounts?: BankAccount[] | null;
   created_at?: string;
+  peduli_photos?: PhotoRow[];
+};
+
+type PickedPhoto = {
+  file: File;
+  caption: string;
+  note: string;
 };
 
 type Session = {
@@ -45,6 +63,8 @@ export default function PeduliAdminPage() {
   const [session, setSession] = useState<Session | null>(null);
   const [editing, setEditing] = useState<EventRow | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [photoFiles, setPhotoFiles] = useState<PickedPhoto[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   const [form, setForm] = useState<Partial<EventRow>>({
     date_label: "",
@@ -94,8 +114,11 @@ export default function PeduliAdminPage() {
     }
   }, []);
 
+  // Pemuatan awal didefer agar tidak setState sinkron di body effect
+  // (pola sama dengan app/admin/posts/page.tsx).
   useEffect(() => {
-    load();
+    const t = window.setTimeout(() => load(), 0);
+    return () => window.clearTimeout(t);
   }, [load]);
 
   const isAdmin = session?.isAdmin === true;
@@ -118,6 +141,7 @@ export default function PeduliAdminPage() {
       urgent_needs: [],
       bank_accounts: [],
     });
+    setPhotoFiles([]);
     setShowForm(true);
   }
 
@@ -128,6 +152,7 @@ export default function PeduliAdminPage() {
       urgent_needs: ev.urgent_needs || [],
       bank_accounts: ev.bank_accounts || [],
     });
+    setPhotoFiles([]);
     setShowForm(true);
   }
 
@@ -170,6 +195,81 @@ export default function PeduliAdminPage() {
     }
   }
 
+  const activeEvent = editing ? events.find((e) => e.id === editing.id) || null : null;
+  const photos: PhotoRow[] = [...(activeEvent?.peduli_photos || [])].sort(
+    (a, b) => (a.order_index ?? 0) - (b.order_index ?? 0)
+  );
+
+  function onPickFiles(e: ChangeEvent<HTMLInputElement>) {
+    const picked = Array.from(e.target.files || []);
+    if (picked.length === 0) return;
+    setPhotoFiles((prev) => [
+      ...prev,
+      ...picked.map((file) => ({ file, caption: "", note: "" })),
+    ]);
+    e.target.value = "";
+  }
+
+  function updatePicked(index: number, patch: Partial<PickedPhoto>) {
+    setPhotoFiles((prev) => prev.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+  }
+
+  function dropPicked(index: number) {
+    setPhotoFiles((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  async function uploadPhotos() {
+    if (!isAdmin || !activeEvent || photoFiles.length === 0) return;
+    setMsg("");
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("event_id", activeEvent.id);
+      photoFiles.forEach((item) => fd.append("files", item.file));
+      fd.append(
+        "meta",
+        JSON.stringify(photoFiles.map((item) => ({ caption: item.caption, handwritten_note: item.note })))
+      );
+      const r = await fetch("/api/peduli/photos", { method: "POST", body: fd });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok) {
+        const failed = Array.isArray(j.failed) ? j.failed : [];
+        const okCount = Array.isArray(j.photos) ? j.photos.length : 0;
+        setMsg(
+          failed.length > 0
+            ? `${okCount} foto tersimpan, ${failed.length} gagal: ${failed[0]?.error || ""}`
+            : `${okCount} foto berhasil diunggah`
+        );
+        setPhotoFiles([]);
+        load();
+      } else {
+        setMsg(j.error || "Gagal mengunggah foto");
+      }
+    } catch {
+      setMsg("Gagal mengunggah foto");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function removePhoto(id: string) {
+    if (!isAdmin) return;
+    if (!confirm("Hapus foto polaroid ini?")) return;
+    setMsg("");
+    try {
+      const r = await fetch(`/api/peduli/photos/${id}`, { method: "DELETE" });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok) {
+        setMsg("Foto dihapus");
+        load();
+      } else {
+        setMsg(j.error || "Gagal menghapus foto");
+      }
+    } catch {
+      setMsg("Gagal menghapus foto");
+    }
+  }
+
   return (
     <div>
       <div className={styles.pageHead}>
@@ -196,6 +296,7 @@ export default function PeduliAdminPage() {
                 <th>Tanggal</th>
                 <th>Panti Asuhan</th>
                 <th>Judul</th>
+                <th>Foto</th>
                 <th>Lokasi</th>
                 {isAdmin && <th>Aksi</th>}
               </tr>
@@ -243,6 +344,111 @@ export default function PeduliAdminPage() {
               <button onClick={() => setShowForm(false)}>Batal</button>
             </div>
           </div>
+
+          {editing && activeEvent && (
+            <div style={{ marginTop: 24, paddingTop: 16, borderTop: "1px solid #1e293b" }}>
+              <h3 style={{ margin: 0, fontSize: 15 }}>Galeri Polaroid ({photos.length} foto)</h3>
+              <p style={{ color: "#94a3b8", fontSize: 12, marginTop: 4 }}>
+                Foto tampil di halaman /peduli setelah diunggah. Keterangan & catatan bersifat opsional.
+              </p>
+
+              {photos.length === 0 ? (
+                <p style={{ color: "#94a3b8", fontSize: 13 }}>Belum ada foto untuk kegiatan ini.</p>
+              ) : (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+                    gap: 12,
+                    marginTop: 12,
+                  }}
+                >
+                  {photos.map((ph) => (
+                    <figure
+                      key={ph.id}
+                      style={{
+                        border: "1px solid #1e293b",
+                        borderRadius: 8,
+                        padding: 8,
+                        margin: 0,
+                        background: "#0f172a",
+                      }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={ph.src}
+                        alt={ph.alt || ph.caption || "Foto polaroid"}
+                        style={{ width: "100%", height: 96, objectFit: "cover", borderRadius: 4 }}
+                      />
+                      <figcaption style={{ fontSize: 12, color: "#cbd5e1", marginTop: 6 }}>
+                        {ph.caption || ph.alt || "—"}
+                      </figcaption>
+                      <button onClick={() => removePhoto(ph.id)} style={{ marginTop: 6, fontSize: 12 }}>
+                        Hapus
+                      </button>
+                    </figure>
+                  ))}
+                </div>
+              )}
+
+              <div style={{ marginTop: 16 }}>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={onPickFiles}
+                />
+                {photoFiles.length > 0 && (
+                  <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
+                    {photoFiles.map((item, i) => (
+                      <div
+                        key={`${item.file.name}-${i}`}
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) auto",
+                          gap: 8,
+                          alignItems: "center",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 12,
+                            color: "#cbd5e1",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {item.file.name}
+                        </span>
+                        <input
+                          placeholder="Keterangan (caption)"
+                          value={item.caption}
+                          onChange={(e) => updatePicked(i, { caption: e.target.value })}
+                        />
+                        <input
+                          placeholder="Catatan tulisan tangan"
+                          value={item.note}
+                          onChange={(e) => updatePicked(i, { note: e.target.value })}
+                        />
+                        <button onClick={() => dropPicked(i)} disabled={uploading}>
+                          Buang
+                        </button>
+                      </div>
+                    ))}
+                    <div>
+                      <button onClick={uploadPhotos} disabled={uploading} style={{ marginRight: 8 }}>
+                        {uploading ? "Mengunggah..." : `Unggah ${photoFiles.length} Foto`}
+                      </button>
+                      <button onClick={() => setPhotoFiles([])} disabled={uploading}>
+                        Bersihkan
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
