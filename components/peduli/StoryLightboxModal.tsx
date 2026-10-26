@@ -31,39 +31,48 @@ export function StoryLightboxModal({ photos, currentIndex, onClose, onNavigate }
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-stone-950/85 backdrop-blur-sm" onClick={onClose} />
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 text-white text-3xl z-10"
+        className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-2xl transition-colors"
         aria-label="Tutup"
       >
-        ×
+        &times;
       </button>
       <button
         onClick={() => onNavigate((currentIndex - 1 + photos.length) % photos.length)}
-        className="absolute left-4 text-white text-4xl z-10"
+        className="absolute left-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-3xl leading-none transition-colors"
         aria-label="Sebelumnya"
       >
-        ‹
+        &lsaquo;
       </button>
       <button
         onClick={() => onNavigate((currentIndex + 1) % photos.length)}
-        className="absolute right-4 text-white text-4xl z-10"
+        className="absolute right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-3xl leading-none transition-colors"
         aria-label="Selanjutnya"
       >
-        ›
+        &rsaquo;
       </button>
-      <div className="relative max-w-3xl w-full bg-white p-4 pb-12 shadow-2xl" style={{ transform: "rotate(-1deg)" }}>
+      <div
+        className="relative max-w-3xl w-full bg-white border border-stone-200/80 p-4 pb-12 shadow-2xl"
+        style={{ transform: "rotate(-1deg)" }}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={photo.src} alt={photo.alt || ""} className="w-full h-auto max-h-[70vh] object-contain bg-slate-100" />
+        <img src={photo.src} alt={photo.alt || ""} className="w-full h-auto max-h-[70vh] object-contain bg-stone-100" />
         {(photo.story_title || photo.handwritten_note || photo.caption) && (
-          <div className="mt-4 text-center">
-            {photo.story_title && <h3 className="text-lg font-semibold text-slate-900 mb-2">{photo.story_title}</h3>}
-            <p className="text-sm text-slate-700 font-[cursive]">{photo.story_description || photo.handwritten_note || photo.caption}</p>
+          <div className="mt-4 text-center px-2">
+            {photo.story_title && (
+              <h3 className="font-editorial text-lg font-semibold text-slate-900 mb-2">
+                {photo.story_title}
+              </h3>
+            )}
+            <p className="font-hand text-xl text-stone-700 leading-snug">
+              {photo.story_description || photo.handwritten_note || photo.caption}
+            </p>
             {photo.quote_text && (
-              <blockquote className="mt-3 italic text-slate-600">
+              <blockquote className="font-editorial mt-3 italic text-stone-600">
                 &ldquo;{photo.quote_text}&rdquo;
-                {photo.quote_author && <cite className="block text-xs mt-1">&mdash; {photo.quote_author}</cite>}
+                {photo.quote_author && <cite className="block text-xs mt-1 not-italic">&mdash; {photo.quote_author}</cite>}
               </blockquote>
             )}
           </div>

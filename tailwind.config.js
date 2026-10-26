@@ -15,6 +15,8 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-jakarta)', 'sans-serif'],
+        hand: ['Caveat', 'cursive'],
+        editorial: ['Lora', 'Georgia', 'Times New Roman', 'serif'],
       },
     },
   },
