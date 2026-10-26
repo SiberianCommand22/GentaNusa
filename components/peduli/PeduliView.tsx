@@ -9,6 +9,12 @@ import { ActivityTimelineNav } from "@/components/peduli/ActivityTimelineNav";
 import { Heart, Sparkles, MapPin, Users, PackageCheck } from "lucide-react";
 import type { ActivityEvent, PolaroidPhoto } from "@/types/peduli";
 
+const DEFAULT_HEADLINE =
+  "Menjemput Senyum di Sudut Sukaraja: Secuil Kasih dan Pelukan Hangat untuk Tunas Harapan Yardysma";
+
+const DEFAULT_SUMMARY =
+  "Di balik pintu sederhana di sudut Sukaraja, Yayasan Ar-Rakha Miftaahul Jannah menampung tawa-tawa yang tak pernah berhenti bertanya. Kami datang bukan membawa belas kasih yang tinggi hati, melainkan secuil kasih, sepiring nasi hangat, dan pelukan hangat yang mengingatkan bahwa setiap tunas harapan berhak tumbuh perlahan di antara kawan dan saudara.";
+
 const placeholderEvent: ActivityEvent = {
   id: "placeholder-1",
   slug: "dokumentasi-lapangan-sedang-disiapkan",
@@ -17,9 +23,8 @@ const placeholderEvent: ActivityEvent = {
   orphanage_name: "GentaNusa Peduli",
   location_city: "Indonesia",
   location: "Indonesia",
-  headline: "Catatan Jurnalis: Dokumentasi Lapangan Sedang Disiapkan untuk Rilis Sore Ini",
-  summary:
-    "Tim liputan GentaNusa sedang merajut dokumentasi aksi sosial dan kemanusiaan. Kami akan menampilkan momen kebersamaan dalam galeri jemuran polaroid begitu rangkaian foto siap dipublikasikan.",
+  headline: DEFAULT_HEADLINE,
+  summary: DEFAULT_SUMMARY,
   children_count: null,
   volunteers_count: null,
   packages_distributed: null,
@@ -93,6 +98,7 @@ export function PeduliView({ initialEvents = [] }: PeduliViewProps) {
   }
 
   const isPlaceholder = activeEvent.id === placeholderEvent.id;
+  const albumPhotos = Array.isArray(activeEvent.photos) ? activeEvent.photos : [];
 
   const children = activeEvent.children_count;
   const volunteers = activeEvent.volunteers_count;
@@ -129,14 +135,14 @@ export function PeduliView({ initialEvents = [] }: PeduliViewProps) {
 
           {/* Poetic Editorial Headline */}
           <h1 className="font-editorial text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-slate-900 leading-[1.25]">
-            {activeEvent.headline}
+            {activeEvent.headline || DEFAULT_HEADLINE}
           </h1>
 
           <div className="w-16 h-0.5 bg-sky-600/40 mx-auto rounded-full" aria-hidden="true" />
 
           {/* Story Intro */}
           <p className="text-stone-600 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
-            {activeEvent.summary}
+            {activeEvent.summary || DEFAULT_SUMMARY}
           </p>
 
           {/* Metrik Bersih & Elegan */}
@@ -191,6 +197,45 @@ export function PeduliView({ initialEvents = [] }: PeduliViewProps) {
         </div>
         <ClotheslineGallery photos={activeEvent.photos || []} onSelectPhoto={openLightbox} />
       </section>
+
+      {/* Album Dokumentasi Kegiatan (mozaik) */}
+      {albumPhotos.length > 0 && (
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 mt-10 w-full">
+          <div className="text-center mb-4">
+            <p className="text-xs uppercase tracking-widest text-stone-400 font-semibold">
+              &mdash; Album Dokumentasi Kegiatan &mdash;
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {albumPhotos.map((photo, idx) => {
+              const src = photo.src || photo.image_url || photo.url || "";
+              const alt = photo.alt || photo.caption || "Dokumentasi kegiatan";
+              return (
+                <button
+                  key={photo.id || idx}
+                  type="button"
+                  onClick={() => openLightbox(photo, idx)}
+                  className="group relative block overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 text-left"
+                >
+                  <span className="relative block aspect-[4/3] overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={src}
+                      alt={alt}
+                      loading="lazy"
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </span>
+                  <span className="flex items-center justify-between gap-2 px-3 py-2 text-[10px] font-mono text-stone-500 border-t border-stone-100">
+                    <span className="truncate">{photo.photographer || "Tim Liputan"}</span>
+                    <span className="shrink-0">{photo.timestamp || ""}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Kartu Profil Yayasan & Rekening Donasi Mandiri */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 mt-8 w-full">
