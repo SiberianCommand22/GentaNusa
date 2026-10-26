@@ -116,37 +116,70 @@ async function apiJson(url: string, init?: RequestInit): Promise<unknown> {
 
 type UploadEntry = { file: File; photo: PhotoItem; orderIndex: number };
 
+// Batas dipakai bersama oleh sisi klien dan API (`MAX_FILES` di route).
+const MAX_UPLOAD_FILES = 30;
+// Ukuran kiriman per request; menjaga beban payload tetap di dalam batas
+// hosting sekaligus memberi progres per langkah.
+const UPLOAD_CHUNK_SIZE = 10;
+
+function summarizeFailures(failures: string[]): string {
+  const unique = Array.from(new Set(failures));
+  const shown = unique.slice(0, 3).join(' | ');
+  const more = failures.length - Math.min(unique.length, 3);
+  return more > 0 ? `${shown} (+${more} foto lainnya)` : shown;
+}
+
 async function uploadPhotos(
   eventId: string,
-  entries: UploadEntry[]
+  entries: UploadEntry[],
+  onProgress?: (done: number, total: number) => void
 ): Promise<{ items: PhotoItem[]; failures: string[] }> {
-  const fd = new FormData();
-  fd.append('event_id', eventId);
-  const metas = entries.map((entry) => {
-    fd.append('files', entry.file);
-    const p = entry.photo;
-    return {
-      alt: p.alt || null,
-      caption: p.caption || null,
-      handwritten_note: p.handwritten_note || null,
-      photographer: p.photographer || null,
-      timestamp: p.timestamp || null,
-      story_title: p.story_title || null,
-      story_description: p.story_description || null,
-      order_index: entry.orderIndex
-    };
-  });
-  fd.append('meta', JSON.stringify(metas));
+  const items: PhotoItem[] = [];
+  const failures: string[] = [];
+  const total = entries.length;
+  let done = 0;
 
-  const data = (await apiJson('/api/peduli/photos', {
-    method: 'POST',
-    body: fd
-  })) as { photos?: PhotoRow[]; failed?: { name: string; error: string }[] };
+  for (let start = 0; start < total; start += UPLOAD_CHUNK_SIZE) {
+    const chunk = entries.slice(start, start + UPLOAD_CHUNK_SIZE);
 
-  const items = (Array.isArray(data.photos) ? data.photos : []).map(rowToPhotoItem);
-  const failures = (Array.isArray(data.failed) ? data.failed : []).map(
-    (f) => `${f.name}: ${f.error}`
-  );
+    const fd = new FormData();
+    fd.append('event_id', eventId);
+    const metas = chunk.map((entry) => {
+      fd.append('files', entry.file);
+      const p = entry.photo;
+      return {
+        alt: p.alt || null,
+        caption: p.caption || null,
+        handwritten_note: p.handwritten_note || null,
+        photographer: p.photographer || null,
+        timestamp: p.timestamp || null,
+        story_title: p.story_title || null,
+        story_description: p.story_description || null,
+        order_index: entry.orderIndex
+      };
+    });
+    fd.append('meta', JSON.stringify(metas));
+
+    try {
+      const data = (await apiJson('/api/peduli/photos', {
+        method: 'POST',
+        body: fd
+      })) as { photos?: PhotoRow[]; failed?: { name: string; error: string }[] };
+
+      items.push(...(Array.isArray(data.photos) ? data.photos : []).map(rowToPhotoItem));
+      failures.push(
+        ...(Array.isArray(data.failed) ? data.failed : []).map((f) => `${f.name}: ${f.error}`)
+      );
+    } catch (err) {
+      // Kegagalan satu blok tidak membatalkan blok lain — laporkan per berkas.
+      const msg = toMessage(err, 'unggahan gagal');
+      failures.push(...chunk.map((entry) => `${entry.file.name}: ${msg}`));
+    }
+
+    done += chunk.length;
+    onProgress?.(Math.min(done, total), total);
+  }
+
   return { items, failures };
 }
 
@@ -162,6 +195,7 @@ export default function AdminPeduliPage() {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Field Form Terbuka (Editable)
@@ -255,26 +289,39 @@ export default function AdminPeduliPage() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    const picked = Array.from(files);
+    if (picked.length > MAX_UPLOAD_FILES) {
+      setStatusMsg({
+        type: 'error',
+        text: `Maksimal ${MAX_UPLOAD_FILES} foto per unggahan — Anda memilih ${picked.length} foto. Silakan pisahkan unggahan.`
+      });
+      e.target.value = '';
+      return;
+    }
+
     setUploadingImage(true);
     setStatusMsg(null);
+    setUploadStatus(`Mengunggah dan mengompresi ${picked.length} foto...`);
 
     try {
-      const picked = Array.from(files);
-
       if (selectedEventId) {
         const base = photos.length;
         const { items, failures } = await uploadPhotos(
           selectedEventId,
-          picked.map((file, i) => ({ file, photo: defaultPhotoItem(file), orderIndex: base + i }))
+          picked.map((file, i) => ({ file, photo: defaultPhotoItem(file), orderIndex: base + i })),
+          (done, total) => setUploadStatus(`Mengunggah dan mengompresi foto ${done}/${total}...`)
         );
         setPhotos(prev => [...prev, ...items]);
         if (failures.length > 0) {
           setStatusMsg({
             type: 'error',
-            text: `${items.length} foto masuk, ${failures.length} gagal diunggah: ${failures.join('; ')}`
+            text: `Berhasil ${items.length} dari ${picked.length} foto. Gagal: ${summarizeFailures(failures)}`
           });
         } else {
-          setStatusMsg({ type: 'success', text: `${items.length} foto berhasil diunggah & tersimpan.` });
+          setStatusMsg({
+            type: 'success',
+            text: `${items.length} dari ${picked.length} foto berhasil diunggah & tersimpan.`
+          });
         }
       } else {
         const held = picked.map(file => ({
@@ -292,6 +339,7 @@ export default function AdminPeduliPage() {
       setStatusMsg({ type: 'error', text: `Upload gagal: ${toMessage(err, 'Periksa koneksi atau sesi admin')}` });
     } finally {
       setUploadingImage(false);
+      setUploadStatus(null);
       e.target.value = '';
     }
   };
@@ -384,14 +432,16 @@ export default function AdminPeduliPage() {
         .map((p, idx) => ({ p, idx }))
         .filter((x): x is { p: PhotoItem & { file: File }; idx: number } => !x.p.id && Boolean(x.p.file));
       if (pending.length > 0) {
+        setUploadStatus(`Mengunggah dan mengompresi ${pending.length} foto...`);
         const { items, failures } = await uploadPhotos(
           activeId,
-          pending.map(({ p, idx }) => ({ file: p.file, photo: p, orderIndex: idx }))
+          pending.map(({ p, idx }) => ({ file: p.file, photo: p, orderIndex: idx })),
+          (done, total) => setUploadStatus(`Mengunggah dan mengompresi foto ${done}/${total}...`)
         );
-        if (failures.length > 0) {
-          throw new Error(`${failures.length} foto gagal diunggah: ${failures.join('; ')}`);
-        }
         items.forEach(item => { if (item.id) serverIdsRef.current.add(item.id); });
+        if (failures.length > 0) {
+          throw new Error(`${failures.length} foto gagal diunggah: ${summarizeFailures(failures)}`);
+        }
       }
 
       await fetch('/api/peduli/revalidate', { method: 'POST' });
@@ -403,6 +453,7 @@ export default function AdminPeduliPage() {
       setStatusMsg({ type: 'error', text: toMessage(err, 'Gagal menyimpan data') });
     } finally {
       setIsSubmitting(false);
+      setUploadStatus(null);
     }
   };
 
@@ -598,7 +649,7 @@ export default function AdminPeduliPage() {
 
               <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md transition">
                 <Upload className="w-4 h-4" />
-                <span>{uploadingImage ? 'Mengunggah ke Storage...' : '+ Upload Foto Baru'}</span>
+                <span>{uploadingImage ? (uploadStatus ?? 'Mengunggah...') : '+ Upload Foto Baru'}</span>
                 <input
                   type="file"
                   accept="image/*"

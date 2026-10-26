@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 const BUCKET = "peduli";
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
-const MAX_FILES = 10;
+const MAX_FILES = 30;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const EXTENSIONS = {
   "image/jpeg": ".jpg",
@@ -175,6 +175,22 @@ export async function POST(req: NextRequest) {
     const rows: Record<string, unknown>[] = [];
     const failures: { name: string; error: string }[] = [];
 
+    // Resolusi Sharp sekali di awal; kalau gagal, seluruh batch memakai
+    // berkas asli (sudah lolos magic-byte) agar fitur tidak mati total.
+    type SharpFactory = (typeof import("sharp"))["default"];
+    let sharpFactory: SharpFactory | null = null;
+    try {
+      sharpFactory = (await import("sharp")).default;
+    } catch (err) {
+      console.warn(
+        "[api/peduli/photos] sharp tidak tersedia, memakai berkas asli:",
+        err instanceof Error ? err.message : err
+      );
+    }
+
+    // Proses berkas SEKUENSIAL (satu per satu, bukan Promise.all): baca →
+    // kompresi Sharp → upload → lepas buffer sebelum berkas berikutnya.
+    // Memori puncak hanya menampung satu foto, aman untuk batch hingga 30 foto.
     for (let i = 0; i < files.length; i += 1) {
       const file = files[i];
       const meta = metas[i] ?? {};
@@ -200,28 +216,27 @@ export async function POST(req: NextRequest) {
       }
 
       // Normalisasi + buang metadata EXIF (orientasi diterapkan via .rotate()).
-      // Bila sharp tidak tersedia, berkas asli (sudah lolos magic-byte) tetap
-      // diunggah agar fitur tidak mati total.
       let payload: Buffer = Buffer.from(bytes);
       let objectName = `${randomUUID()}${EXTENSIONS[type]}`;
       let contentType: ImageType = type;
-      try {
-        const sharp = (await import("sharp")).default;
-        const compressed = await sharp(payload)
-          .rotate()
-          .resize({ width: 1600, withoutEnlargement: true })
-          .jpeg({ quality: 80 })
-          .toBuffer();
-        if (compressed.length > 0 && compressed.length <= MAX_IMAGE_BYTES) {
-          payload = compressed;
-          objectName = `${randomUUID()}.jpg`;
-          contentType = "image/jpeg";
+      if (sharpFactory) {
+        try {
+          const compressed = await sharpFactory(payload)
+            .rotate()
+            .resize({ width: 1600, withoutEnlargement: true })
+            .jpeg({ quality: 80 })
+            .toBuffer();
+          if (compressed.length > 0 && compressed.length <= MAX_IMAGE_BYTES) {
+            payload = compressed;
+            objectName = `${randomUUID()}.jpg`;
+            contentType = "image/jpeg";
+          }
+        } catch (err) {
+          console.warn(
+            "[api/peduli/photos] kompresi gagal, memakai berkas asli:",
+            err instanceof Error ? err.message : err
+          );
         }
-      } catch (err) {
-        console.warn(
-          "[api/peduli/photos] sharp tidak tersedia, memakai berkas asli:",
-          err instanceof Error ? err.message : err
-        );
       }
 
       const storagePath = `peduli/${objectName}`;
