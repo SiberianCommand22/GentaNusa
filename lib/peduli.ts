@@ -60,15 +60,35 @@ export async function fetchPeduliEvents(): Promise<ActivityEvent[]> {
     return [];
   }
   try {
-    const { data, error } = await adminClient
-      .from("peduli_events")
-      .select("*, peduli_photos(*)")
-      .order("created_at", { ascending: false });
-    if (error) {
-      console.error("[lib/peduli] gagal membaca peduli_events:", error.message);
+    const [eventsRes, photosRes] = await Promise.all([
+      adminClient
+        .from("peduli_events")
+        .select("*")
+        .order("created_at", { ascending: false }),
+      adminClient.from("peduli_photos").select("*"),
+    ]);
+    if (eventsRes.error) {
+      console.error(
+        "[lib/peduli] gagal membaca peduli_events:",
+        eventsRes.error.message
+      );
       return [];
     }
-    return (Array.isArray(data) ? data : [])
+    if (photosRes.error) {
+      // Foto gagal tidak boleh mengosongkan halaman — lanjut tanpa foto.
+      console.error(
+        "[lib/peduli] gagal membaca peduli_photos:",
+        photosRes.error.message
+      );
+    }
+    const photos = Array.isArray(photosRes.data) ? photosRes.data : [];
+    const combined = (Array.isArray(eventsRes.data) ? eventsRes.data : []).map(
+      (ev) => ({
+        ...ev,
+        peduli_photos: photos.filter((p) => p.event_id === ev.id),
+      })
+    );
+    return combined
       .map(normalizeEvent)
       .filter((event): event is ActivityEvent => event !== null);
   } catch (err) {

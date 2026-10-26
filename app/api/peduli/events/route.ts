@@ -11,15 +11,35 @@ export async function GET() {
     if (!isSupabaseReady().ok || !adminClient) {
       return NextResponse.json([]);
     }
-    const { data, error } = await adminClient
-      .from("peduli_events")
-      .select("*, peduli_photos(*)")
-      .order("created_at", { ascending: false });
-    
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    const [eventsRes, photosRes] = await Promise.all([
+      adminClient
+        .from("peduli_events")
+        .select("*")
+        .order("created_at", { ascending: false }),
+      adminClient
+        .from("peduli_photos")
+        .select("*")
+        .order("order_index", { ascending: true }),
+    ]);
+
+    if (eventsRes.error) {
+      return NextResponse.json(
+        { error: eventsRes.error.message },
+        { status: 500 }
+      );
     }
-    return NextResponse.json(data || []);
+    if (photosRes.error) {
+      return NextResponse.json(
+        { error: photosRes.error.message },
+        { status: 500 }
+      );
+    }
+    const photos = Array.isArray(photosRes.data) ? photosRes.data : [];
+    const combined = (eventsRes.data || []).map((ev) => ({
+      ...ev,
+      peduli_photos: photos.filter((p) => p.event_id === ev.id),
+    }));
+    return NextResponse.json(combined);
   } catch (e) {
     const error = e as { message?: string };
     return NextResponse.json({ error: error.message || "Terjadi kesalahan" }, { status: 500 });

@@ -1,41 +1,49 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
-import { Trash2, Upload } from "lucide-react";
-import styles from "../cms.module.css";
+import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
+import Image from 'next/image';
+import { 
+  Upload, Trash2, HeartHandshake, Save, 
+  AlertCircle, CheckCircle2, RefreshCw, Edit2
+} from 'lucide-react';
 
-type BankAccount = {
-  bank_name: string;
-  account_number: string;
-  account_holder: string;
-};
+interface PhotoItem {
+  id?: string;
+  src: string;
+  alt: string;
+  caption: string;
+  handwritten_note: string;
+  photographer: string;
+  timestamp: string;
+  rotation_deg: number;
+  story_title: string;
+  story_description: string;
+  order_index?: number;
+  file?: File;
+}
 
-type UrgentNeed = {
-  item: string;
-  priority?: "high" | "medium" | "low";
-};
-
-type PhotoRow = {
+interface PhotoRow {
   id: string;
-  event_id?: string | null;
+  event_id: string;
   src: string;
   alt?: string | null;
   caption?: string | null;
   handwritten_note?: string | null;
   photographer?: string | null;
+  timestamp?: string | null;
+  rotation_deg?: number | null;
   story_title?: string | null;
   story_description?: string | null;
   order_index?: number | null;
-  created_at?: string;
-};
+}
 
-type EventRow = {
+interface EventRow {
   id: string;
-  date_label: string;
-  orphanage_name: string;
-  location_city: string;
-  headline: string;
-  summary: string;
+  date_label?: string | null;
+  orphanage_name?: string | null;
+  location_city?: string | null;
+  headline?: string | null;
+  summary?: string | null;
   children_count?: number | null;
   volunteers_count?: number | null;
   packages_distributed?: number | null;
@@ -43,737 +51,725 @@ type EventRow = {
   head_name?: string | null;
   phone?: string | null;
   address?: string | null;
-  urgent_needs?: UrgentNeed[] | string[] | null;
-  bank_accounts?: BankAccount[] | null;
-  created_at?: string;
+  urgent_needs?: string[] | string | null;
   peduli_photos?: PhotoRow[];
-};
+}
 
-/** Satu kartu di editor foto: baris tersimpan (dbId) atau berkas lokal (file). */
-type PhotoItem = {
-  key: string;
-  dbId?: string;
-  file?: File;
-  src: string;
-  handwritten_note: string;
-  photographer: string;
-  story_title: string;
-  story_description: string;
-  order_index: number;
-  /** Salinan awal (baris DB) untuk deteksi perubahan saat Simpan. */
-  orig: {
-    handwritten_note: string;
-    photographer: string;
-    story_title: string;
-    story_description: string;
-    order_index: number;
-  };
-};
+function toMessage(err: unknown, fallback: string): string {
+  return err instanceof Error && err.message ? err.message : fallback;
+}
 
-type Session = {
-  isAdmin: boolean;
-  displayName: string | null;
-};
+const PHOTO_TEXT_KEYS = [
+  'alt', 'caption', 'handwritten_note', 'photographer',
+  'timestamp', 'story_title', 'story_description'
+] as const;
 
-const PHOTOGRAPHERS = [
-  "Hanif Zulfikar",
-  "Chelsea Aulya",
-  "Adhira Bachtiar",
-  "Dimas Arrizki",
-];
-
-const inputCls =
-  "w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm";
-
-function toItemFromRow(ph: PhotoRow, index: number): PhotoItem {
-  const base = {
-    handwritten_note: ph.handwritten_note || "",
-    photographer: ph.photographer || "",
-    story_title: ph.story_title || "",
-    story_description: ph.story_description || "",
-    order_index: ph.order_index ?? index,
-  };
+function rowToPhotoItem(p: PhotoRow): PhotoItem {
   return {
-    key: ph.id,
-    dbId: ph.id,
-    src: ph.src,
-    ...base,
-    orig: { ...base },
+    id: p.id,
+    src: p.src,
+    alt: p.alt || 'Dokumentasi',
+    caption: p.caption || '',
+    handwritten_note: p.handwritten_note || 'Tawa dan kebersamaan di panti ~',
+    photographer: p.photographer || 'Tim Liputan GentaNusa',
+    timestamp: p.timestamp || '25 Okt 2026',
+    rotation_deg: p.rotation_deg || 0,
+    story_title: p.story_title || 'Momen Hangat di Sukaraja',
+    story_description: p.story_description || '',
+    order_index: p.order_index ?? 0
   };
 }
 
-function sortPhotos(rows: PhotoRow[]): PhotoRow[] {
-  return rows
-    .slice()
-    .sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
+function defaultPhotoItem(file: File): PhotoItem {
+  return {
+    src: '',
+    alt: file.name,
+    caption: 'Dokumentasi Lapangan',
+    handwritten_note: 'Senyum hangat adik-adik di bilik panti ~',
+    photographer: 'Tim Liputan GentaNusa',
+    timestamp: '25 Okt 2026',
+    rotation_deg: Number((Math.random() * 4 - 2).toFixed(1)),
+    story_title: 'Momen Kebersamaan',
+    story_description: 'Liputan aksi kemanusiaan dan kehangatan bersama adik-adik panti.',
+    file
+  };
 }
 
-export default function PeduliAdminPage() {
-  const [events, setEvents] = useState<EventRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [msg, setMsg] = useState("");
-  const [session, setSession] = useState<Session | null>(null);
-  const [editing, setEditing] = useState<EventRow | null>(null);
-  const [showForm, setShowForm] = useState(false);
-  const [photoItems, setPhotoItems] = useState<PhotoItem[]>([]);
-  const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+// Semua akses tulis lewat API routes bertipe admin (sesi `genta_token`);
+// RLS menolak tulisan anon, jadi halaman tidak menulis langsung ke Supabase.
+async function apiJson(url: string, init?: RequestInit): Promise<unknown> {
+  const res = await fetch(url, init);
+  const data: unknown = await res.json().catch(() => null);
+  if (!res.ok) {
+    if (res.status === 401) {
+      throw new Error('Sesi admin berakhir. Silakan login ulang.');
+    }
+    const msg =
+      data && typeof data === 'object' && 'error' in data &&
+      typeof (data as { error: unknown }).error === 'string'
+        ? (data as { error: string }).error
+        : `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+  return data;
+}
 
-  const [form, setForm] = useState<Partial<EventRow>>({
-    date_label: "",
-    orphanage_name: "",
-    location_city: "",
-    headline: "",
-    summary: "",
-    children_count: null,
-    volunteers_count: null,
-    packages_distributed: null,
-    legal_number: "",
-    head_name: "",
-    phone: "",
-    address: "",
-    urgent_needs: [],
-    bank_accounts: [],
+type UploadEntry = { file: File; photo: PhotoItem; orderIndex: number };
+
+async function uploadPhotos(
+  eventId: string,
+  entries: UploadEntry[]
+): Promise<{ items: PhotoItem[]; failures: string[] }> {
+  const fd = new FormData();
+  fd.append('event_id', eventId);
+  const metas = entries.map((entry) => {
+    fd.append('files', entry.file);
+    const p = entry.photo;
+    return {
+      alt: p.alt || null,
+      caption: p.caption || null,
+      handwritten_note: p.handwritten_note || null,
+      photographer: p.photographer || null,
+      timestamp: p.timestamp || null,
+      story_title: p.story_title || null,
+      story_description: p.story_description || null,
+      order_index: entry.orderIndex
+    };
   });
+  fd.append('meta', JSON.stringify(metas));
 
-  useEffect(() => {
-    fetch("/api/admin/check")
-      .then(async (r) => {
-        if (!r.ok) return null;
-        const j = await r.json().catch(() => ({}));
-        return {
-          isAdmin: Boolean(j.is_admin),
-          displayName: typeof j.display_name === "string" ? j.display_name : null,
-        } satisfies Session;
-      })
-      .then((s) => setSession(s))
-      .catch(() => setSession(null));
-  }, []);
+  const data = (await apiJson('/api/peduli/photos', {
+    method: 'POST',
+    body: fd
+  })) as { photos?: PhotoRow[]; failed?: { name: string; error: string }[] };
 
-  const load = useCallback(async () => {
+  const items = (Array.isArray(data.photos) ? data.photos : []).map(rowToPhotoItem);
+  const failures = (Array.isArray(data.failed) ? data.failed : []).map(
+    (f) => `${f.name}: ${f.error}`
+  );
+  return { items, failures };
+}
+
+function revokeBlob(item: PhotoItem | undefined) {
+  if (item && item.file && item.src.startsWith('blob:')) {
+    URL.revokeObjectURL(item.src);
+  }
+}
+
+export default function AdminPeduliPage() {
+  const [events, setEvents] = useState<EventRow[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Field Form Terbuka (Editable)
+  const [dateLabel, setDateLabel] = useState('25 Oktober 2026');
+  const [orphanageName, setOrphanageName] = useState('Yayasan Ar-Rakha Gladys Makaluas, Rumah Yatim Piatu Miftaahul Jannah (Yardysma RYP-MJ)');
+  const [locationCity, setLocationCity] = useState('Sukaraja, Kabupaten Bogor, Jawa Barat');
+  const [headline, setHeadline] = useState('Menjemput Senyum di Sudut Sukaraja: Secuil Kasih dan Pelukan Hangat untuk Tunas Harapan Yardysma');
+  const [summary, setSummary] = useState('Di balik pintu sederhana di sudut Sukaraja, senyum tulus dan tatap mata berbinar adik-adik yatim piatu menyambut kehadiran kami. Lewat sepaket sembako, bingkisan kecil, dan hangatnya kebersamaan, tim GentaNusa hadir bukan sekadar mengantarkan amanah logistik, melainkan merawat lentera harapan agar mimpi mereka di Yayasan Ar-Rakha Miftaahul Jannah terus menyala tanpa rasa sunyi.');
+  
+  const [childrenCount, setChildrenCount] = useState<number | string>(30);
+  const [volunteersCount, setVolunteersCount] = useState<number | string>(22);
+  const [packagesDistributed, setPackagesDistributed] = useState<number | string>(30);
+
+  const [legalNumber, setLegalNumber] = useState('AHU-0012485.AH.01.04.Tahun 2020');
+  const [headName, setHeadName] = useState('Pengelola Yayasan Ar-Rakha Gladys Makaluas (Yardysma RYP-MJ)');
+  const [phone, setPhone] = useState('0251-7556161 / 0812-1330-777');
+  const [address, setAddress] = useState('PERUM SUKARAJA RESIDENCE Jl. Sukaraja - Katulampa No.KAV III / 123, RT.01/RW.07, Sukaraja, Kec. Sukaraja, Kabupaten Bogor, Jawa Barat 16710');
+  const [urgentNeeds, setUrgentNeeds] = useState('Beras Utama, Minyak Goreng, Mie Instan, Hampers Snack, Buku Bacaan');
+
+  // Daftar Foto
+  const [photos, setPhotos] = useState<PhotoItem[]>([]);
+  // Snapshot foto saat terakhir dimuat + id foto yang sudah ada di server —
+  // dipakai untuk diff (hapus/ubah) saat Simpan.
+  const origRef = useRef<PhotoItem[]>([]);
+  const serverIdsRef = useRef<Set<string>>(new Set());
+
+  const loadEventToForm = (event: EventRow) => {
+    setSelectedEventId(event.id);
+    setDateLabel(event.date_label || '');
+    setOrphanageName(event.orphanage_name || '');
+    setLocationCity(event.location_city || '');
+    setHeadline(event.headline || '');
+    setSummary(event.summary || '');
+    setChildrenCount(event.children_count ?? 30);
+    setVolunteersCount(event.volunteers_count ?? 22);
+    setPackagesDistributed(event.packages_distributed ?? 30);
+    setLegalNumber(event.legal_number || '');
+    setHeadName(event.head_name || '');
+    setPhone(event.phone || '');
+    setAddress(event.address || '');
+    setUrgentNeeds(Array.isArray(event.urgent_needs) ? event.urgent_needs.join(', ') : (event.urgent_needs || ''));
+
+    photos.forEach(revokeBlob);
+    const mapped = (event.peduli_photos ?? []).map(rowToPhotoItem);
+    origRef.current = mapped.map((p) => ({ ...p }));
+    serverIdsRef.current = new Set(mapped.map((p) => p.id).filter(Boolean) as string[]);
+    setPhotos(mapped);
+  };
+
+  // Daftar kegiatan via API (baca publik, tanpa join PostgREST).
+  const fetchEvents = async (preferId?: string | null) => {
     setLoading(true);
     try {
-      const r = await fetch("/api/peduli/events");
-      if (r.ok) {
-        const rows = await r.json();
-        setEvents(Array.isArray(rows) ? rows : []);
-      } else {
-        setMsg("Gagal memuat data peduli");
+      const data = await apiJson('/api/peduli/events');
+      const combined: EventRow[] = Array.isArray(data) ? (data as EventRow[]) : [];
+      setEvents(combined);
+      if (combined.length > 0) {
+        const wanted =
+          combined.find((ev) => ev.id === (preferId ?? selectedEventId)) ?? combined[0];
+        loadEventToForm(wanted);
       }
-    } catch {
-      setMsg("Gagal memuat data peduli");
+    } catch (err) {
+      console.error(err);
+      setStatusMsg({ type: 'error', text: toMessage(err, 'Gagal mengambil data dari database') });
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    // Tunda satu tick agar tidak memanggil setState secara sinkron di dalam
+    // effect (larangan react-hooks: set-state-in-effect).
+    const timer = setTimeout(fetchEvents, 0);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Pemuatan awal didefer agar tidak setState sinkron di body effect
-  // (pola sama dengan app/admin/posts/page.tsx).
-  useEffect(() => {
-    const t = window.setTimeout(() => load(), 0);
-    return () => window.clearTimeout(t);
-  }, [load]);
+  const handleCreateNew = () => {
+    photos.forEach(revokeBlob);
+    setSelectedEventId(null);
+    setHeadline('');
+    setSummary('');
+    setPhotos([]);
+    origRef.current = [];
+    serverIdsRef.current = new Set();
+  };
 
-  const isAdmin = session?.isAdmin === true;
+  // Upload foto: untuk kegiatan tersimpan langsung lewat API admin;
+  // untuk kegiatan baru, foto ditahan lokal sampai Simpan.
+  const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-  function closeForm() {
-    photoItems.forEach((item) => {
-      if (item.file) URL.revokeObjectURL(item.src);
-    });
-    setPhotoItems([]);
-    setShowForm(false);
-    setEditing(null);
-  }
+    setUploadingImage(true);
+    setStatusMsg(null);
 
-  function newEvent() {
-    setEditing(null);
-    setForm({
-      date_label: "",
-      orphanage_name: "",
-      location_city: "",
-      headline: "",
-      summary: "",
-      children_count: null,
-      volunteers_count: null,
-      packages_distributed: null,
-      legal_number: "",
-      head_name: "",
-      phone: "",
-      address: "",
-      urgent_needs: [],
-      bank_accounts: [],
-    });
-    setPhotoItems([]);
-    setShowForm(true);
-  }
-
-  function editEvent(ev: EventRow) {
-    setEditing(ev);
-    setForm({
-      ...ev,
-      urgent_needs: ev.urgent_needs || [],
-      bank_accounts: ev.bank_accounts || [],
-    });
-    setPhotoItems(sortPhotos(ev.peduli_photos || []).map(toItemFromRow));
-    setShowForm(true);
-  }
-
-  async function save() {
-    setMsg("");
-    if (!isAdmin) {
-      setMsg("Hanya administrator yang dapat mengelola data Peduli.");
-      return;
-    }
-
-    const dateLabel = (form.date_label || "").trim();
-    const orphanage = (form.orphanage_name || "").trim();
-    const headline = (form.headline || "").trim();
-    if (!dateLabel || !orphanage || !headline) {
-      setMsg("Isi Label Tanggal, Nama Panti Asuhan, dan Headline terlebih dahulu.");
-      return;
-    }
-
-    setSaving(true);
     try {
-      // 1. Simpan / perbarui data pokok kegiatan.
-      const method = editing ? "PUT" : "POST";
-      const url = editing ? `/api/peduli/events/${editing.id}` : "/api/peduli/events";
-      const r = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          date_label: dateLabel,
-          orphanage_name: orphanage,
-          headline,
-        }),
-      });
-      if (!r.ok) {
-        const j = await r.json().catch(() => ({}));
-        setMsg(j.error || "Gagal menyimpan");
-        return;
-      }
-      const saved = (await r.json().catch(() => null)) as EventRow | null;
-      const eventId = saved?.id || editing?.id || "";
+      const picked = Array.from(files);
 
-      // 2. Unggah foto lokal yang belum terkirim (kegiatan baru / unggahan tertunda).
-      let uploadNote = "";
-      const pending = photoItems.filter((p) => p.file);
-      if (pending.length > 0 && eventId) {
-        const fd = new FormData();
-        fd.append("event_id", eventId);
-        pending.forEach((p) => fd.append("files", p.file as File));
-        fd.append(
-          "meta",
-          JSON.stringify(
-            pending.map((p) => ({
-              handwritten_note: p.handwritten_note || null,
-              photographer: p.photographer || null,
-              story_title: p.story_title || null,
-              story_description: p.story_description || null,
-              order_index: photoItems.indexOf(p),
-            }))
-          )
+      if (selectedEventId) {
+        const base = photos.length;
+        const { items, failures } = await uploadPhotos(
+          selectedEventId,
+          picked.map((file, i) => ({ file, photo: defaultPhotoItem(file), orderIndex: base + i }))
         );
-        const up = await fetch("/api/peduli/photos", { method: "POST", body: fd });
-        const upj = await up.json().catch(() => ({}));
-        if (!up.ok) {
-          uploadNote = ` | Foto gagal diunggah: ${upj.error || "kesalahan server"}`;
-        } else {
-          const failed = Array.isArray(upj.failed) ? upj.failed : [];
-          const okCount = Array.isArray(upj.photos) ? upj.photos.length : 0;
-          uploadNote = failed.length
-            ? ` | ${okCount} foto terunggah, ${failed.length} gagal: ${failed[0]?.error || ""}`
-            : ` | ${okCount} foto terunggah`;
-        }
-      }
-
-      // 3. Sinkronkan perubahan keterangan foto yang sudah tersimpan di DB.
-      let patched = 0;
-      for (const p of photoItems) {
-        if (!p.dbId || p.file) continue;
-        const patch: Record<string, unknown> = {};
-        if (p.handwritten_note !== p.orig.handwritten_note) {
-          patch.handwritten_note = p.handwritten_note;
-        }
-        if (p.photographer !== p.orig.photographer) {
-          patch.photographer = p.photographer;
-        }
-        if (p.story_title !== p.orig.story_title) {
-          patch.story_title = p.story_title;
-        }
-        if (p.story_description !== p.orig.story_description) {
-          patch.story_description = p.story_description;
-        }
-        const order = photoItems.indexOf(p);
-        if (order !== p.orig.order_index) {
-          patch.order_index = order;
-        }
-        if (Object.keys(patch).length === 0) continue;
-        try {
-          const pr = await fetch(`/api/peduli/photos/${p.dbId}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(patch),
+        setPhotos(prev => [...prev, ...items]);
+        if (failures.length > 0) {
+          setStatusMsg({
+            type: 'error',
+            text: `${items.length} foto masuk, ${failures.length} gagal diunggah: ${failures.join('; ')}`
           });
-          if (pr.ok) patched += 1;
-        } catch {
-          // Lanjut ke foto berikutnya; kegagalan dilaporkan lewat pesan umum.
+        } else {
+          setStatusMsg({ type: 'success', text: `${items.length} foto berhasil diunggah & tersimpan.` });
         }
-      }
-
-      // 4. Segarkan cache halaman publik /peduli & /kategori/peduli.
-      try {
-        await fetch("/api/peduli/revalidate", { method: "POST" });
-      } catch {
-        // Opsional — rute tulis sudah memanggil revalidatePath secara lokal.
-      }
-
-      setMsg(
-        `Berhasil disimpan${uploadNote}${
-          patched > 0 ? ` | ${patched} keterangan foto diperbarui` : ""
-        }`
-      );
-      setPhotoItems([]);
-      setShowForm(false);
-      setEditing(null);
-      load();
-    } catch {
-      setMsg("Gagal menyimpan");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function remove(id: string) {
-    if (!isAdmin) return;
-    if (!confirm("Hapus kegiatan peduli ini?")) return;
-    const r = await fetch(`/api/peduli/events/${id}`, { method: "DELETE" });
-    if (r.ok) {
-      setMsg("Dihapus");
-      load();
-    } else {
-      setMsg("Gagal menghapus");
-    }
-  }
-
-  async function onPickFiles(e: ChangeEvent<HTMLInputElement>) {
-    const picked = Array.from(e.target.files || []);
-    e.target.value = "";
-    if (picked.length === 0 || !isAdmin) return;
-
-    // Kegiatan sudah ada di DB → unggah langsung ke bucket peduli.
-    if (editing) {
-      setUploading(true);
-      setMsg("");
-      try {
-        const base = photoItems.length;
-        const fd = new FormData();
-        fd.append("event_id", editing.id);
-        picked.forEach((file) => fd.append("files", file));
-        fd.append(
-          "meta",
-          JSON.stringify(
-            picked.map((_, i) => ({
-              handwritten_note: null,
-              photographer: null,
-              story_title: null,
-              story_description: null,
-              order_index: base + i,
-            }))
-          )
-        );
-        const r = await fetch("/api/peduli/photos", { method: "POST", body: fd });
-        const j = await r.json().catch(() => ({}));
-        if (!r.ok) {
-          setMsg(j.error || "Gagal mengunggah foto");
-          return;
-        }
-        const rows: PhotoRow[] = Array.isArray(j.photos) ? j.photos : [];
-        const failed = Array.isArray(j.failed) ? j.failed : [];
-        setPhotoItems((prev) => [
-          ...prev,
-          ...rows.map((row, i) => toItemFromRow(row, prev.length + i)),
-        ]);
-        setMsg(
-          failed.length > 0
-            ? `${rows.length} foto terunggah, ${failed.length} gagal: ${failed[0]?.error || ""}`
-            : `${rows.length} foto diunggah`
-        );
-        load();
-      } catch {
-        setMsg("Gagal mengunggah foto");
-      } finally {
-        setUploading(false);
-      }
-      return;
-    }
-
-    // Kegiatan baru → tahan berkas lokal, diunggah bersamaan saat Simpan.
-    setPhotoItems((prev) => [
-      ...prev,
-      ...picked.map((file, i) => {
-        const base = {
-          handwritten_note: "",
-          photographer: "",
-          story_title: "",
-          story_description: "",
-          order_index: prev.length + i,
-        };
-        return {
-          key: `local-${Date.now()}-${i}-${file.name}`,
-          file,
-          src: URL.createObjectURL(file),
-          ...base,
-          orig: { ...base },
-        } satisfies PhotoItem;
-      }),
-    ]);
-  }
-
-  function updateItem(key: string, patch: Partial<PhotoItem>) {
-    setPhotoItems((prev) =>
-      prev.map((item) => (item.key === key ? { ...item, ...patch } : item))
-    );
-  }
-
-  async function removePhoto(item: PhotoItem) {
-    if (!isAdmin) return;
-
-    // Berkas lokal: cukup buang dari daftar.
-    if (item.file) {
-      URL.revokeObjectURL(item.src);
-      setPhotoItems((prev) => prev.filter((p) => p.key !== item.key));
-      return;
-    }
-    if (!item.dbId) return;
-    if (!confirm("Hapus foto polaroid ini?")) return;
-
-    setMsg("");
-    setUploading(true);
-    try {
-      const r = await fetch(`/api/peduli/photos/${item.dbId}`, { method: "DELETE" });
-      const j = await r.json().catch(() => ({}));
-      if (r.ok) {
-        setPhotoItems((prev) => prev.filter((p) => p.key !== item.key));
-        setMsg("Foto dihapus");
-        load();
       } else {
-        setMsg(j.error || "Gagal menghapus foto");
+        const held = picked.map(file => ({
+          ...defaultPhotoItem(file),
+          src: URL.createObjectURL(file)
+        }));
+        setPhotos(prev => [...prev, ...held]);
+        setStatusMsg({
+          type: 'success',
+          text: `${picked.length} foto siap. Klik 'Simpan Perubahan' untuk mengunggah & menerbitkan.`
+        });
       }
-    } catch {
-      setMsg("Gagal menghapus foto");
+    } catch (err) {
+      console.error(err);
+      setStatusMsg({ type: 'error', text: `Upload gagal: ${toMessage(err, 'Periksa koneksi atau sesi admin')}` });
     } finally {
-      setUploading(false);
+      setUploadingImage(false);
+      e.target.value = '';
     }
-  }
+  };
 
-  const busy = saving || uploading;
+  const updatePhoto = (index: number, field: keyof PhotoItem, value: PhotoItem[keyof PhotoItem]) => {
+    setPhotos(prev => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  };
+
+  const removePhoto = (index: number) => {
+    revokeBlob(photos[index]);
+    setPhotos(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setStatusMsg(null);
+
+    try {
+      const eventPayload = {
+        date_label: dateLabel,
+        orphanage_name: orphanageName,
+        location_city: locationCity,
+        headline,
+        summary,
+        children_count: Number(childrenCount) || 0,
+        volunteers_count: Number(volunteersCount) || 0,
+        packages_distributed: Number(packagesDistributed) || 0,
+        legal_number: legalNumber,
+        head_name: headName,
+        phone,
+        address,
+        urgent_needs: urgentNeeds.split(',').map(s => s.trim()).filter(Boolean)
+      };
+
+      let activeId = selectedEventId;
+
+      if (activeId) {
+        await apiJson(`/api/peduli/events/${activeId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(eventPayload)
+        });
+      } else {
+        const created = (await apiJson('/api/peduli/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(eventPayload)
+        })) as EventRow;
+        activeId = created.id;
+        setSelectedEventId(activeId);
+      }
+
+      // 1) foto server yang hilang dari daftar lokal → hapus permanen
+      for (const id of serverIdsRef.current) {
+        if (!photos.some(p => p.id === id)) {
+          await apiJson(`/api/peduli/photos/${id}`, { method: 'DELETE' });
+        }
+      }
+
+      // 2) foto tersimpan yang diedit teks / geser urutan → PATCH parsial
+      for (let idx = 0; idx < photos.length; idx++) {
+        const photo = photos[idx];
+        if (!photo.id || photo.file) continue;
+        const origIdx = origRef.current.findIndex(o => o.id === photo.id);
+        if (origIdx < 0) continue;
+        const orig = origRef.current[origIdx];
+
+        const patch: Record<string, string | number> = {};
+        for (const key of PHOTO_TEXT_KEYS) {
+          if (photo[key] !== orig[key]) patch[key] = photo[key];
+        }
+        if (idx !== origIdx) patch.order_index = idx;
+
+        if (Object.keys(patch).length > 0) {
+          await apiJson(`/api/peduli/photos/${photo.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(patch)
+          });
+        }
+      }
+
+      // 3) foto baru (ditahan lokal) → unggah sekali jalan
+      const pending = photos
+        .map((p, idx) => ({ p, idx }))
+        .filter((x): x is { p: PhotoItem & { file: File }; idx: number } => !x.p.id && Boolean(x.p.file));
+      if (pending.length > 0) {
+        const { items, failures } = await uploadPhotos(
+          activeId,
+          pending.map(({ p, idx }) => ({ file: p.file, photo: p, orderIndex: idx }))
+        );
+        if (failures.length > 0) {
+          throw new Error(`${failures.length} foto gagal diunggah: ${failures.join('; ')}`);
+        }
+        items.forEach(item => { if (item.id) serverIdsRef.current.add(item.id); });
+      }
+
+      await fetch('/api/peduli/revalidate', { method: 'POST' });
+
+      setStatusMsg({ type: 'success', text: 'Perubahan teks dan foto berhasil disimpan & live seketika!' });
+      await fetchEvents(activeId);
+    } catch (err) {
+      console.error(err);
+      setStatusMsg({ type: 'error', text: toMessage(err, 'Gagal menyimpan data') });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <div>
-      <div className={styles.pageHead}>
-        <div>
-          <h2 className={styles.pageHeading}>Peduli: Aksi Kemanusiaan</h2>
-          <p className={styles.pageSub}>Kelola kegiatan, foto polaroid, profil panti, dan rekening donasi</p>
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto space-y-6">
+        
+        {/* Header Bar */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-800 gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-sky-400 text-xs font-semibold mb-1">
+              <HeartHandshake className="w-4 h-4" />
+              <span>Dashboard Admin Kanal Peduli</span>
+            </div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">
+              Edit Narasi & Dokumentasi Foto
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleCreateNew}
+              className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-medium text-slate-200 hover:bg-slate-800 transition"
+            >
+              + Kegiatan Baru
+            </button>
+            <button
+              type="button"
+              onClick={() => fetchEvents()}
+              disabled={loading}
+              className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white"
+              title="Refresh Data"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow-lg shadow-sky-950 transition disabled:opacity-50"
+            >
+              <Save className="w-4 h-4" />
+              {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+            </button>
+          </div>
         </div>
-        {isAdmin && (
-          <button onClick={newEvent} className={styles.primaryBtn}>
-            + Tambah Kegiatan
-          </button>
+
+        {statusMsg && (
+          <div className={`p-4 rounded-xl flex items-center gap-3 text-sm ${
+            statusMsg.type === 'success' ? 'bg-emerald-950 border border-emerald-500/50 text-emerald-200' : 'bg-rose-950 border border-rose-500/50 text-rose-200'
+          }`}>
+            {statusMsg.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" /> : <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />}
+            <span>{statusMsg.text}</span>
+          </div>
         )}
-      </div>
 
-      {msg && <div className={styles.infoBanner}>{msg}</div>}
-
-      {loading ? (
-        <div>Memuat...</div>
-      ) : (
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Tanggal</th>
-                <th>Panti Asuhan</th>
-                <th>Judul</th>
-                <th>Foto</th>
-                <th>Lokasi</th>
-                {isAdmin && <th>Aksi</th>}
-              </tr>
-            </thead>
-            <tbody>
+        {/* Tabel Riwayat Kegiatan */}
+        {events.length > 0 && (
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden">
+            <div className="px-5 py-3 border-b border-slate-800 text-xs font-bold uppercase tracking-wider text-slate-400">
+              Daftar Kegiatan Tersedia
+            </div>
+            <div className="divide-y divide-slate-800 text-xs">
               {events.map((ev) => (
-                <tr key={ev.id}>
-                  <td>{ev.date_label}</td>
-                  <td>{ev.orphanage_name}</td>
-                  <td>{ev.headline}</td>
-                  <td>{ev.peduli_photos?.length || 0}</td>
-                  <td>{ev.location_city}</td>
-                  {isAdmin && (
-                    <td>
-                      <button onClick={() => editEvent(ev)} disabled={busy} style={{ marginRight: 8 }}>Edit</button>
-                      <button onClick={() => remove(ev.id)} disabled={busy}>Hapus</button>
-                    </td>
-                  )}
-                </tr>
+                <div key={ev.id} className="p-4 flex items-center justify-between gap-4 hover:bg-slate-800/40 transition">
+                  <div className="space-y-1">
+                    <p className="font-bold text-white text-sm">{ev.headline || ev.orphanage_name}</p>
+                    <p className="text-slate-400">{ev.date_label} • {ev.location_city} • {ev.peduli_photos?.length || 0} Foto Terpasang</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => loadEventToForm(ev)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-950 border border-sky-800 text-sky-300 hover:bg-sky-900 transition font-medium"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Pilih & Edit</span>
+                  </button>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </div>
+          </div>
+        )}
 
-      {showForm && isAdmin && (
-        <div style={{ marginTop: 24, padding: 16, border: "1px solid #1e293b", borderRadius: 8 }}>
-          <h3>{editing ? "Edit Kegiatan" : "Tambah Kegiatan"}</h3>
-          <div className="grid gap-3 mt-3">
-            <label className="grid gap-1">
-              <span className="text-xs text-slate-400">Label Tanggal</span>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          
+          {/* Section 1: Formulir Narasi Terbuka */}
+          <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 md:p-6 space-y-4">
+            <h2 className="text-sm font-bold text-sky-400 uppercase tracking-wider">
+              1. Teks Headline & Narasi Kegiatan
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs text-slate-400 mb-1 font-medium">Tanggal Pelaksanaan</label>
+                <input
+                  type="text"
+                  value={dateLabel}
+                  onChange={(e) => setDateLabel(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 focus:border-sky-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+                  placeholder="25 Oktober 2026"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-slate-400 mb-1 font-medium">Wilayah / Lokasi</label>
+                <input
+                  type="text"
+                  value={locationCity}
+                  onChange={(e) => setLocationCity(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 focus:border-sky-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+                  placeholder="Sukaraja, Kabupaten Bogor"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-slate-400 mb-1 font-medium">Nama Mitra Panti / Yayasan</label>
+                <input
+                  type="text"
+                  value={orphanageName}
+                  onChange={(e) => setOrphanageName(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 focus:border-sky-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs text-slate-400 mb-1 font-medium">Judul Utama (Headline)</label>
               <input
-                className={inputCls}
-                placeholder="contoh: 25 Oktober 2026"
-                value={form.date_label || ""}
-                onChange={(e) => setForm({ ...form, date_label: e.target.value })}
-              />
-            </label>
-            <label className="grid gap-1">
-              <span className="text-xs text-slate-400">Nama Panti Asuhan</span>
-              <input
-                className={inputCls}
-                placeholder="Nama Panti Asuhan"
-                value={form.orphanage_name || ""}
-                onChange={(e) => setForm({ ...form, orphanage_name: e.target.value })}
-              />
-            </label>
-            <label className="grid gap-1">
-              <span className="text-xs text-slate-400">Kota</span>
-              <input
-                className={inputCls}
-                placeholder="Kota penyelenggaraan"
-                value={form.location_city || ""}
-                onChange={(e) => setForm({ ...form, location_city: e.target.value })}
-              />
-            </label>
-            <label className="grid gap-1">
-              <span className="text-xs text-slate-400">Headline</span>
-              <input
-                className={inputCls}
-                placeholder="Headline editorial kegiatan"
-                value={form.headline || ""}
-                onChange={(e) => setForm({ ...form, headline: e.target.value })}
-              />
-            </label>
-            <label className="grid gap-1">
-              <span className="text-xs text-slate-400">Ringkasan</span>
-              <textarea
-                className={inputCls}
-                placeholder="Ringkasan kegiatan"
-                value={form.summary || ""}
-                onChange={(e) => setForm({ ...form, summary: e.target.value })}
-                rows={4}
-              />
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              <input
-                className={inputCls}
-                type="number"
-                placeholder="Jumlah Anak"
-                value={form.children_count ?? ""}
-                onChange={(e) => setForm({ ...form, children_count: e.target.value ? Number(e.target.value) : null })}
-              />
-              <input
-                className={inputCls}
-                type="number"
-                placeholder="Jumlah Relawan"
-                value={form.volunteers_count ?? ""}
-                onChange={(e) => setForm({ ...form, volunteers_count: e.target.value ? Number(e.target.value) : null })}
-              />
-              <input
-                className={inputCls}
-                type="number"
-                placeholder="Paket Dibagikan"
-                value={form.packages_distributed ?? ""}
-                onChange={(e) => setForm({ ...form, packages_distributed: e.target.value ? Number(e.target.value) : null })}
+                type="text"
+                value={headline}
+                onChange={(e) => setHeadline(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700 focus:border-sky-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none font-semibold text-sky-200"
+                required
               />
             </div>
-            <label className="grid gap-1">
-              <span className="text-xs text-slate-400">Nomor Badan Hukum</span>
-              <input
-                className={inputCls}
-                placeholder="Nomor Badan Hukum"
-                value={form.legal_number || ""}
-                onChange={(e) => setForm({ ...form, legal_number: e.target.value })}
-              />
-            </label>
-            <label className="grid gap-1">
-              <span className="text-xs text-slate-400">Nama Pimpinan</span>
-              <input
-                className={inputCls}
-                placeholder="Nama Pimpinan Yayasan"
-                value={form.head_name || ""}
-                onChange={(e) => setForm({ ...form, head_name: e.target.value })}
-              />
-            </label>
-            <label className="grid gap-1">
-              <span className="text-xs text-slate-400">Telepon</span>
-              <input
-                className={inputCls}
-                placeholder="Nomor telepon yayasan"
-                value={form.phone || ""}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              />
-            </label>
-            <label className="grid gap-1">
-              <span className="text-xs text-slate-400">Alamat</span>
-              <textarea
-                className={inputCls}
-                placeholder="Alamat lengkap"
-                value={form.address || ""}
-                onChange={(e) => setForm({ ...form, address: e.target.value })}
-                rows={2}
-              />
-            </label>
 
-            <div className="flex items-center gap-2 mt-1">
-              <button
-                onClick={save}
-                disabled={busy}
-                className={styles.primaryBtn}
-                style={{ opacity: busy ? 0.6 : 1 }}
-              >
-                {saving ? "Menyimpan..." : "Simpan Kegiatan"}
-              </button>
-              <button
-                type="button"
-                onClick={closeForm}
-                disabled={busy}
-                className="text-sm text-slate-400 hover:text-white"
-              >
-                Batal
-              </button>
+            <div>
+              <label className="block text-xs text-slate-400 mb-1 font-medium">Ringkasan Narasi (Summary)</label>
+              <textarea
+                rows={4}
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700 focus:border-sky-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none leading-relaxed"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 pt-2">
+              <div>
+                <label className="block text-xs text-slate-400 mb-1 font-medium">Anak Asuh</label>
+                <input
+                  type="number"
+                  value={childrenCount}
+                  onChange={(e) => setChildrenCount(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1 font-medium">Relawan Hadir</label>
+                <input
+                  type="number"
+                  value={volunteersCount}
+                  onChange={(e) => setVolunteersCount(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1 font-medium">Paket Bantuan</label>
+                <input
+                  type="number"
+                  value={packagesDistributed}
+                  onChange={(e) => setPackagesDistributed(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Editor Foto Dokumentasi — berlaku untuk kegiatan baru & lama */}
-          <div style={{ marginTop: 24, paddingTop: 16, borderTop: "1px solid #1e293b" }}>
-            <h3 style={{ margin: 0, fontSize: 15 }}>
-              Editor Foto Dokumentasi ({photoItems.length} foto)
-            </h3>
-            <p style={{ color: "#94a3b8", fontSize: 12, marginTop: 4 }}>
-              Setiap foto punya keterangan sendiri: catatan tulisan tangan, fotografer,
-              dan kisah di balik foto. Kegiatan baru mengunggah foto saat tombol Simpan
-              ditekan.
-            </p>
+          {/* Section 2: Editor Foto Polaroid Lengkap */}
+          <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 md:p-6 space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+              <div>
+                <h2 className="text-sm font-bold text-sky-400 uppercase tracking-wider">
+                  2. Dokumentasi Foto ({photos.length} Foto Aktif)
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Foto yang telah tersimpan bisa diatur catatan tangannya atau dihapus. Tambah foto baru lewat tombol di samping.
+                </p>
+              </div>
 
-            <div className="flex flex-wrap items-center gap-3 mt-4">
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => fileInputRef.current?.click()}
-                className={styles.primaryBtn}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                  opacity: busy ? 0.6 : 1,
-                }}
-              >
-                <Upload className="w-4 h-4" aria-hidden="true" />
-                {uploading ? "Mengunggah..." : "Unggah Foto Dokumentasi"}
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/jpeg,image/png,image/webp"
-                className="hidden"
-                onChange={onPickFiles}
-              />
-              <span className="text-xs text-slate-500">
-                JPG, PNG, atau WebP &middot; maksimal 4 MB per foto
-              </span>
+              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md transition">
+                <Upload className="w-4 h-4" />
+                <span>{uploadingImage ? 'Mengunggah ke Storage...' : '+ Upload Foto Baru'}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFileUpload}
+                  disabled={uploadingImage}
+                  className="hidden"
+                />
+              </label>
             </div>
 
-            {photoItems.length === 0 ? (
-              <p style={{ color: "#94a3b8", fontSize: 13, marginTop: 14 }}>
-                Belum ada foto. Unggah dokumentasi kegiatan untuk galeri jemuran polaroid.
-              </p>
+            {photos.length === 0 ? (
+              <div className="text-center py-12 border-2 border-dashed border-slate-800 rounded-xl">
+                <p className="text-sm text-slate-400">Belum ada foto dokumentasi yang aktif.</p>
+                <p className="text-xs text-slate-500 mt-1">Klik tombol ungu di atas untuk mengunggah kumpulan foto.</p>
+              </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                {photoItems.map((item) => (
-                  <figure
-                    key={item.key}
-                    className="rounded-lg border border-slate-700 bg-slate-900/60 p-3 flex gap-3 m-0"
-                  >
-                    <div className="w-24 shrink-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={item.src}
-                        alt={item.story_title || item.handwritten_note || "Foto dokumentasi"}
-                        className="w-24 h-24 object-cover rounded-md border border-slate-700"
-                      />
+              <div className="space-y-4">
+                {photos.map((photo, index) => (
+                  <div key={index} className="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row gap-4 relative">
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(index)}
+                      className="absolute top-3 right-3 text-slate-500 hover:text-rose-400 p-1 transition"
+                      title="Hapus foto ini"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+
+                    {/* Pratinjau Foto */}
+                    <div className="w-full md:w-40 shrink-0 flex flex-col items-center">
+                      <div className="relative w-36 h-36 rounded-lg overflow-hidden border border-slate-700 bg-black">
+                        {photo.src.startsWith('blob:') ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={photo.src}
+                            alt={photo.alt}
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Image
+                            src={photo.src}
+                            alt={photo.alt}
+                            fill
+                            className="object-cover"
+                          />
+                        )}
+                      </div>
+                      <span className="text-[10px] text-slate-500 mt-2 font-mono">Foto #{index + 1}</span>
                     </div>
-                    <div className="flex-1 min-w-0 grid gap-2">
-                      <textarea
-                        className={`${inputCls} resize-none`}
-                        placeholder="Catatan tulisan tangan (muncul di bawah foto polaroid)"
-                        value={item.handwritten_note}
-                        onChange={(e) => updateItem(item.key, { handwritten_note: e.target.value })}
-                        rows={2}
-                      />
-                      <div className="grid grid-cols-2 gap-2">
-                        <select
-                          className={inputCls}
-                          aria-label="Fotografer"
-                          value={item.photographer}
-                          onChange={(e) => updateItem(item.key, { photographer: e.target.value })}
-                        >
-                          <option value="">— Pilih fotografer —</option>
-                          {PHOTOGRAPHERS.map((name) => (
-                            <option key={name} value={name}>
-                              {name}
-                            </option>
-                          ))}
-                          {item.photographer && !PHOTOGRAPHERS.includes(item.photographer) && (
-                            <option value={item.photographer}>{item.photographer}</option>
-                          )}
-                        </select>
+
+                    {/* Metadata Foto */}
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                      <div className="md:col-span-2">
+                        <label className="block text-slate-400 mb-1 font-medium">
+                          Catatan Tangan Polaroid (Muncul di Bawah Foto)
+                        </label>
                         <input
-                          className={inputCls}
-                          placeholder="Judul cerita lightbox"
-                          value={item.story_title}
-                          onChange={(e) => updateItem(item.key, { story_title: e.target.value })}
+                          type="text"
+                          value={photo.handwritten_note}
+                          onChange={(e) => updatePhoto(index, 'handwritten_note', e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-amber-200 outline-none"
+                          placeholder="Tawa hangat adik-adik ~"
                         />
                       </div>
-                      <textarea
-                        className={`${inputCls} resize-none`}
-                        placeholder="Kisah di balik foto"
-                        value={item.story_description}
-                        onChange={(e) => updateItem(item.key, { story_description: e.target.value })}
-                        rows={2}
-                      />
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-[11px] text-slate-500 font-mono truncate">
-                          {item.file ? item.file.name : "Terunggah"}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => removePhoto(item)}
-                          disabled={busy}
-                          className="text-xs text-rose-400 hover:text-rose-300 inline-flex items-center gap-1 shrink-0"
+
+                      <div>
+                        <label className="block text-slate-400 mb-1 font-medium">Judul Cerita (Lightbox)</label>
+                        <input
+                          type="text"
+                          value={photo.story_title}
+                          onChange={(e) => updatePhoto(index, 'story_title', e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-400 mb-1 font-medium">Fotografer Liputan</label>
+                        <select
+                          value={photo.photographer}
+                          onChange={(e) => updatePhoto(index, 'photographer', e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none"
                         >
-                          <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
-                          Hapus
-                        </button>
+                          <option value="Tim Liputan GentaNusa">Tim Liputan GentaNusa</option>
+                          <option value="Hanif Zulfikar">Hanif Zulfikar</option>
+                          <option value="Chelsea Aulya">Chelsea Aulya</option>
+                          <option value="Adhira Bachtiar">Adhira Bachtiar</option>
+                          <option value="Dimas Arrizki">Dimas Arrizki</option>
+                        </select>
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <label className="block text-slate-400 mb-1 font-medium">Kisah di Balik Foto</label>
+                        <textarea
+                          rows={2}
+                          value={photo.story_description}
+                          onChange={(e) => updatePhoto(index, 'story_description', e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none"
+                          placeholder="Ceritakan momen di balik foto ini..."
+                        />
                       </div>
                     </div>
-                  </figure>
+                  </div>
                 ))}
               </div>
             )}
           </div>
-        </div>
-      )}
+
+          {/* Section 3: Profil & Kontak Panti */}
+          <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 md:p-6 space-y-4">
+            <h2 className="text-sm font-bold text-sky-400 uppercase tracking-wider">
+              3. Profil & Kontak Resmi Panti
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-slate-400 mb-1 font-medium">Nomor Legalitas</label>
+                <input
+                  type="text"
+                  value={legalNumber}
+                  onChange={(e) => setLegalNumber(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-slate-400 mb-1 font-medium">Telepon / WhatsApp Resmi</label>
+                <input
+                  type="text"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs text-slate-400 mb-1 font-medium">Alamat Lengkap</label>
+              <textarea
+                rows={2}
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs text-slate-400 mb-1 font-medium">Kebutuhan Mendesak (Pisahkan Koma)</label>
+              <input
+                type="text"
+                value={urgentNeeds}
+                onChange={(e) => setUrgentNeeds(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white"
+              />
+            </div>
+          </div>
+
+          {/* Tombol Simpan */}
+          <div className="flex justify-end pt-2 pb-12">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm shadow-xl shadow-sky-950 transition"
+            >
+              <Save className="w-5 h-5" />
+              {isSubmitting ? 'Menyimpan ke Database...' : 'Simpan Perubahan'}
+            </button>
+          </div>
+        </form>
+
+      </div>
     </div>
   );
 }
