@@ -59,22 +59,34 @@ export function StoryLightboxModal({ photos, currentIndex, onClose, onNavigate }
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={photo.src} alt={photo.alt || ""} className="w-full h-auto max-h-[70vh] object-contain bg-stone-100" />
-        {(photo.story_title || photo.handwritten_note || photo.caption) && (
+        {(photo.story_title || photo.handwritten_note || photo.caption || photo.photographer) && (
           <div className="mt-4 text-center px-2">
             {photo.story_title && (
               <h3 className="font-editorial text-lg font-semibold text-slate-900 mb-2">
                 {photo.story_title}
               </h3>
             )}
-            <p className="font-hand text-xl text-stone-700 leading-snug">
-              {photo.story_description || photo.handwritten_note || photo.caption}
-            </p>
+            {(photo.story_description || photo.handwritten_note || photo.caption) && (
+              <p className="font-hand text-xl text-stone-700 leading-snug">
+                {photo.story_description || photo.handwritten_note || photo.caption}
+              </p>
+            )}
             {photo.quote_text && (
               <blockquote className="font-editorial mt-3 italic text-stone-600">
                 &ldquo;{photo.quote_text}&rdquo;
                 {photo.quote_author && <cite className="block text-xs mt-1 not-italic">&mdash; {photo.quote_author}</cite>}
               </blockquote>
             )}
+            {/* Kredit liputan: fotografer + waktu jepretan */}
+            <div className="mt-3 flex items-center justify-center gap-2 text-[11px] font-mono text-stone-400">
+              <span>{photo.photographer || "Tim Liputan GentaNusa"}</span>
+              {photo.timestamp && (
+                <>
+                  <span aria-hidden="true">&bull;</span>
+                  <span>{photo.timestamp}</span>
+                </>
+              )}
+            </div>
           </div>
         )}
       </div>

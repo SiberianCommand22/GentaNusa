@@ -119,8 +119,8 @@ type UploadEntry = { file: File; photo: PhotoItem; orderIndex: number };
 // Batas dipakai bersama oleh sisi klien dan API (`MAX_FILES` di route).
 const MAX_UPLOAD_FILES = 30;
 // Ukuran kiriman per request; menjaga beban payload tetap di dalam batas
-// hosting sekaligus memberi progres per langkah.
-const UPLOAD_CHUNK_SIZE = 10;
+// hosting (limit body ±4.5 MB) sekaligus memberi progres per langkah.
+const UPLOAD_CHUNK_SIZE = 3;
 
 function summarizeFailures(failures: string[]): string {
   const unique = Array.from(new Set(failures));
@@ -207,7 +207,6 @@ export default function AdminPeduliPage() {
   
   const [childrenCount, setChildrenCount] = useState<number | string>(30);
   const [volunteersCount, setVolunteersCount] = useState<number | string>(22);
-  const [packagesDistributed, setPackagesDistributed] = useState<number | string>(30);
 
   const [legalNumber, setLegalNumber] = useState('AHU-0012485.AH.01.04.Tahun 2020');
   const [headName, setHeadName] = useState('Pengelola Yayasan Ar-Rakha Gladys Makaluas (Yardysma RYP-MJ)');
@@ -231,7 +230,6 @@ export default function AdminPeduliPage() {
     setSummary(event.summary || '');
     setChildrenCount(event.children_count ?? 30);
     setVolunteersCount(event.volunteers_count ?? 22);
-    setPackagesDistributed(event.packages_distributed ?? 30);
     setLegalNumber(event.legal_number || '');
     setHeadName(event.head_name || '');
     setPhone(event.phone || '');
@@ -371,7 +369,6 @@ export default function AdminPeduliPage() {
         summary,
         children_count: Number(childrenCount) || 0,
         volunteers_count: Number(volunteersCount) || 0,
-        packages_distributed: Number(packagesDistributed) || 0,
         legal_number: legalNumber,
         head_name: headName,
         phone,
@@ -604,9 +601,9 @@ export default function AdminPeduliPage() {
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-4 pt-2">
+            <div className="grid grid-cols-2 gap-4 pt-2">
               <div>
-                <label className="block text-xs text-slate-400 mb-1 font-medium">Anak Asuh</label>
+                <label className="block text-xs text-slate-400 mb-1 font-medium">Anak Asuh (Jiwa Dirangkul)</label>
                 <input
                   type="number"
                   value={childrenCount}
@@ -615,20 +612,11 @@ export default function AdminPeduliPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1 font-medium">Relawan Hadir</label>
+                <label className="block text-xs text-slate-400 mb-1 font-medium">Relawan Hadir (Kawan Lapangan)</label>
                 <input
                   type="number"
                   value={volunteersCount}
                   onChange={(e) => setVolunteersCount(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-slate-400 mb-1 font-medium">Paket Bantuan</label>
-                <input
-                  type="number"
-                  value={packagesDistributed}
-                  onChange={(e) => setPackagesDistributed(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white"
                 />
               </div>

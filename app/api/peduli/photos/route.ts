@@ -111,7 +111,8 @@ function revalidatePublicPaths() {
 
 export async function POST(req: NextRequest) {
   try {
-    const limited = rateLimit(req, { bucket: "peduli-photos", limit: 20, windowMs: 60_000 });
+    // 40/menit: cukup untuk 30 foto dipecah jadi 10 chunk (3 file/chunk) oleh admin.
+    const limited = rateLimit(req, { bucket: "peduli-photos", limit: 40, windowMs: 60_000 });
     if (!limited.ok) return limited.response;
 
     const session = await getEditorialSession();
