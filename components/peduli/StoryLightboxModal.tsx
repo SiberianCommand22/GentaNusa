@@ -54,13 +54,17 @@ export function StoryLightboxModal({ photos, currentIndex, onClose, onNavigate }
         &rsaquo;
       </button>
       <div
-        className="relative max-w-3xl w-full bg-white border border-stone-200/80 p-4 pb-12 shadow-2xl"
+        className="relative max-w-3xl w-full bg-white border border-stone-200/80 p-3 pb-6 md:p-4 md:pb-12 shadow-2xl flex flex-col md:flex-row md:items-start"
         style={{ transform: "rotate(-1deg)" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={photo.src} alt={photo.alt || ""} className="w-full h-auto max-h-[70vh] object-contain bg-stone-100" />
+        <img
+          src={photo.src}
+          alt={photo.alt || ""}
+          className="w-full max-h-[45vh] md:max-h-[70vh] md:w-1/2 object-contain bg-stone-100 shrink-0"
+        />
         {(photo.story_title || photo.handwritten_note || photo.caption || photo.photographer) && (
-          <div className="mt-4 text-center px-2">
+          <div className="mt-4 md:mt-0 md:ml-5 md:flex-1 md:overflow-y-auto text-center px-2 max-h-[40vh] overflow-y-auto md:max-h-none">
             {photo.story_title && (
               <h3 className="font-editorial text-lg font-semibold text-slate-900 mb-2">
                 {photo.story_title}

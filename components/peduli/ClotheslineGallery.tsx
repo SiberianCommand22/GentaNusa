@@ -44,7 +44,7 @@ function FieldMemo({
   return (
     <div
       aria-hidden="true"
-      className={`shrink-0 w-60 p-4 snap-center self-start shadow-md rounded-xs ${className}`}
+      className={`shrink-0 w-52 sm:w-60 p-4 snap-center self-start shadow-md rounded-xs ${className}`}
     >
       <p className="font-hand text-sm font-bold uppercase tracking-wide text-stone-500">
         {label}
@@ -212,7 +212,7 @@ export function ClotheslineGallery({ photos, onSelectPhoto }: Props) {
         type="button"
         onClick={() => handleCardClick(photo, idx)}
         style={{ "--rot": `${rot}deg` } as CSSProperties}
-        className="group shrink-0 w-64 sm:w-72 bg-white p-3.5 pb-6 rounded-sm border border-stone-200/90 shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:shadow-[0_20px_35px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-4 hover:scale-105 hover:rotate-0 hover:shadow-2xl hover:z-30 cursor-pointer snap-center relative rotate-[var(--rot)]"
+        className="group shrink-0 w-52 sm:w-72 bg-white p-3 pb-5 sm:p-3.5 sm:pb-6 rounded-sm border border-stone-200/90 shadow-[0_12px_28px_rgba(0,0,0,0.07)] hover:shadow-[0_20px_35px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-4 hover:scale-105 hover:rotate-0 hover:shadow-2xl hover:z-30 cursor-pointer snap-center relative rotate-[var(--rot)]"
       >
         {/* Jepitan Kayu Pinus */}
         <span
@@ -288,7 +288,7 @@ export function ClotheslineGallery({ photos, onSelectPhoto }: Props) {
   ));
 
   const arrowBtn =
-    "absolute top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-xl border border-stone-200 text-stone-700 hover:scale-110 active:scale-95 rounded-full p-3.5 backdrop-blur transition-all duration-200";
+    "hidden sm:flex items-center justify-center absolute top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-xl border border-stone-200 text-stone-700 hover:scale-110 active:scale-95 rounded-full p-3.5 backdrop-blur transition-all duration-200";
 
   return (
     <div className="relative w-full pt-16 pb-16 group/jemuran">
@@ -351,6 +351,16 @@ export function ClotheslineGallery({ photos, onSelectPhoto }: Props) {
           onPointerMove={onPointerMove}
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
+          onTouchStart={() => {
+            // Jari menyentuh layar → jemuran berhenti agar tidak sulit dibaca.
+            pausedRef.current = true;
+          }}
+          onTouchEnd={() => {
+            if (!draggingRef.current) pausedRef.current = false;
+          }}
+          onTouchCancel={() => {
+            if (!draggingRef.current) pausedRef.current = false;
+          }}
         >
           {/* Dua salinan konten → wrap mulus saat offset modulo lebar salinan. */}
           <div

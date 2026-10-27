@@ -252,11 +252,11 @@ export function PeduliView({ initialEvents = [] }: PeduliViewProps) {
             </p>
           </div>
 
-          {/* Tab Filter Kategori */}
+          {/* Tab Filter Kategori — gulir horizontal di mobile */}
           <div
             role="tablist"
             aria-label="Filter kategori album"
-            className="flex flex-wrap items-center justify-center gap-2 mb-5"
+            className="flex overflow-x-auto no-scrollbar py-1 gap-2 mb-5 px-1 -mx-1"
           >
             {CATEGORIES.map((cat) => (
               <button
@@ -265,7 +265,7 @@ export function PeduliView({ initialEvents = [] }: PeduliViewProps) {
                 role="tab"
                 aria-selected={activeCategory === cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                className={`shrink-0 whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                   activeCategory === cat.id
                     ? "bg-sky-600 border-sky-600 text-white shadow-sm"
                     : "bg-white border-stone-200 text-stone-600 hover:border-sky-300 hover:text-sky-700"
@@ -281,7 +281,7 @@ export function PeduliView({ initialEvents = [] }: PeduliViewProps) {
               Belum ada foto di kategori ini~
             </p>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:auto-rows-[10rem]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:auto-rows-[10rem]">
               {filteredAlbum.map(({ photo, srcIndex }, tileIdx) => {
                 const src = photo.src || photo.image_url || photo.url || "";
                 const alt = photo.alt || photo.caption || "Dokumentasi kegiatan";
@@ -294,7 +294,7 @@ export function PeduliView({ initialEvents = [] }: PeduliViewProps) {
                       key={photo.id || srcIndex}
                       type="button"
                       onClick={() => openLightbox(photo, srcIndex)}
-                      className="group relative col-span-2 row-span-2 overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 shadow-sm hover:shadow-lg transition-all duration-300 min-h-[240px] md:min-h-0 text-left"
+                      className="group relative aspect-[4/3] sm:aspect-auto sm:col-span-2 sm:row-span-2 sm:min-h-0 overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 shadow-sm hover:shadow-lg transition-all duration-300 min-h-[240px] text-left"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -333,7 +333,7 @@ export function PeduliView({ initialEvents = [] }: PeduliViewProps) {
                     onClick={() => openLightbox(photo, srcIndex)}
                     className={`group relative overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 text-left ${
                       TILE_ASPECTS[(tileIdx - 1) % TILE_ASPECTS.length]
-                    } md:aspect-auto md:h-full`}
+                    } sm:aspect-auto sm:h-full`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
