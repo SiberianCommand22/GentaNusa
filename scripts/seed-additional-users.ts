@@ -42,7 +42,7 @@ const users: NewUser[] = [
   {
     name: "Ahmad Lu'luil",
     email: "ahmad.luluil@gentanusa.id",
-    password: "Genta#Luluil2026!",
+    password: "Genta#Ahmad2026!",
     slug: "ahmad-luluil",
   },
   {

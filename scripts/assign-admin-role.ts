@@ -40,6 +40,7 @@ const ALLOWED_ROLES = new Set([
   "redaktur",
   "kontributor",
   "contributor",
+  "koordinator",
 ]);
 
 const UUID_RE =

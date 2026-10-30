@@ -33,6 +33,8 @@ export const ADMIN_ROLES = new Set([
 // berita miliknya + mengunggah gambar — TANPA hak hapus / kelola user.
 // Daftar ini mencakup seluruh varian peran yang dipakai skema Supabase
 // proyek ini (app_metadata.role, case-insensitive via normRole).
+// Termasuk "koordinator" (Koordinator Redaksi) — boleh masuk /admin dan
+// melihat dasbor analitik (lihat canAccessAnalytics), tapi bukan admin.
 export const EDITORIAL_NON_ADMIN_ROLES = new Set([
   "editor",
   "author",
@@ -45,10 +47,23 @@ export const EDITORIAL_NON_ADMIN_ROLES = new Set([
   "redaktur",
   "kontributor",
   "contributor",
+  // Koordinator Redaksi: boleh masuk /admin (dashboard + analitik), tapi
+  // BUKAN admin — hanya melihat berita miliknya sendiri, tanpa hapus/ semua.
+  "koordinator",
 ]);
 
 // Role berhak masuk area /admin (admin + seluruh varian redaksi).
 export const EDITORIAL_ROLES = new Set([...ADMIN_ROLES, ...EDITORIAL_NON_ADMIN_ROLES]);
+
+// Role Koordinator Redaksi: boleh melihat dasbor analitik & monitoring
+// redaksi (/admin/analitik-redaksi), TANPA hak hapus / kelola semua berita.
+// Beda dari redaktur/editor biasa yang hanya melihat berita miliknya sendiri
+// di dashboard utama. (Sudah termasuk di EDITORIAL_NON_ADMIN_ROLES agar
+// canAccessAdminArea / proxy / layout ikut mengizinkan masuk /admin.)
+export const COORDINATOR_ROLES = new Set(["koordinator"]);
+
+// Seluruh role yang boleh membuka dasbor analitik redaksi (admin + koordinator).
+export const ANALYTICS_ROLES = new Set([...ADMIN_ROLES, ...COORDINATOR_ROLES]);
 
 function normRole(role: unknown): string {
   return String(role ?? "").trim().toLowerCase();
@@ -92,5 +107,21 @@ export function isAdminIdentity(input: {
  */
 export function canAccessAdminArea(role: unknown, email: unknown): boolean {
   if (EDITORIAL_ROLES.has(normRole(role))) return true;
+  return isMasterEmail(email);
+}
+
+/**
+ * Gerbang dasbor analitik & monitoring redaksi (/admin/analitik-redaksi).
+ *
+ * Terbuka untuk Administrator (admin + varian) DAN Koordinator Redaksi
+ * (app_metadata.role = "koordinator"). Email master terverifikasi juga
+ * diizinkan. Redaktur/editor biasa TIDAK lolos — mereka hanya melihat
+ * berita miliknya sendiri di dashboard utama.
+ *
+ * `role` WAJIB berasal dari `app_metadata` (ditulis backend via Service
+ * Role). Nilai dari `user_metadata` TIDAK BOLEH diteruskan ke sini.
+ */
+export function canAccessAnalytics(role: unknown, email: unknown): boolean {
+  if (ANALYTICS_ROLES.has(normRole(role))) return true;
   return isMasterEmail(email);
 }
