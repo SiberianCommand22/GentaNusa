@@ -21,6 +21,15 @@ export const MASTER_ADMIN_EMAIL = (
   .trim()
   .toLowerCase();
 
+// Email Koordinator Redaksi (Ahmad Lu'luil). Dapat dioverride lewat env
+// untuk staging/offline. Dipakai sebagai jalur KEDUA (setelah
+// app_metadata.role = "koordinator") untuk membuka dasbor analitik redaksi.
+export const COORDINATOR_EMAIL = (
+  process.env.COORDINATOR_EMAIL || "ahmad.luluil@gentanusa.id"
+)
+  .trim()
+  .toLowerCase();
+
 // Role berhak administrator penuh (lihat semua + hapus berita).
 export const ADMIN_ROLES = new Set([
   "admin",
@@ -78,6 +87,16 @@ export function isMasterEmail(email: unknown): boolean {
   return e.length > 0 && e === MASTER_ADMIN_EMAIL;
 }
 
+/**
+ * Kecocokan email Koordinator Redaksi. Hanya dipanggil dengan email yang
+ * sudah TERVERIFIKASI di sisi server (lihat canAccessAnalytics), sehingga
+ * pengguna tidak bisa mengklaim hak ini lewat user_metadata / email mentah.
+ */
+export function isCoordinatorEmail(email: unknown): boolean {
+  const e = normEmail(email);
+  return e.length > 0 && e === COORDINATOR_EMAIL;
+}
+
 // Nama cookie sesi — string murni agar bisa dipakai middleware Edge tanpa
 // mengimpor lib/auth.ts (yang bergantung pada `next/headers`).
 export const ADMIN_FLAG_COOKIE = "genta_admin";
@@ -123,5 +142,7 @@ export function canAccessAdminArea(role: unknown, email: unknown): boolean {
  */
 export function canAccessAnalytics(role: unknown, email: unknown): boolean {
   if (ANALYTICS_ROLES.has(normRole(role))) return true;
-  return isMasterEmail(email);
+  // Jalur email: Administrator Utama + Koordinator Redaksi (wajib
+  // TERVERIFIKASI - pemanggil hanya mengirim email bila verified).
+  return isMasterEmail(email) || isCoordinatorEmail(email);
 }

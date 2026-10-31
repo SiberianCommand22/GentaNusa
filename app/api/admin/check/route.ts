@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getEditorialSession } from "@/lib/auth";
-import { canAccessAdminArea } from "@/lib/roles";
+import { canAccessAdminArea, canAccessAnalytics } from "@/lib/roles";
 
 // Kunci runtime Node.js Serverless (kuota 50 MB) — JANGAN pakai Edge.
 export const runtime = 'nodejs';
@@ -39,5 +39,11 @@ export async function GET() {
     role: session.role,
     display_name: session.fullName,
     author_slug: session.authorSlug,
+    // Dipakai sidebar untuk menampilkan/menyembunyikan menu Analitik Redaksi
+    // (hanya admin + koordinator). Nilai dari app_metadata, bukan user_metadata.
+    can_analytics: canAccessAnalytics(
+      session.appRole,
+      session.emailVerified ? session.email : null
+    ),
   });
 }

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { 
   Upload, Trash2, HeartHandshake, Save, 
   AlertCircle, CheckCircle2, RefreshCw, Edit2
@@ -190,6 +191,7 @@ function revokeBlob(item: PhotoItem | undefined) {
 }
 
 export default function AdminPeduliPage() {
+  const [access, setAccess] = useState<'checking' | 'granted' | 'denied'>('checking');
   const [events, setEvents] = useState<EventRow[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -265,8 +267,26 @@ export default function AdminPeduliPage() {
 
   useEffect(() => {
     // Tunda satu tick agar tidak memanggil setState secara sinkron di dalam
-    // effect (larangan react-hooks: set-state-in-effect).
-    const timer = setTimeout(fetchEvents, 0);
+    // effect (larangan react-hooks: set-state-in-effect). Verifikasi peran
+    // admin dulu; hanya Administrator yang boleh memuat & mengelola Peduli.
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/admin/check');
+        const j: unknown = await res.json().catch(() => null);
+        const ok =
+          res.ok &&
+          typeof j === 'object' && j !== null &&
+          (j as { is_admin?: boolean }).is_admin === true;
+        if (!ok) {
+          setAccess('denied');
+          return;
+        }
+        setAccess('granted');
+        await fetchEvents();
+      } catch {
+        setAccess('denied');
+      }
+    }, 0);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -454,10 +474,44 @@ export default function AdminPeduliPage() {
     }
   };
 
+  if (access === 'checking') {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 flex items-center justify-center">
+        <div className="flex items-center gap-3 text-slate-400 text-sm">
+          <RefreshCw className="w-4 h-4 animate-spin" />
+          <span>Memeriksa sesi administrator...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (access === 'denied') {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
+        <div className="max-w-md mx-auto mt-16 bg-rose-950/40 border border-rose-500/40 rounded-2xl p-8 text-center space-y-4">
+          <AlertCircle className="w-12 h-12 text-rose-400 mx-auto" />
+          <h1 className="text-xl font-bold text-white tracking-tight">
+            Akses Ditolak
+          </h1>
+          <p className="text-sm text-slate-400 leading-relaxed">
+            Halaman Peduli khusus Administrator Utama. Anda masuk sebagai
+            redaksi non-admin, sehingga tidak dapat mengelola kanal Peduli.
+          </p>
+          <Link
+            href="/admin"
+            className="inline-block px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition"
+          >
+            Kembali ke Dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
-        
+
         {/* Header Bar */}
         <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-800 gap-4">
           <div>

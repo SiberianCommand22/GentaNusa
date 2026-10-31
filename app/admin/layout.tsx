@@ -43,6 +43,20 @@ const NAV = [
   { href: "/admin/settings", label: "Pengaturan", icon: SETTINGS, exact: true },
 ];
 
+// Visibilitas menu per peran. Peduli = hanya Administrator (is_admin).
+// Analitik Redaksi = Administrator + Koordinator (can_analytics, dari
+// app_metadata — bukan user_metadata). Menu lain terbuka untuk seluruh
+// sesi redaksi yang lolos gerbang /admin.
+function canSeeItem(
+  item: { href: string },
+  profile: Profile | null
+): boolean {
+  if (item.href === "/admin/peduli") return profile?.is_admin === true;
+  if (item.href === "/admin/analitik-redaksi")
+    return profile?.can_analytics === true;
+  return true;
+}
+
 const TITLES: Array<[string, string]> = [
   ["/admin/posts/new", "Tulis Berita"],
   ["/admin/posts/edit", "Edit Berita"],
@@ -60,7 +74,12 @@ const TITLES: Array<[string, string]> = [
 // pengunjung ke sana lewat pengalihan.
 const LOGIN_PATH = "/admin/login/gentanusa";
 
-type Profile = { display_name?: string | null; role?: string | null; is_admin?: boolean };
+type Profile = {
+  display_name?: string | null;
+  role?: string | null;
+  is_admin?: boolean;
+  can_analytics?: boolean;
+};
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -120,7 +139,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <BrandLogo theme="dark" size="md" href="/admin" />
           </div>
           <nav className={styles.nav}>
-            {NAV.map((item) => {
+            {NAV.filter((item) => canSeeItem(item, profile)).map((item) => {
               const active = item.exact ? pathname === item.href : pathname?.startsWith(item.href);
               // Halaman editor memuat chunk CSS/JS berat (rich-text) — jangan
               // prefetch saat sidebar tampil agar tak ada preload mubazir.
